@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Postulación - FIAT Venezuela</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      overflow: hidden;
+    }
+    .postulacion-page {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .postulacion-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .postulacion-header img {
+      max-width: 100px;
+      height: auto;
+      margin-bottom: 12px;
+      filter: brightness(0);
+    }
+    .postulacion-header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      letter-spacing: -0.5px;
+    }
+    .postulacion-header p {
+      font-size: 12px;
+      opacity: 0.85;
+    }
+    .postulacion-form {
+      width: 100%;
+      max-width: 720px;
+    }
+    .form-group {
+      margin-bottom: 10px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+      opacity: 0.9;
+    }
+    .form-group label .required {
+      color: inherit;
+    }
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: none;
+      background: #ffffff;
+      color: #1a1a1a;
+      font-size: 14px;
+      font-family: inherit;
+      transition: background 0.2s;
+    }
+    .form-input::placeholder, .form-textarea::placeholder {
+      color: #999;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      background: #f5f5f5;
+    }
+    .form-select option {
+      background: #fff;
+      color: #1a1a1a;
+    }
+    .form-textarea {
+      resize: vertical;
+      min-height: 50px;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 12px 24px;
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      margin-top: 6px;
+    }
+    .btn-submit:hover {
+      opacity: 0.9;
+    }
+    .btn-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .success-message {
+      display: none;
+      text-align: center;
+      max-width: 720px;
+    }
+    .success-message .checkmark {
+      width: 56px;
+      height: 56px;
+      background: rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      color: inherit;
+      font-size: 28px;
+    }
+    .success-message h3 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .success-message p {
+      font-size: 13px;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+    .error-message {
+      display: none;
+      background: rgba(220, 38, 38, 0.9);
+      color: #fff;
+      padding: 10px 14px;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+    .form-footer {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 11px;
+      opacity: 0.7;
+    }
+    .form-footer a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid currentColor;
+      opacity: 0.7;
+    }
+    .form-footer a:hover {
+      opacity: 1;
+    }
+    @media (max-width: 480px) {
+      .form-row { grid-template-columns: 1fr; }
+      .postulacion-header h1 { font-size: 20px; }
+      .postulacion-page { padding: 30px 16px; }
+    }
+    @media (min-width: 768px) {
+      .form-row-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 12px;
+      }
+      .form-row-3 .form-group {
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="postulacion-page">
+    <div class="postulacion-header">
+      <img src="icons/logo FIAT.webp" alt="FIAT Venezuela">
+      <h1>Únete a nuestro equipo</h1>
+      <p>Completa el formulario para postular a nuestras vacantes</p>
+    </div>
+
+    <div id="formContainer" class="postulacion-form">
+      <div class="error-message" id="errorMsg"></div>
+      <form id="postulacionForm">
+        <div class="form-row form-row-3">
+          <div class="form-group">
+            <label>Cédula <span class="required">*</span></label>
+            <input type="text" class="form-input" id="cedula" placeholder="V12345678" required maxlength="12">
+          </div>
+          <div class="form-group">
+            <label>Nombres <span class="required">*</span></label>
+            <input type="text" class="form-input" id="nombres" required>
+          </div>
+          <div class="form-group">
+            <label>Apellidos <span class="required">*</span></label>
+            <input type="text" class="form-input" id="apellidos" required>
+          </div>
+        </div>
+        <div class="form-row form-row-3">
+          <div class="form-group">
+            <label>Correo electrónico <span class="required">*</span></label>
+            <input type="email" class="form-input" id="correo" required>
+          </div>
+          <div class="form-group">
+            <label>Teléfono <span class="required">*</span></label>
+            <input type="tel" class="form-input" id="telefono" placeholder="04141234567" required maxlength="11">
+          </div>
+          <div class="form-group">
+            <label>Dirección</label>
+            <input type="text" class="form-input" id="direccion" placeholder="Dirección de residencia">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Cargo de interés <span class="required">*</span></label>
+          <input type="text" class="form-input" id="cargo_interes" placeholder="Ej: Analista de sistemas" required>
+        </div>
+        <div class="form-group">
+          <label>Notas adicionales</label>
+          <textarea class="form-textarea" id="notas" placeholder="Experiencia, formación, disponibilidad..."></textarea>
+        </div>
+        <button type="submit" class="btn-submit" id="submitBtn">Enviar postulación</button>
+      </form>
+    </div>
+
+    <div class="success-message" id="successContainer">
+      <div class="checkmark">✓</div>
+      <h3>¡Postulación enviada!</h3>
+      <p>Hemos recibido tu postulación correctamente. Nuestro equipo de selección revisará tu perfil y te contactará si tu perfil coincide con nuestras vacantes.</p>
+    </div>
+
+    <div class="form-footer">
+      <a href="index.html">Acceso empleados</a>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script>
+    // Colores aleatorios para el fondo
+    var colores = ['#ea587c', '#fce750', '#36c6fb', '#a4c30d'];
+
+    function colorAleatorio() {
+      var color = colores[Math.floor(Math.random() * colores.length)];
+      document.body.style.backgroundColor = color;
+      
+      // Calcular brillo del color
+      var hex = color.replace('#', '');
+      var r = parseInt(hex.substr(0, 2), 16);
+      var g = parseInt(hex.substr(2, 2), 16);
+      var b = parseInt(hex.substr(4, 2), 16);
+      var brillo = (r * 299 + g * 587 + b * 114) / 1000;
+      
+      // Ajustar color del texto según el brillo
+      if (brillo > 128) {
+        document.body.style.color = '#1a1a1a';
+      } else {
+        document.body.style.color = '#ffffff';
+      }
+    }
+
+    colorAleatorio();
+
+    function validarCedulaVE(v) {
+      return /^[VE]\d{4,10}$/.test(v.toUpperCase());
+    }
+
+    function validarTelefonoVE(v) {
+      return /^0(212|4(12|14|16|24|26))\d{7}$/.test(v.replace(/\D/g, ''));
+    }
+
+    function showError(msg) {
+      var el = document.getElementById('errorMsg');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function hideError() {
+      document.getElementById('errorMsg').style.display = 'none';
+    }
+
+    document.getElementById('cedula').addEventListener('input', function() {
+      this.value = this.value.toUpperCase();
+    });
+
+    document.getElementById('nombres').addEventListener('input', function() {
+      this.value = this.value.toUpperCase();
+    });
+
+    document.getElementById('apellidos').addEventListener('input', function() {
+      this.value = this.value.toUpperCase();
+    });
+
+    document.getElementById('correo').addEventListener('input', function() {
+      this.value = this.value.toUpperCase();
+    });
+
+    document.getElementById('telefono').addEventListener('input', function() {
+      this.value = this.value.toUpperCase();
+    });
+
+    document.getElementById('cargo_interes').addEventListener('input', function() {
+      this.value = this.value.toUpperCase();
+    });
+
+    document.getElementById('direccion').addEventListener('input', function() {
+      this.value = this.value.toUpperCase();
+    });
+
+    document.getElementById('notas').addEventListener('input', function() {
+      this.value = this.value.toUpperCase();
+    });
+
+    document.getElementById('postulacionForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      hideError();
+
+      var cedula = document.getElementById('cedula').value.trim();
+      var nombres = document.getElementById('nombres').value.trim();
+      var apellidos = document.getElementById('apellidos').value.trim();
+      var correo = document.getElementById('correo').value.trim();
+      var telefono = document.getElementById('telefono').value.trim();
+      var direccion = document.getElementById('direccion').value.trim();
+      var cargo = document.getElementById('cargo_interes').value.trim();
+      var notas = document.getElementById('notas').value.trim();
+
+      if (!validarCedulaVE(cedula)) {
+        showError('La cédula debe iniciar con V o E seguida de 4 a 10 dígitos. Ej: V12345678');
+        return;
+      }
+
+      if (!validarTelefonoVE(telefono)) {
+        showError('El teléfono debe ser un número válido de Venezuela. Ej: 04141234567');
+        return;
+      }
+
+      var submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enviando...';
+
+      try {
+        var { data: existente, error: errCheck } = await supabaseClient
+          .from('ats_candidatos')
+          .select('id')
+          .eq('cedula', cedula)
+          .limit(1);
+
+        if (errCheck) throw errCheck;
+
+        if (existente && existente.length > 0) {
+          showError('Ya existe una postulación con esta cédula. Si ya te postulaste anteriormente, espera a que nuestro equipo te contacte.');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Enviar postulación';
+          return;
+        }
+
+        var { error: errInsert } = await supabaseClient
+          .from('ats_candidatos')
+          .insert([{
+            cedula: cedula,
+            nombres: nombres,
+            apellidos: apellidos,
+            correo: correo,
+            telefono: telefono,
+            direccion: direccion,
+            cargo_interes: cargo,
+            notas: notas,
+            estado_kanban: 'Nuevo'
+          }]);
+
+        if (errInsert) throw errInsert;
+
+        document.getElementById('formContainer').style.display = 'none';
+        document.getElementById('successContainer').style.display = 'block';
+      } catch (err) {
+        showError('Error al enviar postulación: ' + err.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Enviar postulación';
+      }
+    });
+  </script>
+</body>
+</html>

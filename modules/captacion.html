@@ -27,6 +27,7 @@
         <option value="bienestar-social.html">Bienestar Social</option>
         <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
         <option value="compensacion.html">Compensación</option>
+        <option value="repositorio.html">Repositorio</option>
       </select>
       <div class="nav-user">
         <span id="navUserEmail"></span>
@@ -76,7 +77,6 @@
               <div style="display:flex;align-items:center;gap:8px;">
                 <button class="btn btn-captacion btn-sm" onclick="openModalUnidad()">+ Nueva unidad</button>
                 <button class="btn btn-outline" onclick="openModalCargo()">+ Nuevo cargo</button>
-                <button class="btn btn-outline" onclick="exportarOrganigrama()">Exportar organigrama</button>
               </div>
             </div>
             <div class="toolbar-content" data-toolbar="plantilla" style="display:none;align-items:center;gap:16px;width:100%;">
@@ -442,12 +442,12 @@
   </div>
 
   <div class="modal-overlay" id="modalCargo">
-    <div class="modal" style="max-width:700px;max-height:90vh;">
+    <div class="modal" style="max-width:700px;">
       <div class="modal-header">
         <h3 id="modalCargoTitle">Nuevo cargo</h3>
         <button class="modal-close" onclick="closeModalCargo()">&times;</button>
       </div>
-      <div class="modal-body" style="max-height:calc(90vh - 120px);overflow-y:auto;">
+      <div class="modal-body" style="max-height:calc(90vh - 140px);overflow-y:auto;">
         <form id="cargoForm">
           <div style="background:#f8f9fa;padding:12px;border-radius:6px;margin-bottom:16px;">
             <strong style="color:var(--module-captacion);">Datos Básicos</strong>
@@ -468,7 +468,7 @@
           </div>
           <div class="form-group">
             <label>Vacantes</label>
-            <input type="number" class="form-input" id="cargo_vacantes" min="0" value="0">
+            <input type="number" class="form-input" id="cargo_vacantes" min="0" value="1">
           </div>
 
           <div style="background:#f8f9fa;padding:12px;border-radius:6px;margin:16px 0;">
@@ -1249,17 +1249,18 @@
       return c ? c.titulo : '-';
     }
 
-    function unidadCard(u, nivel, hasChildren) {
+    function unidadCard(u, nivel, hasChildren, totalCargos) {
       var toggle = hasChildren ? '<span class="org-toggle">▶</span>' : '';
       var cls = 'org-card org-card-tree org-card-' + (u.tipo === 'DIRECCION' ? 'direccion' : u.tipo === 'GERENCIA' ? 'gerencia' : 'departamento') + ' org-card-lvl-' + nivel;
       if (hasChildren) cls += ' org-card-has-children';
       var click = hasChildren ? ' onclick="toggleOrgChildren(this)"' : '';
       var sub = u.tipo === 'DIRECCION' ? 'DIRECCIÓN' : u.tipo === 'GERENCIA' ? 'GERENCIA' : 'DEPARTAMENTO';
+      var badgeCargos = totalCargos > 0 ? ' <span class="org-cargo-vac">(' + totalCargos + ' cargo' + (totalCargos > 1 ? 's' : '') + ')</span>' : '';
       return '<div class="' + cls + '"' + click + '>'
         + toggle
         + '<div class="org-card-body">'
         + '<div class="org-card-sub">' + sub + '</div>'
-        + '<div class="org-card-title">' + u.nombre + '</div>'
+        + '<div class="org-card-title">' + u.nombre + badgeCargos + '</div>'
         + '</div>'
         + '<div class="org-card-actions">'
         + '<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();editarUnidad(\'' + u.id + '\')">Editar</button>'
@@ -1299,7 +1300,8 @@
         match = true;
       }
       if (!match) return '';
-      html += unidadCard(u, nivel, hijos.length > 0 || cargosU.length > 0);
+      var totalCargos = countCargosRecursivo(u.id, allUnidades, allCargos);
+      html += unidadCard(u, nivel, hijos.length > 0 || cargosU.length > 0, totalCargos);
       if (hasChildren) {
         html += '<div class="org-children open">';
         cargosU.forEach(function(c) {
@@ -1445,6 +1447,14 @@
       var vacantes = parseInt(document.getElementById('cargo_vacantes').value) || 0;
       if (!titulo) { alert('Ingresa el título del cargo'); return; }
       if (!unidadId) { alert('Selecciona una unidad'); return; }
+      
+      // Bloquear botón y mostrar estado "Guardando..."
+      var btnGuardar = event.target;
+      var textoOriginal = btnGuardar.textContent;
+      btnGuardar.disabled = true;
+      btnGuardar.textContent = 'Guardando...';
+      btnGuardar.style.opacity = '0.7';
+      
       var data = {
         titulo: titulo, unidad_id: unidadId, jefe_inmediato_id: jefeId || null, vacantes: vacantes,
         ocupacion_fisica_sede: document.getElementById('cargo_sede').value.trim() || null,
@@ -1486,11 +1496,29 @@
             solAprobadaId = null;
           }
         }
+        
+        // Mostrar estado "✓ Guardado"
+        btnGuardar.textContent = '✓ Guardado';
+        btnGuardar.style.background = '#10b981';
+        
+        // Esperar un momento y cerrar modal
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
         await loadEstructura();
         closeModalCargo();
         loadRequisiciones();
         loadSolicitudes();
+        
+        // Restaurar botón
+        btnGuardar.disabled = false;
+        btnGuardar.textContent = textoOriginal;
+        btnGuardar.style.opacity = '1';
+        btnGuardar.style.background = '';
       } catch (err) {
+        // En caso de error, restaurar botón
+        btnGuardar.disabled = false;
+        btnGuardar.textContent = textoOriginal;
+        btnGuardar.style.opacity = '1';
         alert('Error: ' + err.message);
       }
     }
@@ -1541,6 +1569,7 @@
       try {
         var { error } = await supabaseClient.from('est_cargos').delete().eq('id', id);
         if (error) throw error;
+        closeModalCargo();
         await loadEstructura();
       } catch (err) {
         alert('Error: ' + err.message);
@@ -1568,6 +1597,15 @@
         + '</div>';
     }
 
+    function countCargosRecursivo(unidadId, unidades, cargos) {
+      var count = cargos.filter(function(c) { return c.unidad_id === unidadId; }).length;
+      var subUnidades = unidades.filter(function(u) { return u.unidad_padre_id === unidadId; });
+      subUnidades.forEach(function(sub) {
+        count += countCargosRecursivo(sub.id, unidades, cargos);
+      });
+      return count;
+    }
+
     function renderOrgLevel(items, tipo, nivel, cargos, unidades) {
       var html = '';
       items.forEach(function(item) {
@@ -1582,7 +1620,9 @@
         var subTipo = tipo === 'direccion' ? 'gerencia' : tipo === 'gerencia' ? 'departamento' : null;
         var subItems = subTipo ? unidades.filter(function(u) { return u.unidad_padre_id === item.id && u.tipo.toUpperCase() === subTipo.toUpperCase(); }) : [];
         var hasChildren = subItems.length > 0 || cargosItem.length > 0;
-        html += orgCard(tipo, nivel, item.nombre, sub, '', hasChildren);
+        var totalCargos = countCargosRecursivo(item.id, unidades, cargos);
+        var nombreConConteo = item.nombre + (totalCargos > 0 ? ' <span style="color:var(--module-captacion);font-size:12px;font-weight:400;">(' + totalCargos + ' cargo' + (totalCargos > 1 ? 's' : '') + ')</span>' : '');
+        html += orgCard(tipo, nivel, nombreConConteo, sub, '', hasChildren);
         if (hasChildren) {
           html += '<div class="org-children open">';
           cargosItem.forEach(function(c) {

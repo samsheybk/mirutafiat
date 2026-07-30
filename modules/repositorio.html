@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Repositorio - FIAT Intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+  <style>
+    .repo-toolbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .repo-view-toggle {
+      display: flex;
+      gap: 4px;
+      background: var(--color-bg);
+      padding: 4px;
+      border-radius: 6px;
+    }
+    .repo-view-btn {
+      padding: 6px 12px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 13px;
+      transition: all 0.15s;
+    }
+    .repo-view-btn.active {
+      background: var(--module-repositorio);
+      color: white;
+    }
+    .repo-filters {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .repo-filter-select {
+      padding: 6px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      background: white;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .repo-search {
+      flex: 1;
+      min-width: 200px;
+      padding: 8px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      font-size: 13px;
+    }
+    .repo-list-view {
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .repo-doc-item {
+      display: flex;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid var(--color-border);
+      transition: background 0.15s;
+      cursor: pointer;
+    }
+    .repo-doc-item:hover {
+      background: var(--color-bg);
+    }
+    .repo-doc-item:last-child {
+      border-bottom: none;
+    }
+    .repo-doc-icon {
+      font-size: 32px;
+      margin-right: 16px;
+      flex-shrink: 0;
+    }
+    .repo-doc-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .repo-doc-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .repo-doc-meta {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .repo-doc-actions {
+      display: flex;
+      gap: 8px;
+      margin-left: 16px;
+    }
+    .repo-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .repo-badge-version {
+      background: var(--module-repositorio);
+      color: white;
+    }
+    .repo-badge-protected {
+      background: #f59e0b;
+      color: white;
+    }
+    .repo-badge-vigencia {
+      background: #10b981;
+      color: white;
+    }
+    .repo-tree-view {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .repo-tree-category {
+      margin-bottom: 24px;
+    }
+    .repo-tree-category-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      padding: 8px;
+      background: var(--color-bg);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .repo-tree-subcategory {
+      margin-left: 24px;
+      margin-bottom: 16px;
+    }
+    .repo-tree-subcategory-header {
+      font-weight: 500;
+      margin-bottom: 8px;
+      padding: 6px 8px;
+      background: #f8f9fa;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .repo-tree-doc {
+      margin-left: 48px;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .repo-tree-doc:hover {
+      background: var(--color-bg);
+    }
+    .repo-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      background: var(--color-bg);
+      border-radius: 4px;
+      font-size: 11px;
+      margin-right: 4px;
+    }
+    .repo-tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 8px;
+    }
+    .repo-tag-input {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .repo-tag-input input {
+      flex: 1;
+      padding: 6px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    .repo-file-input {
+      border: 2px dashed var(--color-border);
+      padding: 24px;
+      text-align: center;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .repo-file-input:hover {
+      border-color: var(--module-repositorio);
+      background: #f8f9fa;
+    }
+    .repo-file-input.has-file {
+      border-color: #10b981;
+      background: #f0fdf4;
+    }
+    .repo-notification-badge {
+      position: relative;
+      display: inline-block;
+    }
+    .repo-notification-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #ef4444;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .repo-notification-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      width: 320px;
+      max-height: 400px;
+      overflow-y: auto;
+      background: white;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      z-index: 1000;
+      display: none;
+    }
+    .repo-notification-dropdown.show {
+      display: block;
+    }
+    .repo-notification-item {
+      padding: 12px;
+      border-bottom: 1px solid var(--color-border);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .repo-notification-item:hover {
+      background: var(--color-bg);
+    }
+    .repo-notification-item.unread {
+      background: #f0f9ff;
+    }
+    .repo-notification-item:last-child {
+      border-bottom: none;
+    }
+    .repo-preview-modal {
+      max-width: 90vw;
+      max-height: 90vh;
+      width: 800px;
+    }
+    .repo-preview-content {
+      width: 100%;
+      height: 70vh;
+      border: none;
+    }
+    .repo-category-card {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: 2px solid transparent;
+    }
+    .repo-category-card:hover {
+      border-color: var(--module-repositorio);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .repo-category-icon {
+      font-size: 32px;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+    }
+    .repo-category-info {
+      flex: 1;
+    }
+    .repo-category-name {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+    .repo-category-desc {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+    }
+    .repo-category-count {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--module-repositorio);
+    }
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--color-text-secondary);
+    }
+    .empty-state-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    .empty-state-text {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <nav class="topnav" style="background:var(--module-repositorio);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'">FIAT Venezuela<span>Intranet</span></div>
+      <div class="topnav-spacer"></div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Dashboard</option>
+        <option value="captacion.html">Captación y Selección</option>
+        <option value="relaciones-laborales.html">Relaciones Laborales</option>
+        <option value="capacitacion.html">Capacitación y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="compensacion.html">Compensación</option>
+        <option value="repositorio.html" selected>Repositorio</option>
+      </select>
+      <div class="nav-user">
+        <span id="navUserEmail"></span>
+        <div class="repo-notification-badge">
+          <button class="btn-nav-logout" id="notificationBtn" style="background:transparent;">🔔</button>
+          <span class="repo-notification-count" id="notificationCount" style="display:none;">0</span>
+          <div class="repo-notification-dropdown" id="notificationDropdown"></div>
+        </div>
+        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-panel">
+          <div class="panel-item active" data-tool="documentos" onclick="switchTool('documentos')" title="Documentos">
+            <span class="panel-item-indicator bg-repositorio"></span>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h14v13H3z"/><path d="M3 4l7 6 7-6"/></svg>
+          </div>
+          <div class="panel-item" data-tool="categorias" onclick="switchTool('categorias')" title="Categorías">
+            <span class="panel-item-indicator bg-repositorio"></span>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h6v6H3z"/><path d="M11 3h6v6h-6z"/><path d="M3 11h6v6H3z"/><path d="M11 11h6v6h-6z"/></svg>
+          </div>
+          <div class="panel-item" data-tool="subcategorias" onclick="switchTool('subcategorias')" title="Subcategorías">
+            <span class="panel-item-indicator bg-repositorio"></span>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h14v4H3z"/><path d="M5 7v10"/><path d="M10 7v10"/><path d="M15 7v10"/></svg>
+          </div>
+        </div>
+
+        <div class="module-body">
+          <header class="topbar">
+            <div><h1>Repositorio</h1><div class="topbar-breadcrumb">Inicio / Repositorio</div></div>
+          </header>
+
+          <div class="module-content">
+            <!-- Vista Documentos -->
+            <div class="tool-section active" id="tool-documentos">
+              <div class="tool-section-header">
+                <h2 style="color:var(--module-repositorio);">Documentos</h2>
+                <button class="btn btn-repositorio" onclick="openUploadModal()">+ Subir documento</button>
+              </div>
+              <div class="repo-toolbar">
+                <input type="text" class="repo-search" id="searchInput" placeholder="Buscar documentos..." oninput="filterDocuments()">
+                <div class="repo-filters">
+                  <select class="repo-filter-select" id="filterCategoria" onchange="filterDocuments()">
+                    <option value="">Todas las categorías</option>
+                  </select>
+                  <select class="repo-filter-select" id="filterSubcategoria" onchange="filterDocuments()">
+                    <option value="">Todas las subcategorías</option>
+                  </select>
+                </div>
+                <div class="repo-view-toggle">
+                  <button class="repo-view-btn active" onclick="switchView('list', this)">📋 Lista</button>
+                  <button class="repo-view-btn" onclick="switchView('tree', this)">📁 Carpetas</button>
+                </div>
+              </div>
+              <div id="documentsContainer"></div>
+            </div>
+
+            <!-- Vista Categorías -->
+            <div class="tool-section" id="tool-categorias">
+              <div class="tool-section-header">
+                <h2 style="color:var(--module-repositorio);">Categorías</h2>
+                <button class="btn btn-repositorio" onclick="openCategoryModal()">+ Nueva categoría</button>
+              </div>
+              <div id="categoriesContainer"></div>
+            </div>
+
+            <!-- Vista Subcategorías -->
+            <div class="tool-section" id="tool-subcategorias">
+              <div class="tool-section-header">
+                <h2 style="color:var(--module-repositorio);">Subcategorías</h2>
+                <button class="btn btn-repositorio" onclick="openSubcategoryModal()">+ Nueva subcategoría</button>
+              </div>
+              <div class="repo-toolbar" style="margin-bottom:16px;">
+                <select class="repo-filter-select" id="filterSubcatCategoria" onchange="loadSubcategorias()">
+                  <option value="">Selecciona una categoría</option>
+                </select>
+              </div>
+              <div id="subcategoriesContainer"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Subir Documento -->
+  <div class="modal-overlay" id="modalUpload">
+    <div class="modal" style="max-width:600px;">
+      <div class="modal-header"><h3 id="uploadModalTitle">Subir documento</h3><button class="modal-close" onclick="closeModal('modalUpload')">&times;</button></div>
+      <div class="modal-body">
+        <form id="uploadForm">
+          <div class="form-group"><label>Título *</label><input type="text" class="form-input" id="docTitulo" required></div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="docDescripcion" rows="3"></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Categoría *</label><select class="form-select" id="docCategoria" required onchange="updateSubcategoriasSelect()"></select></div>
+            <div class="form-group"><label>Subcategoría</label><select class="form-select" id="docSubcategoria"></select></div>
+          </div>
+          <div class="form-group">
+            <label>Archivo * (PDF, Word, Excel, PowerPoint - Máx 20MB)</label>
+            <div class="repo-file-input" id="fileInputContainer" onclick="document.getElementById('docArchivo').click()">
+              <input type="file" id="docArchivo" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" style="display:none;" onchange="handleFileSelect(this)">
+              <div id="fileInputText">📎 Haz clic para seleccionar un archivo</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Etiquetas</label>
+            <div class="repo-tag-input">
+              <input type="text" id="tagInput" placeholder="Agregar etiqueta y presionar Enter" onkeypress="handleTagInput(event)">
+              <button type="button" class="btn btn-outline" onclick="addTag()">Agregar</button>
+            </div>
+            <div class="repo-tags-container" id="tagsContainer"></div>
+          </div>
+          <div class="form-group"><label>Fecha de vigencia</label><input type="date" class="form-input" id="docFechaVigencia"></div>
+          <div class="form-group">
+            <label><input type="checkbox" id="docProtegido" onchange="togglePasswordFields()"> Proteger con contraseña</label>
+          </div>
+          <div id="passwordFields" style="display:none;">
+            <div class="form-group"><label>Contraseña *</label><input type="password" class="form-input" id="docPassword"></div>
+            <div class="form-group"><label>Confirmar contraseña *</label><input type="password" class="form-input" id="docPasswordConfirm"></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalUpload')">Cancelar</button>
+        <button class="btn btn-repositorio" onclick="saveDocument()">Subir</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Descargar Protegido -->
+  <div class="modal-overlay" id="modalPassword">
+    <div class="modal" style="max-width:400px;">
+      <div class="modal-header"><h3>Documento protegido</h3><button class="modal-close" onclick="closeModal('modalPassword')">&times;</button></div>
+      <div class="modal-body">
+        <p style="margin-bottom:16px;">Este documento está protegido con contraseña. Ingresa la contraseña para descargar.</p>
+        <div class="form-group"><label>Contraseña</label><input type="password" class="form-input" id="downloadPassword"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalPassword')">Cancelar</button>
+        <button class="btn btn-repositorio" onclick="verifyAndDownload()">Descargar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Vista Previa -->
+  <div class="modal-overlay" id="modalPreview">
+    <div class="modal repo-preview-modal">
+      <div class="modal-header"><h3 id="previewTitle">Vista previa</h3><button class="modal-close" onclick="closeModal('modalPreview')">&times;</button></div>
+      <div class="modal-body" id="previewBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalPreview')">Cerrar</button>
+        <button class="btn btn-repositorio" id="previewDownloadBtn">Descargar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Categoría -->
+  <div class="modal-overlay" id="modalCategory">
+    <div class="modal" style="max-width:500px;">
+      <div class="modal-header"><h3 id="categoryModalTitle">Nueva categoría</h3><button class="modal-close" onclick="closeModal('modalCategory')">&times;</button></div>
+      <div class="modal-body">
+        <form id="categoryForm">
+          <div class="form-group"><label>Nombre *</label><input type="text" class="form-input" id="catNombre" required></div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="catDescripcion" rows="3"></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Icono (emoji)</label><input type="text" class="form-input" id="catIcono" value="📁" maxlength="2"></div>
+            <div class="form-group"><label>Color</label><input type="color" class="form-input" id="catColor" value="#8b5cf6" style="height:44px;padding:4px;"></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalCategory')">Cancelar</button>
+        <button class="btn btn-repositorio" onclick="saveCategory()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Subcategoría -->
+  <div class="modal-overlay" id="modalSubcategory">
+    <div class="modal" style="max-width:500px;">
+      <div class="modal-header"><h3 id="subcategoryModalTitle">Nueva subcategoría</h3><button class="modal-close" onclick="closeModal('modalSubcategory')">&times;</button></div>
+      <div class="modal-body">
+        <form id="subcategoryForm">
+          <div class="form-group"><label>Categoría *</label><select class="form-select" id="subcatCategoria" required></select></div>
+          <div class="form-group"><label>Nombre *</label><input type="text" class="form-input" id="subcatNombre" required></div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="subcatDescripcion" rows="3"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalSubcategory')">Cancelar</button>
+        <button class="btn btn-repositorio" onclick="saveSubcategory()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/modules.js"></script>
+  <script>
+    // Variables globales
+    let categorias = [];
+    let subcategorias = [];
+    let documentos = [];
+    let tags = [];
+    let selectedFile = null;
+    let currentView = 'list';
+    let editingDocId = null;
+    let downloadingDocId = null;
+    let currentUser = null;
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', async () => {
+      currentUser = await getCurrentUser();
+      await loadCategorias();
+      await loadDocumentos();
+      await loadNotifications();
+    });
+
+    // ============================================
+    // CARGAR DATOS
+    // ============================================
+
+    async function loadCategorias() {
+      const { data, error } = await supabaseClient
+        .from('repo_categorias')
+        .select('*')
+        .order('nombre');
+      
+      if (error) {
+        console.error('Error cargando categorías:', error);
+        return;
+      }
+      
+      categorias = data || [];
+      updateCategoriaSelects();
+      renderCategorias();
+    }
+
+    async function loadSubcategorias() {
+      const categoriaId = document.getElementById('filterSubcatCategoria').value;
+      
+      if (!categoriaId) {
+        document.getElementById('subcategoriesContainer').innerHTML = '<div class="empty-state"><div class="empty-state-icon">📂</div><div class="empty-state-text">Selecciona una categoría para ver sus subcategorías</div></div>';
+        return;
+      }
+      
+      const { data, error } = await supabaseClient
+        .from('repo_subcategorias')
+        .select('*, repo_categorias(nombre)')
+        .eq('categoria_id', categoriaId)
+        .order('nombre');
+      
+      if (error) {
+        console.error('Error cargando subcategorías:', error);
+        return;
+      }
+      
+      subcategorias = data || [];
+      renderSubcategorias();
+    }
+
+    async function loadDocumentos() {
+      const { data, error } = await supabaseClient
+        .from('repo_documentos')
+        .select('*, repo_categorias(nombre, color), repo_subcategorias(nombre)')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error cargando documentos:', error);
+        return;
+      }
+      
+      documentos = data || [];
+      renderDocumentos();
+    }
+
+    async function loadNotifications() {
+      const { data, error } = await supabaseClient
+        .from('repo_notificaciones')
+        .select('*')
+        .eq('leido', false)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error cargando notificaciones:', error);
+        return;
+      }
+      
+      const count = data ? data.length : 0;
+      const countEl = document.getElementById('notificationCount');
+      const dropdown = document.getElementById('notificationDropdown');
+      
+      if (count > 0) {
+        countEl.textContent = count;
+        countEl.style.display = 'flex';
+        
+        dropdown.innerHTML = data.map(n => `
+          <div class="repo-notification-item unread" onclick="markAsRead(${n.id}, ${n.documento_id})">
+            <div style="font-weight:600;font-size:13px;margin-bottom:4px;">${n.tipo === 'nuevo_documento' ? '📄 Nuevo documento' : '🔄 Nueva versión'}</div>
+            <div style="font-size:12px;color:var(--color-text-secondary);">${n.mensaje}</div>
+            <div style="font-size:11px;color:var(--color-text-secondary);margin-top:4px;">${new Date(n.created_at).toLocaleString('es-VE')}</div>
+          </div>
+        `).join('');
+      } else {
+        countEl.style.display = 'none';
+        dropdown.innerHTML = '<div style="padding:20px;text-align:center;color:var(--color-text-secondary);">No hay notificaciones</div>';
+      }
+    }
+
+    // ============================================
+    // RENDERIZAR VISTAS
+    // ============================================
+
+    function renderDocumentos() {
+      const container = document.getElementById('documentsContainer');
+      const filtered = getFilteredDocuments();
+      
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📄</div><div class="empty-state-text">No hay documentos</div></div>';
+        return;
+      }
+      
+      if (currentView === 'list') {
+        container.innerHTML = `<div class="repo-list-view">${filtered.map(doc => renderDocItem(doc)).join('')}</div>`;
+      } else {
+        container.innerHTML = `<div class="repo-tree-view">${renderTreeView(filtered)}</div>`;
+      }
+    }
+
+    function renderDocItem(doc) {
+      const icon = getFileIcon(doc.archivo_tipo);
+      const size = formatFileSize(doc.archivo_tamano);
+      const date = new Date(doc.created_at).toLocaleDateString('es-VE');
+      const tags = doc.tags && doc.tags.length > 0 ? doc.tags.map(t => `<span class="repo-tag">${t}</span>`).join('') : '';
+      const protected = doc.password_hash ? '<span class="repo-badge repo-badge-protected">🔒 Protegido</span>' : '';
+      const vigencia = doc.fecha_vigencia ? `<span class="repo-badge repo-badge-vigencia">Vence: ${new Date(doc.fecha_vigencia).toLocaleDateString('es-VE')}</span>` : '';
+      
+      return `
+        <div class="repo-doc-item" onclick="previewDocument('${doc.id}')">
+          <div class="repo-doc-icon">${icon}</div>
+          <div class="repo-doc-info">
+            <div class="repo-doc-title">
+              ${doc.titulo}
+              <span class="repo-badge repo-badge-version">v${doc.version}</span>
+              ${protected}
+              ${vigencia}
+            </div>
+            <div class="repo-doc-meta">
+              <span>${doc.repo_categorias.nombre}</span>
+              ${doc.repo_subcategorias ? `<span>› ${doc.repo_subcategorias.nombre}</span>` : ''}
+              <span>•</span>
+              <span>${doc.archivo_nombre}</span>
+              <span>•</span>
+              <span>${size}</span>
+              <span>•</span>
+              <span>${date}</span>
+            </div>
+            ${tags ? `<div class="repo-tags-container">${tags}</div>` : ''}
+          </div>
+          <div class="repo-doc-actions" onclick="event.stopPropagation()">
+            <button class="btn btn-sm btn-outline" onclick="downloadDocument('${doc.id}')" title="Descargar">⬇</button>
+            <button class="btn btn-sm btn-outline" onclick="editDocument('${doc.id}')" title="Editar">✏️</button>
+            <button class="btn btn-sm btn-outline" onclick="deleteDocument('${doc.id}')" title="Eliminar">🗑️</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTreeView(docs) {
+      const grouped = {};
+      
+      docs.forEach(doc => {
+        const catId = doc.categoria_id;
+        if (!grouped[catId]) {
+          grouped[catId] = {
+            categoria: doc.repo_categorias,
+            subcategorias: {}
+          };
+        }
+        
+        const subcatId = doc.subcategoria_id || 'sin_subcategoria';
+        if (!grouped[catId].subcategorias[subcatId]) {
+          grouped[catId].subcategorias[subcatId] = {
+            nombre: doc.repo_subcategorias ? doc.repo_subcategorias.nombre : 'Sin subcategoría',
+            documentos: []
+          };
+        }
+        
+        grouped[catId].subcategorias[subcatId].documentos.push(doc);
+      });
+      
+      return Object.values(grouped).map(cat => `
+        <div class="repo-tree-category">
+          <div class="repo-tree-category-header" style="background:${cat.categoria.color}20;color:${cat.categoria.color};">
+            <span style="font-size:24px;">${cat.categoria.icono}</span>
+            <span>${cat.categoria.nombre}</span>
+            <span style="margin-left:auto;font-size:13px;">${Object.values(cat.subcategorias).reduce((sum, sub) => sum + sub.documentos.length, 0)} documentos</span>
+          </div>
+          ${Object.values(cat.subcategorias).map(sub => `
+            <div class="repo-tree-subcategory">
+              <div class="repo-tree-subcategory-header">${sub.nombre} (${sub.documentos.length})</div>
+              ${sub.documentos.map(doc => `
+                <div class="repo-tree-doc" onclick="previewDocument('${doc.id}')">
+                  <span>${getFileIcon(doc.archivo_tipo)}</span>
+                  <span style="flex:1;">${doc.titulo}</span>
+                  <span class="repo-badge repo-badge-version">v${doc.version}</span>
+                  ${doc.password_hash ? '<span style="color:#f59e0b;">🔒</span>' : ''}
+                </div>
+              `).join('')}
+            </div>
+          `).join('')}
+        </div>
+      `).join('');
+    }
+
+    function renderCategorias() {
+      const container = document.getElementById('categoriesContainer');
+      
+      if (categorias.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📁</div><div class="empty-state-text">No hay categorías</div></div>';
+        return;
+      }
+      
+      container.innerHTML = categorias.map(cat => {
+        const count = documentos.filter(d => d.categoria_id === cat.id).length;
+        return `
+          <div class="repo-category-card" onclick="editCategory('${cat.id}')">
+            <div class="repo-category-icon" style="background:${cat.color}20;color:${cat.color};">${cat.icono}</div>
+            <div class="repo-category-info">
+              <div class="repo-category-name">${cat.nombre}</div>
+              <div class="repo-category-desc">${cat.descripcion || 'Sin descripción'}</div>
+            </div>
+            <div class="repo-category-count">${count}</div>
+            <button class="btn btn-sm btn-outline" onclick="event.stopPropagation();deleteCategory('${cat.id}')" title="Eliminar">🗑️</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderSubcategorias() {
+      const container = document.getElementById('subcategoriesContainer');
+      
+      if (subcategorias.length === 0) {
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📂</div><div class="empty-state-text">No hay subcategorías</div></div>';
+        return;
+      }
+      
+      container.innerHTML = subcategorias.map(sub => {
+        const count = documentos.filter(d => d.subcategoria_id === sub.id).length;
+        return `
+          <div class="repo-category-card" onclick="editSubcategory('${sub.id}')">
+            <div class="repo-category-icon" style="background:var(--module-repositorio);color:white;">📂</div>
+            <div class="repo-category-info">
+              <div class="repo-category-name">${sub.nombre}</div>
+              <div class="repo-category-desc">${sub.descripcion || 'Sin descripción'}</div>
+            </div>
+            <div class="repo-category-count">${count}</div>
+            <button class="btn btn-sm btn-outline" onclick="event.stopPropagation();deleteSubcategory('${sub.id}')" title="Eliminar">🗑️</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ============================================
+    // FUNCIONES AUXILIARES
+    // ============================================
+
+    function getFileIcon(mimeType) {
+      if (mimeType.includes('pdf')) return '📄';
+      if (mimeType.includes('word') || mimeType.includes('document')) return '📝';
+      if (mimeType.includes('excel') || mimeType.includes('spreadsheet')) return '📊';
+      if (mimeType.includes('presentation') || mimeType.includes('powerpoint')) return '📽️';
+      return '📄';
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    function getFilteredDocuments() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const catId = document.getElementById('filterCategoria').value;
+      const subcatId = document.getElementById('filterSubcategoria').value;
+      
+      return documentos.filter(doc => {
+        const matchSearch = !search || 
+          doc.titulo.toLowerCase().includes(search) ||
+          (doc.descripcion && doc.descripcion.toLowerCase().includes(search)) ||
+          (doc.tags && doc.tags.some(t => t.toLowerCase().includes(search)));
+        
+        const matchCat = !catId || doc.categoria_id === catId;
+        const matchSubcat = !subcatId || doc.subcategoria_id === subcatId;
+        
+        return matchSearch && matchCat && matchSubcat;
+      });
+    }
+
+    function updateCategoriaSelects() {
+      const selects = ['filterCategoria', 'docCategoria', 'filterSubcatCategoria', 'subcatCategoria'];
+      
+      selects.forEach(selectId => {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        
+        const currentValue = select.value;
+        const firstOption = selectId === 'filterCategoria' || selectId === 'filterSubcatCategoria' 
+          ? '<option value="">Todas las categorías</option>'
+          : '<option value="">Selecciona una categoría</option>';
+        
+        select.innerHTML = firstOption + categorias.map(cat => 
+          `<option value="${cat.id}">${cat.icono} ${cat.nombre}</option>`
+        ).join('');
+        
+        if (currentValue) select.value = currentValue;
+      });
+    }
+
+    function updateSubcategoriasSelect() {
+      const catId = document.getElementById('docCategoria').value;
+      const select = document.getElementById('docSubcategoria');
+      
+      if (!catId) {
+        select.innerHTML = '<option value="">Selecciona una categoría primero</option>';
+        return;
+      }
+      
+      const subs = subcategorias.filter(s => s.categoria_id === catId);
+      select.innerHTML = '<option value="">Sin subcategoría</option>' + 
+        subs.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
+    }
+
+    // ============================================
+    // GESTIÓN DE DOCUMENTOS
+    // ============================================
+
+    function openUploadModal() {
+      editingDocId = null;
+      document.getElementById('uploadModalTitle').textContent = 'Subir documento';
+      document.getElementById('uploadForm').reset();
+      document.getElementById('tagsContainer').innerHTML = '';
+      document.getElementById('fileInputContainer').classList.remove('has-file');
+      document.getElementById('fileInputText').textContent = '📎 Haz clic para seleccionar un archivo';
+      document.getElementById('passwordFields').style.display = 'none';
+      tags = [];
+      selectedFile = null;
+      openModal('modalUpload');
+    }
+
+    function handleFileSelect(input) {
+      const file = input.files[0];
+      if (!file) return;
+      
+      if (file.size > 20 * 1024 * 1024) {
+        alert('El archivo no puede superar los 20MB');
+        input.value = '';
+        return;
+      }
+      
+      const validTypes = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'];
+      const ext = '.' + file.name.split('.').pop().toLowerCase();
+      
+      if (!validTypes.includes(ext)) {
+        alert('Tipo de archivo no permitido. Solo se aceptan PDF, Word, Excel y PowerPoint.');
+        input.value = '';
+        return;
+      }
+      
+      selectedFile = file;
+      document.getElementById('fileInputContainer').classList.add('has-file');
+      document.getElementById('fileInputText').textContent = `✅ ${file.name} (${formatFileSize(file.size)})`;
+    }
+
+    function handleTagInput(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        addTag();
+      }
+    }
+
+    function addTag() {
+      const input = document.getElementById('tagInput');
+      const tag = input.value.trim();
+      
+      if (tag && !tags.includes(tag)) {
+        tags.push(tag);
+        renderTags();
+      }
+      
+      input.value = '';
+    }
+
+    function removeTag(tag) {
+      tags = tags.filter(t => t !== tag);
+      renderTags();
+    }
+
+    function renderTags() {
+      document.getElementById('tagsContainer').innerHTML = tags.map(t => 
+        `<span class="repo-tag">${t} <span style="cursor:pointer;margin-left:4px;" onclick="removeTag('${t}')">×</span></span>`
+      ).join('');
+    }
+
+    function togglePasswordFields() {
+      const checked = document.getElementById('docProtegido').checked;
+      document.getElementById('passwordFields').style.display = checked ? 'block' : 'none';
+    }
+
+    async function saveDocument() {
+      const titulo = document.getElementById('docTitulo').value.trim();
+      const descripcion = document.getElementById('docDescripcion').value.trim();
+      const categoriaId = document.getElementById('docCategoria').value;
+      const subcategoriaId = document.getElementById('docSubcategoria').value || null;
+      const fechaVigencia = document.getElementById('docFechaVigencia').value || null;
+      const protegido = document.getElementById('docProtegido').checked;
+      
+      if (!titulo || !categoriaId) {
+        alert('Completa los campos obligatorios');
+        return;
+      }
+      
+      if (!selectedFile && !editingDocId) {
+        alert('Selecciona un archivo');
+        return;
+      }
+      
+      let passwordHash = null;
+      if (protegido) {
+        const password = document.getElementById('docPassword').value;
+        const confirm = document.getElementById('docPasswordConfirm').value;
+        
+        if (!password || password.length < 6) {
+          alert('La contraseña debe tener al menos 6 caracteres');
+          return;
+        }
+        
+        if (password !== confirm) {
+          alert('Las contraseñas no coinciden');
+          return;
+        }
+        
+        passwordHash = await bcrypt.hash(password, 10);
+      }
+      
+      try {
+        let archivoUrl = null;
+        let archivoNombre = null;
+        let archivoTipo = null;
+        let archivoTamano = null;
+        let version = 1;
+        
+        if (selectedFile) {
+          archivoNombre = selectedFile.name;
+          archivoTipo = selectedFile.type;
+          archivoTamano = selectedFile.size;
+          
+          const fileExt = archivoNombre.split('.').pop();
+          const fileName = `${crypto.randomUUID()}.${fileExt}`;
+          const filePath = `${categoriaId}/${subcategoriaId || 'general'}/${fileName}`;
+          
+          const { error: uploadError } = await supabaseClient.storage
+            .from('repositorio-documentos')
+            .upload(filePath, selectedFile);
+          
+          if (uploadError) throw uploadError;
+          
+          archivoUrl = filePath;
+        }
+        
+        if (editingDocId) {
+          const updateData = {
+            titulo,
+            descripcion,
+            categoria_id: categoriaId,
+            subcategoria_id: subcategoriaId,
+            tags: tags,
+            fecha_vigencia: fechaVigencia,
+            password_hash: passwordHash
+          };
+          
+          if (archivoUrl) {
+            const doc = documentos.find(d => d.id === editingDocId);
+            await supabaseClient.storage.from('repositorio-documentos').remove([doc.archivo_url]);
+            
+            updateData.archivo_url = archivoUrl;
+            updateData.archivo_nombre = archivoNombre;
+            updateData.archivo_tipo = archivoTipo;
+            updateData.archivo_tamano = archivoTamano;
+            updateData.version = doc.version + 1;
+          }
+          
+          const { error } = await supabaseClient
+            .from('repo_documentos')
+            .update(updateData)
+            .eq('id', editingDocId);
+          
+          if (error) throw error;
+          
+          await createNotification(editingDocId, 'nueva_version', `Se actualizó: ${titulo}`);
+        } else {
+          const { data, error } = await supabaseClient
+            .from('repo_documentos')
+            .insert([{
+              titulo,
+              descripcion,
+              categoria_id: categoriaId,
+              subcategoria_id: subcategoriaId,
+              archivo_url: archivoUrl,
+              archivo_nombre: archivoNombre,
+              archivo_tipo: archivoTipo,
+              archivo_tamano: archivoTamano,
+              version: version,
+              tags: tags,
+              fecha_vigencia: fechaVigencia,
+              password_hash: passwordHash,
+              subido_por: currentUser.id
+            }])
+            .select()
+            .single();
+          
+          if (error) throw error;
+          
+          await createNotification(data.id, 'nuevo_documento', `Nuevo documento: ${titulo}`);
+        }
+        
+        closeModal('modalUpload');
+        await loadDocumentos();
+        await loadNotifications();
+      } catch (error) {
+        console.error('Error guardando documento:', error);
+        alert('Error: ' + error.message);
+      }
+    }
+
+    async function editDocument(id) {
+      const doc = documentos.find(d => d.id === id);
+      if (!doc) return;
+      
+      editingDocId = id;
+      document.getElementById('uploadModalTitle').textContent = 'Actualizar documento';
+      document.getElementById('docTitulo').value = doc.titulo;
+      document.getElementById('docDescripcion').value = doc.descripcion || '';
+      document.getElementById('docCategoria').value = doc.categoria_id;
+      updateSubcategoriasSelect();
+      document.getElementById('docSubcategoria').value = doc.subcategoria_id || '';
+      document.getElementById('docFechaVigencia').value = doc.fecha_vigencia || '';
+      
+      tags = doc.tags || [];
+      renderTags();
+      
+      document.getElementById('fileInputContainer').classList.remove('has-file');
+      document.getElementById('fileInputText').textContent = `📄 Archivo actual: ${doc.archivo_nombre} (${formatFileSize(doc.archivo_tamano)}) - Haz clic para cambiar`;
+      
+      if (doc.password_hash) {
+        document.getElementById('docProtegido').checked = true;
+        document.getElementById('passwordFields').style.display = 'block';
+      } else {
+        document.getElementById('docProtegido').checked = false;
+        document.getElementById('passwordFields').style.display = 'none';
+      }
+      
+      openModal('modalUpload');
+    }
+
+    async function deleteDocument(id) {
+      if (!confirm('¿Estás seguro de eliminar este documento?')) return;
+      
+      try {
+        const doc = documentos.find(d => d.id === id);
+        
+        await supabaseClient.storage.from('repositorio-documentos').remove([doc.archivo_url]);
+        
+        const { error } = await supabaseClient
+          .from('repo_documentos')
+          .delete()
+          .eq('id', id);
+        
+        if (error) throw error;
+        
+        await loadDocumentos();
+      } catch (error) {
+        console.error('Error eliminando documento:', error);
+        alert('Error: ' + error.message);
+      }
+    }
+
+    async function downloadDocument(id) {
+      const doc = documentos.find(d => d.id === id);
+      if (!doc) return;
+      
+      if (doc.password_hash) {
+        downloadingDocId = id;
+        document.getElementById('downloadPassword').value = '';
+        openModal('modalPassword');
+      } else {
+        await performDownload(doc);
+      }
+    }
+
+    async function verifyAndDownload() {
+      const password = document.getElementById('downloadPassword').value;
+      const doc = documentos.find(d => d.id === downloadingDocId);
+      
+      if (!doc) return;
+      
+      const isValid = await bcrypt.compare(password, doc.password_hash);
+      
+      if (!isValid) {
+        alert('Contraseña incorrecta');
+        return;
+      }
+      
+      closeModal('modalPassword');
+      await performDownload(doc);
+    }
+
+    async function performDownload(doc) {
+      try {
+        const { data, error } = await supabaseClient.storage
+          .from('repositorio-documentos')
+          .download(doc.archivo_url);
+        
+        if (error) throw error;
+        
+        const url = URL.createObjectURL(data);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = doc.archivo_nombre;
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error('Error descargando:', error);
+        alert('Error: ' + error.message);
+      }
+    }
+
+    async function previewDocument(id) {
+      const doc = documentos.find(d => d.id === id);
+      if (!doc) return;
+      
+      document.getElementById('previewTitle').textContent = doc.titulo;
+      document.getElementById('previewDownloadBtn').onclick = () => downloadDocument(id);
+      
+      const body = document.getElementById('previewBody');
+      
+      if (doc.archivo_tipo.includes('pdf')) {
+        try {
+          const { data, error } = await supabaseClient.storage
+            .from('repositorio-documentos')
+            .download(doc.archivo_url);
+          
+          if (error) throw error;
+          
+          const url = URL.createObjectURL(data);
+          body.innerHTML = `<iframe src="${url}" class="repo-preview-content"></iframe>`;
+        } catch (error) {
+          body.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Error al cargar la vista previa</div></div>';
+        }
+      } else {
+        body.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">${getFileIcon(doc.archivo_tipo)}</div>
+            <div class="empty-state-text">Este formato no se puede previsualizar</div>
+            <p style="color:var(--color-text-secondary);margin-top:8px;">Descarga el archivo para visualizarlo</p>
+          </div>
+        `;
+      }
+      
+      openModal('modalPreview');
+    }
+
+    // ============================================
+    // GESTIÓN DE CATEGORÍAS
+    // ============================================
+
+    function openCategoryModal() {
+      document.getElementById('categoryModalTitle').textContent = 'Nueva categoría';
+      document.getElementById('categoryForm').reset();
+      document.getElementById('catIcono').value = '📁';
+      document.getElementById('catColor').value = '#8b5cf6';
+      openModal('modalCategory');
+    }
+
+    async function saveCategory() {
+      const nombre = document.getElementById('catNombre').value.trim();
+      const descripcion = document.getElementById('catDescripcion').value.trim();
+      const icono = document.getElementById('catIcono').value || '📁';
+      const color = document.getElementById('catColor').value || '#8b5cf6';
+      
+      if (!nombre) {
+        alert('El nombre es obligatorio');
+        return;
+      }
+      
+      try {
+        const { error } = await supabaseClient
+          .from('repo_categorias')
+          .insert([{ nombre, descripcion, icono, color }]);
+        
+        if (error) throw error;
+        
+        closeModal('modalCategory');
+        await loadCategorias();
+      } catch (error) {
+        console.error('Error guardando categoría:', error);
+        alert('Error: ' + error.message);
+      }
+    }
+
+    async function editCategory(id) {
+      const cat = categorias.find(c => c.id === id);
+      if (!cat) return;
+      
+      document.getElementById('categoryModalTitle').textContent = 'Editar categoría';
+      document.getElementById('catNombre').value = cat.nombre;
+      document.getElementById('catDescripcion').value = cat.descripcion || '';
+      document.getElementById('catIcono').value = cat.icono;
+      document.getElementById('catColor').value = cat.color;
+      
+      openModal('modalCategory');
+    }
+
+    async function deleteCategory(id) {
+      const count = documentos.filter(d => d.categoria_id === id).length;
+      
+      if (count > 0) {
+        alert(`No se puede eliminar esta categoría porque tiene ${count} documento(s) asociado(s)`);
+        return;
+      }
+      
+      if (!confirm('¿Estás seguro de eliminar esta categoría?')) return;
+      
+      try {
+        const { error } = await supabaseClient
+          .from('repo_categorias')
+          .delete()
+          .eq('id', id);
+        
+        if (error) throw error;
+        
+        await loadCategorias();
+      } catch (error) {
+        console.error('Error eliminando categoría:', error);
+        alert('Error: ' + error.message);
+      }
+    }
+
+    // ============================================
+    // GESTIÓN DE SUBCATEGORÍAS
+    // ============================================
+
+    function openSubcategoryModal() {
+      document.getElementById('subcategoryModalTitle').textContent = 'Nueva subcategoría';
+      document.getElementById('subcategoryForm').reset();
+      openModal('modalSubcategory');
+    }
+
+    async function saveSubcategory() {
+      const categoriaId = document.getElementById('subcatCategoria').value;
+      const nombre = document.getElementById('subcatNombre').value.trim();
+      const descripcion = document.getElementById('subcatDescripcion').value.trim();
+      
+      if (!categoriaId || !nombre) {
+        alert('Completa los campos obligatorios');
+        return;
+      }
+      
+      try {
+        const { error } = await supabaseClient
+          .from('repo_subcategorias')
+          .insert([{ categoria_id: categoriaId, nombre, descripcion }]);
+        
+        if (error) throw error;
+        
+        closeModal('modalSubcategory');
+        document.getElementById('filterSubcatCategoria').value = categoriaId;
+        await loadSubcategorias();
+      } catch (error) {
+        console.error('Error guardando subcategoría:', error);
+        alert('Error: ' + error.message);
+      }
+    }
+
+    async function editSubcategory(id) {
+      const sub = subcategorias.find(s => s.id === id);
+      if (!sub) return;
+      
+      document.getElementById('subcategoryModalTitle').textContent = 'Editar subcategoría';
+      document.getElementById('subcatCategoria').value = sub.categoria_id;
+      document.getElementById('subcatNombre').value = sub.nombre;
+      document.getElementById('subcatDescripcion').value = sub.descripcion || '';
+      
+      openModal('modalSubcategory');
+    }
+
+    async function deleteSubcategory(id) {
+      const count = documentos.filter(d => d.subcategoria_id === id).length;
+      
+      if (count > 0) {
+        alert(`No se puede eliminar esta subcategoría porque tiene ${count} documento(s) asociado(s)`);
+        return;
+      }
+      
+      if (!confirm('¿Estás seguro de eliminar esta subcategoría?')) return;
+      
+      try {
+        const { error } = await supabaseClient
+          .from('repo_subcategorias')
+          .delete()
+          .eq('id', id);
+        
+        if (error) throw error;
+        
+        await loadSubcategorias();
+      } catch (error) {
+        console.error('Error eliminando subcategoría:', error);
+        alert('Error: ' + error.message);
+      }
+    }
+
+    // ============================================
+    // NOTIFICACIONES
+    // ============================================
+
+    async function createNotification(documentoId, tipo, mensaje) {
+      try {
+        await supabaseClient
+          .from('repo_notificaciones')
+          .insert([{
+            documento_id: documentoId,
+            usuario_id: null,
+            tipo: tipo,
+            mensaje: mensaje
+          }]);
+      } catch (error) {
+        console.error('Error creando notificación:', error);
+      }
+    }
+
+    async function markAsRead(notificationId, documentoId) {
+      try {
+        await supabaseClient
+          .from('repo_notificaciones')
+          .update({ leido: true })
+          .eq('id', notificationId);
+        
+        await loadNotifications();
+        previewDocument(documentoId);
+      } catch (error) {
+        console.error('Error marcando notificación:', error);
+      }
+    }
+
+    // ============================================
+    // UTILIDADES
+    // ============================================
+
+    function switchView(view, btn) {
+      currentView = view;
+      document.querySelectorAll('.repo-view-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderDocumentos();
+    }
+
+    function filterDocuments() {
+      const catId = document.getElementById('filterCategoria').value;
+      const subcatSelect = document.getElementById('filterSubcategoria');
+      
+      if (catId) {
+        const subs = subcategorias.filter(s => s.categoria_id === catId);
+        subcatSelect.innerHTML = '<option value="">Todas las subcategorías</option>' + 
+          subs.map(s => `<option value="${s.id}">${s.nombre}</option>`).join('');
+      } else {
+        subcatSelect.innerHTML = '<option value="">Todas las subcategorías</option>';
+      }
+      
+      renderDocumentos();
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add('show');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('show');
+    }
+
+    document.getElementById('notificationBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('notificationDropdown').classList.toggle('show');
+    });
+
+    document.addEventListener('click', () => {
+      document.getElementById('notificationDropdown').classList.remove('show');
+    });
+  </script>
+</body>
+</html>

@@ -15,6 +15,11 @@
       transition: background-color 0.3s ease, color 0.3s ease;
       overflow: hidden;
     }
+    @media (max-width: 767px) {
+      body {
+        overflow: auto;
+      }
+    }
     .postulacion-page {
       display: flex;
       flex-direction: column;
@@ -182,7 +187,7 @@
 <body>
   <div class="postulacion-page">
     <div class="postulacion-header">
-      <img src="icons/logo FIAT.webp" alt="FIAT Venezuela">
+      <img src="../icons/logo FIAT.webp" alt="FIAT Venezuela">
       <h1>Únete a nuestro equipo</h1>
       <p>Completa el formulario para postular a nuestras vacantes</p>
     </div>
@@ -237,12 +242,12 @@
     </div>
 
     <div class="form-footer">
-      <a href="index.html">Acceso empleados</a>
+      <a href="../index.html">Acceso empleados</a>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/supabase-config.js"></script>
+  <script src="../js/supabase-config.js"></script>
   <script>
     // Colores aleatorios para el fondo
     var colores = ['#ea587c', '#fce750', '#36c6fb', '#a4c30d'];

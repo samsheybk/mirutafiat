@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (loginForm) {
     const session = await getSession();
     if (session) {
-      window.location.href = 'dashboard.html';
+      window.location.href = '/dashboard.html';
       return;
     }
 
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       try {
         await handleLogin(email, password);
-        window.location.href = 'dashboard.html';
+        window.location.href = '/dashboard.html';
       } catch (err) {
         errorDiv.textContent = 'Credenciales inválidas. Verifica tu correo y contraseña.';
         errorDiv.classList.add('show');
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (logoutBtn) {
     const session = await getSession();
     if (!session) {
-      window.location.href = 'index.html';
+      window.location.href = '/index.html';
       return;
     }
 
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     logoutBtn.addEventListener('click', async () => {
       await handleLogout();
-      window.location.href = 'index.html';
+      window.location.href = '/index.html';
     });
   }
 });

@@ -87,8 +87,9 @@
               <span style="font-size:12px;color:var(--color-text-secondary);" id="plantCount">0 trabajadores</span>
             </div>
             <div class="toolbar-content" data-toolbar="requisiciones" style="display:none;align-items:center;gap:16px;width:100%;">
-              <span style="font-size:12px;color:var(--color-text-secondary);">Vacantes pendientes por cubrir</span>
-              <button class="btn btn-outline btn-sm" onclick="loadRequisiciones()" style="margin-left:auto;">Actualizar</button>
+              <input type="text" class="form-input" id="reqSearch" placeholder="Buscar en requisiciones..." oninput="filterRequisiciones()" style="flex:1;max-width:400px;height:36px;">
+              <button class="btn btn-captacion btn-sm" onclick="openModalSolicitud()">+ Nueva solicitud</button>
+              <button class="btn btn-outline btn-sm" onclick="loadRequisiciones()">Actualizar</button>
             </div>
           </header>
 
@@ -141,14 +142,6 @@
                   <div class="kanban-column-header">Elegible <span class="kanban-column-count" id="count-Elegible">0</span></div>
                   <div class="kanban-column-body" id="col-Elegible"></div>
                 </div>
-                <div class="kanban-column" data-col="Contratado">
-                  <div class="kanban-column-header">Contratado <span class="kanban-column-count" id="count-Contratado">0</span></div>
-                  <div class="kanban-column-body" id="col-Contratado"></div>
-                </div>
-                <div class="kanban-column" data-col="No elegible">
-                  <div class="kanban-column-header">No elegible <span class="kanban-column-count" id="count-Noelegible">0</span></div>
-                  <div class="kanban-column-body" id="col-Noelegible"></div>
-                </div>
               </div>
             </div>
           </div>
@@ -178,16 +171,29 @@
 
           <div class="tool-section" id="tool-requisiciones">
             <div class="tool-section-header">
-              <h2 style="color:var(--module-captacion);">Requisiciones de personal</h2>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <button class="btn btn-sm req-tab active" data-tab="vacantes" onclick="switchReqView('vacantes',this)" style="background:var(--module-captacion);color:#fff;border:0;border-radius:4px;padding:6px 16px;">Vacantes Pendientes</button>
+                <button class="btn btn-sm req-tab" data-tab="solicitudes" onclick="switchReqView('solicitudes',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Solicitudes</button>
+              </div>
               <span style="font-size:12px;color:var(--color-text-secondary);" id="reqCount">0 pendientes</span>
             </div>
-            <div style="height:calc(100vh - 260px);overflow-y:auto;">
+            <div id="reqVacantesView" style="height:calc(100vh - 260px);overflow-y:auto;">
               <table class="data-table">
                 <thead>
                   <tr><th>Cargo</th><th>Unidad</th><th>Vacantes totales</th><th>Ocupados</th><th style="color:var(--module-captacion);font-weight:700;">Pendientes</th></tr>
                 </thead>
                 <tbody id="reqTableBody">
                   <tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Cargando...</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div id="reqSolicitudesView" style="display:none;height:calc(100vh - 260px);overflow-y:auto;">
+              <table class="data-table">
+                <thead>
+                  <tr><th>Tipo</th><th>Cargo / Unidad</th><th>Vacantes</th><th>Justificación</th><th>Estado</th><th>Fecha</th><th style="width:120px;">Acción</th></tr>
+                </thead>
+                <tbody id="reqSolTableBody">
+                  <tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Cargando...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -436,31 +442,115 @@
   </div>
 
   <div class="modal-overlay" id="modalCargo">
-    <div class="modal" style="max-width:480px;">
+    <div class="modal" style="max-width:700px;max-height:90vh;">
       <div class="modal-header">
         <h3 id="modalCargoTitle">Nuevo cargo</h3>
         <button class="modal-close" onclick="closeModalCargo()">&times;</button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" style="max-height:calc(90vh - 120px);overflow-y:auto;">
         <form id="cargoForm">
+          <div style="background:#f8f9fa;padding:12px;border-radius:6px;margin-bottom:16px;">
+            <strong style="color:var(--module-captacion);">Datos Básicos</strong>
+          </div>
           <div class="form-group">
-            <label>Título</label>
+            <label>Denominación del cargo</label>
             <input type="text" class="form-input" id="cargo_titulo" required oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;">
           </div>
-          <div class="form-group">
-            <label>Unidad</label>
-            <select class="form-select" id="cargo_unidad_id" required></select>
-          </div>
-          <div class="form-group">
-            <label>Jefe inmediato (opcional)</label>
-            <select class="form-select" id="cargo_jefe_id">
-              <option value="">— Ninguno —</option>
-            </select>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label>Dirección de adscripción</label>
+              <select class="form-select" id="cargo_unidad_id" required></select>
+            </div>
+            <div class="form-group">
+              <label>Jefe inmediato</label>
+              <select class="form-select" id="cargo_jefe_id"><option value="">— Ninguno —</option></select>
+            </div>
           </div>
           <div class="form-group">
             <label>Vacantes</label>
             <input type="number" class="form-input" id="cargo_vacantes" min="0" value="0">
           </div>
+
+          <div style="background:#f8f9fa;padding:12px;border-radius:6px;margin:16px 0;">
+            <strong style="color:var(--module-captacion);">Ocupación Física</strong>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group"><label>Sede</label><input type="text" class="form-input" id="cargo_sede" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;"></div>
+            <div class="form-group"><label>Ciudad</label><input type="text" class="form-input" id="cargo_ciudad" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;"></div>
+            <div class="form-group"><label>Estado</label><input type="text" class="form-input" id="cargo_estado" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;"></div>
+            <div class="form-group"><label>Código del cargo</label><input type="text" class="form-input" id="cargo_codigo" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;"></div>
+          </div>
+
+          <div style="background:#f8f9fa;padding:12px;border-radius:6px;margin:16px 0;">
+            <strong style="color:var(--module-captacion);">Propósito y Finalidades</strong>
+          </div>
+          <div class="form-group"><label>Propósito general del cargo</label><textarea class="form-input" id="cargo_proposito" rows="2" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;resize:vertical;"></textarea></div>
+          <div class="form-group"><label>Finalidades / Actividades</label><textarea class="form-input" id="cargo_finalidades" rows="3" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;resize:vertical;"></textarea></div>
+          <div class="form-group"><label>Responsabilidades generales y específicas</label><textarea class="form-input" id="cargo_responsabilidades" rows="3" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;resize:vertical;"></textarea></div>
+
+          <div style="background:#f8f9fa;padding:12px;border-radius:6px;margin:16px 0;">
+            <strong style="color:var(--module-captacion);">Alcance</strong>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group"><label>Cargos que le reportan directamente</label><input type="text" class="form-input" id="cargo_reporta_directo" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;"></div>
+            <div class="form-group"><label>Cargos que le reportan indirectamente</label><input type="text" class="form-input" id="cargo_reporta_indirecto" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;"></div>
+          </div>
+          <div class="form-group"><label>Relaciones internas</label><textarea class="form-input" id="cargo_relaciones_internas" rows="2" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;resize:vertical;"></textarea></div>
+          <div class="form-group"><label>Relaciones externas</label><textarea class="form-input" id="cargo_relaciones_externas" rows="2" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;resize:vertical;"></textarea></div>
+
+          <div style="background:#f8f9fa;padding:12px;border-radius:6px;margin:16px 0;">
+            <strong style="color:var(--module-captacion);">Perfil del Cargo</strong>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group"><label>Área de formación</label><input type="text" class="form-input" id="cargo_area_formacion" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;"></div>
+            <div class="form-group"><label>Nivel de formación</label>
+              <select class="form-select" id="cargo_nivel_formacion">
+                <option value="">— Selecciona —</option>
+                <option value="Bachiller">Bachiller</option>
+                <option value="Técnico">Técnico</option>
+                <option value="Universitario">Universitario</option>
+                <option value="Postgrado">Postgrado</option>
+                <option value="Maestría">Maestría</option>
+                <option value="Doctorado">Doctorado</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Área de experiencia</label><input type="text" class="form-input" id="cargo_area_experiencia" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;"></div>
+            <div class="form-group"><label>Tiempo de experiencia</label><input type="text" class="form-input" id="cargo_tiempo_experiencia" placeholder="Ej: 2 años"></div>
+            <div class="form-group"><label>Sexo</label>
+              <select class="form-select" id="cargo_sexo">
+                <option value="">— Selecciona —</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+                <option value="Indistinto">Indistinto</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Edad</label><input type="text" class="form-input" id="cargo_edad" placeholder="Ej: 25-35"></div>
+            <div class="form-group"><label>Estado civil</label>
+              <select class="form-select" id="cargo_estado_civil">
+                <option value="">— Selecciona —</option>
+                <option value="Soltero">Soltero</option>
+                <option value="Casado">Casado</option>
+                <option value="Divorciado">Divorciado</option>
+                <option value="Viudo">Viudo</option>
+                <option value="Indistinto">Indistinto</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Zona de residencia</label><input type="text" class="form-input" id="cargo_zona_residencia" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;"></div>
+          </div>
+          <div class="form-group"><label>Vehículo u otros</label><input type="text" class="form-input" id="cargo_vehiculo" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;"></div>
+          <div class="form-group"><label>Otros aspectos</label><textarea class="form-input" id="cargo_otros" rows="2" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;resize:vertical;"></textarea></div>
+
+          <div style="background:#f8f9fa;padding:12px;border-radius:6px;margin:16px 0;">
+            <strong style="color:var(--module-captacion);">Competencias</strong>
+          </div>
+          <div class="form-group"><label>Conocimientos específicos o formación</label><textarea class="form-input" id="cargo_conocimientos" rows="2" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;resize:vertical;"></textarea></div>
+          <div class="form-group"><label>Habilidades y actitudes</label><textarea class="form-input" id="cargo_habilidades" rows="2" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;resize:vertical;"></textarea></div>
+
+          <div style="background:#f8f9fa;padding:12px;border-radius:6px;margin:16px 0;">
+            <strong style="color:var(--module-captacion);">Autoridad y Ambiente</strong>
+          </div>
+          <div class="form-group"><label>Autoridad</label><textarea class="form-input" id="cargo_autoridad" rows="2" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;resize:vertical;"></textarea></div>
+          <div class="form-group"><label>Ambiente de trabajo y riesgos</label><textarea class="form-input" id="cargo_ambiente_riesgos" rows="2" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;resize:vertical;"></textarea></div>
         </form>
       </div>
       <div class="modal-footer">
@@ -577,6 +667,77 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="modalSolicitud">
+    <div class="modal" style="max-width:560px;">
+      <div class="modal-header">
+        <h3>Nueva solicitud de requisición</h3>
+        <button class="modal-close" onclick="closeModalSolicitud()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="solicitudForm">
+          <div class="form-group">
+            <label>Tipo de solicitud</label>
+            <select class="form-select" id="sol_tipo" required onchange="onSolTipoChange()">
+              <option value="">— Selecciona —</option>
+              <option value="nuevo_cargo">Creación de nuevo cargo</option>
+              <option value="aumento_vacantes">Aumento de vacantes</option>
+            </select>
+          </div>
+          <div class="form-group" id="solCargoGroup" style="display:none;">
+            <label>Cargo existente</label>
+            <select class="form-select" id="sol_cargo_id">
+              <option value="">— Selecciona —</option>
+            </select>
+          </div>
+          <div class="form-group" id="solUnidadGroup" style="display:none;">
+            <label>Unidad</label>
+            <select class="form-select" id="sol_unidad_id">
+              <option value="">— Selecciona —</option>
+            </select>
+          </div>
+          <div class="form-group" id="solTituloGroup" style="display:none;">
+            <label>Título del nuevo cargo</label>
+            <input type="text" class="form-input" id="sol_cargo_titulo" placeholder="Ej: Analista de sistemas" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;">
+          </div>
+          <div class="form-group">
+            <label>Vacantes solicitadas</label>
+            <input type="number" class="form-input" id="sol_vacantes" min="1" value="1" required>
+          </div>
+          <div class="form-group">
+            <label>Justificación <span style="color:#dc2626;">*</span></label>
+            <textarea class="form-input" id="sol_justificacion" rows="4" placeholder="Explica el motivo de la solicitud..." required oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;resize:vertical;"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModalSolicitud()">Cancelar</button>
+        <button class="btn btn-captacion" onclick="saveSolicitud()">Enviar solicitud</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalRechazo">
+    <div class="modal" style="max-width:480px;">
+      <div class="modal-header">
+        <h3>Justificar rechazo</h3>
+        <button class="modal-close" onclick="closeModalRechazo()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom:12px;font-size:14px;color:#666;">
+          Rechazando solicitud de <strong id="rechazoSolInfo"></strong>:
+        </p>
+        <div class="form-group">
+          <label>Motivo del rechazo <span style="color:#dc2626;">*</span></label>
+          <textarea class="form-input" id="rechazoMotivo" rows="4" placeholder="Indica el motivo del rechazo..." required oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;resize:vertical;"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModalRechazo()">Cancelar</button>
+        <button class="btn btn-captacion" onclick="confirmRechazo()" style="background:#dc2626;">Confirmar rechazo</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/supabase-config.js"></script>
   <script src="../js/auth.js"></script>
@@ -638,7 +799,7 @@
     }
 
     function colorEstado(estado) {
-      var m = {'Nuevo':'#2563EB','Contacto':'#0891B2','Entrevista':'#D97706','Tecnica':'#EA580C','Medica':'#DB2777','Elegible':'#059669','Contratado':'#7C3AED','No elegible':'#DC2626'};
+      var m = {'Nuevo':'#2563EB','Contacto':'#0891B2','Entrevista':'#D97706','Tecnica':'#EA580C','Medica':'#DB2777','Elegible':'#059669'};
       return m[estado] || '#999';
     }
 
@@ -650,10 +811,10 @@
       }
       tbody.innerHTML = data.map(function(c) {
         var clr = colorEstado(c.estado_kanban);
-        var descBtn = c.estado_kanban !== 'No elegible' && c.estado_kanban !== 'Contratado'
-          ? '<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();openDescarta(\'' + c.id + '\',\'' + c.nombres + ' ' + c.apellidos + '\')" style="color:#dc2626;">Descarta</button>'
+        var descBtn = c.estado_kanban !== 'No elegible'
+          ? '<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();openDescarta(' + c.id + ',\'' + c.nombres + ' ' + c.apellidos + '\')" style="color:#dc2626;">Descarta</button>'
           : '';
-        return '<tr style="cursor:pointer;border-left:3px solid ' + clr + ';" onclick="openFichaTecnica(\'' + c.id + '\')">'
+        return '<tr style="cursor:pointer;border-left:3px solid ' + clr + ';" onclick="openFichaTecnica(' + c.id + ')">'
           + '<td><span style="font-weight:600;">' + c.nombres + ' ' + c.apellidos + '</span><br><span class="text-sm text-secondary">' + c.cedula + '</span></td>'
           + '<td>' + c.cargo_interes + '</td>'
           + '<td>' + (c.telefono || '-') + '</td>'
@@ -665,7 +826,7 @@
     }
 
     function renderATSKanban(data) {
-      const cols = ['Nuevo','Contacto','Entrevista','Tecnica','Medica','Elegible','Contratado','No elegible'];
+      const cols = ['Nuevo','Contacto','Entrevista','Tecnica','Medica','Elegible'];
       cols.forEach(col => {
         const items = data.filter(c => c.estado_kanban === col);
         document.getElementById('count-' + col).textContent = items.length;
@@ -675,19 +836,19 @@
           return;
         }
         body.innerHTML = items.map(function(c) {
-          var descBtn = c.estado_kanban !== 'No elegible' && c.estado_kanban !== 'Contratado'
-            ? '<button class="kanban-arrow" onclick="event.stopPropagation();openDescarta(\'' + c.id + '\',\'' + c.nombres + ' ' + c.apellidos + '\')" title="Descartar" style="color:#dc2626;">&#10005;</button>'
+          var descBtn = c.estado_kanban !== 'No elegible'
+            ? '<button class="kanban-arrow" onclick="event.stopPropagation();openDescarta(' + c.id + ',\'' + c.nombres + ' ' + c.apellidos + '\')" title="Descartar" style="color:#dc2626;">&#10005;</button>'
             : '';
           return '<div class="kanban-card">'
-            + '<div class="kanban-card-body" onclick="openFichaTecnica(\'' + c.id + '\')" title="Ver ficha del candidato">'
+            + '<div class="kanban-card-body" onclick="openFichaTecnica(' + c.id + ')" title="Ver ficha del candidato">'
             + '<div class="kanban-card-title">' + c.nombres + ' ' + c.apellidos + '</div>'
             + '<div class="kanban-card-sub">' + c.cargo_interes + '</div>'
             + '<div class="kanban-card-footer"><span>' + (c.telefono || '') + '</span></div>'
             + '</div>'
             + '<div class="kanban-card-arrows">'
-            + '<button class="kanban-arrow" onclick="event.stopPropagation();moverEstado(\'' + c.id + '\',\'' + c.estado_kanban + '\',-1)" ' + (c.estado_kanban === 'Nuevo' ? 'disabled' : '') + '>&#9664;</button>'
+            + '<button class="kanban-arrow" onclick="event.stopPropagation();moverEstado(' + c.id + ',\'' + c.estado_kanban + '\',-1)" ' + (c.estado_kanban === 'Nuevo' ? 'disabled' : '') + '>&#9664;</button>'
             + descBtn
-            + '<button class="kanban-arrow" onclick="event.stopPropagation();moverEstado(\'' + c.id + '\',\'' + c.estado_kanban + '\',1)" ' + (c.estado_kanban === 'No elegible' ? 'disabled' : '') + '>&#9654;</button>'
+            + '<button class="kanban-arrow" onclick="event.stopPropagation();moverEstado(' + c.id + ',\'' + c.estado_kanban + '\',1)" ' + (c.estado_kanban === 'Elegible' ? 'disabled' : '') + '>&#9654;</button>'
             + '</div>'
             + '</div>';
         }).join('');
@@ -714,8 +875,11 @@
       try {
         var user = await getCurrentUser();
         if (!user) { alert('Error: sesión no encontrada. Recarga la página.'); return; }
+        console.log('descartaCandidatoId:', descartaCandidatoId, 'tipo:', typeof descartaCandidatoId);
+        console.log('allCandidatos.length:', allCandidatos.length);
+        if (allCandidatos.length > 0) console.log('Primer candidato ID:', allCandidatos[0].id, 'tipo:', typeof allCandidatos[0].id);
         var estadoActual = allCandidatos.find(function(c) { return c.id === descartaCandidatoId; });
-        if (!estadoActual) { alert('Error: candidato no encontrado en memoria'); return; }
+        if (!estadoActual) { alert('Error: candidato no encontrado en memoria. ID buscado: ' + descartaCandidatoId); return; }
         estadoActual = estadoActual.estado_kanban;
         var { error: e1 } = await supabaseClient.from('ats_candidatos').update({ estado_kanban: 'No elegible' }).eq('id', descartaCandidatoId);
         if (e1) throw e1;
@@ -815,7 +979,7 @@
 
     function openEstadoPicker(id, nombre, estadoActual) {
       document.getElementById('estadoPickerName').textContent = nombre;
-      const estados = ['Nuevo','Contacto','Entrevista','Tecnica','Medica','Elegible','No elegible'];
+      const estados = ['Nuevo','Contacto','Entrevista','Tecnica','Medica','Elegible'];
       const list = document.getElementById('estadoPickerList');
       list.innerHTML = estados.map(function(e) {
         var disabled = e === estadoActual;
@@ -832,15 +996,11 @@
     }
 
     function moverEstado(id, estadoActual, direccion) {
-      var orden = ['Nuevo','Contacto','Entrevista','Tecnica','Medica','Elegible','Contratado','No elegible'];
+      var orden = ['Nuevo','Contacto','Entrevista','Tecnica','Medica','Elegible'];
       var idx = orden.indexOf(estadoActual);
       var nuevoIdx = idx + direccion;
       if (nuevoIdx < 0 || nuevoIdx >= orden.length) return;
       var estadoNuevo = orden[nuevoIdx];
-      if (estadoActual === 'Elegible' && estadoNuevo === 'Contratado') {
-        openIngreso(id);
-        return;
-      }
       cambiarEstado(id, estadoActual, estadoNuevo);
     }
 
@@ -1035,7 +1195,7 @@
           + logHtml
           + renderComentarios(comentarios)
           + '<div style="margin-top:12px;border-top:1px solid var(--color-border);padding-top:12px;display:flex;gap:8px;">'
-          + (c.estado_kanban === 'Elegible' ? '<button class="btn btn-captacion" onclick="closeFichaTecnica();openIngreso(\'' + c.id + '\')">Ingreso</button>' : '')
+          + (c.estado_kanban === 'Elegible' ? '<button class="btn btn-captacion" onclick="closeFichaTecnica();openIngreso(' + c.id + ')">Ingreso</button>' : '')
           + '<button class="btn btn-captacion" onclick="closeFichaTecnica();openEstadoPicker(' + c.id + ',\'' + c.nombres + ' ' + c.apellidos + '\',\'' + c.estado_kanban + '\')">Cambiar estado</button>'
           + '<button class="btn btn-outline" onclick="closeFichaTecnica()">Cerrar</button>'
           + '</div>';
@@ -1272,7 +1432,11 @@
 
     function closeModalCargo() {
       document.getElementById('modalCargo').classList.remove('show');
+      document.getElementById('btnEliminarCargo').style.display = 'none';
+      solAprobadaId = null;
     }
+
+    var solAprobadaId = null;
 
     async function saveCargo() {
       var titulo = document.getElementById('cargo_titulo').value.trim();
@@ -1281,16 +1445,51 @@
       var vacantes = parseInt(document.getElementById('cargo_vacantes').value) || 0;
       if (!titulo) { alert('Ingresa el título del cargo'); return; }
       if (!unidadId) { alert('Selecciona una unidad'); return; }
+      var data = {
+        titulo: titulo, unidad_id: unidadId, jefe_inmediato_id: jefeId || null, vacantes: vacantes,
+        ocupacion_fisica_sede: document.getElementById('cargo_sede').value.trim() || null,
+        ocupacion_fisica_ciudad: document.getElementById('cargo_ciudad').value.trim() || null,
+        ocupacion_fisica_estado: document.getElementById('cargo_estado').value.trim() || null,
+        ocupacion_fisica_codigo: document.getElementById('cargo_codigo').value.trim() || null,
+        proposito_general: document.getElementById('cargo_proposito').value.trim() || null,
+        finalidades: document.getElementById('cargo_finalidades').value.trim() || null,
+        responsabilidades: document.getElementById('cargo_responsabilidades').value.trim() || null,
+        alcance_reporta_directo: document.getElementById('cargo_reporta_directo').value.trim() || null,
+        alcance_reporta_indirecto: document.getElementById('cargo_reporta_indirecto').value.trim() || null,
+        alcance_relaciones_internas: document.getElementById('cargo_relaciones_internas').value.trim() || null,
+        alcance_relaciones_externas: document.getElementById('cargo_relaciones_externas').value.trim() || null,
+        perfil_area_formacion: document.getElementById('cargo_area_formacion').value.trim() || null,
+        perfil_nivel_formacion: document.getElementById('cargo_nivel_formacion').value.trim() || null,
+        perfil_area_experiencia: document.getElementById('cargo_area_experiencia').value.trim() || null,
+        perfil_tiempo_experiencia: document.getElementById('cargo_tiempo_experiencia').value.trim() || null,
+        perfil_sexo: document.getElementById('cargo_sexo').value.trim() || null,
+        perfil_edad: document.getElementById('cargo_edad').value.trim() || null,
+        perfil_estado_civil: document.getElementById('cargo_estado_civil').value.trim() || null,
+        perfil_zona_residencia: document.getElementById('cargo_zona_residencia').value.trim() || null,
+        perfil_vehiculo: document.getElementById('cargo_vehiculo').value.trim() || null,
+        perfil_otros: document.getElementById('cargo_otros').value.trim() || null,
+        competencias_conocimientos: document.getElementById('cargo_conocimientos').value.trim() || null,
+        competencias_habilidades: document.getElementById('cargo_habilidades').value.trim() || null,
+        autoridad: document.getElementById('cargo_autoridad').value.trim() || null,
+        ambiente_riesgos: document.getElementById('cargo_ambiente_riesgos').value.trim() || null
+      };
       try {
         if (editingCargoId) {
-          var { error } = await supabaseClient.from('est_cargos').update({ titulo: titulo, unidad_id: unidadId, jefe_inmediato_id: jefeId || null, vacantes: vacantes }).eq('id', editingCargoId);
+          var { error } = await supabaseClient.from('est_cargos').update(data).eq('id', editingCargoId);
           if (error) throw error;
         } else {
-          var { error } = await supabaseClient.from('est_cargos').insert([{ titulo: titulo, unidad_id: unidadId, jefe_inmediato_id: jefeId || null, vacantes: vacantes }]);
+          var { error } = await supabaseClient.from('est_cargos').insert([data]);
           if (error) throw error;
+          if (solAprobadaId) {
+            var { error: e2 } = await supabaseClient.from('requisiciones_solicitudes').update({ estado: 'Aprobada' }).eq('id', solAprobadaId);
+            if (e2) throw e2;
+            solAprobadaId = null;
+          }
         }
         await loadEstructura();
         closeModalCargo();
+        loadRequisiciones();
+        loadSolicitudes();
       } catch (err) {
         alert('Error: ' + err.message);
       }
@@ -1309,6 +1508,31 @@
       populateJefeSelect();
       if (c.jefe_inmediato_id) document.getElementById('cargo_jefe_id').value = c.jefe_inmediato_id;
       document.getElementById('cargo_vacantes').value = c.vacantes || 0;
+      document.getElementById('cargo_sede').value = c.ocupacion_fisica_sede || '';
+      document.getElementById('cargo_ciudad').value = c.ocupacion_fisica_ciudad || '';
+      document.getElementById('cargo_estado').value = c.ocupacion_fisica_estado || '';
+      document.getElementById('cargo_codigo').value = c.ocupacion_fisica_codigo || '';
+      document.getElementById('cargo_proposito').value = c.proposito_general || '';
+      document.getElementById('cargo_finalidades').value = c.finalidades || '';
+      document.getElementById('cargo_responsabilidades').value = c.responsabilidades || '';
+      document.getElementById('cargo_reporta_directo').value = c.alcance_reporta_directo || '';
+      document.getElementById('cargo_reporta_indirecto').value = c.alcance_reporta_indirecto || '';
+      document.getElementById('cargo_relaciones_internas').value = c.alcance_relaciones_internas || '';
+      document.getElementById('cargo_relaciones_externas').value = c.alcance_relaciones_externas || '';
+      document.getElementById('cargo_area_formacion').value = c.perfil_area_formacion || '';
+      document.getElementById('cargo_nivel_formacion').value = c.perfil_nivel_formacion || '';
+      document.getElementById('cargo_area_experiencia').value = c.perfil_area_experiencia || '';
+      document.getElementById('cargo_tiempo_experiencia').value = c.perfil_tiempo_experiencia || '';
+      document.getElementById('cargo_sexo').value = c.perfil_sexo || '';
+      document.getElementById('cargo_edad').value = c.perfil_edad || '';
+      document.getElementById('cargo_estado_civil').value = c.perfil_estado_civil || '';
+      document.getElementById('cargo_zona_residencia').value = c.perfil_zona_residencia || '';
+      document.getElementById('cargo_vehiculo').value = c.perfil_vehiculo || '';
+      document.getElementById('cargo_otros').value = c.perfil_otros || '';
+      document.getElementById('cargo_conocimientos').value = c.competencias_conocimientos || '';
+      document.getElementById('cargo_habilidades').value = c.competencias_habilidades || '';
+      document.getElementById('cargo_autoridad').value = c.autoridad || '';
+      document.getElementById('cargo_ambiente_riesgos').value = c.ambiente_riesgos || '';
       document.getElementById('modalCargo').classList.add('show');
     }
 
@@ -1592,8 +1816,14 @@
       }
     }
 
+    function filterRequisiciones() {
+      if (currentReqView === 'vacantes') loadRequisiciones();
+      else loadSolicitudes();
+    }
+
     async function loadRequisiciones() {
       try {
+        var q = document.getElementById('reqSearch').value.trim().toLowerCase();
         var { data: cargos } = await supabaseClient.from('est_cargos').select('*,jefe_inmediato_id').order('titulo');
         var { data: plantilla } = await supabaseClient.from('plantilla_trabajadores').select('*');
         var { data: unidades } = await supabaseClient.from('est_unidades').select('*').order('nombre');
@@ -1611,6 +1841,13 @@
           var pend = Math.max(0, vac - ocup);
           if (pend > 0) { totalPend += pend; rows.push({ cargo: c, vac: vac, ocup: ocup, pend: pend }); }
         });
+        if (q) {
+          rows = rows.filter(function(r) {
+            var unid = unidades.find(function(u) { return u.id === r.cargo.unidad_id; });
+            var texto = r.cargo.titulo + ' ' + (unid ? unid.nombre : '') + ' ' + r.vac + ' ' + r.ocup + ' ' + r.pend;
+            return texto.toLowerCase().indexOf(q) !== -1;
+          });
+        }
         rows.sort(function(a, b) { return b.pend - a.pend; });
         document.getElementById('reqCount').textContent = totalPend + ' pendiente' + (totalPend !== 1 ? 's' : '');
         var tbody = document.getElementById('reqTableBody');
@@ -1631,6 +1868,193 @@
         tbody.innerHTML = html;
       } catch (err) {
         document.getElementById('reqTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:#dc2626;">Error: ' + err.message + '</td></tr>';
+      }
+    }
+
+    /* ===== REQUISICIONES - SOLICITUDES ===== */
+    var currentReqView = 'vacantes';
+    var allSolicitudes = [];
+
+    function switchReqView(tab, btn) {
+      currentReqView = tab;
+      document.querySelectorAll('.req-tab').forEach(function(b) {
+        b.style.background = b === btn ? 'var(--module-captacion)' : 'transparent';
+        b.style.color = b === btn ? '#fff' : 'var(--color-text)';
+        b.style.border = b === btn ? '0' : '1px solid var(--border-color)';
+      });
+      document.getElementById('reqVacantesView').style.display = tab === 'vacantes' ? '' : 'none';
+      document.getElementById('reqSolicitudesView').style.display = tab === 'solicitudes' ? '' : 'none';
+      if (tab === 'solicitudes') loadSolicitudes();
+    }
+
+    function openModalSolicitud() {
+      document.getElementById('solicitudForm').reset();
+      document.getElementById('solCargoGroup').style.display = 'none';
+      document.getElementById('solUnidadGroup').style.display = 'none';
+      document.getElementById('solTituloGroup').style.display = 'none';
+      populateSolCargos();
+      populateSolUnidades();
+      document.getElementById('modalSolicitud').classList.add('show');
+    }
+
+    function closeModalSolicitud() {
+      document.getElementById('modalSolicitud').classList.remove('show');
+    }
+
+    function onSolTipoChange() {
+      var tipo = document.getElementById('sol_tipo').value;
+      document.getElementById('solCargoGroup').style.display = tipo === 'aumento_vacantes' ? '' : 'none';
+      document.getElementById('solUnidadGroup').style.display = tipo === 'nuevo_cargo' ? '' : 'none';
+      document.getElementById('solTituloGroup').style.display = tipo === 'nuevo_cargo' ? '' : 'none';
+    }
+
+    function populateSolCargos() {
+      var sel = document.getElementById('sol_cargo_id');
+      sel.innerHTML = '<option value="">— Selecciona —</option>';
+      allCargos.forEach(function(c) { sel.innerHTML += '<option value="' + c.id + '">' + c.titulo + '</option>'; });
+    }
+
+    function populateSolUnidades() {
+      var sel = document.getElementById('sol_unidad_id');
+      sel.innerHTML = '<option value="">— Selecciona —</option>';
+      allUnidades.forEach(function(u) { sel.innerHTML += '<option value="' + u.id + '">' + u.nombre + '</option>'; });
+    }
+
+    async function saveSolicitud() {
+      var tipo = document.getElementById('sol_tipo').value;
+      var vacantes = parseInt(document.getElementById('sol_vacantes').value, 10);
+      var justificacion = document.getElementById('sol_justificacion').value.trim();
+      if (!tipo) { alert('Selecciona el tipo de solicitud'); return; }
+      if (!vacantes || vacantes < 1) { alert('Indica las vacantes solicitadas'); return; }
+      if (!justificacion) { alert('La justificación es obligatoria'); return; }
+      var cargo_id = null, unidad_id = null, cargo_titulo = null;
+      if (tipo === 'aumento_vacantes') {
+        cargo_id = document.getElementById('sol_cargo_id').value;
+        if (!cargo_id) { alert('Selecciona el cargo'); return; }
+      } else {
+        unidad_id = document.getElementById('sol_unidad_id').value;
+        cargo_titulo = document.getElementById('sol_cargo_titulo').value.trim();
+        if (!unidad_id) { alert('Selecciona la unidad'); return; }
+        if (!cargo_titulo) { alert('Indica el título del nuevo cargo'); return; }
+      }
+      try {
+        var user = await getCurrentUser();
+        var { error } = await supabaseClient.from('requisiciones_solicitudes').insert([{
+          tipo: tipo, cargo_id: cargo_id, unidad_id: unidad_id, cargo_titulo: cargo_titulo,
+          vacantes_solicitadas: vacantes, justificacion: justificacion,
+          creado_por: user.id, creado_por_email: user.email
+        }]);
+        if (error) throw error;
+        closeModalSolicitud();
+        loadSolicitudes();
+        alert('Solicitud enviada correctamente');
+      } catch (err) {
+        alert('Error al enviar solicitud: ' + err.message);
+      }
+    }
+
+    async function loadSolicitudes() {
+      try {
+        var q = document.getElementById('reqSearch').value.trim().toLowerCase();
+        var { data, error } = await supabaseClient.from('requisiciones_solicitudes').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        allSolicitudes = data || [];
+        var solicitudes = allSolicitudes;
+        if (q) {
+          solicitudes = solicitudes.filter(function(s) {
+            var tipoLabel = s.tipo === 'nuevo_cargo' ? 'Nuevo cargo' : 'Aumento vacantes';
+            var detalle = s.tipo === 'nuevo_cargo' ? (s.cargo_titulo + ' ' + getUnidadNombre(s.unidad_id)) : getCargoNombre(s.cargo_id);
+            var fecha = new Date(s.created_at).toLocaleDateString('es-VE');
+            var texto = tipoLabel + ' ' + detalle + ' ' + s.vacantes_solicitadas + ' ' + s.justificacion + ' ' + s.estado + ' ' + fecha;
+            return texto.toLowerCase().indexOf(q) !== -1;
+          });
+        }
+        var tbody = document.getElementById('reqSolTableBody');
+        if (!solicitudes.length) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay solicitudes registradas</td></tr>';
+          return;
+        }
+        var html = solicitudes.map(function(s) {
+          var tipoLabel = s.tipo === 'nuevo_cargo' ? 'Nuevo cargo' : 'Aumento vacantes';
+          var detalle = s.tipo === 'nuevo_cargo' ? (s.cargo_titulo + ' / ' + getUnidadNombre(s.unidad_id)) : getCargoNombre(s.cargo_id);
+          var estadoColor = s.estado === 'Aprobada' ? '#059669' : s.estado === 'Rechazada' ? '#dc2626' : '#D97706';
+          var fecha = new Date(s.created_at).toLocaleDateString('es-VE');
+          return '<tr>'
+            + '<td>' + tipoLabel + '</td>'
+            + '<td>' + detalle + '</td>'
+            + '<td style="text-align:center;font-weight:600;">' + s.vacantes_solicitadas + '</td>'
+            + '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + s.justificacion + '">' + s.justificacion + '</td>'
+            + '<td><span style="color:' + estadoColor + ';font-weight:600;">' + s.estado + '</span></td>'
+            + '<td>' + fecha + '</td>'
+            + '<td>' + (s.estado === 'Pendiente' ? '<button onclick="aprobarSolicitud(' + s.id + ')" style="background:none;border:none;cursor:pointer;color:#059669;font-size:18px;padding:4px 8px;" title="Aprobar">✓</button><button onclick="rechazarSolicitud(' + s.id + ')" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:18px;padding:4px 8px;" title="Rechazar">✗</button>' : '-') + '</td>'
+            + '</tr>';
+        }).join('');
+        tbody.innerHTML = html;
+      } catch (err) {
+        document.getElementById('reqSolTableBody').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#dc2626;">Error: ' + err.message + '</td></tr>';
+      }
+    }
+
+    async function aprobarSolicitud(id) {
+      var sol = allSolicitudes.find(function(s) { return s.id === id; });
+      if (!sol) return;
+      try {
+        if (sol.tipo === 'aumento_vacantes') {
+          var cargo = allCargos.find(function(c) { return c.id === sol.cargo_id; });
+          if (!cargo) { alert('Cargo no encontrado'); return; }
+          var nuevasVacantes = (parseInt(cargo.vacantes, 10) || 0) + sol.vacantes_solicitadas;
+          var { error } = await supabaseClient.from('est_cargos').update({ vacantes: nuevasVacantes }).eq('id', sol.cargo_id);
+          if (error) throw error;
+          var { error: e2 } = await supabaseClient.from('requisiciones_solicitudes').update({ estado: 'Aprobada' }).eq('id', id);
+          if (e2) throw e2;
+          await loadEstructura();
+          loadRequisiciones();
+          loadSolicitudes();
+          alert('Vacantes actualizadas: ' + cargo.titulo + ' ahora tiene ' + nuevasVacantes + ' vacantes');
+        } else {
+          solAprobadaId = id;
+          document.getElementById('modalCargoTitle').textContent = 'Crear cargo (solicitud aprobada)';
+          document.getElementById('cargoForm').reset();
+          document.getElementById('btnEliminarCargo').style.display = 'none';
+          document.getElementById('cargo_titulo').value = sol.cargo_titulo || '';
+          populateUnidadSelects();
+          document.getElementById('cargo_unidad_id').value = sol.unidad_id || '';
+          populateJefeSelect();
+          document.getElementById('cargo_vacantes').value = sol.vacantes_solicitadas || 1;
+          document.getElementById('modalCargo').classList.add('show');
+        }
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    var rechazoSolId = null;
+
+    function rechazarSolicitud(id) {
+      var sol = allSolicitudes.find(function(s) { return s.id === id; });
+      if (!sol) return;
+      rechazoSolId = id;
+      var tipoLabel = sol.tipo === 'nuevo_cargo' ? 'Nuevo cargo: ' + sol.cargo_titulo : 'Aumento vacantes: ' + getCargoNombre(sol.cargo_id);
+      document.getElementById('rechazoSolInfo').textContent = tipoLabel;
+      document.getElementById('rechazoMotivo').value = '';
+      document.getElementById('modalRechazo').classList.add('show');
+    }
+
+    function closeModalRechazo() {
+      document.getElementById('modalRechazo').classList.remove('show');
+      rechazoSolId = null;
+    }
+
+    async function confirmRechazo() {
+      var motivo = document.getElementById('rechazoMotivo').value.trim();
+      if (!motivo) { alert('Indica el motivo del rechazo'); return; }
+      try {
+        var { error } = await supabaseClient.from('requisiciones_solicitudes').update({ estado: 'Rechazada', justificacion: motivo }).eq('id', rechazoSolId);
+        if (error) throw error;
+        closeModalRechazo();
+        loadSolicitudes();
+      } catch (err) {
+        alert('Error: ' + err.message);
       }
     }
 

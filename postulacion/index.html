@@ -182,6 +182,52 @@
         margin-bottom: 10px;
       }
     }
+    .photo-upload {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .photo-preview {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .photo-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .photo-placeholder {
+      font-size: 24px;
+      color: #999;
+    }
+    .photo-text {
+      font-size: 9px;
+      color: #999;
+      text-align: center;
+    }
+    .btn-photo {
+      padding: 10px 16px;
+      background: rgba(0, 0, 0, 0.8);
+      color: #fff;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .btn-photo:hover {
+      opacity: 0.9;
+    }
   </style>
 </head>
 <body>
@@ -221,6 +267,17 @@
           <div class="form-group">
             <label>Dirección</label>
             <input type="text" class="form-input" id="direccion" placeholder="Dirección de residencia">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Foto de perfil (selfie) <span class="required">*</span></label>
+          <div class="photo-upload">
+            <div class="photo-preview" id="photoPreview">
+              <span class="photo-placeholder">📷</span>
+              <span class="photo-text">Toma o sube tu foto</span>
+            </div>
+            <input type="file" id="foto" accept="image/*" capture="user" required style="display:none;">
+            <button type="button" class="btn-photo" onclick="document.getElementById('foto').click()">Tomar foto</button>
           </div>
         </div>
         <div class="form-group">
@@ -323,6 +380,21 @@
       this.value = this.value.toUpperCase();
     });
 
+    var fotoBase64 = null;
+
+    document.getElementById('foto').addEventListener('change', function(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      
+      var reader = new FileReader();
+      reader.onload = function(event) {
+        fotoBase64 = event.target.result;
+        var preview = document.getElementById('photoPreview');
+        preview.innerHTML = '<img src="' + fotoBase64 + '" alt="Preview">';
+      };
+      reader.readAsDataURL(file);
+    });
+
     document.getElementById('postulacionForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       hideError();
@@ -343,6 +415,11 @@
 
       if (!validarTelefonoVE(telefono)) {
         showError('El teléfono debe ser un número válido de Venezuela. Ej: 04141234567');
+        return;
+      }
+
+      if (!fotoBase64) {
+        showError('Debes tomar o subir tu foto de perfil');
         return;
       }
 
@@ -377,6 +454,7 @@
             direccion: direccion,
             cargo_interes: cargo,
             notas: notas,
+            foto_url: fotoBase64,
             estado_kanban: 'Nuevo'
           }]);
 

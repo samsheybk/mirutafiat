@@ -20,6 +20,7 @@
   --module-seguridad: #dc2626;
   --module-compensacion: #7c3aed;
   --module-plantilla: #0d9488;
+  --module-repositorio: #06b6d4;
 }
 
 html, body {
@@ -595,6 +596,7 @@ a {
 .btn-seguridad { background: var(--module-seguridad); }
 .btn-compensacion { background: var(--module-compensacion); }
 .btn-plantilla { background: var(--module-plantilla); }
+.btn-repositorio { background: var(--module-repositorio); }
 
 .border-captacion { border-color: var(--module-captacion); }
 .border-relaciones { border-color: var(--module-relaciones); }
@@ -603,6 +605,7 @@ a {
 .border-seguridad { border-color: var(--module-seguridad); }
 .border-compensacion { border-color: var(--module-compensacion); }
 .border-plantilla { border-color: var(--module-plantilla); }
+.border-repositorio { border-color: var(--module-repositorio); }
 
 .text-captacion { color: var(--module-captacion); }
 .text-relaciones { color: var(--module-relaciones); }
@@ -611,6 +614,7 @@ a {
 .text-seguridad { color: var(--module-seguridad); }
 .text-compensacion { color: var(--module-compensacion); }
 .text-plantilla { color: var(--module-plantilla); }
+.text-repositorio { color: var(--module-repositorio); }
 
 .bg-captacion { background: var(--module-captacion); }
 .bg-relaciones { background: var(--module-relaciones); }
@@ -619,6 +623,7 @@ a {
 .bg-seguridad { background: var(--module-seguridad); }
 .bg-compensacion { background: var(--module-compensacion); }
 .bg-plantilla { background: var(--module-plantilla); }
+.bg-repositorio { background: var(--module-repositorio); }
 
 /* ===== EMPTY STATE ===== */
 .empty-state {

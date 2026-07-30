@@ -1,0 +1,27 @@
+-- Actualizar tabla de cargos con todos los campos del perfil
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS vacantes INTEGER DEFAULT 0;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS ocupacion_fisica_sede TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS ocupacion_fisica_ciudad TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS ocupacion_fisica_estado TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS ocupacion_fisica_codigo TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS proposito_general TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS finalidades TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS responsabilidades TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS alcance_reporta_directo TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS alcance_reporta_indirecto TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS alcance_relaciones_internas TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS alcance_relaciones_externas TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_area_formacion TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_nivel_formacion TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_area_experiencia TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_tiempo_experiencia TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_sexo TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_edad TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_estado_civil TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_zona_residencia TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_vehiculo TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_otros TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS competencias_conocimientos TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS competencias_habilidades TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS autoridad TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS ambiente_riesgos TEXT;

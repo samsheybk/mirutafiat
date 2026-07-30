@@ -1,0 +1,81 @@
+function navigateModule(url) {
+  if (url) window.location.href = url;
+}
+
+async function handleLogin(email, password) {
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password,
+  });
+  if (error) throw error;
+  return data;
+}
+
+async function handleLogout() {
+  const { error } = await supabaseClient.auth.signOut();
+  if (error) throw error;
+}
+
+async function getSession() {
+  const { data, error } = await supabaseClient.auth.getSession();
+  if (error) throw error;
+  return data.session;
+}
+
+async function getCurrentUser() {
+  const { data, error } = await supabaseClient.auth.getUser();
+  if (error) throw error;
+  return data.user;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+    const session = await getSession();
+    if (session) {
+      window.location.href = 'dashboard.html';
+      return;
+    }
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const errorDiv = document.getElementById('loginError');
+      const loginBtn = document.getElementById('loginBtn');
+
+      errorDiv.classList.remove('show');
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Iniciando sesión...';
+
+      try {
+        await handleLogin(email, password);
+        window.location.href = 'dashboard.html';
+      } catch (err) {
+        errorDiv.textContent = 'Credenciales inválidas. Verifica tu correo y contraseña.';
+        errorDiv.classList.add('show');
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Iniciar sesión';
+      }
+    });
+    return;
+  }
+
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    const session = await getSession();
+    if (!session) {
+      window.location.href = 'index.html';
+      return;
+    }
+
+    const user = await getCurrentUser();
+    const emailEl = document.getElementById('navUserEmail');
+    if (emailEl) emailEl.textContent = user.email || '';
+
+    logoutBtn.addEventListener('click', async () => {
+      await handleLogout();
+      window.location.href = 'index.html';
+    });
+  }
+});

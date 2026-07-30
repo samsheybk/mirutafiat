@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Captación y Selección - FIAT Intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    .estado-activo { color: #059669; font-weight: 600; }
+    .estado-suspendido { color: #D97706; font-weight: 600; }
+    .estado-retirado { color: #DC2626; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <nav class="topnav" style="background:var(--module-captacion);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'">FIAT Venezuela<span>Intranet</span></div>
+      <div class="topnav-spacer"></div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Dashboard</option>
+        <option value="captacion.html" selected>Captación y Selección</option>
+        <option value="relaciones-laborales.html">Relaciones Laborales</option>
+        <option value="capacitacion.html">Capacitación y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="compensacion.html">Compensación</option>
+      </select>
+      <div class="nav-user">
+        <span id="navUserEmail"></span>
+        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-panel">
+          <div class="panel-item active" data-tool="ats" onclick="switchTool('ats')" title="ATS">
+            <span class="panel-item-indicator bg-captacion"></span>
+            <img src="../icons/ats.webp" alt="ATS" width="24" height="24" style="pointer-events:none;">
+          </div>
+          <div class="panel-item" data-tool="estructura" onclick="switchTool('estructura')" title="Estructura organizacional">
+            <span class="panel-item-indicator bg-captacion"></span>
+            <img src="../icons/estructura-organizacional.webp" alt="Estructura organizacional" width="24" height="24" style="pointer-events:none;">
+          </div>
+          <div class="panel-item" data-tool="psicologia" onclick="switchTool('psicologia')" title="Psicología">
+            <span class="panel-item-indicator bg-captacion"></span>
+            <img src="../icons/psicologia.webp" alt="Psicología" width="24" height="24" style="pointer-events:none;">
+          </div>
+          <div class="panel-item" data-tool="requisiciones" onclick="switchTool('requisiciones')" title="Requisiciones de personal">
+            <span class="panel-item-indicator bg-captacion"></span>
+            <img src="../icons/requisiciones-de-personal.webp" alt="Requisiciones de personal" width="24" height="24" style="pointer-events:none;">
+          </div>
+          <div class="panel-item" data-tool="plantilla" onclick="switchTool('plantilla')" title="Plantilla activa">
+            <span class="panel-item-indicator bg-captacion"></span>
+            <img src="../icons/plantilla-activa.webp" alt="Plantilla activa" width="24" height="24" style="pointer-events:none;">
+          </div>
+        </div>
+
+        <div class="module-body">
+          <header class="topbar" style="gap:16px;">
+            <div class="toolbar-content" data-toolbar="ats" style="display:flex;align-items:center;gap:16px;width:100%;">
+              <input type="text" class="form-input" id="atsSearch" placeholder="Buscar por nombre, cédula, cargo..." oninput="filterCandidatos()" style="flex:1;max-width:400px;height:36px;">
+              <div class="view-toggle">
+                <button class="active" onclick="toggleATSView('tabla', this)">Tabla</button>
+                <button onclick="toggleATSView('kanban', this)">Kanban</button>
+              </div>
+              <button class="btn btn-captacion btn-sm" onclick="openModalATS()">+ Nuevo candidato</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="estructura" style="display:none;align-items:center;gap:16px;width:100%;">
+                <div style="display:flex;align-items:center;gap:8px;flex:1;">
+                  <input type="text" class="form-input" id="estSearch" placeholder="Buscar en estructura..." oninput="filterEstructura()" style="max-width:320px;height:36px;">
+                </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <button class="btn btn-captacion btn-sm" onclick="openModalUnidad()">+ Nueva unidad</button>
+                <button class="btn btn-outline" onclick="openModalCargo()">+ Nuevo cargo</button>
+                <button class="btn btn-outline" onclick="exportarOrganigrama()">Exportar organigrama</button>
+              </div>
+            </div>
+            <div class="toolbar-content" data-toolbar="plantilla" style="display:none;align-items:center;gap:16px;width:100%;">
+              <input type="text" class="form-input" id="plantSearch" placeholder="Buscar trabajador..." oninput="filterPlantilla()" style="max-width:280px;height:36px;">
+              <select class="form-select" id="filtroUnidad" onchange="filterPlantilla()" style="max-width:200px;height:36px;">
+                <option value="">Todas las unidades</option>
+              </select>
+              <span style="font-size:12px;color:var(--color-text-secondary);" id="plantCount">0 trabajadores</span>
+            </div>
+            <div class="toolbar-content" data-toolbar="requisiciones" style="display:none;align-items:center;gap:16px;width:100%;">
+              <span style="font-size:12px;color:var(--color-text-secondary);">Vacantes pendientes por cubrir</span>
+              <button class="btn btn-outline btn-sm" onclick="loadRequisiciones()" style="margin-left:auto;">Actualizar</button>
+            </div>
+          </header>
+
+          <div class="module-content">
+          <div class="tool-section active" id="tool-ats">
+
+            <div id="atsTableView">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Nombre / Cédula</th>
+                    <th>Cargo de interés</th>
+                    <th>Teléfono</th>
+                    <th>Correo</th>
+                    <th>Estado</th>
+                    <th style="width:80px;">Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="atsTableBody">
+                  <tr>
+                    <td colspan="6" style="text-align:center;padding:40px;color:#999;">No hay candidatos registrados</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div id="atsKanbanView" class="kanban-hidden">
+              <div class="kanban-board" id="atsKanbanBoard">
+                <div class="kanban-column" data-col="Nuevo">
+                  <div class="kanban-column-header">Nuevo <span class="kanban-column-count" id="count-Nuevo">0</span></div>
+                  <div class="kanban-column-body" id="col-Nuevo"></div>
+                </div>
+                <div class="kanban-column" data-col="Contacto">
+                  <div class="kanban-column-header">Contacto <span class="kanban-column-count" id="count-Contacto">0</span></div>
+                  <div class="kanban-column-body" id="col-Contacto"></div>
+                </div>
+                <div class="kanban-column" data-col="Entrevista">
+                  <div class="kanban-column-header">Entrevista <span class="kanban-column-count" id="count-Entrevista">0</span></div>
+                  <div class="kanban-column-body" id="col-Entrevista"></div>
+                </div>
+                <div class="kanban-column" data-col="Tecnica">
+                  <div class="kanban-column-header">Técnica <span class="kanban-column-count" id="count-Tecnica">0</span></div>
+                  <div class="kanban-column-body" id="col-Tecnica"></div>
+                </div>
+                <div class="kanban-column" data-col="Medica">
+                  <div class="kanban-column-header">Médica <span class="kanban-column-count" id="count-Medica">0</span></div>
+                  <div class="kanban-column-body" id="col-Medica"></div>
+                </div>
+                <div class="kanban-column" data-col="Elegible">
+                  <div class="kanban-column-header">Elegible <span class="kanban-column-count" id="count-Elegible">0</span></div>
+                  <div class="kanban-column-body" id="col-Elegible"></div>
+                </div>
+                <div class="kanban-column" data-col="Contratado">
+                  <div class="kanban-column-header">Contratado <span class="kanban-column-count" id="count-Contratado">0</span></div>
+                  <div class="kanban-column-body" id="col-Contratado"></div>
+                </div>
+                <div class="kanban-column" data-col="No elegible">
+                  <div class="kanban-column-header">No elegible <span class="kanban-column-count" id="count-Noelegible">0</span></div>
+                  <div class="kanban-column-body" id="col-Noelegible"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tool-section" id="tool-estructura">
+            <div id="estUnidadesView">
+              <div class="org-tree" id="estUnidadesTree">
+                <div style="text-align:center;padding:40px;color:#999;">No hay unidades registradas</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tool-section" id="tool-psicologia">
+            <div class="tool-section-header">
+              <h2 style="color:var(--module-captacion);">Evaluaciones psicológicas</h2>
+              <button class="btn btn-captacion">+ Nueva evaluación</button>
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr><th>Candidato</th><th>Tipo de prueba</th><th>Fecha</th><th>Resultado</th><th>Estado</th></tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="tool-section" id="tool-requisiciones">
+            <div class="tool-section-header">
+              <h2 style="color:var(--module-captacion);">Requisiciones de personal</h2>
+              <span style="font-size:12px;color:var(--color-text-secondary);" id="reqCount">0 pendientes</span>
+            </div>
+            <div style="height:calc(100vh - 260px);overflow-y:auto;">
+              <table class="data-table">
+                <thead>
+                  <tr><th>Cargo</th><th>Unidad</th><th>Vacantes totales</th><th>Ocupados</th><th style="color:var(--module-captacion);font-weight:700;">Pendientes</th></tr>
+                </thead>
+                <tbody id="reqTableBody">
+                  <tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Cargando...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="tool-section" id="tool-plantilla">
+            <div class="tool-section-header">
+              <div style="display:flex;gap:8px;align-items:center;">
+                <button class="btn btn-sm plantilla-tab active" data-tab="activo" onclick="switchPlantillaView('activo',this)" style="background:var(--module-captacion);color:#fff;border:0;border-radius:4px;padding:6px 16px;">Personal Activo</button>
+                <button class="btn btn-sm plantilla-tab" data-tab="historico" onclick="switchPlantillaView('historico',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Histórico</button>
+              </div>
+              <span style="font-size:12px;color:var(--color-text-secondary);" id="plantCount">0 trabajadores</span>
+            </div>
+            <div id="plantillaActivoView" style="height:calc(100vh - 260px);overflow-y:auto;">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Trabajador</th>
+                    <th>Cédula</th>
+                    <th>Unidad</th>
+                    <th>Cargo</th>
+                    <th>Ingreso</th>
+                    <th>Estado</th>
+                    <th style="width:100px;">Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="plantTableBody">
+                  <tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay trabajadores registrados</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div id="plantillaHistoricoView" style="display:none;height:calc(100vh - 260px);overflow-y:auto;">
+              <div class="tool-section-header">
+                <span style="font-size:12px;color:var(--color-text-secondary);" id="histCount">0 registros</span>
+              </div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Trabajador</th>
+                    <th>Cédula</th>
+                    <th>Unidad</th>
+                    <th>Cargo</th>
+                    <th>Período</th>
+                    <th>Estado</th>
+                    <th style="width:100px;">Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="histTableBody">
+                  <tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay registros históricos</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Nuevo proceso de reclutamiento</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="moduleForm">
+          <div class="form-group">
+            <label>Cargo</label>
+            <input type="text" class="form-input" id="cargo" required>
+          </div>
+          <div class="form-group">
+            <label>Departamento</label>
+            <input type="text" class="form-input" id="departamento" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Vacantes</label>
+              <input type="number" class="form-input" id="vacantes" min="1" required>
+            </div>
+            <div class="form-group">
+              <label>Fecha de inicio</label>
+              <input type="date" class="form-input" id="fecha_inicio" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Estado</label>
+            <select class="form-select" id="estado">
+              <option value="Abierto">Abierto</option>
+              <option value="En revisión">En revisión</option>
+              <option value="Cerrado">Cerrado</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea class="form-textarea" id="descripcion" rows="3"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-captacion" onclick="saveModule()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalEstadoPicker">
+    <div class="modal" style="max-width:400px;">
+      <div class="modal-header">
+        <h3>Cambiar estado</h3>
+        <button class="modal-close" onclick="closeEstadoPicker()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom:12px;font-size:14px;color:#666;">
+          Nuevo estado para <strong id="estadoPickerName" style="color:#111;"></strong>:
+        </p>
+        <div id="estadoPickerList" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalDescarta">
+    <div class="modal" style="max-width:400px;">
+      <div class="modal-header">
+        <h3>Descartar candidato</h3>
+        <button class="modal-close" onclick="closeDescarta()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom:12px;font-size:14px;color:#666;">
+          Pasando a <strong>No elegible</strong> a <strong id="descartaName"></strong>:
+        </p>
+        <div class="form-group">
+          <label>Motivo <span style="color:#dc2626;">*</span></label>
+          <textarea class="form-input" id="descartaMotivo" rows="4" placeholder="Indica el motivo del descarte..." style="resize:vertical;"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeDescarta()">Cancelar</button>
+        <button class="btn btn-captacion" onclick="confirmDescarta()" style="background:#dc2626;">Confirmar descarte</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalFicha">
+    <div class="modal" style="max-width:600px;">
+      <div class="modal-header">
+        <h3>Ficha del candidato</h3>
+        <button class="modal-close" onclick="closeFichaTecnica()">&times;</button>
+      </div>
+      <div class="modal-body" id="fichaBody"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalATS">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Nuevo candidato</h3>
+        <button class="modal-close" onclick="closeModalATS()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="atsForm">
+          <div class="form-group">
+            <label>Cédula</label>
+            <input type="text" class="form-input" id="ats_cedula" required oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase" onblur="verificarCedula()">
+            <div id="cedulaWarning" style="display:none;margin-top:4px;font-size:11px;color:#DC2626;font-weight:500;"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nombres</label>
+              <input type="text" class="form-input" id="ats_nombres" required oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase">
+            </div>
+            <div class="form-group">
+              <label>Apellidos</label>
+              <input type="text" class="form-input" id="ats_apellidos" required oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Correo electrónico</label>
+              <input type="email" class="form-input" id="ats_correo" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase">
+            </div>
+            <div class="form-group">
+              <label>Teléfono</label>
+              <input type="text" class="form-input" id="ats_telefono" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Dirección</label>
+            <input type="text" class="form-input" id="ats_direccion" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase">
+          </div>
+          <div class="form-group">
+            <label>Foto (URL)</label>
+            <input type="url" class="form-input" id="ats_foto_url" placeholder="https://ejemplo.com/foto.jpg" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase">
+          </div>
+          <div class="form-group">
+            <label>Cargo de interés</label>
+            <input type="text" class="form-input" id="ats_cargo" required oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase">
+          </div>
+          <input type="hidden" id="ats_estado_kanban" value="Nuevo">
+          <div class="form-group">
+            <label>Notas</label>
+            <textarea class="form-textarea" id="ats_notas" rows="3" oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModalATS()">Cancelar</button>
+        <button class="btn btn-captacion" onclick="saveATSCandidato()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalUnidad">
+    <div class="modal" style="max-width:480px;">
+      <div class="modal-header">
+        <h3 id="modalUnidadTitle">Nueva unidad</h3>
+        <button class="modal-close" onclick="closeModalUnidad()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="unidadForm">
+          <div class="form-group">
+            <label>Tipo de unidad</label>
+            <select class="form-select" id="unidad_tipo">
+              <option value="DIRECCION">Dirección</option>
+              <option value="GERENCIA">Gerencia</option>
+              <option value="DEPARTAMENTO">Departamento</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" class="form-input" id="unidad_nombre" required oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;">
+          </div>
+          <div class="form-group">
+            <label>Unidad padre (opcional)</label>
+            <select class="form-select" id="unidad_padre">
+              <option value="">— Ninguna —</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModalUnidad()">Cancelar</button>
+        <button class="btn btn-captacion" onclick="saveUnidad()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalCargo">
+    <div class="modal" style="max-width:480px;">
+      <div class="modal-header">
+        <h3 id="modalCargoTitle">Nuevo cargo</h3>
+        <button class="modal-close" onclick="closeModalCargo()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="cargoForm">
+          <div class="form-group">
+            <label>Título</label>
+            <input type="text" class="form-input" id="cargo_titulo" required oninput="this.value=this.value.toUpperCase()" style="text-transform:uppercase;">
+          </div>
+          <div class="form-group">
+            <label>Unidad</label>
+            <select class="form-select" id="cargo_unidad_id" required></select>
+          </div>
+          <div class="form-group">
+            <label>Jefe inmediato (opcional)</label>
+            <select class="form-select" id="cargo_jefe_id">
+              <option value="">— Ninguno —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Vacantes</label>
+            <input type="number" class="form-input" id="cargo_vacantes" min="0" value="0">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModalCargo()">Cancelar</button>
+        <button class="btn btn-outline" id="btnEliminarCargo" style="color:#dc2626;margin-right:auto;display:none;" onclick="eliminarCargo(editingCargoId)">Eliminar</button>
+        <button class="btn btn-captacion" onclick="saveCargo()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalIngreso">
+    <div class="modal" style="max-width:520px;">
+      <div class="modal-header">
+        <h3>Ingreso de personal</h3>
+        <button class="modal-close" onclick="closeIngreso()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="ingresoForm">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label>Cédula</label>
+              <input type="text" class="form-input" id="ingreso_cedula" readonly style="background:var(--color-bg);">
+            </div>
+            <div class="form-group">
+              <label>Nombre completo</label>
+              <input type="text" class="form-input" id="ingreso_nombre" readonly style="background:var(--color-bg);">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label>Unidad</label>
+              <select class="form-select" id="ingreso_unidad_id" required></select>
+            </div>
+            <div class="form-group">
+              <label>Cargo</label>
+              <select class="form-select" id="ingreso_cargo_id" required></select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Fecha de ingreso</label>
+            <input type="date" class="form-input" id="ingreso_fecha" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeIngreso()">Cancelar</button>
+        <button class="btn btn-captacion" onclick="saveIngreso()">Confirmar ingreso</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalOrganigrama">
+    <div class="modal" style="max-width:800px;">
+      <div class="modal-header">
+        <h3>Organigrama</h3>
+        <button class="modal-close" onclick="closeModalOrganigrama()">&times;</button>
+      </div>
+      <div class="modal-body" id="organigramaBody" style="max-height:60vh;overflow-y:auto;font-size:13px;"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalEditarTrabajador">
+    <div class="modal" style="max-width:520px;">
+      <div class="modal-header">
+        <h3 id="modalTrabTitle">Editar trabajador</h3>
+        <button class="modal-close" onclick="closeModalTrab()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="trabForm">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label>Cédula</label>
+              <input type="text" class="form-input" id="trab_cedula" readonly style="background:var(--color-bg);">
+            </div>
+            <div class="form-group">
+              <label>Nombre</label>
+              <input type="text" class="form-input" id="trab_nombre" readonly style="background:var(--color-bg);">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label>Unidad</label>
+              <select class="form-select" id="trab_unidad_id" required></select>
+            </div>
+            <div class="form-group">
+              <label>Cargo</label>
+              <select class="form-select" id="trab_cargo_id" required></select>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label>Fecha ingreso</label>
+              <input type="date" class="form-input" id="trab_fecha_ingreso">
+            </div>
+            <div class="form-group">
+              <label>Estado</label>
+              <select class="form-select" id="trab_estado">
+                <option value="Activo">Activo</option>
+                <option value="Suspendido">Suspendido</option>
+                <option value="Retirado">Retirado</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" id="fechaEgresoGroup" style="display:none;">
+            <label>Fecha de egreso</label>
+            <input type="date" class="form-input" id="trab_fecha_egreso">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModalTrab()">Cancelar</button>
+        <button class="btn btn-captacion" onclick="saveTrabajador()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/modules.js"></script>
+  <script>
+    (function() {
+      var saved = localStorage.getItem('fiat_tool_' + location.pathname);
+      if (saved && saved !== 'ats') switchTool(saved);
+    })();
+
+    let atsView = 'tabla';
+    let existingCandidatoId = null;
+    let allCandidatos = [];
+
+    function toggleATSView(view, btn) {
+      atsView = view;
+      document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('atsTableView').classList.toggle('kanban-hidden', view !== 'tabla');
+      document.getElementById('atsKanbanView').classList.toggle('kanban-hidden', view !== 'kanban');
+    }
+
+    function openModalATS() {
+      resetModalATS();
+      document.getElementById('modalATS').classList.add('show');
+    }
+
+    function closeModalATS() {
+      resetModalATS();
+      document.getElementById('modalATS').classList.remove('show');
+    }
+
+    function filterCandidatos() {
+      var q = document.getElementById('atsSearch').value.trim().toLowerCase();
+      if (!q) { renderATSTable(allCandidatos); renderATSKanban(allCandidatos); return; }
+      var filtered = allCandidatos.filter(function(c) {
+        var texto = '';
+        for (var k in c) { if (typeof c[k] === 'string') texto += ' ' + c[k]; }
+        return texto.toLowerCase().indexOf(q) !== -1;
+      });
+      renderATSTable(filtered);
+      renderATSKanban(filtered);
+    }
+
+    async function loadATSCandidatos() {
+      try {
+        const { data, error } = await supabaseClient
+          .from('ats_candidatos')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        allCandidatos = data || [];
+        filterCandidatos();
+      } catch (err) {
+        console.log('ATS: tabla ats_candidatos no existe aún');
+      }
+    }
+
+    function colorEstado(estado) {
+      var m = {'Nuevo':'#2563EB','Contacto':'#0891B2','Entrevista':'#D97706','Tecnica':'#EA580C','Medica':'#DB2777','Elegible':'#059669','Contratado':'#7C3AED','No elegible':'#DC2626'};
+      return m[estado] || '#999';
+    }
+
+    function renderATSTable(data) {
+      const tbody = document.getElementById('atsTableBody');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">No hay candidatos registrados</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(function(c) {
+        var clr = colorEstado(c.estado_kanban);
+        var descBtn = c.estado_kanban !== 'No elegible' && c.estado_kanban !== 'Contratado'
+          ? '<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();openDescarta(\'' + c.id + '\',\'' + c.nombres + ' ' + c.apellidos + '\')" style="color:#dc2626;">Descarta</button>'
+          : '';
+        return '<tr style="cursor:pointer;border-left:3px solid ' + clr + ';" onclick="openFichaTecnica(\'' + c.id + '\')">'
+          + '<td><span style="font-weight:600;">' + c.nombres + ' ' + c.apellidos + '</span><br><span class="text-sm text-secondary">' + c.cedula + '</span></td>'
+          + '<td>' + c.cargo_interes + '</td>'
+          + '<td>' + (c.telefono || '-') + '</td>'
+          + '<td>' + (c.correo || '-') + '</td>'
+          + '<td><span class="badge" style="background:' + clr + ';color:#fff;border:0;">' + c.estado_kanban + '</span></td>'
+          + '<td style="width:80px;">' + descBtn + '</td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function renderATSKanban(data) {
+      const cols = ['Nuevo','Contacto','Entrevista','Tecnica','Medica','Elegible','Contratado','No elegible'];
+      cols.forEach(col => {
+        const items = data.filter(c => c.estado_kanban === col);
+        document.getElementById('count-' + col).textContent = items.length;
+        const body = document.getElementById('col-' + col);
+        if (!items.length) {
+          body.innerHTML = '<div style="text-align:center;padding:16px;font-size:11px;color:#999;">Sin candidatos</div>';
+          return;
+        }
+        body.innerHTML = items.map(function(c) {
+          var descBtn = c.estado_kanban !== 'No elegible' && c.estado_kanban !== 'Contratado'
+            ? '<button class="kanban-arrow" onclick="event.stopPropagation();openDescarta(\'' + c.id + '\',\'' + c.nombres + ' ' + c.apellidos + '\')" title="Descartar" style="color:#dc2626;">&#10005;</button>'
+            : '';
+          return '<div class="kanban-card">'
+            + '<div class="kanban-card-body" onclick="openFichaTecnica(\'' + c.id + '\')" title="Ver ficha del candidato">'
+            + '<div class="kanban-card-title">' + c.nombres + ' ' + c.apellidos + '</div>'
+            + '<div class="kanban-card-sub">' + c.cargo_interes + '</div>'
+            + '<div class="kanban-card-footer"><span>' + (c.telefono || '') + '</span></div>'
+            + '</div>'
+            + '<div class="kanban-card-arrows">'
+            + '<button class="kanban-arrow" onclick="event.stopPropagation();moverEstado(\'' + c.id + '\',\'' + c.estado_kanban + '\',-1)" ' + (c.estado_kanban === 'Nuevo' ? 'disabled' : '') + '>&#9664;</button>'
+            + descBtn
+            + '<button class="kanban-arrow" onclick="event.stopPropagation();moverEstado(\'' + c.id + '\',\'' + c.estado_kanban + '\',1)" ' + (c.estado_kanban === 'No elegible' ? 'disabled' : '') + '>&#9654;</button>'
+            + '</div>'
+            + '</div>';
+        }).join('');
+      });
+    }
+
+    /* ===== DESCARTA ===== */
+    var descartaCandidatoId = null;
+
+    function openDescarta(id, nombre) {
+      descartaCandidatoId = id;
+      document.getElementById('descartaName').textContent = nombre;
+      document.getElementById('descartaMotivo').value = '';
+      document.getElementById('modalDescarta').classList.add('show');
+    }
+
+    function closeDescarta() {
+      document.getElementById('modalDescarta').classList.remove('show');
+    }
+
+    async function confirmDescarta() {
+      var motivo = document.getElementById('descartaMotivo').value.trim();
+      if (!motivo) { alert('Debes indicar el motivo del descarte'); return; }
+      try {
+        var user = await getCurrentUser();
+        if (!user) { alert('Error: sesión no encontrada. Recarga la página.'); return; }
+        var estadoActual = allCandidatos.find(function(c) { return c.id === descartaCandidatoId; });
+        if (!estadoActual) { alert('Error: candidato no encontrado en memoria'); return; }
+        estadoActual = estadoActual.estado_kanban;
+        var { error: e1 } = await supabaseClient.from('ats_candidatos').update({ estado_kanban: 'No elegible' }).eq('id', descartaCandidatoId);
+        if (e1) throw e1;
+        var { error: e2 } = await supabaseClient.from('ats_log_estados').insert([{
+          candidato_id: descartaCandidatoId, estado_anterior: estadoActual, estado_nuevo: 'No elegible',
+          changed_by: user.id, changed_by_email: user.email
+        }]);
+        if (e2) throw e2;
+        var { error: e3 } = await supabaseClient.from('ats_comentarios').insert([{
+          candidato_id: descartaCandidatoId, texto: 'DESCARTA: ' + motivo,
+          user_id: user.id, user_email: user.email
+        }]);
+        if (e3) throw e3;
+        closeDescarta();
+        loadATSCandidatos();
+      } catch (err) {
+        alert('Error al descartar: ' + err.message);
+      }
+    }
+
+    function validarCedulaVE(v) {
+      return /^[VE]\d{4,10}$/.test(v);
+    }
+
+    function validarTelefonoVE(v) {
+      return /^0(212|4(12|14|16|24|26))\d{7}$/.test(v.replace(/\D/g, ''));
+    }
+
+    function validarCorreoDominio(v) {
+      if (!v) return true;
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+    }
+
+    async function verificarCedula() {
+      var cedula = document.getElementById('ats_cedula').value.trim();
+      var warning = document.getElementById('cedulaWarning');
+      existingCandidatoId = null;
+      if (!cedula) { warning.style.display = 'none'; return; }
+      try {
+        var { data } = await supabaseClient.from('ats_candidatos').select('id,nombres,apellidos').eq('cedula', cedula).maybeSingle();
+        if (data) {
+          existingCandidatoId = data.id;
+          warning.style.display = 'block';
+          warning.innerHTML = 'Esta cédula ya tiene un proceso abierto (' + data.nombres + ' ' + data.apellidos + ').<br>Al guardar se actualizarán los datos sin afectar el historial.';
+        } else {
+          warning.style.display = 'none';
+        }
+      } catch (e) {}
+    }
+
+    function resetModalATS() {
+      document.getElementById('atsForm').reset();
+      existingCandidatoId = null;
+      document.getElementById('cedulaWarning').style.display = 'none';
+    }
+
+    async function saveATSCandidato() {
+      var cedula = document.getElementById('ats_cedula').value.trim();
+      var nombres = document.getElementById('ats_nombres').value.trim();
+      var apellidos = document.getElementById('ats_apellidos').value.trim();
+      var correo = document.getElementById('ats_correo').value.trim();
+      var telefono = document.getElementById('ats_telefono').value.trim();
+      var direccion = document.getElementById('ats_direccion').value.trim();
+      var foto_url = document.getElementById('ats_foto_url').value.trim();
+      var cargo = document.getElementById('ats_cargo').value.trim();
+      var notas = document.getElementById('ats_notas').value.trim();
+
+      if (!cedula || !nombres || !apellidos) { alert('Completa cédula, nombres y apellidos'); return; }
+      if (!validarCedulaVE(cedula)) { alert('La cédula debe comenzar con V o E seguido solo de números (ej: V12345678)'); return; }
+      if (telefono && !validarTelefonoVE(telefono)) { alert('El teléfono debe ser un número venezolano válido (ej: 0412-1234567)'); return; }
+      if (correo && !validarCorreoDominio(correo)) { alert('El correo debe tener un dominio válido (ej: usuario@dominio.com)'); return; }
+
+      if (existingCandidatoId) {
+        var confirmar = confirm('Esta cédula ya existe. ¿Deseas actualizar los datos?\n\nLos datos anteriores serán reemplazados.\nEl historial de movimientos NO se verá afectado.');
+        if (!confirmar) return;
+      }
+
+      try {
+        if (existingCandidatoId) {
+          var { error } = await supabaseClient.from('ats_candidatos').update({
+            nombres: nombres, apellidos: apellidos, correo: correo, telefono: telefono,
+            direccion: direccion, foto_url: foto_url, cargo_interes: cargo, notas: notas
+          }).eq('id', existingCandidatoId);
+        } else {
+          var { error } = await supabaseClient.from('ats_candidatos').insert([{
+            cedula: cedula, nombres: nombres, apellidos: apellidos, correo: correo, telefono: telefono,
+            direccion: direccion, foto_url: foto_url, cargo_interes: cargo, estado_kanban: 'Nuevo', notas: notas
+          }]);
+        }
+        if (error) throw error;
+        closeModalATS();
+        loadATSCandidatos();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    function openEstadoPicker(id, nombre, estadoActual) {
+      document.getElementById('estadoPickerName').textContent = nombre;
+      const estados = ['Nuevo','Contacto','Entrevista','Tecnica','Medica','Elegible','No elegible'];
+      const list = document.getElementById('estadoPickerList');
+      list.innerHTML = estados.map(function(e) {
+        var disabled = e === estadoActual;
+        var cls = disabled ? 'btn-captacion' : 'btn-outline';
+        var suffix = disabled ? ' (actual)' : '';
+        var onclick = disabled ? '' : "cambiarEstado(" + id + ",'" + estadoActual + "','" + e + "')";
+        return '<button class="btn ' + cls + '" onclick="' + onclick + '" style="text-align:left;justify-content:flex-start;"' + (disabled ? ' disabled' : '') + '>' + e + suffix + '</button>';
+      }).join('');
+      document.getElementById('modalEstadoPicker').classList.add('show');
+    }
+
+    function closeEstadoPicker() {
+      document.getElementById('modalEstadoPicker').classList.remove('show');
+    }
+
+    function moverEstado(id, estadoActual, direccion) {
+      var orden = ['Nuevo','Contacto','Entrevista','Tecnica','Medica','Elegible','Contratado','No elegible'];
+      var idx = orden.indexOf(estadoActual);
+      var nuevoIdx = idx + direccion;
+      if (nuevoIdx < 0 || nuevoIdx >= orden.length) return;
+      var estadoNuevo = orden[nuevoIdx];
+      if (estadoActual === 'Elegible' && estadoNuevo === 'Contratado') {
+        openIngreso(id);
+        return;
+      }
+      cambiarEstado(id, estadoActual, estadoNuevo);
+    }
+
+    async function cambiarEstado(id, estadoAnterior, estadoNuevo) {
+      try {
+        const user = await getCurrentUser();
+        const { error: updateError } = await supabaseClient
+          .from('ats_candidatos')
+          .update({ estado_kanban: estadoNuevo })
+          .eq('id', id);
+        if (updateError) throw updateError;
+        const { error: logError } = await supabaseClient
+          .from('ats_log_estados')
+          .insert([{
+            candidato_id: id,
+            estado_anterior: estadoAnterior,
+            estado_nuevo: estadoNuevo,
+            changed_by: user.id,
+            changed_by_email: user.email
+          }]);
+        if (logError) throw logError;
+        closeEstadoPicker();
+        loadATSCandidatos();
+      } catch (err) {
+        alert('Error al cambiar estado: ' + err.message);
+      }
+    }
+
+    function closeFichaTecnica() {
+      document.getElementById('modalFicha').classList.remove('show');
+    }
+
+    /* ===== INGRESO DESDE ATS ===== */
+    var ingresoCandidatoId = null;
+
+    async function openIngreso(id) {
+      ingresoCandidatoId = id;
+      try {
+        var { data: c, error } = await supabaseClient.from('ats_candidatos').select('*').eq('id', id).single();
+        if (error) throw error;
+        if (!c) return;
+        document.getElementById('ingreso_cedula').value = c.cedula;
+        document.getElementById('ingreso_nombre').value = c.nombres + ' ' + c.apellidos;
+        var hoy = new Date().toISOString().split('T')[0];
+        document.getElementById('ingreso_fecha').value = hoy;
+        var { data: unidades } = await supabaseClient.from('est_unidades').select('*').order('nombre');
+        if (unidades) {
+          var sel = document.getElementById('ingreso_unidad_id');
+          sel.innerHTML = '<option value="">— Selecciona unidad —</option>' + unidades.map(function(u) { return '<option value="' + u.id + '">' + u.nombre + ' (' + u.tipo + ')</option>'; }).join('');
+          sel.onchange = function() { populateIngresoCargos(); };
+        }
+        populateIngresoCargos();
+        document.getElementById('modalIngreso').classList.add('show');
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function populateIngresoCargos() {
+      var unidadId = document.getElementById('ingreso_unidad_id').value;
+      var sel = document.getElementById('ingreso_cargo_id');
+      sel.innerHTML = '<option value="">— Selecciona cargo —</option>';
+      if (!unidadId) return;
+      try {
+        var { data: cargos } = await supabaseClient.from('est_cargos').select('*').eq('unidad_id', unidadId).order('titulo');
+        if (cargos) {
+          cargos.forEach(function(c) {
+            sel.innerHTML += '<option value="' + c.id + '">' + c.titulo + ' ' + (c.vacantes > 0 ? '(' + c.vacantes + ' vacantes)' : '') + '</option>';
+          });
+        }
+      } catch (e) {}
+    }
+
+    function closeIngreso() {
+      document.getElementById('modalIngreso').classList.remove('show');
+    }
+
+    async function saveIngreso() {
+      var unidadId = document.getElementById('ingreso_unidad_id').value;
+      var cargoId = document.getElementById('ingreso_cargo_id').value;
+      var fecha = document.getElementById('ingreso_fecha').value;
+      if (!unidadId || !cargoId || !fecha) { alert('Completa todos los campos'); return; }
+      if (!confirm('¿Confirmar ingreso del trabajador a la nómina?')) return;
+      try {
+        var user = await getCurrentUser();
+        var { data: c, error: e1 } = await supabaseClient.from('ats_candidatos').select('*').eq('id', ingresoCandidatoId).single();
+        if (e1) throw e1;
+        var { error: e2 } = await supabaseClient.from('plantilla_trabajadores').insert([{
+          candidato_id: ingresoCandidatoId,
+          cedula: c.cedula, nombres: c.nombres, apellidos: c.apellidos,
+          correo: c.correo, telefono: c.telefono, direccion: c.direccion, foto_url: c.foto_url,
+          cargo_id: cargoId, unidad_id: unidadId, fecha_ingreso: fecha, estado: 'Activo'
+        }]);
+        if (e2) throw e2;
+        var { error: e3 } = await supabaseClient.from('ats_candidatos').update({ estado_kanban: 'Contratado' }).eq('id', ingresoCandidatoId);
+        if (e3) throw e3;
+        var { error: e4 } = await supabaseClient.from('ats_log_estados').insert([{
+          candidato_id: ingresoCandidatoId, estado_anterior: 'Elegible', estado_nuevo: 'Contratado',
+          changed_by: user.id, changed_by_email: user.email
+        }]);
+        if (e4) throw e4;
+        closeIngreso();
+        loadATSCandidatos();
+        alert('Trabajador ingresado exitosamente a la nómina.');
+      } catch (err) {
+        alert('Error al ingresar: ' + err.message);
+      }
+    }
+
+    var fichaActualId = null;
+
+    function renderComentarios(data) {
+      var html = '<div style="margin-top:20px;border-top:1px solid var(--color-border);padding-top:16px;">'
+        + '<h4 style="font-size:13px;font-weight:600;margin-bottom:10px;">Comentarios</h4>'
+        + '<div id="comentariosLista" style="display:flex;flex-direction:column;gap:8px;max-height:180px;overflow-y:auto;margin-bottom:10px;">';
+      if (data && data.length) {
+        html += data.map(function(m) {
+          return '<div style="font-size:12px;padding:8px 10px;background:var(--color-bg);border:1px solid var(--color-border);">'
+            + '<div style="font-weight:600;font-size:11px;color:var(--color-text-secondary);margin-bottom:4px;">' + (m.user_email || 'Usuario') + ' · ' + new Date(m.created_at).toLocaleString('es-VE') + '</div>'
+            + '<div>' + m.texto + '</div>'
+            + '</div>';
+        }).join('');
+      } else {
+        html += '<div style="font-size:12px;color:var(--color-text-secondary);padding:8px;">Sin comentarios</div>';
+      }
+      html += '</div>'
+        + '<div style="display:flex;gap:8px;">'
+        + '<textarea id="comentarioInput" rows="2" style="flex:1;padding:8px;font-size:12px;border:1px solid var(--color-border);background:var(--color-surface);resize:none;outline:none;" placeholder="Escribe un comentario..."></textarea>'
+        + '<button class="btn btn-captacion" style="align-self:flex-end;" onclick="guardarComentario()">Enviar</button>'
+        + '</div>'
+        + '</div>';
+      return html;
+    }
+
+    async function guardarComentario() {
+      var texto = document.getElementById('comentarioInput').value.trim();
+      if (!texto || !fichaActualId) return;
+      try {
+        var user = await getCurrentUser();
+        var { error } = await supabaseClient.from('ats_comentarios').insert([{
+          candidato_id: fichaActualId,
+          texto: texto,
+          user_id: user.id,
+          user_email: user.email
+        }]);
+        if (error) throw error;
+        await openFichaTecnica(fichaActualId);
+      } catch (err) {
+        alert('Error al guardar comentario: ' + err.message);
+      }
+    }
+
+    async function openFichaTecnica(id) {
+      fichaActualId = id;
+      try {
+        var { data: c, error } = await supabaseClient.from('ats_candidatos').select('*').eq('id', id).single();
+        if (error) throw error;
+        if (!c) return;
+
+        var { data: logs } = await supabaseClient.from('ats_log_estados').select('*').eq('candidato_id', id).order('created_at', { ascending: false });
+        var { data: comentarios } = await supabaseClient.from('ats_comentarios').select('*').eq('candidato_id', id).order('created_at', { ascending: false });
+
+        var fotoHtml = c.foto_url
+          ? '<div><img src="' + c.foto_url + '" style="width:80px;height:80px;object-fit:cover;border:1px solid var(--color-border);"></div>'
+          : '<div style="width:80px;height:80px;border:1px solid var(--color-border);display:flex;align-items:center;justify-content:center;background:var(--color-bg);"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>';
+
+        var logHtml = '';
+        if (logs && logs.length) {
+          logHtml = '<div style="margin-top:20px;border-top:1px solid var(--color-border);padding-top:16px;"><h4 style="font-size:13px;font-weight:600;margin-bottom:10px;">Historial de movimientos</h4>'
+            + '<div style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;">'
+            + logs.map(function(l) { return '<div style="font-size:11px;padding:6px 10px;background:var(--color-bg);display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;"><span><strong style="color:var(--module-captacion);">' + l.estado_anterior + '</strong> → <strong style="color:var(--module-captacion);">' + l.estado_nuevo + '</strong></span><span style="color:var(--color-text-secondary);font-size:10px;">' + (l.changed_by_email || '') + ' · ' + new Date(l.created_at).toLocaleString('es-VE') + '</span></div>'; }).join('')
+            + '</div></div>';
+        }
+
+        document.getElementById('fichaBody').innerHTML =
+          '<div style="display:flex;gap:24px;margin-bottom:16px;">'
+          + fotoHtml
+          + '<div style="flex:1;">'
+          + '<h3 style="font-size:18px;font-weight:700;margin-bottom:4px;">' + c.nombres + ' ' + c.apellidos + '</h3>'
+          + '<div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:12px;">' + c.cedula + '</div>'
+          + '<span class="badge" style="font-size:12px;padding:4px 12px;background:' + colorEstado(c.estado_kanban) + ';color:#fff;border:0;">' + c.estado_kanban + '</span>'
+          + '</div>'
+          + '</div>'
+          + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;">'
+          + '<div><span style="color:var(--color-text-secondary);font-size:11px;">CARGO DE INTERÉS</span><br><span style="font-weight:500;">' + c.cargo_interes + '</span></div>'
+          + '<div><span style="color:var(--color-text-secondary);font-size:11px;">TELÉFONO</span><br><span style="font-weight:500;">' + (c.telefono || '-') + '</span></div>'
+          + '<div><span style="color:var(--color-text-secondary);font-size:11px;">CORREO</span><br><span style="font-weight:500;">' + (c.correo || '-') + '</span></div>'
+          + '<div><span style="color:var(--color-text-secondary);font-size:11px;">DIRECCIÓN</span><br><span style="font-weight:500;">' + (c.direccion || '-') + '</span></div>'
+          + '<div style="grid-column:1/-1;"><span style="color:var(--color-text-secondary);font-size:11px;">NOTAS</span><br><span style="font-weight:500;">' + (c.notas || '-') + '</span></div>'
+          + '<div style="grid-column:1/-1;"><span style="color:var(--color-text-secondary);font-size:11px;">REGISTRADO</span><br><span style="font-weight:500;">' + new Date(c.created_at).toLocaleString('es-VE') + '</span></div>'
+          + '</div>'
+          + logHtml
+          + renderComentarios(comentarios)
+          + '<div style="margin-top:12px;border-top:1px solid var(--color-border);padding-top:12px;display:flex;gap:8px;">'
+          + (c.estado_kanban === 'Elegible' ? '<button class="btn btn-captacion" onclick="closeFichaTecnica();openIngreso(\'' + c.id + '\')">Ingreso</button>' : '')
+          + '<button class="btn btn-captacion" onclick="closeFichaTecnica();openEstadoPicker(' + c.id + ',\'' + c.nombres + ' ' + c.apellidos + '\',\'' + c.estado_kanban + '\')">Cambiar estado</button>'
+          + '<button class="btn btn-outline" onclick="closeFichaTecnica()">Cerrar</button>'
+          + '</div>';
+
+        document.getElementById('modalFicha').classList.add('show');
+      } catch (err) {
+        alert('Error al cargar ficha: ' + err.message);
+      }
+    }
+
+    /* ===== ESTRUCTURA ORGANIZACIONAL ===== */
+    var allUnidades = [];
+    var allCargos = [];
+    var editingCargoId = null;
+    var editingUnidadId = null;
+
+    function filterEstructura() {
+      var q = document.getElementById('estSearch').value.trim().toLowerCase();
+      renderUnidadesTree(q);
+    }
+
+    async function loadEstructura() {
+      try {
+        var u = await supabaseClient.from('est_unidades').select('*').order('nombre');
+        if (u.data) allUnidades = u.data;
+        var c = await supabaseClient.from('est_cargos').select('*').order('titulo');
+        if (c.data) allCargos = c.data;
+        renderUnidadesTree('');
+        populateUnidadSelects();
+        populateJefeSelect();
+        if (document.getElementById('modalOrganigrama').classList.contains('show')) {
+          renderOrganigrama();
+        }
+      } catch (e) {
+        console.warn('Error loading estructura:', e);
+      }
+    }
+
+    function getUnidadNombre(id) {
+      var u = allUnidades.find(function(x) { return x.id === id; });
+      return u ? u.nombre : '-';
+    }
+
+    function getUnidadTipo(id) {
+      var u = allUnidades.find(function(x) { return x.id === id; });
+      return u ? u.tipo : '-';
+    }
+
+    function getCargoNombre(id) {
+      var c = allCargos.find(function(x) { return x.id === id; });
+      return c ? c.titulo : '-';
+    }
+
+    function unidadCard(u, nivel, hasChildren) {
+      var toggle = hasChildren ? '<span class="org-toggle">▶</span>' : '';
+      var cls = 'org-card org-card-tree org-card-' + (u.tipo === 'DIRECCION' ? 'direccion' : u.tipo === 'GERENCIA' ? 'gerencia' : 'departamento') + ' org-card-lvl-' + nivel;
+      if (hasChildren) cls += ' org-card-has-children';
+      var click = hasChildren ? ' onclick="toggleOrgChildren(this)"' : '';
+      var sub = u.tipo === 'DIRECCION' ? 'DIRECCIÓN' : u.tipo === 'GERENCIA' ? 'GERENCIA' : 'DEPARTAMENTO';
+      return '<div class="' + cls + '"' + click + '>'
+        + toggle
+        + '<div class="org-card-body">'
+        + '<div class="org-card-sub">' + sub + '</div>'
+        + '<div class="org-card-title">' + u.nombre + '</div>'
+        + '</div>'
+        + '<div class="org-card-actions">'
+        + '<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();editarUnidad(\'' + u.id + '\')">Editar</button>'
+        + '<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();eliminarUnidad(\'' + u.id + '\')" style="color:#dc2626;">Eliminar</button>'
+        + '</div>'
+        + '</div>';
+    }
+
+    function cargoItem(c, jefeNombre) {
+      var vac = (c.vacantes && c.vacantes > 0) ? ' <span class="org-cargo-vac">' + c.vacantes + ' vacante' + (c.vacantes > 1 ? 's' : '') + '</span>' : '';
+      return '<div class="org-cargo-item" onclick="editarCargo(\'' + c.id + '\')" title="Click para editar" style="cursor:pointer;">'
+        + '<span class="org-cargo-bullet">▪</span>'
+        + '<span style="font-weight:500;">' + c.titulo + '</span>'
+        + (jefeNombre ? '<span class="org-cargo-jefe">→ ' + jefeNombre + '</span>' : '')
+        + vac
+        + '</div>';
+    }
+
+    function renderUnidadNode(u, nivel, q) {
+      var html = '';
+      var hijos = allUnidades.filter(function(x) { return x.unidad_padre_id === u.id; });
+      var cargosU = allCargos.filter(function(c) { return c.unidad_id === u.id; }).sort(function(a,b) {
+        if (a.jefe_inmediato_id === b.id) return 1;
+        if (b.jefe_inmediato_id === a.id) return -1;
+        if (!a.jefe_inmediato_id && b.jefe_inmediato_id) return -1;
+        if (a.jefe_inmediato_id && !b.jefe_inmediato_id) return 1;
+        return a.titulo.localeCompare(b.titulo);
+      });
+      var hasChildren = hijos.length > 0 || cargosU.length > 0;
+      var match = !q || u.nombre.toLowerCase().indexOf(q) !== -1 || u.tipo.toLowerCase().indexOf(q) !== -1;
+      if (!match && !q) match = true;
+      if (!match && hasChildren) {
+        var childMatch = false;
+        hijos.forEach(function(h) { if (renderUnidadNode(h, nivel + 1, q) !== '') childMatch = true; });
+        cargosU.forEach(function(c) { if (c.titulo.toLowerCase().indexOf(q) !== -1) childMatch = true; });
+        if (!childMatch) return '';
+        match = true;
+      }
+      if (!match) return '';
+      html += unidadCard(u, nivel, hijos.length > 0 || cargosU.length > 0);
+      if (hasChildren) {
+        html += '<div class="org-children open">';
+        cargosU.forEach(function(c) {
+          if (!q || c.titulo.toLowerCase().indexOf(q) !== -1) {
+            var jefe = allCargos.find(function(x) { return x.id === c.jefe_inmediato_id; });
+            html += cargoItem(c, jefe ? jefe.titulo : '');
+          }
+        });
+        hijos.forEach(function(h) {
+          html += renderUnidadNode(h, nivel + 1, q);
+        });
+        html += '</div>';
+      }
+      return html;
+    }
+
+    function renderUnidadesTree(q) {
+      var tree = document.getElementById('estUnidadesTree');
+      var raices = allUnidades.filter(function(u) { return !u.unidad_padre_id; }).sort(function(a,b) { return a.tipo.localeCompare(b.tipo) || a.nombre.localeCompare(b.nombre); });
+      if (!raices.length) {
+        tree.innerHTML = '<div style="text-align:center;padding:40px;color:#999;">' + (q ? 'Sin resultados' : 'No hay unidades registradas. Crea una Dirección para comenzar.') + '</div>';
+        return;
+      }
+      var html = '';
+      raices.forEach(function(r) {
+        html += renderUnidadNode(r, 0, q);
+      });
+      tree.innerHTML = html || '<div style="text-align:center;padding:40px;color:#999;">Sin resultados</div>';
+    }
+
+    function populateUnidadSelects() {
+      var selects = ['unidad_padre', 'cargo_unidad_id'];
+      selects.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        var currentVal = el.value;
+        if (id === 'unidad_padre') {
+          el.innerHTML = '<option value="">— Ninguna —</option>';
+        } else {
+          el.innerHTML = '';
+        }
+        allUnidades.forEach(function(u) {
+          var opt = document.createElement('option');
+          opt.value = u.id;
+          opt.textContent = u.nombre + ' (' + u.tipo + ')';
+          el.appendChild(opt);
+        });
+        if (currentVal) el.value = currentVal;
+      });
+    }
+
+    function populateJefeSelect() {
+      var el = document.getElementById('cargo_jefe_id');
+      if (!el) return;
+      var currentVal = el.value;
+      el.innerHTML = '<option value="">— Ninguno —</option>';
+      allCargos.forEach(function(c) {
+        var opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = c.titulo + ' - ' + getUnidadNombre(c.unidad_id);
+        el.appendChild(opt);
+      });
+      if (currentVal) el.value = currentVal;
+    }
+
+    function openModalUnidad() {
+      editingUnidadId = null;
+      document.getElementById('modalUnidadTitle').textContent = 'Nueva unidad';
+      document.getElementById('unidadForm').reset();
+      populateUnidadSelects();
+      document.getElementById('modalUnidad').classList.add('show');
+    }
+
+    function closeModalUnidad() {
+      document.getElementById('modalUnidad').classList.remove('show');
+    }
+
+    async function saveUnidad() {
+      var nombre = document.getElementById('unidad_nombre').value.trim();
+      var tipo = document.getElementById('unidad_tipo').value;
+      var padre = document.getElementById('unidad_padre').value;
+      if (!nombre) { alert('Ingresa el nombre de la unidad'); return; }
+      try {
+        if (editingUnidadId) {
+          var { error } = await supabaseClient.from('est_unidades').update({ nombre: nombre, tipo: tipo, unidad_padre_id: padre || null }).eq('id', editingUnidadId);
+          if (error) throw error;
+        } else {
+          var { error } = await supabaseClient.from('est_unidades').insert([{ nombre: nombre, tipo: tipo, unidad_padre_id: padre || null }]);
+          if (error) throw error;
+        }
+        await loadEstructura();
+        closeModalUnidad();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function editarUnidad(id) {
+      editingUnidadId = id;
+      var u = allUnidades.find(function(x) { return x.id === id; });
+      if (!u) return;
+      document.getElementById('modalUnidadTitle').textContent = 'Editar unidad';
+      document.getElementById('unidad_nombre').value = u.nombre;
+      document.getElementById('unidad_tipo').value = u.tipo;
+      populateUnidadSelects();
+      if (u.unidad_padre_id) document.getElementById('unidad_padre').value = u.unidad_padre_id;
+      document.getElementById('modalUnidad').classList.add('show');
+    }
+
+    async function eliminarUnidad(id) {
+      if (!confirm('¿Eliminar esta unidad? Los cargos asignados a ella quedarán huérfanos.')) return;
+      try {
+        var { error } = await supabaseClient.from('est_unidades').delete().eq('id', id);
+        if (error) throw error;
+        await loadEstructura();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    function openModalCargo() {
+      editingCargoId = null;
+      document.getElementById('modalCargoTitle').textContent = 'Nuevo cargo';
+      document.getElementById('cargoForm').reset();
+      document.getElementById('btnEliminarCargo').style.display = 'none';
+      populateUnidadSelects();
+      populateJefeSelect();
+      document.getElementById('modalCargo').classList.add('show');
+    }
+
+    function closeModalCargo() {
+      document.getElementById('modalCargo').classList.remove('show');
+    }
+
+    async function saveCargo() {
+      var titulo = document.getElementById('cargo_titulo').value.trim();
+      var unidadId = document.getElementById('cargo_unidad_id').value;
+      var jefeId = document.getElementById('cargo_jefe_id').value;
+      var vacantes = parseInt(document.getElementById('cargo_vacantes').value) || 0;
+      if (!titulo) { alert('Ingresa el título del cargo'); return; }
+      if (!unidadId) { alert('Selecciona una unidad'); return; }
+      try {
+        if (editingCargoId) {
+          var { error } = await supabaseClient.from('est_cargos').update({ titulo: titulo, unidad_id: unidadId, jefe_inmediato_id: jefeId || null, vacantes: vacantes }).eq('id', editingCargoId);
+          if (error) throw error;
+        } else {
+          var { error } = await supabaseClient.from('est_cargos').insert([{ titulo: titulo, unidad_id: unidadId, jefe_inmediato_id: jefeId || null, vacantes: vacantes }]);
+          if (error) throw error;
+        }
+        await loadEstructura();
+        closeModalCargo();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function editarCargo(id) {
+      editingCargoId = id;
+      var c = allCargos.find(function(x) { return x.id === id; });
+      if (!c) return;
+      document.getElementById('modalCargoTitle').textContent = 'Editar cargo';
+      document.getElementById('cargoForm').reset();
+      document.getElementById('btnEliminarCargo').style.display = '';
+      document.getElementById('cargo_titulo').value = c.titulo;
+      populateUnidadSelects();
+      document.getElementById('cargo_unidad_id').value = c.unidad_id;
+      populateJefeSelect();
+      if (c.jefe_inmediato_id) document.getElementById('cargo_jefe_id').value = c.jefe_inmediato_id;
+      document.getElementById('cargo_vacantes').value = c.vacantes || 0;
+      document.getElementById('modalCargo').classList.add('show');
+    }
+
+    async function eliminarCargo(id) {
+      if (!confirm('¿Eliminar este cargo?')) return;
+      try {
+        var { error } = await supabaseClient.from('est_cargos').delete().eq('id', id);
+        if (error) throw error;
+        await loadEstructura();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    function toggleOrgChildren(card) {
+      var children = card.nextElementSibling;
+      if (!children || !children.classList.contains('org-children')) return;
+      children.classList.toggle('open');
+      var toggle = card.querySelector('.org-toggle');
+      if (toggle) toggle.textContent = children.classList.contains('open') ? '▼' : '▶';
+    }
+
+    function orgCard(tipo, nivel, nombre, sub, jefeHtml, hasChildren) {
+      var toggle = hasChildren ? '<span class="org-toggle">▶</span>' : '';
+      var cls = 'org-card org-card-' + tipo + ' org-card-lvl-' + nivel;
+      if (hasChildren) cls += ' org-card-has-children';
+      var click = hasChildren ? ' onclick="toggleOrgChildren(this)"' : '';
+      return '<div class="' + cls + '"' + click + '>'
+        + toggle
+        + (sub ? '<div class="org-card-sub">' + sub + '</div>' : '')
+        + '<div class="org-card-title"' + (toggle ? ' style="display:inline;"' : '') + '>' + nombre + '</div>'
+        + (jefeHtml ? '<div class="org-card-jefe">→ ' + jefeHtml + '</div>' : '')
+        + '</div>';
+    }
+
+    function renderOrgLevel(items, tipo, nivel, cargos, unidades) {
+      var html = '';
+      items.forEach(function(item) {
+        var sub = tipo === 'direccion' ? 'DIRECCIÓN' : tipo === 'gerencia' ? 'GERENCIA' : 'DEPARTAMENTO';
+        var cargosItem = cargos.filter(function(c) { return c.unidad_id === item.id; }).sort(function(a,b) {
+          if (a.jefe_inmediato_id === b.id) return 1;
+          if (b.jefe_inmediato_id === a.id) return -1;
+          if (!a.jefe_inmediato_id && b.jefe_inmediato_id) return -1;
+          if (a.jefe_inmediato_id && !b.jefe_inmediato_id) return 1;
+          return a.titulo.localeCompare(b.titulo);
+        });
+        var subTipo = tipo === 'direccion' ? 'gerencia' : tipo === 'gerencia' ? 'departamento' : null;
+        var subItems = subTipo ? unidades.filter(function(u) { return u.unidad_padre_id === item.id && u.tipo.toUpperCase() === subTipo.toUpperCase(); }) : [];
+        var hasChildren = subItems.length > 0 || cargosItem.length > 0;
+        html += orgCard(tipo, nivel, item.nombre, sub, '', hasChildren);
+        if (hasChildren) {
+          html += '<div class="org-children open">';
+          cargosItem.forEach(function(c) {
+            var jefe = cargos.find(function(x) { return x.id === c.jefe_inmediato_id; });
+            html += orgCard('cargo', nivel + 1, c.titulo + (c.vacantes > 0 ? ' — ' + c.vacantes + ' vacante' + (c.vacantes > 1 ? 's' : '') : ''), '', jefe ? jefe.titulo : '', false);
+          });
+          if (subItems.length) {
+            subItems.forEach(function(si) {
+              html += renderOrgLevel([si], subTipo === 'gerencia' ? 'gerencia' : 'departamento', nivel + 1, cargos, unidades);
+            });
+          }
+          html += '</div>';
+        }
+      });
+      return html;
+    }
+
+    function renderOrganigrama() {
+      var direcciones = allUnidades.filter(function(u) { return u.tipo === 'DIRECCION'; });
+      var body = document.getElementById('organigramaBody');
+      var html = '<div class="org-tree">';
+      if (direcciones.length) {
+        direcciones.forEach(function(dir) {
+          html += renderOrgLevel([dir], 'direccion', 0, allCargos, allUnidades);
+        });
+      } else {
+        html += '<div style="text-align:center;padding:40px;color:var(--color-text-secondary);">No hay direcciones registradas.<br>Crea una unidad de tipo Dirección para ver el organigrama.</div>';
+      }
+      html += '</div>';
+      body.innerHTML = html;
+    }
+
+    async function exportarOrganigrama() {
+      try {
+        var { data: unidades } = await supabaseClient.from('est_unidades').select('*').order('nombre');
+        var { data: cargos } = await supabaseClient.from('est_cargos').select('*,jefe_inmediato_id').order('titulo');
+        if (unidades) allUnidades = unidades;
+        if (cargos) allCargos = cargos;
+        renderOrganigrama();
+        document.getElementById('modalOrganigrama').classList.add('show');
+      } catch (err) {
+        alert('Error al generar organigrama: ' + err.message);
+      }
+    }
+
+    function closeModalOrganigrama() {
+      document.getElementById('modalOrganigrama').classList.remove('show');
+    }
+
+    /* ===== PLANTILLA ACTIVA ===== */
+    var allTrabajadores = [];
+    var editingTrabId = null;
+    var currentPlantillaView = 'activo';
+
+    function switchPlantillaView(tab, btn) {
+      currentPlantillaView = tab;
+      document.querySelectorAll('.plantilla-tab').forEach(function(b) {
+        b.style.background = b === btn ? 'var(--module-captacion)' : 'transparent';
+        b.style.color = b === btn ? '#fff' : 'var(--color-text)';
+        b.style.border = b === btn ? '0' : '1px solid var(--border-color)';
+      });
+      document.getElementById('plantillaActivoView').style.display = tab === 'activo' ? '' : 'none';
+      document.getElementById('plantillaHistoricoView').style.display = tab === 'historico' ? '' : 'none';
+      filterPlantilla();
+    }
+
+    function filterPlantilla() {
+      var q = document.getElementById('plantSearch').value.trim().toLowerCase();
+      var unidadFiltro = document.getElementById('filtroUnidad').value;
+      if (currentPlantillaView === 'activo') renderActivos(q, unidadFiltro);
+      else renderHistoricos(q);
+    }
+
+    function renderActivos(q, unidadFiltro) {
+      var data = allTrabajadores.filter(function(t) { return t.estado === 'Activo' || t.estado === 'Suspendido'; });
+      if (unidadFiltro) data = data.filter(function(t) { return t.unidad_id === unidadFiltro; });
+      if (q) data = data.filter(function(t) {
+        var texto = t.nombres + ' ' + t.apellidos + ' ' + t.cedula + ' ' + getUnidadNombre(t.unidad_id) + ' ' + getCargoNombre(t.cargo_id);
+        return texto.toLowerCase().indexOf(q) !== -1;
+      });
+      var tbody = document.getElementById('plantTableBody');
+      document.getElementById('plantCount').textContent = data.length + ' trabajador' + (data.length !== 1 ? 'es' : '');
+      if (!data.length) {
+        var msg = (q || unidadFiltro) ? 'Sin resultados' : 'No hay trabajadores activos (total BD: ' + allTrabajadores.length + ')';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">' + msg + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(function(t) {
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + t.nombres + ' ' + t.apellidos + '</span></td>'
+          + '<td>' + t.cedula + '</td>'
+          + '<td>' + getUnidadNombre(t.unidad_id) + '</td>'
+          + '<td>' + getCargoNombre(t.cargo_id) + '</td>'
+          + '<td>' + t.fecha_ingreso + '</td>'
+          + '<td class="estado-' + t.estado.toLowerCase() + '">' + t.estado + '</td>'
+          + '<td><button class="btn btn-sm btn-outline" onclick="editarTrabajador(\'' + t.id + '\')">Editar</button></td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function renderHistoricos(q) {
+      var data = allTrabajadores.filter(function(t) { return t.estado === 'Retirado'; });
+      if (q) data = data.filter(function(t) {
+        var texto = t.nombres + ' ' + t.apellidos + ' ' + t.cedula + ' ' + getUnidadNombre(t.unidad_id) + ' ' + getCargoNombre(t.cargo_id);
+        return texto.toLowerCase().indexOf(q) !== -1;
+      });
+      var tbody = document.getElementById('histTableBody');
+      document.getElementById('histCount').textContent = data.length + ' registro' + (data.length !== 1 ? 's' : '');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">' + (q ? 'Sin resultados' : 'No hay registros históricos') + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(function(t) {
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + t.nombres + ' ' + t.apellidos + '</span></td>'
+          + '<td>' + t.cedula + '</td>'
+          + '<td>' + getUnidadNombre(t.unidad_id) + '</td>'
+          + '<td>' + getCargoNombre(t.cargo_id) + '</td>'
+          + '<td>' + t.fecha_ingreso + ' → ' + (t.fecha_egreso || '-') + '</td>'
+          + '<td class="estado-' + t.estado.toLowerCase() + '">' + t.estado + '</td>'
+          + '<td><button class="btn btn-sm btn-outline" onclick="editarTrabajador(\'' + t.id + '\')">Editar</button></td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function populateUnidadSelect() {
+      var sel = document.getElementById('trab_unidad_id');
+      if (!sel) return;
+      var val = sel.value;
+      sel.innerHTML = '<option value="">— Selecciona —</option>';
+      allUnidades.forEach(function(u) { sel.innerHTML += '<option value="' + u.id + '">' + u.nombre + ' (' + u.tipo + ')</option>'; });
+      if (val) sel.value = val;
+    }
+
+    function populateCargoSelect() {
+      var unidadId = document.getElementById('trab_unidad_id').value;
+      var sel = document.getElementById('trab_cargo_id');
+      if (!sel) return;
+      var val = sel.value;
+      sel.innerHTML = '<option value="">— Selecciona —</option>';
+      allCargos.filter(function(c) { return c.unidad_id === unidadId; }).forEach(function(c) {
+        sel.innerHTML += '<option value="' + c.id + '">' + c.titulo + '</option>';
+      });
+      if (val) sel.value = val;
+    }
+
+    document.getElementById('trab_unidad_id').onchange = function() { populateCargoSelect(); };
+    document.getElementById('trab_estado').onchange = function() {
+      var eg = document.getElementById('fechaEgresoGroup');
+      if (eg) eg.style.display = this.value === 'Retirado' ? '' : 'none';
+    };
+
+    function openModalTrab() {
+      editingTrabId = null;
+      document.getElementById('modalTrabTitle').textContent = 'Nuevo trabajador';
+      document.getElementById('trabForm').reset();
+      var eg = document.getElementById('fechaEgresoGroup');
+      if (eg) eg.style.display = 'none';
+      populateUnidadSelect();
+      populateCargoSelect();
+      document.getElementById('modalEditarTrabajador').classList.add('show');
+    }
+
+    function closeModalTrab() {
+      document.getElementById('modalEditarTrabajador').classList.remove('show');
+    }
+
+    async function editarTrabajador(id) {
+      editingTrabId = id;
+      var t = allTrabajadores.find(function(x) { return x.id === id; });
+      if (!t) return;
+      document.getElementById('modalTrabTitle').textContent = 'Editar trabajador';
+      document.getElementById('trab_cedula').value = t.cedula;
+      document.getElementById('trab_nombre').value = t.nombres + ' ' + t.apellidos;
+      populateUnidadSelect();
+      document.getElementById('trab_unidad_id').value = t.unidad_id || '';
+      populateCargoSelect();
+      document.getElementById('trab_cargo_id').value = t.cargo_id || '';
+      document.getElementById('trab_fecha_ingreso').value = t.fecha_ingreso;
+      document.getElementById('trab_estado').value = t.estado;
+      var eg = document.getElementById('fechaEgresoGroup');
+      if (eg) eg.style.display = t.estado === 'Retirado' ? '' : 'none';
+      document.getElementById('trab_fecha_egreso').value = t.fecha_egreso || '';
+      document.getElementById('modalEditarTrabajador').classList.add('show');
+    }
+
+    async function saveTrabajador() {
+      var unidadId = document.getElementById('trab_unidad_id').value;
+      var cargoId = document.getElementById('trab_cargo_id').value;
+      var fechaIngreso = document.getElementById('trab_fecha_ingreso').value;
+      var estado = document.getElementById('trab_estado').value;
+      var fechaEgreso = document.getElementById('trab_fecha_egreso').value || null;
+      if (!unidadId || !cargoId || !fechaIngreso) { alert('Completa unidad, cargo y fecha de ingreso'); return; }
+      try {
+        if (editingTrabId) {
+          var { error } = await supabaseClient.from('plantilla_trabajadores').update({
+            unidad_id: unidadId, cargo_id: cargoId, fecha_ingreso: fechaIngreso,
+            estado: estado, fecha_egreso: fechaEgreso
+          }).eq('id', editingTrabId);
+          if (error) throw error;
+        }
+        await loadPlantilla();
+        closeModalTrab();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    async function loadPlantilla() {
+      try {
+        var u = await supabaseClient.from('est_unidades').select('*').order('nombre');
+        if (u.data) allUnidades = u.data;
+        var c = await supabaseClient.from('est_cargos').select('*').order('titulo');
+        if (c.data) allCargos = c.data;
+        var t = await supabaseClient.from('plantilla_trabajadores').select('*').order('apellidos');
+        if (t.error) {
+          alert('Error BD plantilla: ' + t.error.message);
+        } else if (t.data) {
+          allTrabajadores = t.data;
+        }
+        var filtroUnidad = document.getElementById('filtroUnidad');
+        var val = filtroUnidad.value;
+        filtroUnidad.innerHTML = '<option value="">Todas las unidades</option>';
+        allUnidades.forEach(function(u) {
+          filtroUnidad.innerHTML += '<option value="' + u.id + '">' + u.nombre + '</option>';
+        });
+        if (val) filtroUnidad.value = val;
+        filterPlantilla();
+      } catch (e) {
+        alert('Error al cargar plantilla: ' + e.message);
+      }
+    }
+
+    async function loadRequisiciones() {
+      try {
+        var { data: cargos } = await supabaseClient.from('est_cargos').select('*,jefe_inmediato_id').order('titulo');
+        var { data: plantilla } = await supabaseClient.from('plantilla_trabajadores').select('*');
+        var { data: unidades } = await supabaseClient.from('est_unidades').select('*').order('nombre');
+        if (!cargos) cargos = [];
+        if (!plantilla) plantilla = [];
+        if (!unidades) unidades = [];
+        var ocupados = {};
+        plantilla.filter(function(w) { return w.estado === 'Activo' || w.estado === 'Suspendido'; }).forEach(function(w) {
+          ocupados[w.cargo_id] = (ocupados[w.cargo_id] || 0) + 1;
+        });
+        var rows = [], totalPend = 0;
+        cargos.forEach(function(c) {
+          var vac = parseInt(c.vacantes, 10) || 0;
+          var ocup = ocupados[c.id] || 0;
+          var pend = Math.max(0, vac - ocup);
+          if (pend > 0) { totalPend += pend; rows.push({ cargo: c, vac: vac, ocup: ocup, pend: pend }); }
+        });
+        rows.sort(function(a, b) { return b.pend - a.pend; });
+        document.getElementById('reqCount').textContent = totalPend + ' pendiente' + (totalPend !== 1 ? 's' : '');
+        var tbody = document.getElementById('reqTableBody');
+        if (!rows.length) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Todas las vacantes están cubiertas</td></tr>';
+          return;
+        }
+        var html = rows.map(function(r) {
+          var unid = unidades.find(function(u) { return u.id === r.cargo.unidad_id; });
+          return '<tr>'
+            + '<td><span style="font-weight:600;">' + r.cargo.titulo + '</span></td>'
+            + '<td>' + (unid ? unid.nombre : '-') + '</td>'
+            + '<td style="text-align:center;">' + r.vac + '</td>'
+            + '<td style="text-align:center;">' + r.ocup + '</td>'
+            + '<td style="text-align:center;font-weight:700;' + (r.pend > 0 ? 'color:var(--module-captacion);' : '') + '">' + r.pend + '</td>'
+            + '</tr>';
+        }).join('');
+        tbody.innerHTML = html;
+      } catch (err) {
+        document.getElementById('reqTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:#dc2626;">Error: ' + err.message + '</td></tr>';
+      }
+    }
+
+    initModule('captacion', 'captacion_procesos', ['cargo','departamento','vacantes','fecha_inicio','estado','descripcion']);
+    loadATSCandidatos();
+    loadEstructura();
+    loadPlantilla();
+    loadRequisiciones();
+  </script>
+</body>
+</html>

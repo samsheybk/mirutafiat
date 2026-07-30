@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - FIAT Intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <nav class="topnav">
+      <div class="topnav-brand" onclick="location.href='dashboard.html'">FIAT Venezuela<span>Intranet</span></div>
+      <div class="topnav-spacer"></div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="dashboard.html">Dashboard</option>
+        <option value="modules/captacion.html">Captación y Selección</option>
+        <option value="modules/relaciones-laborales.html">Relaciones Laborales</option>
+        <option value="modules/capacitacion.html">Capacitación y Desarrollo</option>
+        <option value="modules/bienestar-social.html">Bienestar Social</option>
+        <option value="modules/seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="modules/compensacion.html">Compensación</option>
+      </select>
+      <div class="nav-user">
+        <span id="navUserEmail"></span>
+        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <header class="topbar">
+        <div>
+          <h1>Dashboard</h1>
+          <div class="topbar-breadcrumb">Inicio / Dashboard</div>
+        </div>
+      </header>
+
+      <div class="content-area">
+        <div class="module-grid">
+          <div class="module-card" onclick="location.href='modules/captacion.html'">
+            <div class="module-card-accent bg-captacion"></div>
+            <div class="module-icon text-captacion">CS</div>
+            <h3>Captación y Selección</h3>
+            <p>Gestión de reclutamiento, entrevistas y selección de personal</p>
+            <div class="module-count" id="count-captacion">0 procesos activos</div>
+          </div>
+          <div class="module-card" onclick="location.href='modules/relaciones-laborales.html'">
+            <div class="module-card-accent bg-relaciones"></div>
+            <div class="module-icon text-relaciones">RL</div>
+            <h3>Relaciones Laborales</h3>
+            <p>Contratos colectivos, nóminas y relaciones sindicales</p>
+            <div class="module-count" id="count-relaciones">0 registros</div>
+          </div>
+          <div class="module-card" onclick="location.href='modules/capacitacion.html'">
+            <div class="module-card-accent bg-capacitacion"></div>
+            <div class="module-icon text-capacitacion">CD</div>
+            <h3>Capacitación y Desarrollo</h3>
+            <p>Planes de formación, talleres y evaluación de competencias</p>
+            <div class="module-count" id="count-capacitacion">0 cursos</div>
+          </div>
+          <div class="module-card" onclick="location.href='modules/bienestar-social.html'">
+            <div class="module-card-accent bg-bienestar"></div>
+            <div class="module-icon text-bienestar">BS</div>
+            <h3>Bienestar Social</h3>
+            <p>Programas sociales, actividades recreativas y beneficios</p>
+            <div class="module-count" id="count-bienestar">0 programas</div>
+          </div>
+          <div class="module-card" onclick="location.href='modules/seguridad-salud.html'">
+            <div class="module-card-accent bg-seguridad"></div>
+            <div class="module-icon text-seguridad">SL</div>
+            <h3>Seguridad y Salud Laboral</h3>
+            <p>Incidentes, evaluaciones de riesgo e inspecciones</p>
+            <div class="module-count" id="count-seguridad">0 incidentes</div>
+          </div>
+          <div class="module-card" onclick="location.href='modules/compensacion.html'">
+            <div class="module-card-accent bg-compensacion"></div>
+            <div class="module-icon text-compensacion">CM</div>
+            <h3>Compensación</h3>
+            <p>Estructura salarial, bonificaciones y beneficios económicos</p>
+            <div class="module-count" id="count-compensacion">0 registros</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

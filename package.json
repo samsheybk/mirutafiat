@@ -1,0 +1,21 @@
+{
+  "name": "fiat-intranet",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "http-server -p 3000 -c-1",
+    "start": "http-server -p 3000 -c-1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "sharp": "^0.35.3"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.110.9"
+  }
+}

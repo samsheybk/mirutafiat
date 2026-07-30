@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relaciones Laborales - FIAT Intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <nav class="topnav" style="background:var(--module-relaciones);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'">FIAT Venezuela<span>Intranet</span></div>
+      <div class="topnav-spacer"></div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Dashboard</option>
+        <option value="captacion.html">Captación y Selección</option>
+        <option value="relaciones-laborales.html" selected>Relaciones Laborales</option>
+        <option value="capacitacion.html">Capacitación y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="compensacion.html">Compensación</option>
+      </select>
+      <div class="nav-user">
+        <span id="navUserEmail"></span>
+        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-panel">
+          <div class="panel-item active" data-tool="registros" onclick="switchTool('registros')" title="Registros laborales">
+            <span class="panel-item-indicator bg-relaciones"></span>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 3h7l4 4v11H5V3z"/><path d="M12 3v4h4"/></svg>
+          </div>
+          <div class="panel-item" data-tool="contratos" onclick="switchTool('contratos')" title="Contratos colectivos">
+            <span class="panel-item-indicator bg-relaciones"></span>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 3h7l4 4v11H5V3z"/><path d="M12 3v4h4"/></svg>
+          </div>
+          <div class="panel-item" data-tool="actas" onclick="switchTool('actas')" title="Actas y reuniones">
+            <span class="panel-item-indicator bg-relaciones"></span>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="8" r="2"/><circle cx="13" cy="8" r="2"/><path d="M4 15c0-2 2-4 6-4s6 2 6 4"/></svg>
+          </div>
+          <div class="panel-item" data-tool="reportes" onclick="switchTool('reportes')" title="Reportes">
+            <span class="panel-item-indicator bg-relaciones"></span>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 13v3M10 9v7M16 5v11"/></svg>
+          </div>
+        </div>
+
+        <div class="module-body">
+          <header class="topbar">
+            <div><h1>Relaciones Laborales</h1><div class="topbar-breadcrumb">Inicio / Relaciones Laborales</div></div>
+          </header>
+
+          <div class="module-content">
+          <div class="tool-section active" id="tool-registros">
+            <div class="tool-section-header">
+              <h2 style="color:var(--module-relaciones);">Registros laborales</h2>
+              <button class="btn btn-relaciones" onclick="openModal()">+ Nuevo registro</button>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Trabajador</th><th>Tipo</th><th>Fecha</th><th>Estado</th></tr></thead>
+              <tbody id="moduleTableBody">
+                <tr><td colspan="4" style="text-align:center;padding:40px;color:#999;">No hay registros</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="tool-section" id="tool-contratos">
+            <div class="tool-section-header">
+              <h2 style="color:var(--module-relaciones);">Contratos colectivos</h2>
+              <button class="btn btn-relaciones">+ Nuevo contrato</button>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Título</th><th>Fecha firma</th><th>Vigencia</th><th>Estado</th></tr></thead>
+              <tbody><tr><td colspan="4" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
+            </table>
+          </div>
+
+          <div class="tool-section" id="tool-actas">
+            <div class="tool-section-header">
+              <h2 style="color:var(--module-relaciones);">Actas y reuniones</h2>
+              <button class="btn btn-relaciones">+ Nueva acta</button>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Tema</th><th>Fecha</th><th>Participantes</th><th>Estado</th></tr></thead>
+              <tbody><tr><td colspan="4" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
+            </table>
+          </div>
+
+          <div class="tool-section" id="tool-reportes">
+            <div class="tool-section-header">
+              <h2 style="color:var(--module-relaciones);">Reportes</h2>
+            </div>
+            <div class="empty-state">
+              <h3>Reportes laborales</h3>
+              <p>Los reportes estadísticos estarán disponibles próximamente.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-header"><h3>Nuevo registro laboral</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+      <div class="modal-body">
+        <form id="moduleForm">
+          <div class="form-group"><label>Trabajador</label><input type="text" class="form-input" id="trabajador" required></div>
+          <div class="form-group"><label>Tipo</label>
+            <select class="form-select" id="tipo"><option>Contrato</option><option>Permiso</option><option>Notificación</option><option>Sanción</option></select>
+          </div>
+          <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="fecha" required></div>
+          <div class="form-group"><label>Estado</label>
+            <select class="form-select" id="estado"><option value="Activo">Activo</option><option value="Pendiente">Pendiente</option><option value="Finalizado">Finalizado</option></select>
+          </div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="descripcion" rows="3"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-relaciones" onclick="saveModule()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/modules.js"></script>
+  <script>initModule('relaciones', 'relaciones_registros', ['trabajador','tipo','fecha','estado','descripcion']);</script>
+</body>
+</html>

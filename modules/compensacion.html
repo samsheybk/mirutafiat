@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compensación - FIAT Intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <nav class="topnav" style="background:var(--module-compensacion);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'">FIAT Venezuela<span>Intranet</span></div>
+      <div class="topnav-spacer"></div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Dashboard</option>
+        <option value="captacion.html">Captación y Selección</option>
+        <option value="relaciones-laborales.html">Relaciones Laborales</option>
+        <option value="capacitacion.html">Capacitación y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="compensacion.html" selected>Compensación</option>
+      </select>
+      <div class="nav-user">
+        <span id="navUserEmail"></span>
+        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-panel">
+          <div class="panel-item active" data-tool="salarial" onclick="switchTool('salarial')" title="Estructura salarial">
+            <span class="panel-item-indicator bg-compensacion"></span>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="7"/><path d="M10 6v8M7 8h4a2 2 0 110 4H7"/></svg>
+          </div>
+          <div class="panel-item" data-tool="bonificaciones" onclick="switchTool('bonificaciones')" title="Bonificaciones">
+            <span class="panel-item-indicator bg-compensacion"></span>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="7"/><path d="M10 7v6M7 10h6"/></svg>
+          </div>
+          <div class="panel-item" data-tool="beneficios" onclick="switchTool('beneficios')" title="Beneficios económicos">
+            <span class="panel-item-indicator bg-compensacion"></span>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2a5 5 0 100 10 5 5 0 000-10z"/><path d="M7 11l-1 6 4-2 4 2-1-6"/></svg>
+          </div>
+          <div class="panel-item" data-tool="reportes" onclick="switchTool('reportes')" title="Reportes">
+            <span class="panel-item-indicator bg-compensacion"></span>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 13v3M10 9v7M16 5v11"/></svg>
+          </div>
+        </div>
+
+        <div class="module-body">
+          <header class="topbar">
+            <div><h1>Compensación</h1><div class="topbar-breadcrumb">Inicio / Compensación</div></div>
+          </header>
+
+          <div class="module-content">
+          <div class="tool-section active" id="tool-salarial">
+            <div class="tool-section-header">
+              <h2 style="color:var(--module-compensacion);">Estructura salarial</h2>
+              <button class="btn btn-compensacion" onclick="openModal()">+ Nuevo registro</button>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Trabajador</th><th>Cargo</th><th>Salario base</th><th>Bonificación</th><th>Estado</th></tr></thead>
+              <tbody id="moduleTableBody">
+                <tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">No hay registros salariales</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="tool-section" id="tool-bonificaciones">
+            <div class="tool-section-header">
+              <h2 style="color:var(--module-compensacion);">Bonificaciones</h2>
+              <button class="btn btn-compensacion">+ Nueva bonificación</button>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Trabajador</th><th>Concepto</th><th>Monto</th><th>Fecha</th><th>Estado</th></tr></thead>
+              <tbody><tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
+            </table>
+          </div>
+
+          <div class="tool-section" id="tool-beneficios">
+            <div class="tool-section-header">
+              <h2 style="color:var(--module-compensacion);">Beneficios económicos</h2>
+              <button class="btn btn-compensacion">+ Nuevo beneficio</button>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Beneficio</th><th>Tipo</th><th>Monto</th><th>Vigencia</th><th>Estado</th></tr></thead>
+              <tbody><tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
+            </table>
+          </div>
+
+          <div class="tool-section" id="tool-reportes">
+            <div class="tool-section-header">
+              <h2 style="color:var(--module-compensacion);">Reportes</h2>
+            </div>
+            <div class="empty-state">
+              <h3>Reportes de compensación</h3>
+              <p>Los reportes estadísticos estarán disponibles próximamente.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-header"><h3>Nuevo registro salarial</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+      <div class="modal-body">
+        <form id="moduleForm">
+          <div class="form-group"><label>Trabajador</label><input type="text" class="form-input" id="trabajador" required></div>
+          <div class="form-group"><label>Cargo</label><input type="text" class="form-input" id="cargo" required></div>
+          <div class="form-row">
+            <div class="form-group"><label>Salario base (Bs.)</label><input type="number" class="form-input" id="salario_base" min="0" step="0.01" required></div>
+            <div class="form-group"><label>Bonificación (Bs.)</label><input type="number" class="form-input" id="bonificacion" min="0" step="0.01" value="0"></div>
+          </div>
+          <div class="form-group"><label>Estado</label>
+            <select class="form-select" id="estado"><option value="Activo">Activo</option><option value="Inactivo">Inactivo</option></select>
+          </div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="observaciones" rows="3"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-compensacion" onclick="saveModule()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/modules.js"></script>
+  <script>initModule('compensacion', 'compensacion_registros', ['trabajador','cargo','salario_base','bonificacion','estado','observaciones']);</script>
+</body>
+</html>

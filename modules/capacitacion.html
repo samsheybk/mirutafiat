@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capacitación y Desarrollo - FIAT Intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+  <div class="app-layout">
+    <nav class="topnav" style="background:var(--module-capacitacion);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'">FIAT Venezuela<span>Intranet</span></div>
+      <div class="topnav-spacer"></div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Dashboard</option>
+        <option value="captacion.html">Captación y Selección</option>
+        <option value="relaciones-laborales.html">Relaciones Laborales</option>
+        <option value="capacitacion.html" selected>Capacitación y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="compensacion.html">Compensación</option>
+      </select>
+      <div class="nav-user">
+        <span id="navUserEmail"></span>
+        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-panel">
+          <div class="panel-item active" data-tool="cursos" onclick="switchTool('cursos')" title="Cursos">
+            <span class="panel-item-indicator bg-capacitacion"></span>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h12v13H4z"/><path d="M8 4v13"/></svg>
+          </div>
+          <div class="panel-item" data-tool="talleres" onclick="switchTool('talleres')" title="Talleres">
+            <span class="panel-item-indicator bg-capacitacion"></span>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="14" cy="6" r="4"/><path d="M10 10l-6 6"/><circle cx="5" cy="15" r="1"/></svg>
+          </div>
+          <div class="panel-item" data-tool="evaluaciones" onclick="switchTool('evaluaciones')" title="Evaluaciones">
+            <span class="panel-item-indicator bg-capacitacion"></span>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 4h10v13H6z"/><path d="M4 7h2v10H4z"/><path d="M8 8h6M8 11h6M8 14h4"/></svg>
+          </div>
+          <div class="panel-item" data-tool="planes" onclick="switchTool('planes')" title="Planes de formación">
+            <span class="panel-item-indicator bg-capacitacion"></span>
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7h14v10H3z"/><path d="M3 4h14v3H3z"/><path d="M7 2v3M13 2v3"/></svg>
+          </div>
+        </div>
+
+        <div class="module-body">
+          <header class="topbar">
+            <div><h1>Capacitación y Desarrollo</h1><div class="topbar-breadcrumb">Inicio / Capacitación y Desarrollo</div></div>
+          </header>
+
+          <div class="module-content">
+          <div class="tool-section active" id="tool-cursos">
+            <div class="tool-section-header">
+              <h2 style="color:var(--module-capacitacion);">Cursos</h2>
+              <button class="btn btn-capacitacion" onclick="openModal()">+ Nuevo curso</button>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Curso</th><th>Instructor</th><th>Fecha inicio</th><th>Duración</th><th>Estado</th></tr></thead>
+              <tbody id="moduleTableBody">
+                <tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">No hay cursos registrados</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="tool-section" id="tool-talleres">
+            <div class="tool-section-header">
+              <h2 style="color:var(--module-capacitacion);">Talleres</h2>
+              <button class="btn btn-capacitacion">+ Nuevo taller</button>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Taller</th><th>Facilitador</th><th>Fecha</th><th>Duración</th><th>Estado</th></tr></thead>
+              <tbody><tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
+            </table>
+          </div>
+
+          <div class="tool-section" id="tool-evaluaciones">
+            <div class="tool-section-header">
+              <h2 style="color:var(--module-capacitacion);">Evaluaciones</h2>
+              <button class="btn btn-capacitacion">+ Nueva evaluación</button>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Participante</th><th>Curso</th><th>Fecha</th><th>Calificación</th><th>Estado</th></tr></thead>
+              <tbody><tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
+            </table>
+          </div>
+
+          <div class="tool-section" id="tool-planes">
+            <div class="tool-section-header">
+              <h2 style="color:var(--module-capacitacion);">Planes de formación</h2>
+              <button class="btn btn-capacitacion">+ Nuevo plan</button>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Plan</th><th>Departamento</th><th>Fecha inicio</th><th>Fecha fin</th><th>Estado</th></tr></thead>
+              <tbody><tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-header"><h3>Nuevo curso</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+      <div class="modal-body">
+        <form id="moduleForm">
+          <div class="form-group"><label>Nombre del curso</label><input type="text" class="form-input" id="nombre" required></div>
+          <div class="form-group"><label>Instructor</label><input type="text" class="form-input" id="instructor" required></div>
+          <div class="form-row">
+            <div class="form-group"><label>Fecha inicio</label><input type="date" class="form-input" id="fecha_inicio" required></div>
+            <div class="form-group"><label>Duración (horas)</label><input type="number" class="form-input" id="duracion" min="1" required></div>
+          </div>
+          <div class="form-group"><label>Estado</label>
+            <select class="form-select" id="estado"><option value="Programado">Programado</option><option value="En curso">En curso</option><option value="Finalizado">Finalizado</option></select>
+          </div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="descripcion" rows="3"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-capacitacion" onclick="saveModule()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/modules.js"></script>
+  <script>initModule('capacitacion', 'capacitacion_cursos', ['nombre','instructor','fecha_inicio','duracion','estado','descripcion']);</script>
+</body>
+</html>

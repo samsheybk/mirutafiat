@@ -660,7 +660,28 @@ CREATE POLICY "Autenticados pueden eliminar fotos de perfil"
   ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'fotos-perfil');
 
 -- BUCKET "repositorio-documentos" (PRIVADO): documentos del módulo Repositorio.
--- PASO 1: Crear bucket en Supabase Dashboard > Storage
+-- Se crea con SQL (privado). Autenticados pueden ver/subir/actualizar/eliminar.
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('repositorio-documentos', 'repositorio-documentos', FALSE)
+ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "Autenticados pueden ver documentos del repositorio" ON storage.objects;
+CREATE POLICY "Autenticados pueden ver documentos del repositorio"
+  ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'repositorio-documentos');
+
+DROP POLICY IF EXISTS "Autenticados pueden subir documentos del repositorio" ON storage.objects;
+CREATE POLICY "Autenticados pueden subir documentos del repositorio"
+  ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'repositorio-documentos');
+
+DROP POLICY IF EXISTS "Autenticados pueden actualizar documentos del repositorio" ON storage.objects;
+CREATE POLICY "Autenticados pueden actualizar documentos del repositorio"
+  ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'repositorio-documentos');
+
+DROP POLICY IF EXISTS "Autenticados pueden eliminar documentos del repositorio" ON storage.objects;
+CREATE POLICY "Autenticados pueden eliminar documentos del repositorio"
+  ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'repositorio-documentos');
+
+-- Referencia para creación manual en Supabase Dashboard > Storage (si se prefiere):
 -- Nombre del bucket: repositorio-documentos
 -- Público: NO (privado)
 

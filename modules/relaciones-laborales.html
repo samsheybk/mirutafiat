@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
 </head>
 <body>
   <div class="app-layout">
@@ -33,21 +34,13 @@
     <div class="main-content">
       <div class="module-layout">
         <div class="module-panel">
-          <div class="panel-item active" data-tool="registros" onclick="switchTool('registros')" title="Registros laborales">
-            <span class="panel-item-indicator bg-relaciones"></span>
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 3h7l4 4v11H5V3z"/><path d="M12 3v4h4"/></svg>
+          <div class="panel-item active" data-tool="registros" onclick="switchTool('registros')" title="Registros laborales"><span class="panel-item-indicator bg-relaciones"></span><i class="fi fi-sr-clipboard-list" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="contratos" onclick="switchTool('contratos')" title="Contratos colectivos">
-            <span class="panel-item-indicator bg-relaciones"></span>
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 3h7l4 4v11H5V3z"/><path d="M12 3v4h4"/></svg>
+          <div class="panel-item" data-tool="contratos" onclick="switchTool('contratos')" title="Contratos colectivos"><span class="panel-item-indicator bg-relaciones"></span><i class="fi fi-sr-handshake" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="actas" onclick="switchTool('actas')" title="Actas y reuniones">
-            <span class="panel-item-indicator bg-relaciones"></span>
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="8" r="2"/><circle cx="13" cy="8" r="2"/><path d="M4 15c0-2 2-4 6-4s6 2 6 4"/></svg>
+          <div class="panel-item" data-tool="actas" onclick="switchTool('actas')" title="Actas y reuniones"><span class="panel-item-indicator bg-relaciones"></span><i class="fi fi-sr-users" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="reportes" onclick="switchTool('reportes')" title="Reportes">
-            <span class="panel-item-indicator bg-relaciones"></span>
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 13v3M10 9v7M16 5v11"/></svg>
+          <div class="panel-item" data-tool="reportes" onclick="switchTool('reportes')" title="Reportes"><span class="panel-item-indicator bg-relaciones"></span><i class="fi fi-sr-chart-pie" style="font-size:24px;pointer-events:none;"></i>
           </div>
         </div>
 

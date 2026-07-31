@@ -406,9 +406,17 @@ a {
   color: var(--color-text);
 }
 
-.panel-item.active i[class^="fi-"] {
-  color: var(--color-text);
+.panel-item i.fi {
+  color: #b6bcc6;
 }
+
+.panel-item.active .panel-item-indicator.bg-captacion ~ i.fi { color: var(--module-captacion); }
+.panel-item.active .panel-item-indicator.bg-relaciones ~ i.fi { color: var(--module-relaciones); }
+.panel-item.active .panel-item-indicator.bg-capacitacion ~ i.fi { color: var(--module-capacitacion); }
+.panel-item.active .panel-item-indicator.bg-bienestar ~ i.fi { color: var(--module-bienestar); }
+.panel-item.active .panel-item-indicator.bg-seguridad ~ i.fi { color: var(--module-seguridad); }
+.panel-item.active .panel-item-indicator.bg-compensacion ~ i.fi { color: var(--module-compensacion); }
+.panel-item.active .panel-item-indicator.bg-repositorio ~ i.fi { color: var(--module-repositorio); }
 
 .panel-item-indicator {
   position: absolute;

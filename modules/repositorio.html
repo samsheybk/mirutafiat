@@ -8,8 +8,60 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
   <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+  <script>var bcrypt = dcodeIO.bcrypt;</script>
   <style>
+    .password-wrap {
+      position: relative;
+    }
+    .password-wrap .form-input {
+      padding-right: 44px;
+    }
+    .password-toggle {
+      position: absolute;
+      top: 50%;
+      right: 4px;
+      transform: translateY(-50%);
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: var(--color-text-secondary);
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .password-toggle:hover {
+      color: var(--color-text);
+    }
+    .cat-icon-picker {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .cat-icon-option {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 44px;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      background: var(--color-surface);
+      color: var(--color-text);
+      cursor: pointer;
+      font-size: 20px;
+    }
+    .cat-icon-option:hover {
+      border-color: var(--module-repositorio);
+    }
+    .cat-icon-option.selected {
+      border-color: var(--module-repositorio);
+      background: var(--module-repositorio);
+      color: #fff;
+    }
     .repo-toolbar {
       display: flex;
       gap: 12px;
@@ -348,7 +400,7 @@
       <div class="nav-user">
         <span id="navUserEmail"></span>
         <div class="repo-notification-badge">
-          <button class="btn-nav-logout" id="notificationBtn" style="background:transparent;">🔔</button>
+          <button class="btn-nav-logout" id="notificationBtn" style="background:transparent;"><i class="fi fi-sr-bell"></i></button>
           <span class="repo-notification-count" id="notificationCount" style="display:none;">0</span>
           <div class="repo-notification-dropdown" id="notificationDropdown"></div>
         </div>
@@ -359,17 +411,11 @@
     <div class="main-content">
       <div class="module-layout">
         <div class="module-panel">
-          <div class="panel-item active" data-tool="documentos" onclick="switchTool('documentos')" title="Documentos">
-            <span class="panel-item-indicator bg-repositorio"></span>
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h14v13H3z"/><path d="M3 4l7 6 7-6"/></svg>
+          <div class="panel-item active" data-tool="documentos" onclick="switchTool('documentos')" title="Documentos"><span class="panel-item-indicator bg-repositorio"></span><i class="fi fi-sr-folder" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="categorias" onclick="switchTool('categorias')" title="Categorías">
-            <span class="panel-item-indicator bg-repositorio"></span>
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h6v6H3z"/><path d="M11 3h6v6h-6z"/><path d="M3 11h6v6H3z"/><path d="M11 11h6v6h-6z"/></svg>
+          <div class="panel-item" data-tool="categorias" onclick="switchTool('categorias')" title="Categorías"><span class="panel-item-indicator bg-repositorio"></span><i class="fi fi-sr-folder-tree" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="subcategorias" onclick="switchTool('subcategorias')" title="Subcategorías">
-            <span class="panel-item-indicator bg-repositorio"></span>
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h14v4H3z"/><path d="M5 7v10"/><path d="M10 7v10"/><path d="M15 7v10"/></svg>
+          <div class="panel-item" data-tool="subcategorias" onclick="switchTool('subcategorias')" title="Subcategorías"><span class="panel-item-indicator bg-repositorio"></span><i class="fi fi-sr-folder-open" style="font-size:24px;pointer-events:none;"></i>
           </div>
         </div>
 
@@ -396,8 +442,8 @@
                   </select>
                 </div>
                 <div class="repo-view-toggle">
-                  <button class="repo-view-btn active" onclick="switchView('list', this)">📋 Lista</button>
-                  <button class="repo-view-btn" onclick="switchView('tree', this)">📁 Carpetas</button>
+<button class="repo-view-btn active" onclick="switchView('list', this)"><i class="fi fi-sr-list"></i> Lista</button>
+                <button class="repo-view-btn" onclick="switchView('tree', this)"><i class="fi fi-sr-folder"></i> Carpetas</button>
                 </div>
               </div>
               <div id="documentsContainer"></div>
@@ -437,8 +483,8 @@
       <div class="modal-header"><h3 id="uploadModalTitle">Subir documento</h3><button class="modal-close" onclick="closeModal('modalUpload')">&times;</button></div>
       <div class="modal-body">
         <form id="uploadForm">
-          <div class="form-group"><label>Título *</label><input type="text" class="form-input" id="docTitulo" required></div>
-          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="docDescripcion" rows="3"></textarea></div>
+          <div class="form-group"><label>Título *</label><input type="text" class="form-input" id="docTitulo" required style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"></div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="docDescripcion" rows="3" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"></textarea></div>
           <div class="form-row">
             <div class="form-group"><label>Categoría *</label><select class="form-select" id="docCategoria" required onchange="updateSubcategoriasSelect()"></select></div>
             <div class="form-group"><label>Subcategoría</label><select class="form-select" id="docSubcategoria"></select></div>
@@ -447,30 +493,40 @@
             <label>Archivo * (PDF, Word, Excel, PowerPoint - Máx 20MB)</label>
             <div class="repo-file-input" id="fileInputContainer" onclick="document.getElementById('docArchivo').click()">
               <input type="file" id="docArchivo" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx" style="display:none;" onchange="handleFileSelect(this)">
-              <div id="fileInputText">📎 Haz clic para seleccionar un archivo</div>
+              <div id="fileInputText"><i class="fi fi-sr-paperclip-vertical"></i> Haz clic para seleccionar un archivo</div>
             </div>
           </div>
           <div class="form-group">
             <label>Etiquetas</label>
             <div class="repo-tag-input">
-              <input type="text" id="tagInput" placeholder="Agregar etiqueta y presionar Enter" onkeypress="handleTagInput(event)">
+              <input type="text" id="tagInput" placeholder="Agregar etiqueta y presionar Enter" onkeypress="handleTagInput(event)" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
               <button type="button" class="btn btn-outline" onclick="addTag()">Agregar</button>
             </div>
             <div class="repo-tags-container" id="tagsContainer"></div>
           </div>
-          <div class="form-group"><label>Fecha de vigencia</label><input type="date" class="form-input" id="docFechaVigencia"></div>
+          <div class="form-group"><label>Última modificación</label><input type="text" class="form-input" id="docFechaVigencia" readonly style="background:var(--color-bg);"></div>
           <div class="form-group">
             <label><input type="checkbox" id="docProtegido" onchange="togglePasswordFields()"> Proteger con contraseña</label>
           </div>
           <div id="passwordFields" style="display:none;">
-            <div class="form-group"><label>Contraseña *</label><input type="password" class="form-input" id="docPassword"></div>
-            <div class="form-group"><label>Confirmar contraseña *</label><input type="password" class="form-input" id="docPasswordConfirm"></div>
+            <div class="form-group"><label>Contraseña *</label>
+              <div class="password-wrap">
+                <input type="password" class="form-input" id="docPassword" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+                <button type="button" class="password-toggle" onclick="togglePassword('docPassword', this)" tabindex="-1"><i class="fi-sr-eye"></i></button>
+              </div>
+            </div>
+            <div class="form-group"><label>Confirmar contraseña *</label>
+              <div class="password-wrap">
+                <input type="password" class="form-input" id="docPasswordConfirm" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+                <button type="button" class="password-toggle" onclick="togglePassword('docPasswordConfirm', this)" tabindex="-1"><i class="fi-sr-eye"></i></button>
+              </div>
+            </div>
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeModal('modalUpload')">Cancelar</button>
-        <button class="btn btn-repositorio" onclick="saveDocument()">Subir</button>
+        <button class="btn btn-repositorio btn-sm" onclick="saveDocument()">Subir</button>
       </div>
     </div>
   </div>
@@ -480,12 +536,17 @@
     <div class="modal" style="max-width:400px;">
       <div class="modal-header"><h3>Documento protegido</h3><button class="modal-close" onclick="closeModal('modalPassword')">&times;</button></div>
       <div class="modal-body">
-        <p style="margin-bottom:16px;">Este documento está protegido con contraseña. Ingresa la contraseña para descargar.</p>
-        <div class="form-group"><label>Contraseña</label><input type="password" class="form-input" id="downloadPassword"></div>
+        <p style="margin-bottom:16px;" id="passwordModalMsg">Este documento está protegido con contraseña. Ingresa la contraseña para descargar.</p>
+        <div class="form-group"><label>Contraseña</label>
+          <div class="password-wrap">
+            <input type="password" class="form-input" id="downloadPassword" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+            <button type="button" class="password-toggle" onclick="togglePassword('downloadPassword', this)" tabindex="-1"><i class="fi-sr-eye"></i></button>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeModal('modalPassword')">Cancelar</button>
-        <button class="btn btn-repositorio" onclick="verifyAndDownload()">Descargar</button>
+        <button class="btn btn-repositorio btn-sm" id="passwordModalBtn" onclick="verifyAndDownload()">Descargar</button>
       </div>
     </div>
   </div>
@@ -497,7 +558,7 @@
       <div class="modal-body" id="previewBody"></div>
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeModal('modalPreview')">Cerrar</button>
-        <button class="btn btn-repositorio" id="previewDownloadBtn">Descargar</button>
+        <button class="btn btn-repositorio btn-sm" id="previewDownloadBtn">Descargar</button>
       </div>
     </div>
   </div>
@@ -508,17 +569,17 @@
       <div class="modal-header"><h3 id="categoryModalTitle">Nueva categoría</h3><button class="modal-close" onclick="closeModal('modalCategory')">&times;</button></div>
       <div class="modal-body">
         <form id="categoryForm">
-          <div class="form-group"><label>Nombre *</label><input type="text" class="form-input" id="catNombre" required></div>
-          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="catDescripcion" rows="3"></textarea></div>
+          <div class="form-group"><label>Nombre *</label><input type="text" class="form-input" id="catNombre" required style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"></div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="catDescripcion" rows="3" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"></textarea></div>
           <div class="form-row">
-            <div class="form-group"><label>Icono (emoji)</label><input type="text" class="form-input" id="catIcono" value="📁" maxlength="2"></div>
+            <div class="form-group"><label>Icono</label><div class="cat-icon-picker" id="catIconoPicker"></div><input type="hidden" id="catIcono" value="fi-sr-folder"></div>
             <div class="form-group"><label>Color</label><input type="color" class="form-input" id="catColor" value="#8b5cf6" style="height:44px;padding:4px;"></div>
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeModal('modalCategory')">Cancelar</button>
-        <button class="btn btn-repositorio" onclick="saveCategory()">Guardar</button>
+        <button class="btn btn-repositorio btn-sm" onclick="saveCategory()">Guardar</button>
       </div>
     </div>
   </div>
@@ -530,13 +591,13 @@
       <div class="modal-body">
         <form id="subcategoryForm">
           <div class="form-group"><label>Categoría *</label><select class="form-select" id="subcatCategoria" required></select></div>
-          <div class="form-group"><label>Nombre *</label><input type="text" class="form-input" id="subcatNombre" required></div>
-          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="subcatDescripcion" rows="3"></textarea></div>
+          <div class="form-group"><label>Nombre *</label><input type="text" class="form-input" id="subcatNombre" required style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"></div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="subcatDescripcion" rows="3" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"></textarea></div>
         </form>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeModal('modalSubcategory')">Cancelar</button>
-        <button class="btn btn-repositorio" onclick="saveSubcategory()">Guardar</button>
+        <button class="btn btn-repositorio btn-sm" onclick="saveSubcategory()">Guardar</button>
       </div>
     </div>
   </div>
@@ -555,6 +616,7 @@
     let currentView = 'list';
     let editingDocId = null;
     let downloadingDocId = null;
+    let pendingAction = 'download';
     let currentUser = null;
 
     // Inicialización
@@ -589,7 +651,7 @@
       const categoriaId = document.getElementById('filterSubcatCategoria').value;
       
       if (!categoriaId) {
-        document.getElementById('subcategoriesContainer').innerHTML = '<div class="empty-state"><div class="empty-state-icon">📂</div><div class="empty-state-text">Selecciona una categoría para ver sus subcategorías</div></div>';
+        document.getElementById('subcategoriesContainer').innerHTML = '<div class="empty-state"><div class="empty-state-icon"><i class="fi fi-sr-folder-open"></i></div><div class="empty-state-text">Selecciona una categoría para ver sus subcategorías</div></div>';
         return;
       }
       
@@ -645,7 +707,7 @@
         
         dropdown.innerHTML = data.map(n => `
           <div class="repo-notification-item unread" onclick="markAsRead(${n.id}, ${n.documento_id})">
-            <div style="font-weight:600;font-size:13px;margin-bottom:4px;">${n.tipo === 'nuevo_documento' ? '📄 Nuevo documento' : '🔄 Nueva versión'}</div>
+            <div style="font-weight:600;font-size:13px;margin-bottom:4px;">${n.tipo === 'nuevo_documento' ? '<i class="fi fi-sr-file"></i> Nuevo documento' : '<i class="fi fi-sr-refresh"></i> Nueva versión'}</div>
             <div style="font-size:12px;color:var(--color-text-secondary);">${n.mensaje}</div>
             <div style="font-size:11px;color:var(--color-text-secondary);margin-top:4px;">${new Date(n.created_at).toLocaleString('es-VE')}</div>
           </div>
@@ -665,7 +727,7 @@
       const filtered = getFilteredDocuments();
       
       if (filtered.length === 0) {
-        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📄</div><div class="empty-state-text">No hay documentos</div></div>';
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><i class="fi fi-sr-file"></i></div><div class="empty-state-text">No hay documentos</div></div>';
         return;
       }
       
@@ -681,8 +743,8 @@
       const size = formatFileSize(doc.archivo_tamano);
       const date = new Date(doc.created_at).toLocaleDateString('es-VE');
       const tags = doc.tags && doc.tags.length > 0 ? doc.tags.map(t => `<span class="repo-tag">${t}</span>`).join('') : '';
-      const protected = doc.password_hash ? '<span class="repo-badge repo-badge-protected">🔒 Protegido</span>' : '';
-      const vigencia = doc.fecha_vigencia ? `<span class="repo-badge repo-badge-vigencia">Vence: ${new Date(doc.fecha_vigencia).toLocaleDateString('es-VE')}</span>` : '';
+      const protected = doc.password_hash ? '<span class="repo-badge repo-badge-protected"><i class="fi fi-sr-lock"></i> Protegido</span>' : '';
+      const vigencia = doc.fecha_vigencia ? `<span class="repo-badge repo-badge-vigencia">Modificado: ${new Date(doc.fecha_vigencia).toLocaleDateString('es-VE')}</span>` : '';
       
       return `
         <div class="repo-doc-item" onclick="previewDocument('${doc.id}')">
@@ -707,9 +769,9 @@
             ${tags ? `<div class="repo-tags-container">${tags}</div>` : ''}
           </div>
           <div class="repo-doc-actions" onclick="event.stopPropagation()">
-            <button class="btn btn-sm btn-outline" onclick="downloadDocument('${doc.id}')" title="Descargar">⬇</button>
-            <button class="btn btn-sm btn-outline" onclick="editDocument('${doc.id}')" title="Editar">✏️</button>
-            <button class="btn btn-sm btn-outline" onclick="deleteDocument('${doc.id}')" title="Eliminar">🗑️</button>
+            <button class="btn btn-sm btn-outline" onclick="downloadDocument('${doc.id}')" title="Descargar"><i class="fi fi-sr-download"></i></button>
+            <button class="btn btn-sm btn-outline" onclick="editDocument('${doc.id}')" title="Editar"><i class="fi fi-sr-pencil"></i></button>
+            <button class="btn btn-sm btn-outline" onclick="deleteDocument('${doc.id}')" title="Eliminar"><i class="fi fi-sr-trash"></i></button>
           </div>
         </div>
       `;
@@ -741,7 +803,7 @@
       return Object.values(grouped).map(cat => `
         <div class="repo-tree-category">
           <div class="repo-tree-category-header" style="background:${cat.categoria.color}20;color:${cat.categoria.color};">
-            <span style="font-size:24px;">${cat.categoria.icono}</span>
+            <span style="font-size:24px;">${categoryIconHtml(cat.categoria.icono)}</span>
             <span>${cat.categoria.nombre}</span>
             <span style="margin-left:auto;font-size:13px;">${Object.values(cat.subcategorias).reduce((sum, sub) => sum + sub.documentos.length, 0)} documentos</span>
           </div>
@@ -753,7 +815,7 @@
                   <span>${getFileIcon(doc.archivo_tipo)}</span>
                   <span style="flex:1;">${doc.titulo}</span>
                   <span class="repo-badge repo-badge-version">v${doc.version}</span>
-                  ${doc.password_hash ? '<span style="color:#f59e0b;">🔒</span>' : ''}
+                  ${doc.password_hash ? '<span style="color:#f59e0b;"><i class="fi fi-sr-lock"></i></span>' : ''}
                 </div>
               `).join('')}
             </div>
@@ -766,7 +828,7 @@
       const container = document.getElementById('categoriesContainer');
       
       if (categorias.length === 0) {
-        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📁</div><div class="empty-state-text">No hay categorías</div></div>';
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><i class="fi fi-sr-folder"></i></div><div class="empty-state-text">No hay categorías</div></div>';
         return;
       }
       
@@ -774,13 +836,13 @@
         const count = documentos.filter(d => d.categoria_id === cat.id).length;
         return `
           <div class="repo-category-card" onclick="editCategory('${cat.id}')">
-            <div class="repo-category-icon" style="background:${cat.color}20;color:${cat.color};">${cat.icono}</div>
+            <div class="repo-category-icon" style="background:${cat.color}20;color:${cat.color};">${categoryIconHtml(cat.icono)}</div>
             <div class="repo-category-info">
               <div class="repo-category-name">${cat.nombre}</div>
               <div class="repo-category-desc">${cat.descripcion || 'Sin descripción'}</div>
             </div>
             <div class="repo-category-count">${count}</div>
-            <button class="btn btn-sm btn-outline" onclick="event.stopPropagation();deleteCategory('${cat.id}')" title="Eliminar">🗑️</button>
+            <button class="btn btn-sm btn-outline" onclick="event.stopPropagation();deleteCategory('${cat.id}')" title="Eliminar"><i class="fi fi-sr-trash"></i></button>
           </div>
         `;
       }).join('');
@@ -790,7 +852,7 @@
       const container = document.getElementById('subcategoriesContainer');
       
       if (subcategorias.length === 0) {
-        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📂</div><div class="empty-state-text">No hay subcategorías</div></div>';
+        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><i class="fi fi-sr-folder-open"></i></div><div class="empty-state-text">No hay subcategorías</div></div>';
         return;
       }
       
@@ -798,13 +860,13 @@
         const count = documentos.filter(d => d.subcategoria_id === sub.id).length;
         return `
           <div class="repo-category-card" onclick="editSubcategory('${sub.id}')">
-            <div class="repo-category-icon" style="background:var(--module-repositorio);color:white;">📂</div>
+            <div class="repo-category-icon" style="background:var(--module-repositorio);color:white;"><i class="fi fi-sr-folder-open"></i></div>
             <div class="repo-category-info">
               <div class="repo-category-name">${sub.nombre}</div>
               <div class="repo-category-desc">${sub.descripcion || 'Sin descripción'}</div>
             </div>
             <div class="repo-category-count">${count}</div>
-            <button class="btn btn-sm btn-outline" onclick="event.stopPropagation();deleteSubcategory('${sub.id}')" title="Eliminar">🗑️</button>
+            <button class="btn btn-sm btn-outline" onclick="event.stopPropagation();deleteSubcategory('${sub.id}')" title="Eliminar"><i class="fi fi-sr-trash"></i></button>
           </div>
         `;
       }).join('');
@@ -815,17 +877,45 @@
     // ============================================
 
     function getFileIcon(mimeType) {
-      if (mimeType.includes('pdf')) return '📄';
-      if (mimeType.includes('word') || mimeType.includes('document')) return '📝';
-      if (mimeType.includes('excel') || mimeType.includes('spreadsheet')) return '📊';
-      if (mimeType.includes('presentation') || mimeType.includes('powerpoint')) return '📽️';
-      return '📄';
+      if (mimeType.includes('pdf')) return '<i class="fi fi-sr-file-pdf"></i>';
+      if (mimeType.includes('word') || mimeType.includes('document')) return '<i class="fi fi-sr-file-word"></i>';
+      if (mimeType.includes('excel') || mimeType.includes('spreadsheet')) return '<i class="fi fi-sr-file-excel"></i>';
+      if (mimeType.includes('presentation') || mimeType.includes('powerpoint')) return '<i class="fi fi-sr-file-powerpoint"></i>';
+      return '<i class="fi fi-sr-file"></i>';
+    }
+
+    const CATEGORY_ICONS = ['fi-sr-folder','fi-sr-folder-open','fi-sr-folder-tree','fi-sr-inbox','fi-sr-clipboard','fi-sr-file','fi-sr-file-pdf','fi-sr-file-word','fi-sr-file-excel','fi-sr-file-powerpoint','fi-sr-document','fi-sr-file-invoice','fi-sr-briefcase','fi-sr-box','fi-sr-database','fi-sr-lock'];
+
+    function normalizeCategoryIcon(icono) {
+      return (icono && icono.startsWith('fi-')) ? icono : 'fi-sr-folder';
+    }
+
+    function categoryIconHtml(icono) {
+      return `<i class="fi ${normalizeCategoryIcon(icono)}"></i>`;
+    }
+
+    function renderCategoryIconPicker(selected) {
+      const container = document.getElementById('catIconoPicker');
+      if (!container) return;
+      container.innerHTML = CATEGORY_ICONS.map(c => `
+        <button type="button" class="cat-icon-option${c === selected ? ' selected' : ''}" data-icon="${c}" title="${c}" onclick="selectCategoryIcon('${c}', this)"><i class="fi ${c}"></i></button>
+      `).join('');
+    }
+
+    function selectCategoryIcon(icon, btn) {
+      document.getElementById('catIcono').value = icon;
+      document.querySelectorAll('#catIconoPicker .cat-icon-option').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
     }
 
     function formatFileSize(bytes) {
       if (bytes < 1024) return bytes + ' B';
       if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
       return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    function escapeHtml(text) {
+      return String(text).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]);
     }
 
     function getFilteredDocuments() {
@@ -890,10 +980,11 @@
       document.getElementById('uploadForm').reset();
       document.getElementById('tagsContainer').innerHTML = '';
       document.getElementById('fileInputContainer').classList.remove('has-file');
-      document.getElementById('fileInputText').textContent = '📎 Haz clic para seleccionar un archivo';
+      document.getElementById('fileInputText').innerHTML = '<i class="fi fi-sr-paperclip-vertical"></i> Haz clic para seleccionar un archivo';
       document.getElementById('passwordFields').style.display = 'none';
       tags = [];
       selectedFile = null;
+      document.getElementById('docFechaVigencia').value = new Date().toISOString().split('T')[0];
       openModal('modalUpload');
     }
 
@@ -918,7 +1009,7 @@
       
       selectedFile = file;
       document.getElementById('fileInputContainer').classList.add('has-file');
-      document.getElementById('fileInputText').textContent = `✅ ${file.name} (${formatFileSize(file.size)})`;
+      document.getElementById('fileInputText').innerHTML = `<i class="fi fi-sr-check-circle"></i> ${escapeHtml(file.name)} (${formatFileSize(file.size)})`;
     }
 
     function handleTagInput(event) {
@@ -956,12 +1047,19 @@
       document.getElementById('passwordFields').style.display = checked ? 'block' : 'none';
     }
 
+    function togglePassword(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      btn.innerHTML = show ? '<i class="fi-sr-eye-crossed"></i>' : '<i class="fi-sr-eye"></i>';
+    }
+
     async function saveDocument() {
       const titulo = document.getElementById('docTitulo').value.trim();
       const descripcion = document.getElementById('docDescripcion').value.trim();
       const categoriaId = document.getElementById('docCategoria').value;
       const subcategoriaId = document.getElementById('docSubcategoria').value || null;
-      const fechaVigencia = document.getElementById('docFechaVigencia').value || null;
+      const fechaVigencia = new Date().toISOString().split('T')[0];
       const protegido = document.getElementById('docProtegido').checked;
       
       if (!titulo || !categoriaId) {
@@ -1093,13 +1191,13 @@
       document.getElementById('docCategoria').value = doc.categoria_id;
       updateSubcategoriasSelect();
       document.getElementById('docSubcategoria').value = doc.subcategoria_id || '';
-      document.getElementById('docFechaVigencia').value = doc.fecha_vigencia || '';
+      document.getElementById('docFechaVigencia').value = new Date().toISOString().split('T')[0];
       
       tags = doc.tags || [];
       renderTags();
       
       document.getElementById('fileInputContainer').classList.remove('has-file');
-      document.getElementById('fileInputText').textContent = `📄 Archivo actual: ${doc.archivo_nombre} (${formatFileSize(doc.archivo_tamano)}) - Haz clic para cambiar`;
+      document.getElementById('fileInputText').innerHTML = `<i class="fi fi-sr-file"></i> Archivo actual: ${escapeHtml(doc.archivo_nombre)} (${formatFileSize(doc.archivo_tamano)}) - Haz clic para cambiar`;
       
       if (doc.password_hash) {
         document.getElementById('docProtegido').checked = true;
@@ -1139,7 +1237,10 @@
       if (!doc) return;
       
       if (doc.password_hash) {
+        pendingAction = 'download';
         downloadingDocId = id;
+        document.getElementById('passwordModalMsg').textContent = 'Este documento está protegido con contraseña. Ingresa la contraseña para descargar.';
+        document.getElementById('passwordModalBtn').textContent = 'Descargar';
         document.getElementById('downloadPassword').value = '';
         openModal('modalPassword');
       } else {
@@ -1161,7 +1262,12 @@
       }
       
       closeModal('modalPassword');
-      await performDownload(doc);
+      if (pendingAction === 'preview') {
+        await renderPreview(doc);
+      } else {
+        await performDownload(doc);
+      }
+      pendingAction = 'download';
     }
 
     async function performDownload(doc) {
@@ -1191,6 +1297,19 @@
       document.getElementById('previewTitle').textContent = doc.titulo;
       document.getElementById('previewDownloadBtn').onclick = () => downloadDocument(id);
       
+      if (doc.password_hash) {
+        pendingAction = 'preview';
+        downloadingDocId = id;
+        document.getElementById('passwordModalMsg').textContent = 'Este documento está protegido con contraseña. Ingresa la contraseña para visualizarlo.';
+        document.getElementById('passwordModalBtn').textContent = 'Ver';
+        document.getElementById('downloadPassword').value = '';
+        openModal('modalPassword');
+      } else {
+        await renderPreview(doc);
+      }
+    }
+
+    async function renderPreview(doc) {
       const body = document.getElementById('previewBody');
       
       if (doc.archivo_tipo.includes('pdf')) {
@@ -1204,7 +1323,7 @@
           const url = URL.createObjectURL(data);
           body.innerHTML = `<iframe src="${url}" class="repo-preview-content"></iframe>`;
         } catch (error) {
-          body.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">Error al cargar la vista previa</div></div>';
+          body.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><i class="fi fi-sr-alarm-exclamation"></i></div><div class="empty-state-text">Error al cargar la vista previa</div></div>';
         }
       } else {
         body.innerHTML = `
@@ -1226,7 +1345,8 @@
     function openCategoryModal() {
       document.getElementById('categoryModalTitle').textContent = 'Nueva categoría';
       document.getElementById('categoryForm').reset();
-      document.getElementById('catIcono').value = '📁';
+      document.getElementById('catIcono').value = 'fi-sr-folder';
+      renderCategoryIconPicker('fi-sr-folder');
       document.getElementById('catColor').value = '#8b5cf6';
       openModal('modalCategory');
     }
@@ -1234,7 +1354,7 @@
     async function saveCategory() {
       const nombre = document.getElementById('catNombre').value.trim();
       const descripcion = document.getElementById('catDescripcion').value.trim();
-      const icono = document.getElementById('catIcono').value || '📁';
+      const icono = document.getElementById('catIcono').value || 'fi-sr-folder';
       const color = document.getElementById('catColor').value || '#8b5cf6';
       
       if (!nombre) {
@@ -1264,7 +1384,8 @@
       document.getElementById('categoryModalTitle').textContent = 'Editar categoría';
       document.getElementById('catNombre').value = cat.nombre;
       document.getElementById('catDescripcion').value = cat.descripcion || '';
-      document.getElementById('catIcono').value = cat.icono;
+      document.getElementById('catIcono').value = normalizeCategoryIcon(cat.icono);
+      renderCategoryIconPicker(normalizeCategoryIcon(cat.icono));
       document.getElementById('catColor').value = cat.color;
       
       openModal('modalCategory');

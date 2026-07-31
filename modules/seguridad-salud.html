@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
 </head>
 <body>
   <div class="app-layout">
@@ -33,21 +34,13 @@
     <div class="main-content">
       <div class="module-layout">
         <div class="module-panel">
-          <div class="panel-item active" data-tool="incidentes" onclick="switchTool('incidentes')" title="Incidentes">
-            <span class="panel-item-indicator bg-seguridad"></span>
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 4l7 13H3l7-13z"/><path d="M10 9v3"/><circle cx="10" cy="15" r=".5"/></svg>
+          <div class="panel-item active" data-tool="incidentes" onclick="switchTool('incidentes')" title="Incidentes"><span class="panel-item-indicator bg-seguridad"></span><i class="fi fi-sr-alarm-exclamation" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="riesgos" onclick="switchTool('riesgos')" title="Evaluación de riesgos">
-            <span class="panel-item-indicator bg-seguridad"></span>
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 2l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V5l7-3z"/></svg>
+          <div class="panel-item" data-tool="riesgos" onclick="switchTool('riesgos')" title="Evaluación de riesgos"><span class="panel-item-indicator bg-seguridad"></span><i class="fi fi-sr-shield" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="inspecciones" onclick="switchTool('inspecciones')" title="Inspecciones">
-            <span class="panel-item-indicator bg-seguridad"></span>
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="5"/><path d="M12 12l4 4"/></svg>
+          <div class="panel-item" data-tool="inspecciones" onclick="switchTool('inspecciones')" title="Inspecciones"><span class="panel-item-indicator bg-seguridad"></span><i class="fi fi-sr-search-alt" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="capacitaciones" onclick="switchTool('capacitaciones')" title="Capacitaciones SSL">
-            <span class="panel-item-indicator bg-seguridad"></span>
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h12v13H4z"/><path d="M8 4v13"/></svg>
+          <div class="panel-item" data-tool="capacitaciones" onclick="switchTool('capacitaciones')" title="Capacitaciones SSL"><span class="panel-item-indicator bg-seguridad"></span><i class="fi fi-sr-graduation-cap" style="font-size:24px;pointer-events:none;"></i>
           </div>
         </div>
 

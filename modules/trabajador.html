@@ -456,7 +456,7 @@
       var inicial = document.getElementById('detFotoInicial');
       if (url) {
         img.src = url;
-        img.style.display = '';
+        img.style.display = 'block';
         inicial.style.display = 'none';
       } else {
         img.style.display = 'none';
@@ -553,8 +553,12 @@
             .getPublicUrl(path);
           payload.foto_url = pubData.publicUrl;
         }
-        var { error } = await supabaseClient.from('plantilla_trabajadores').update(payload).eq('id', detalleTrabajadorId);
+        var { error, count } = await supabaseClient
+          .from('plantilla_trabajadores')
+          .update(payload, { count: 'exact' })
+          .eq('id', detalleTrabajadorId);
         if (error) throw error;
+        if (count === 0) throw new Error('0 filas actualizadas. Revisa la política de UPDATE en plantilla_trabajadores (RLS).');
         detalleFotoArchivo = null;
         document.getElementById('detFotoFile').value = '';
         alert('Datos guardados correctamente');

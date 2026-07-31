@@ -86,6 +86,7 @@
                 <option value="">Todas las unidades</option>
               </select>
               <span style="font-size:12px;color:var(--color-text-secondary);" id="plantCount">0 trabajadores</span>
+              <button class="btn btn-outline btn-sm" onclick="openModalImportar()" style="margin-left:auto;">Importar plantilla</button>
             </div>
             <div class="toolbar-content" data-toolbar="requisiciones" style="display:none;align-items:center;gap:16px;width:100%;">
               <input type="text" class="form-input" id="reqSearch" placeholder="Buscar en requisiciones..." oninput="filterRequisiciones()" style="flex:1;max-width:400px;height:36px;">
@@ -739,6 +740,39 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="modalImportar">
+    <div class="modal" style="max-width:580px;">
+      <div class="modal-header">
+        <h3>Importar plantilla activa</h3>
+        <button class="modal-close" onclick="closeModalImportar()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="importSteps">
+          <ol style="font-size:14px;line-height:1.8;padding-left:20px;margin:0 0 16px;color:var(--color-text);">
+            <li>Descarga la plantilla Excel con el botón inferior.</li>
+            <li>Llena una fila por trabajador. Las columnas <strong>UNIDAD</strong> y <strong>CARGO</strong> deben coincidir exactamente con los catálogos incluidos en el mismo libro (hojas <em>Catálogo Unidades</em> y <em>Catálogo Cargos</em>).</li>
+            <li>Guarda el archivo y súbelo aquí pulsando <strong>Importar</strong>.</li>
+          </ol>
+          <button class="btn btn-captacion" onclick="descargarPlantillaTemplate()">Descargar plantilla Excel</button>
+          <div class="form-group" style="margin-top:16px;">
+            <label>Archivo Excel (.xlsx o .xls)</label>
+            <input type="file" class="form-input" id="importFile" accept=".xlsx,.xls" onchange="onImportFileChange()">
+          </div>
+          <p style="font-size:12px;color:#666;margin-top:8px;">
+            Columnas: Cédula, Nombres, Apellidos, Correo, Teléfono, Dirección, Unidad, Cargo, Fecha de ingreso (AAAA-MM-DD), Estado (Activo, Suspendido o Retirado).
+            Los trabajadores cuya cédula ya exista serán omitidos.
+          </p>
+        </div>
+        <div id="importResult" style="display:none;max-height:280px;overflow-y:auto;font-size:14px;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModalImportar()">Cancelar</button>
+        <button class="btn btn-captacion" id="btnImportar" onclick="importarPlantilla()" disabled>Importar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/vendor/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/supabase-config.js"></script>
   <script src="../js/auth.js"></script>
@@ -1854,6 +1888,174 @@
         filterPlantilla();
       } catch (e) {
         alert('Error al cargar plantilla: ' + e.message);
+      }
+    }
+
+    /* ===== IMPORTAR PLANTILLA (EXCEL) ===== */
+    function openModalImportar() {
+      document.getElementById('importFile').value = '';
+      document.getElementById('importSteps').style.display = '';
+      document.getElementById('importResult').style.display = 'none';
+      document.getElementById('btnImportar').disabled = true;
+      document.getElementById('modalImportar').classList.add('show');
+    }
+
+    function closeModalImportar() {
+      document.getElementById('modalImportar').classList.remove('show');
+    }
+
+    function onImportFileChange() {
+      var f = document.getElementById('importFile').files[0];
+      document.getElementById('btnImportar').disabled = !f;
+      if (f) {
+        document.getElementById('importSteps').style.display = '';
+        document.getElementById('importResult').style.display = 'none';
+      }
+    }
+
+    function normalizeHeader(h) {
+      return String(h || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    }
+
+    function parseFechaImport(v) {
+      if (!v) return null;
+      if (typeof v === 'number') {
+        var d = new Date(Math.round((v - 25569) * 86400000));
+        if (isNaN(d.getTime())) return null;
+        return d.toISOString().slice(0, 10);
+      }
+      var s = String(v).trim();
+      if (/^\d+(\.\d+)?$/.test(s)) return parseFechaImport(Number(s));
+      var m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      if (m) return m[1] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[3]).slice(-2);
+      var d = new Date(s);
+      if (isNaN(d.getTime())) return null;
+      return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+    }
+
+    async function descargarPlantillaTemplate() {
+      try {
+        var u = await supabaseClient.from('est_unidades').select('*').order('nombre');
+        var c = await supabaseClient.from('est_cargos').select('*').order('titulo');
+        var unidades = u.data || [];
+        var cargos = c.data || [];
+        var headers = ['CÉDULA', 'NOMBRES', 'APELLIDOS', 'CORREO', 'TELÉFONO', 'DIRECCIÓN', 'UNIDAD', 'CARGO', 'FECHA DE INGRESO', 'ESTADO'];
+        var ws = XLSX.utils.aoa_to_sheet([headers]);
+        ws['!cols'] = headers.map(function(h, i) { return { wch: (i === 6 || i === 7) ? 34 : 18 }; });
+        var wsu = XLSX.utils.aoa_to_sheet([['UNIDAD']].concat(unidades.map(function(x) { return [x.nombre]; })));
+        wsu['!cols'] = [{ wch: 40 }];
+        var wsc = XLSX.utils.aoa_to_sheet([['CARGO']].concat(cargos.map(function(x) { return [x.titulo]; })));
+        wsc['!cols'] = [{ wch: 40 }];
+        var wsi = XLSX.utils.aoa_to_sheet([
+          ['PLANTILLA ACTIVA - INSTRUCCIONES'],
+          [''],
+          ['1. Llena la hoja "Plantilla" con un trabajador por fila.'],
+          ['2. Las columnas UNIDAD y CARGO deben coincidir exactamente con los catálogos (hojas "Catálogo Unidades" y "Catálogo Cargos").'],
+          ['3. FECHA DE INGRESO debe tener formato AAAA-MM-DD (ej: 2025-01-15).'],
+          ['4. ESTADO solo puede ser: Activo, Suspendido o Retirado.'],
+          ['5. Guarda el archivo y súbelo en: Captación → Plantilla activa → Importar plantilla.'],
+          [''],
+          ['Columnas obligatorias: CÉDULA, NOMBRES, APELLIDOS, UNIDAD, CARGO, FECHA DE INGRESO.'],
+          ['Los trabajadores cuya cédula ya exista serán omitidos automáticamente.']
+        ]);
+        wsi['!cols'] = [{ wch: 95 }];
+        var wb = {
+          SheetNames: ['Plantilla', 'Catálogo Unidades', 'Catálogo Cargos', 'Instrucciones'],
+          Sheets: { 'Plantilla': ws, 'Catálogo Unidades': wsu, 'Catálogo Cargos': wsc, 'Instrucciones': wsi }
+        };
+        XLSX.writeFile(wb, 'plantilla-activa.xlsx');
+      } catch (err) {
+        alert('Error al generar la plantilla: ' + err.message);
+      }
+    }
+
+    async function importarPlantilla() {
+      var file = document.getElementById('importFile').files[0];
+      if (!file) { alert('Selecciona un archivo Excel'); return; }
+      var btn = document.getElementById('btnImportar');
+      btn.disabled = true;
+      try {
+        var buf = await file.arrayBuffer();
+        var wb = XLSX.read(buf, { type: 'array' });
+        var ws = wb.Sheets[wb.SheetNames[0]];
+        var rows = XLSX.utils.sheet_to_json(ws, { header: 1 });
+        if (!rows.length) throw new Error('El archivo está vacío');
+        var headerRow = rows[0].map(normalizeHeader);
+        var col = {
+          cedula: headerRow.indexOf('cedula'),
+          nombres: headerRow.indexOf('nombres'),
+          apellidos: headerRow.indexOf('apellidos'),
+          correo: headerRow.indexOf('correo'),
+          telefono: headerRow.indexOf('telefono'),
+          direccion: headerRow.indexOf('direccion'),
+          unidad: headerRow.indexOf('unidad'),
+          cargo: headerRow.indexOf('cargo'),
+          fecha: headerRow.indexOf('fecha de ingreso'),
+          estado: headerRow.indexOf('estado')
+        };
+        if (col.cedula === -1 || col.nombres === -1 || col.apellidos === -1 || col.unidad === -1 || col.cargo === -1) {
+          throw new Error('El archivo no tiene las columnas esperadas (Cédula, Nombres, Apellidos, Unidad, Cargo). Usa la plantilla descargada.');
+        }
+        var unidadesMap = {};
+        allUnidades.forEach(function(x) { unidadesMap[x.nombre.trim().toLowerCase()] = x; });
+        var bd = {};
+        allTrabajadores.forEach(function(t) { if (t.cedula) bd[String(t.cedula).trim()] = true; });
+        var aInsert = [], skipped = [], errores = [], vistos = {};
+        for (var i = 1; i < rows.length; i++) {
+          var r = rows[i];
+          if (!r || !r.length) continue;
+          var get = function(idx) { return idx === -1 ? '' : (r[idx] === null || r[idx] === undefined ? '' : String(r[idx]).trim()); };
+          var fila = i + 1;
+          var cedula = get(col.cedula);
+          var nombres = get(col.nombres);
+          var apellidos = get(col.apellidos);
+          if (!cedula && !nombres && !apellidos && !get(col.unidad) && !get(col.cargo)) continue;
+          if (!cedula) { errores.push('Fila ' + fila + ': falta la Cédula.'); continue; }
+          if (!nombres || !apellidos) { errores.push('Fila ' + fila + ' (' + cedula + '): faltan Nombres o Apellidos.'); continue; }
+          var cKey = String(cedula).trim();
+          if (bd[cKey]) { skipped.push('Fila ' + fila + ': la cédula ' + cedula + ' ya existe en la plantilla.'); continue; }
+          if (vistos[cKey]) { skipped.push('Fila ' + fila + ': la cédula ' + cedula + ' está repetida en el archivo.'); continue; }
+          vistos[cKey] = true;
+          var unidadName = get(col.unidad);
+          var cargoTitle = get(col.cargo);
+          var unidad = unidadesMap[unidadName.toLowerCase()];
+          if (!unidad) { errores.push('Fila ' + fila + ' (' + cedula + '): la unidad "' + unidadName + '" no existe en Estructura.'); continue; }
+          var cargo = allCargos.find(function(x) { return x.titulo.trim().toLowerCase() === cargoTitle.toLowerCase() && x.unidad_id === unidad.id; });
+          if (!cargo) { errores.push('Fila ' + fila + ' (' + cedula + '): el cargo "' + cargoTitle + '" no existe en la unidad "' + unidad.nombre + '".'); continue; }
+          var fechaIngreso = parseFechaImport(get(col.fecha));
+          if (!fechaIngreso) { errores.push('Fila ' + fila + ' (' + cedula + '): fecha de ingreso inválida (usa AAAA-MM-DD).'); continue; }
+          var estado = get(col.estado) || 'Activo';
+          estado = estado.charAt(0).toUpperCase() + estado.slice(1).toLowerCase();
+          if (['Activo', 'Suspendido', 'Retirado'].indexOf(estado) === -1) { errores.push('Fila ' + fila + ' (' + cedula + '): estado "' + estado + '" inválido (usa Activo, Suspendido o Retirado).'); continue; }
+          aInsert.push({
+            cedula: cedula, nombres: nombres, apellidos: apellidos,
+            correo: get(col.correo) || null, telefono: get(col.telefono) || null, direccion: get(col.direccion) || null,
+            unidad_id: unidad.id, cargo_id: cargo.id, fecha_ingreso: fechaIngreso, estado: estado
+          });
+        }
+        var importados = 0;
+        for (var k = 0; k < aInsert.length; k += 100) {
+          var lote = aInsert.slice(k, k + 100);
+          var { error } = await supabaseClient.from('plantilla_trabajadores').insert(lote);
+          if (error) throw error;
+          importados += lote.length;
+        }
+        document.getElementById('importFile').value = '';
+        document.getElementById('btnImportar').disabled = true;
+        document.getElementById('importSteps').style.display = 'none';
+        var html = '<div style="margin-bottom:10px;">'
+          + '<strong style="color:#059669;">✓ ' + importados + ' trabajador' + (importados !== 1 ? 'es' : '') + ' importado' + (importados !== 1 ? 's' : '') + '</strong>'
+          + (skipped.length ? '<br><span style="color:#D97706;">' + skipped.length + ' omitido' + (skipped.length !== 1 ? 's' : '') + '</span>' : '')
+          + (errores.length ? '<br><span style="color:#dc2626;">' + errores.length + ' con error' + (errores.length !== 1 ? 'es' : '') + '</span>' : '')
+          + '</div>';
+        if (skipped.length) html += '<div style="font-size:12px;color:#D97706;margin-bottom:8px;">' + skipped.map(function(s) { return '• ' + s; }).join('<br>') + '</div>';
+        if (errores.length) html += '<div style="font-size:12px;color:#dc2626;">' + errores.map(function(e) { return '• ' + e; }).join('<br>') + '</div>';
+        document.getElementById('importResult').innerHTML = html;
+        document.getElementById('importResult').style.display = '';
+        await loadPlantilla();
+      } catch (err) {
+        alert('Error al importar: ' + err.message);
+        btn.disabled = false;
       }
     }
 

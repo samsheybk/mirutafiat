@@ -1,10 +1,15 @@
 -- ============================================
--- FIAT Venezuela - Intranet Database Schema
--- Ejecutar en SQL Editor de Supabase
+-- FIAT Venezuela - Intranet: ESQUEMA COMPLETO DE BASE DE DATOS
+-- Unifica todos los scripts del repositorio en un solo archivo.
+-- Ejecutar en el SQL Editor de Supabase.
+-- Es idempotente: se puede re-ejecutar sin errores.
 -- ============================================
 
--- Tabla: Captación y Selección de Personal
-CREATE TABLE captacion_procesos (
+-- ============================================
+-- 1) MÓDULOS BASE (dashboard y módulos simples)
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS captacion_procesos (
   id BIGSERIAL PRIMARY KEY,
   cargo TEXT NOT NULL,
   departamento TEXT NOT NULL,
@@ -16,19 +21,7 @@ CREATE TABLE captacion_procesos (
   user_id UUID REFERENCES auth.users(id)
 );
 
-ALTER TABLE captacion_procesos ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Usuarios autenticados pueden leer captacion"
-  ON captacion_procesos FOR SELECT TO authenticated USING (true);
-
-CREATE POLICY "Usuarios autenticados pueden insertar captacion"
-  ON captacion_procesos FOR INSERT TO authenticated WITH CHECK (true);
-
-CREATE POLICY "Usuarios autenticados pueden actualizar captacion"
-  ON captacion_procesos FOR UPDATE TO authenticated USING (true);
-
--- Tabla: Relaciones Laborales
-CREATE TABLE relaciones_registros (
+CREATE TABLE IF NOT EXISTS relaciones_registros (
   id BIGSERIAL PRIMARY KEY,
   trabajador TEXT NOT NULL,
   tipo TEXT NOT NULL,
@@ -39,19 +32,7 @@ CREATE TABLE relaciones_registros (
   user_id UUID REFERENCES auth.users(id)
 );
 
-ALTER TABLE relaciones_registros ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Usuarios autenticados pueden leer relaciones"
-  ON relaciones_registros FOR SELECT TO authenticated USING (true);
-
-CREATE POLICY "Usuarios autenticados pueden insertar relaciones"
-  ON relaciones_registros FOR INSERT TO authenticated WITH CHECK (true);
-
-CREATE POLICY "Usuarios autenticados pueden actualizar relaciones"
-  ON relaciones_registros FOR UPDATE TO authenticated USING (true);
-
--- Tabla: Capacitación y Desarrollo
-CREATE TABLE capacitacion_cursos (
+CREATE TABLE IF NOT EXISTS capacitacion_cursos (
   id BIGSERIAL PRIMARY KEY,
   nombre TEXT NOT NULL,
   instructor TEXT NOT NULL,
@@ -63,19 +44,7 @@ CREATE TABLE capacitacion_cursos (
   user_id UUID REFERENCES auth.users(id)
 );
 
-ALTER TABLE capacitacion_cursos ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Usuarios autenticados pueden leer capacitacion"
-  ON capacitacion_cursos FOR SELECT TO authenticated USING (true);
-
-CREATE POLICY "Usuarios autenticados pueden insertar capacitacion"
-  ON capacitacion_cursos FOR INSERT TO authenticated WITH CHECK (true);
-
-CREATE POLICY "Usuarios autenticados pueden actualizar capacitacion"
-  ON capacitacion_cursos FOR UPDATE TO authenticated USING (true);
-
--- Tabla: Bienestar Social
-CREATE TABLE bienestar_programas (
+CREATE TABLE IF NOT EXISTS bienestar_programas (
   id BIGSERIAL PRIMARY KEY,
   nombre TEXT NOT NULL,
   responsable TEXT NOT NULL,
@@ -87,19 +56,7 @@ CREATE TABLE bienestar_programas (
   user_id UUID REFERENCES auth.users(id)
 );
 
-ALTER TABLE bienestar_programas ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Usuarios autenticados pueden leer bienestar"
-  ON bienestar_programas FOR SELECT TO authenticated USING (true);
-
-CREATE POLICY "Usuarios autenticados pueden insertar bienestar"
-  ON bienestar_programas FOR INSERT TO authenticated WITH CHECK (true);
-
-CREATE POLICY "Usuarios autenticados pueden actualizar bienestar"
-  ON bienestar_programas FOR UPDATE TO authenticated USING (true);
-
--- Tabla: Seguridad y Salud Laboral
-CREATE TABLE seguridad_incidentes (
+CREATE TABLE IF NOT EXISTS seguridad_incidentes (
   id BIGSERIAL PRIMARY KEY,
   tipo TEXT NOT NULL,
   ubicacion TEXT NOT NULL,
@@ -111,19 +68,7 @@ CREATE TABLE seguridad_incidentes (
   user_id UUID REFERENCES auth.users(id)
 );
 
-ALTER TABLE seguridad_incidentes ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Usuarios autenticados pueden leer seguridad"
-  ON seguridad_incidentes FOR SELECT TO authenticated USING (true);
-
-CREATE POLICY "Usuarios autenticados pueden insertar seguridad"
-  ON seguridad_incidentes FOR INSERT TO authenticated WITH CHECK (true);
-
-CREATE POLICY "Usuarios autenticados pueden actualizar seguridad"
-  ON seguridad_incidentes FOR UPDATE TO authenticated USING (true);
-
--- Tabla: Compensación
-CREATE TABLE compensacion_registros (
+CREATE TABLE IF NOT EXISTS compensacion_registros (
   id BIGSERIAL PRIMARY KEY,
   trabajador TEXT NOT NULL,
   cargo TEXT NOT NULL,
@@ -135,19 +80,59 @@ CREATE TABLE compensacion_registros (
   user_id UUID REFERENCES auth.users(id)
 );
 
-ALTER TABLE compensacion_registros ENABLE ROW LEVEL SECURITY;
+-- ============================================
+-- 2) ESTRUCTURA ORGANIZACIONAL
+-- ============================================
 
-CREATE POLICY "Usuarios autenticados pueden leer compensacion"
-  ON compensacion_registros FOR SELECT TO authenticated USING (true);
+CREATE TABLE IF NOT EXISTS est_unidades (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  nombre TEXT NOT NULL,
+  tipo TEXT NOT NULL CHECK (tipo IN ('DIRECCION', 'GERENCIA', 'DEPARTAMENTO')),
+  unidad_padre_id UUID REFERENCES est_unidades(id) ON DELETE SET NULL,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
 
-CREATE POLICY "Usuarios autenticados pueden insertar compensacion"
-  ON compensacion_registros FOR INSERT TO authenticated WITH CHECK (true);
+CREATE TABLE IF NOT EXISTS est_cargos (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  titulo TEXT NOT NULL,
+  unidad_id UUID NOT NULL REFERENCES est_unidades(id) ON DELETE RESTRICT,
+  jefe_inmediato_id UUID REFERENCES est_cargos(id) ON DELETE SET NULL,
+  vacantes INTEGER DEFAULT 0,
+  ocupacion_fisica_sede TEXT,
+  ocupacion_fisica_ciudad TEXT,
+  ocupacion_fisica_estado TEXT,
+  ocupacion_fisica_codigo TEXT,
+  proposito_general TEXT,
+  finalidades TEXT,
+  responsabilidades TEXT,
+  alcance_reporta_directo TEXT,
+  alcance_reporta_indirecto TEXT,
+  alcance_relaciones_internas TEXT,
+  alcance_relaciones_externas TEXT,
+  perfil_area_formacion TEXT,
+  perfil_nivel_formacion TEXT,
+  perfil_area_experiencia TEXT,
+  perfil_tiempo_experiencia TEXT,
+  perfil_sexo TEXT,
+  perfil_edad TEXT,
+  perfil_estado_civil TEXT,
+  perfil_zona_residencia TEXT,
+  perfil_vehiculo TEXT,
+  perfil_otros TEXT,
+  competencias_conocimientos TEXT,
+  competencias_habilidades TEXT,
+  autoridad TEXT,
+  ambiente_riesgos TEXT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
 
-CREATE POLICY "Usuarios autenticados pueden actualizar compensacion"
-  ON compensacion_registros FOR UPDATE TO authenticated USING (true);
+-- ============================================
+-- 3) ATS - CAPTACIÓN Y SELECCIÓN
+-- ============================================
 
--- Tabla: ATS Candidatos (para kanban de Captación)
-CREATE TABLE ats_candidatos (
+CREATE TABLE IF NOT EXISTS ats_candidatos (
   id BIGSERIAL PRIMARY KEY,
   cedula TEXT NOT NULL,
   nombres TEXT NOT NULL,
@@ -163,19 +148,7 @@ CREATE TABLE ats_candidatos (
   user_id UUID REFERENCES auth.users(id)
 );
 
-ALTER TABLE ats_candidatos ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Usuarios autenticados pueden leer ats"
-  ON ats_candidatos FOR SELECT TO authenticated USING (true);
-
-CREATE POLICY "Usuarios autenticados pueden insertar ats"
-  ON ats_candidatos FOR INSERT TO authenticated WITH CHECK (true);
-
-CREATE POLICY "Usuarios autenticados pueden actualizar ats"
-  ON ats_candidatos FOR UPDATE TO authenticated USING (true);
-
--- Tabla: Log de cambios de estado en ATS
-CREATE TABLE ats_log_estados (
+CREATE TABLE IF NOT EXISTS ats_log_estados (
   id BIGSERIAL PRIMARY KEY,
   candidato_id BIGINT NOT NULL REFERENCES ats_candidatos(id) ON DELETE CASCADE,
   estado_anterior TEXT NOT NULL,
@@ -185,16 +158,7 @@ CREATE TABLE ats_log_estados (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-ALTER TABLE ats_log_estados ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Usuarios autenticados pueden leer logs"
-  ON ats_log_estados FOR SELECT TO authenticated USING (true);
-
-CREATE POLICY "Usuarios autenticados pueden insertar logs"
-  ON ats_log_estados FOR INSERT TO authenticated WITH CHECK (true);
-
--- Tabla: Comentarios de candidatos
-CREATE TABLE ats_comentarios (
+CREATE TABLE IF NOT EXISTS ats_comentarios (
   id BIGSERIAL PRIMARY KEY,
   candidato_id BIGINT NOT NULL REFERENCES ats_candidatos(id) ON DELETE CASCADE,
   texto TEXT NOT NULL,
@@ -203,10 +167,530 @@ CREATE TABLE ats_comentarios (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-ALTER TABLE ats_comentarios ENABLE ROW LEVEL SECURITY;
+CREATE TABLE IF NOT EXISTS requisiciones_solicitudes (
+  id BIGSERIAL PRIMARY KEY,
+  tipo TEXT NOT NULL CHECK (tipo IN ('nuevo_cargo', 'aumento_vacantes')),
+  cargo_id UUID REFERENCES est_cargos(id),
+  unidad_id UUID REFERENCES est_unidades(id),
+  cargo_titulo TEXT,
+  vacantes_solicitadas INTEGER NOT NULL DEFAULT 1,
+  justificacion TEXT NOT NULL,
+  estado TEXT NOT NULL DEFAULT 'Pendiente' CHECK (estado IN ('Pendiente', 'Aprobada', 'Rechazada')),
+  creado_por UUID,
+  creado_por_email TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
 
+-- ============================================
+-- 4) PLANTILLA ACTIVA Y PERFIL DEL TRABAJADOR
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS plantilla_trabajadores (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  candidato_id BIGINT REFERENCES ats_candidatos(id),
+  cedula TEXT NOT NULL,
+  nombres TEXT NOT NULL,
+  apellidos TEXT NOT NULL,
+  correo TEXT,
+  telefono TEXT,
+  direccion TEXT,
+  foto_url TEXT,
+  cargo_id UUID REFERENCES est_cargos(id),
+  unidad_id UUID REFERENCES est_unidades(id),
+  fecha_ingreso DATE NOT NULL DEFAULT CURRENT_DATE,
+  fecha_egreso DATE,
+  estado TEXT NOT NULL DEFAULT 'Activo' CHECK (estado IN ('Activo','Suspendido','Retirado')),
+  fecha_nacimiento DATE,
+  lugar_nacimiento TEXT,
+  sexo TEXT,
+  estado_civil TEXT,
+  talla_camisa TEXT,
+  talla_pantalon TEXT,
+  talla_calzado TEXT,
+  talla_franela TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS trabajador_documentos (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trabajador_id UUID REFERENCES plantilla_trabajadores(id) ON DELETE CASCADE,
+  tipo TEXT NOT NULL,
+  numero TEXT,
+  fecha_emision DATE,
+  fecha_vencimiento DATE,
+  archivo_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS trabajador_carga_familiar (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trabajador_id UUID REFERENCES plantilla_trabajadores(id) ON DELETE CASCADE,
+  parentesco TEXT NOT NULL,
+  nombre TEXT NOT NULL,
+  cedula TEXT,
+  fecha_nacimiento DATE,
+  sexo TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================
+-- 5) REPOSITORIO
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS repo_categorias (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  nombre TEXT NOT NULL UNIQUE,
+  descripcion TEXT,
+  icono TEXT DEFAULT '📁',
+  color TEXT DEFAULT '#8b5cf6',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS repo_subcategorias (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  categoria_id UUID NOT NULL REFERENCES repo_categorias(id) ON DELETE CASCADE,
+  nombre TEXT NOT NULL,
+  descripcion TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(categoria_id, nombre)
+);
+
+CREATE TABLE IF NOT EXISTS repo_documentos (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  titulo TEXT NOT NULL,
+  descripcion TEXT,
+  categoria_id UUID NOT NULL REFERENCES repo_categorias(id) ON DELETE RESTRICT,
+  subcategoria_id UUID REFERENCES repo_subcategorias(id) ON DELETE SET NULL,
+  archivo_url TEXT NOT NULL,
+  archivo_nombre TEXT NOT NULL,
+  archivo_tipo TEXT NOT NULL,
+  archivo_tamano BIGINT NOT NULL,
+  version INTEGER DEFAULT 1,
+  tags TEXT[] DEFAULT '{}',
+  fecha_vigencia DATE,
+  password_hash TEXT,
+  subido_por UUID REFERENCES auth.users(id),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS repo_notificaciones (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  documento_id UUID REFERENCES repo_documentos(id) ON DELETE CASCADE,
+  usuario_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  tipo TEXT NOT NULL CHECK (tipo IN ('nuevo_documento', 'nueva_version')),
+  mensaje TEXT NOT NULL,
+  leido BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_repo_documentos_categoria ON repo_documentos(categoria_id);
+CREATE INDEX IF NOT EXISTS idx_repo_documentos_subcategoria ON repo_documentos(subcategoria_id);
+CREATE INDEX IF NOT EXISTS idx_repo_documentos_tags ON repo_documentos USING GIN(tags);
+CREATE INDEX IF NOT EXISTS idx_repo_subcategorias_categoria ON repo_subcategorias(categoria_id);
+CREATE INDEX IF NOT EXISTS idx_repo_notificaciones_usuario ON repo_notificaciones(usuario_id, leido);
+CREATE INDEX IF NOT EXISTS idx_repo_notificaciones_documento ON repo_notificaciones(documento_id);
+
+-- ============================================
+-- 6) REPARAR ESQUEMAS EXISTENTES (idempotente)
+--    Agrega columnas que se crearon después de la versión inicial.
+-- ============================================
+
+ALTER TABLE ats_candidatos ADD COLUMN IF NOT EXISTS foto_url TEXT;
+ALTER TABLE ats_log_estados ADD COLUMN IF NOT EXISTS changed_by_email TEXT;
+
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS vacantes INTEGER DEFAULT 0;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS ocupacion_fisica_sede TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS ocupacion_fisica_ciudad TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS ocupacion_fisica_estado TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS ocupacion_fisica_codigo TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS proposito_general TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS finalidades TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS responsabilidades TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS alcance_reporta_directo TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS alcance_reporta_indirecto TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS alcance_relaciones_internas TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS alcance_relaciones_externas TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_area_formacion TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_nivel_formacion TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_area_experiencia TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_tiempo_experiencia TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_sexo TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_edad TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_estado_civil TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_zona_residencia TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_vehiculo TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS perfil_otros TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS competencias_conocimientos TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS competencias_habilidades TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS autoridad TEXT;
+ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS ambiente_riesgos TEXT;
+
+ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS foto_url TEXT;
+ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS fecha_nacimiento DATE;
+ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS lugar_nacimiento TEXT;
+ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS sexo TEXT;
+ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS estado_civil TEXT;
+ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS talla_camisa TEXT;
+ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS talla_pantalon TEXT;
+ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS talla_calzado TEXT;
+ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS talla_franela TEXT;
+
+-- ============================================
+-- ROW LEVEL SECURITY (RLS)
+-- ============================================
+
+ALTER TABLE captacion_procesos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE relaciones_registros ENABLE ROW LEVEL SECURITY;
+ALTER TABLE capacitacion_cursos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bienestar_programas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE seguridad_incidentes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE compensacion_registros ENABLE ROW LEVEL SECURITY;
+ALTER TABLE est_unidades ENABLE ROW LEVEL SECURITY;
+ALTER TABLE est_cargos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ats_candidatos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ats_log_estados ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ats_comentarios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE requisiciones_solicitudes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE plantilla_trabajadores ENABLE ROW LEVEL SECURITY;
+ALTER TABLE trabajador_documentos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE trabajador_carga_familiar ENABLE ROW LEVEL SECURITY;
+ALTER TABLE repo_categorias ENABLE ROW LEVEL SECURITY;
+ALTER TABLE repo_subcategorias ENABLE ROW LEVEL SECURITY;
+ALTER TABLE repo_documentos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE repo_notificaciones ENABLE ROW LEVEL SECURITY;
+
+-- --- Módulos base ---
+DROP POLICY IF EXISTS "Usuarios autenticados pueden leer captacion" ON captacion_procesos;
+CREATE POLICY "Usuarios autenticados pueden leer captacion"
+  ON captacion_procesos FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden insertar captacion" ON captacion_procesos;
+CREATE POLICY "Usuarios autenticados pueden insertar captacion"
+  ON captacion_procesos FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar captacion" ON captacion_procesos;
+CREATE POLICY "Usuarios autenticados pueden actualizar captacion"
+  ON captacion_procesos FOR UPDATE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden leer relaciones" ON relaciones_registros;
+CREATE POLICY "Usuarios autenticados pueden leer relaciones"
+  ON relaciones_registros FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden insertar relaciones" ON relaciones_registros;
+CREATE POLICY "Usuarios autenticados pueden insertar relaciones"
+  ON relaciones_registros FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar relaciones" ON relaciones_registros;
+CREATE POLICY "Usuarios autenticados pueden actualizar relaciones"
+  ON relaciones_registros FOR UPDATE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden leer capacitacion" ON capacitacion_cursos;
+CREATE POLICY "Usuarios autenticados pueden leer capacitacion"
+  ON capacitacion_cursos FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden insertar capacitacion" ON capacitacion_cursos;
+CREATE POLICY "Usuarios autenticados pueden insertar capacitacion"
+  ON capacitacion_cursos FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar capacitacion" ON capacitacion_cursos;
+CREATE POLICY "Usuarios autenticados pueden actualizar capacitacion"
+  ON capacitacion_cursos FOR UPDATE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden leer bienestar" ON bienestar_programas;
+CREATE POLICY "Usuarios autenticados pueden leer bienestar"
+  ON bienestar_programas FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden insertar bienestar" ON bienestar_programas;
+CREATE POLICY "Usuarios autenticados pueden insertar bienestar"
+  ON bienestar_programas FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar bienestar" ON bienestar_programas;
+CREATE POLICY "Usuarios autenticados pueden actualizar bienestar"
+  ON bienestar_programas FOR UPDATE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden leer seguridad" ON seguridad_incidentes;
+CREATE POLICY "Usuarios autenticados pueden leer seguridad"
+  ON seguridad_incidentes FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden insertar seguridad" ON seguridad_incidentes;
+CREATE POLICY "Usuarios autenticados pueden insertar seguridad"
+  ON seguridad_incidentes FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar seguridad" ON seguridad_incidentes;
+CREATE POLICY "Usuarios autenticados pueden actualizar seguridad"
+  ON seguridad_incidentes FOR UPDATE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden leer compensacion" ON compensacion_registros;
+CREATE POLICY "Usuarios autenticados pueden leer compensacion"
+  ON compensacion_registros FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden insertar compensacion" ON compensacion_registros;
+CREATE POLICY "Usuarios autenticados pueden insertar compensacion"
+  ON compensacion_registros FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar compensacion" ON compensacion_registros;
+CREATE POLICY "Usuarios autenticados pueden actualizar compensacion"
+  ON compensacion_registros FOR UPDATE TO authenticated USING (true);
+
+-- --- Estructura organizacional ---
+DROP POLICY IF EXISTS "Todos pueden leer unidades" ON est_unidades;
+CREATE POLICY "Todos pueden leer unidades" ON est_unidades FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Todos pueden insertar unidades" ON est_unidades;
+CREATE POLICY "Todos pueden insertar unidades" ON est_unidades FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Todos pueden actualizar unidades" ON est_unidades;
+CREATE POLICY "Todos pueden actualizar unidades" ON est_unidades FOR UPDATE USING (true);
+DROP POLICY IF EXISTS "Todos pueden eliminar unidades" ON est_unidades;
+CREATE POLICY "Todos pueden eliminar unidades" ON est_unidades FOR DELETE USING (true);
+
+DROP POLICY IF EXISTS "Todos pueden leer cargos" ON est_cargos;
+CREATE POLICY "Todos pueden leer cargos" ON est_cargos FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Todos pueden insertar cargos" ON est_cargos;
+CREATE POLICY "Todos pueden insertar cargos" ON est_cargos FOR INSERT WITH CHECK (true);
+DROP POLICY IF EXISTS "Todos pueden actualizar cargos" ON est_cargos;
+CREATE POLICY "Todos pueden actualizar cargos" ON est_cargos FOR UPDATE USING (true);
+DROP POLICY IF EXISTS "Todos pueden eliminar cargos" ON est_cargos;
+CREATE POLICY "Todos pueden eliminar cargos" ON est_cargos FOR DELETE USING (true);
+
+-- --- ATS ---
+DROP POLICY IF EXISTS "Usuarios autenticados pueden leer ats" ON ats_candidatos;
+CREATE POLICY "Usuarios autenticados pueden leer ats"
+  ON ats_candidatos FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden insertar ats" ON ats_candidatos;
+CREATE POLICY "Usuarios autenticados pueden insertar ats"
+  ON ats_candidatos FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar ats" ON ats_candidatos;
+CREATE POLICY "Usuarios autenticados pueden actualizar ats"
+  ON ats_candidatos FOR UPDATE TO authenticated USING (true);
+
+-- Postulaciones públicas (permite insertar como anónimo desde /postulacion/)
+DROP POLICY IF EXISTS "Permitir postulaciones públicas" ON ats_candidatos;
+CREATE POLICY "Permitir postulaciones públicas"
+  ON ats_candidatos FOR INSERT TO anon WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden leer logs" ON ats_log_estados;
+CREATE POLICY "Usuarios autenticados pueden leer logs"
+  ON ats_log_estados FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden insertar logs" ON ats_log_estados;
+CREATE POLICY "Usuarios autenticados pueden insertar logs"
+  ON ats_log_estados FOR INSERT TO authenticated WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden leer comentarios" ON ats_comentarios;
 CREATE POLICY "Usuarios autenticados pueden leer comentarios"
   ON ats_comentarios FOR SELECT TO authenticated USING (true);
-
+DROP POLICY IF EXISTS "Usuarios autenticados pueden insertar comentarios" ON ats_comentarios;
 CREATE POLICY "Usuarios autenticados pueden insertar comentarios"
   ON ats_comentarios FOR INSERT TO authenticated WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Permitir todo" ON requisiciones_solicitudes;
+CREATE POLICY "Permitir todo" ON requisiciones_solicitudes FOR ALL USING (true) WITH CHECK (true);
+
+-- --- Plantilla activa y perfil del trabajador ---
+DROP POLICY IF EXISTS "Todos pueden leer plantilla" ON plantilla_trabajadores;
+CREATE POLICY "Todos pueden leer plantilla"
+  ON plantilla_trabajadores FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Todos pueden insertar plantilla" ON plantilla_trabajadores;
+CREATE POLICY "Todos pueden insertar plantilla"
+  ON plantilla_trabajadores FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Todos pueden actualizar plantilla" ON plantilla_trabajadores;
+CREATE POLICY "Todos pueden actualizar plantilla"
+  ON plantilla_trabajadores FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Todos pueden eliminar plantilla" ON plantilla_trabajadores;
+CREATE POLICY "Todos pueden eliminar plantilla"
+  ON plantilla_trabajadores FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Todos pueden leer documentos" ON trabajador_documentos;
+CREATE POLICY "Todos pueden leer documentos"
+  ON trabajador_documentos FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Todos pueden insertar documentos" ON trabajador_documentos;
+CREATE POLICY "Todos pueden insertar documentos"
+  ON trabajador_documentos FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Todos pueden actualizar documentos" ON trabajador_documentos;
+CREATE POLICY "Todos pueden actualizar documentos"
+  ON trabajador_documentos FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Todos pueden eliminar documentos" ON trabajador_documentos;
+CREATE POLICY "Todos pueden eliminar documentos"
+  ON trabajador_documentos FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Todos pueden leer carga familiar" ON trabajador_carga_familiar;
+CREATE POLICY "Todos pueden leer carga familiar"
+  ON trabajador_carga_familiar FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Todos pueden insertar carga familiar" ON trabajador_carga_familiar;
+CREATE POLICY "Todos pueden insertar carga familiar"
+  ON trabajador_carga_familiar FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Todos pueden actualizar carga familiar" ON trabajador_carga_familiar;
+CREATE POLICY "Todos pueden actualizar carga familiar"
+  ON trabajador_carga_familiar FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Todos pueden eliminar carga familiar" ON trabajador_carga_familiar;
+CREATE POLICY "Todos pueden eliminar carga familiar"
+  ON trabajador_carga_familiar FOR DELETE TO authenticated USING (true);
+
+-- --- Repositorio ---
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver categorías" ON repo_categorias;
+CREATE POLICY "Usuarios autenticados pueden ver categorías"
+  ON repo_categorias FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear categorías" ON repo_categorias;
+CREATE POLICY "Usuarios autenticados pueden crear categorías"
+  ON repo_categorias FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar categorías" ON repo_categorias;
+CREATE POLICY "Usuarios autenticados pueden actualizar categorías"
+  ON repo_categorias FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar categorías" ON repo_categorias;
+CREATE POLICY "Usuarios autenticados pueden eliminar categorías"
+  ON repo_categorias FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver subcategorías" ON repo_subcategorias;
+CREATE POLICY "Usuarios autenticados pueden ver subcategorías"
+  ON repo_subcategorias FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear subcategorías" ON repo_subcategorias;
+CREATE POLICY "Usuarios autenticados pueden crear subcategorías"
+  ON repo_subcategorias FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar subcategorías" ON repo_subcategorias;
+CREATE POLICY "Usuarios autenticados pueden actualizar subcategorías"
+  ON repo_subcategorias FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar subcategorías" ON repo_subcategorias;
+CREATE POLICY "Usuarios autenticados pueden eliminar subcategorías"
+  ON repo_subcategorias FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver documentos" ON repo_documentos;
+CREATE POLICY "Usuarios autenticados pueden ver documentos"
+  ON repo_documentos FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden subir documentos" ON repo_documentos;
+CREATE POLICY "Usuarios autenticados pueden subir documentos"
+  ON repo_documentos FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar documentos" ON repo_documentos;
+CREATE POLICY "Usuarios autenticados pueden actualizar documentos"
+  ON repo_documentos FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar documentos" ON repo_documentos;
+CREATE POLICY "Usuarios autenticados pueden eliminar documentos"
+  ON repo_documentos FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios pueden ver sus propias notificaciones" ON repo_notificaciones;
+CREATE POLICY "Usuarios pueden ver sus propias notificaciones"
+  ON repo_notificaciones FOR SELECT TO authenticated
+  USING (usuario_id = auth.uid() OR usuario_id IS NULL);
+DROP POLICY IF EXISTS "Usuarios pueden crear notificaciones" ON repo_notificaciones;
+CREATE POLICY "Usuarios pueden crear notificaciones"
+  ON repo_notificaciones FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios pueden actualizar sus propias notificaciones" ON repo_notificaciones;
+CREATE POLICY "Usuarios pueden actualizar sus propias notificaciones"
+  ON repo_notificaciones FOR UPDATE TO authenticated USING (usuario_id = auth.uid());
+
+-- ============================================
+-- FUNCIONES Y TRIGGERS AUXILIARES
+-- ============================================
+
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS update_repo_categorias_updated_at ON repo_categorias;
+CREATE TRIGGER update_repo_categorias_updated_at
+  BEFORE UPDATE ON repo_categorias
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+DROP TRIGGER IF EXISTS update_repo_subcategorias_updated_at ON repo_subcategorias;
+CREATE TRIGGER update_repo_subcategorias_updated_at
+  BEFORE UPDATE ON repo_subcategorias
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+DROP TRIGGER IF EXISTS update_repo_documentos_updated_at ON repo_documentos;
+CREATE TRIGGER update_repo_documentos_updated_at
+  BEFORE UPDATE ON repo_documentos
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ============================================
+-- DATOS INICIALES
+-- ============================================
+
+-- Categorías de repositorio (solo si no existen)
+INSERT INTO repo_categorias (nombre, descripcion, icono, color) VALUES
+  ('Formatos', 'Formatos y plantillas oficiales', '📋', '#3b82f6'),
+  ('Manuales', 'Manuales de procedimientos y políticas', '📚', '#10b981'),
+  ('Material de Apoyo', 'Documentos de consulta y referencia', '📖', '#f59e0b'),
+  ('Normativas', 'Normas y regulaciones', '⚖️', '#ef4444')
+ON CONFLICT (nombre) DO NOTHING;
+
+-- Candidatos de ejemplo (solo si la tabla está vacía)
+DO $$
+BEGIN
+  IF (SELECT COUNT(*) FROM ats_candidatos) = 0 THEN
+    INSERT INTO ats_candidatos (cedula, nombres, apellidos, correo, telefono, direccion, cargo_interes, estado_kanban, notas) VALUES
+    ('V12345678', 'JUAN CARLOS', 'PEREZ GONZALEZ', 'juan.perez@gmail.com', '04121234567', 'AV PRINCIPAL URB LA FLORESTA', 'ANALISTA DE SELECCION', 'Nuevo', 'CONTACTADO POR LINKEDIN'),
+    ('V23456789', 'MARIA ISABEL', 'RODRIGUEZ LOPEZ', 'maria.rodriguez@hotmail.com', '04141234567', 'CC LOS CHAGUARAMOS', 'RECLUTADOR SENIOR', 'Contacto', 'LLAMAR MAÑANA'),
+    ('V34567890', 'PEDRO JOSE', 'MARTINEZ SILVA', 'pedro.martinez@yahoo.com', '04161234567', 'URB EL PRADO', 'ESPECIALISTA EN COMPENSACION', 'Entrevista', 'SEGUNDA ENTREVISTA PENDIENTE'),
+    ('V45678901', 'ANA VICTORIA', 'HERNANDEZ BLANCO', 'ana.hernandez@gmail.com', '04241234567', 'SECTOR BELLA VISTA', 'ANALISTA DE NOMINA', 'Tecnica', 'PRUEBA TECNICA PROGRAMADA'),
+    ('V56789012', 'JOSE RAFAEL', 'GARCIA TORRES', 'jose.garcia@correo.com', '04261234567', 'URB LAS ACACIAS', 'COORDINADOR DE TALENTO', 'Medica', 'EXAMEN MEDICO ENVIADO'),
+    ('V67890123', 'CARLOS ALBERTO', 'LOPEZ MENDOZA', 'carlos.lopez@gmail.com', '04121239876', 'AV FRANCISCO DE MIRANDA', 'GERENTE DE RH', 'Elegible', 'OFERTA ENVIADA'),
+    ('V78901234', 'LAURA CAROLINA', 'DIAZ SANCHEZ', 'laura.diaz@empresa.com', '04141239876', 'URB SANTA MONICA', 'ANALISTA DE CAPACITACION', 'No elegible', 'NO CUMPLE PERFIL'),
+    ('E89123456', 'JOHN WILLIAM', 'SMITH BROWN', 'john.smith@mail.com', '04161239876', 'AV PRINCIPAL LAS MERCEDES', 'CONSULTOR DE RH', 'Nuevo', 'EXTRANJERO CON PERMISO'),
+    ('V90123456', 'DANIELA ANDREA', 'TORRES MEJIA', 'daniela.torres@gmail.com', '04241239876', 'SECTOR PLAZA VENEZUELA', 'RECLUTADOR JUNIOR', 'Contacto', 'POSTULACION RECIENTE'),
+    ('V01234567', 'FREDDY ALONSO', 'RAMIREZ CASTILLO', 'freddy.ramirez@yahoo.com', '04261239876', 'URB BOYACA', 'ANALISTA DE SELECCION', 'Entrevista', 'PROGRAMAR ENTREVISTA'),
+    ('V11111111', 'ALEJANDRO JOSE', 'SUAREZ PARRA', 'alejandro.suarez@gmail.com', '04121111111', 'AV PRINCIPAL DE CHACAO', 'PSICOLOGO ORGANIZACIONAL', 'Tecnica', 'PRUEBA PSICOMETRICA'),
+    ('V22222222', 'KARINA DEL VALLE', 'MORENO RIVAS', 'karina.moreno@hotmail.com', '04141111111', 'URB LAS LOMAS', 'ESPECIALISTA EN DESARROLLO', 'Medica', 'AGENDAR CITA MEDICA'),
+    ('V33333333', 'GUSTAVO ADOLFO', 'CASTRO LINARES', 'gustavo.castro@correo.com', '04161111111', 'SECTOR SANTA CECILIA', 'COORDINADOR DE NOMINA', 'Elegible', 'OFERTA EN REVISION'),
+    ('V44444444', 'YENIFER COROMOTO', 'RONDON PONTE', 'yenifer.rondon@gmail.com', '04241111111', 'AV PRINCIPAL LOS RUICES', 'ANALISTA DE RH', 'No elegible', 'SALARIO FUERA DE RANGO'),
+    ('E55555555', 'PAUL MICHAEL', 'JOHNSON DAVIS', 'paul.johnson@mail.com', '04261111111', 'CC MACARACUAY', 'GERENTE DE SELECCION', 'Nuevo', 'CONTACTO INICIAL POR EMAIL'),
+    ('V66666666', 'ROSA EUGENIA', 'GOMEZ VARGAS', 'rosa.gomez@gmail.com', '04121112222', 'URB LOS ROSALES', 'RECLUTADOR CORPORATIVO', 'Contacto', 'ENVIAR INFORMACION'),
+    ('V77777777', 'JESUS RAMON', 'SALAZAR CONTRERAS', 'jesus.salazar@empresa.com', '04141112222', 'AV PRINCIPAL DE BOSQUE', 'ANALISTA DE EVALUACION', 'Entrevista', 'PRIMERA ENTREVISTA OK'),
+    ('V88888888', 'MARCO ANTONIO', 'QUINTERO ALVARADO', 'marco.quintero@yahoo.com', '04161112222', 'URB LOURDES', 'ESPECIALISTA EN CLIMA', 'Tecnica', 'PENDIENTE RETROALIMENTACION'),
+    ('V99999999', 'ADRIANA PATRICIA', 'MONTILLA COLMENARES', 'adriana.montilla@gmail.com', '04241112222', 'SECTOR LOS NARANJOS', 'COORDINADOR DE CAPACITACION', 'Medica', 'RESULTADOS MEDICOS OK'),
+    ('V10101010', 'OSCAR ENRIQUE', 'FERNANDEZ RUIZ', 'oscar.fernandez@correo.com', '04261112222', 'AV VICTORIA SECTOR LA TRINIDAD', 'GERENTE DE COMPENSACION', 'Elegible', 'OFERTA FIRMADA');
+  END IF;
+END $$;
+
+-- ============================================
+-- SUPABASE STORAGE - BUCKETS
+-- ============================================
+
+-- BUCKET "fotos-perfil" (PÚBLICO): fotos de perfil de trabajadores y candidatos.
+-- Se crea con SQL para que al re-ejecutar el script quede disponible.
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('fotos-perfil', 'fotos-perfil', TRUE)
+ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "Cualquiera puede ver fotos de perfil" ON storage.objects;
+CREATE POLICY "Cualquiera puede ver fotos de perfil"
+  ON storage.objects FOR SELECT USING (bucket_id = 'fotos-perfil');
+
+DROP POLICY IF EXISTS "Autenticados pueden subir fotos de perfil" ON storage.objects;
+CREATE POLICY "Autenticados pueden subir fotos de perfil"
+  ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'fotos-perfil');
+
+DROP POLICY IF EXISTS "Autenticados pueden actualizar fotos de perfil" ON storage.objects;
+CREATE POLICY "Autenticados pueden actualizar fotos de perfil"
+  ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'fotos-perfil');
+
+DROP POLICY IF EXISTS "Autenticados pueden eliminar fotos de perfil" ON storage.objects;
+CREATE POLICY "Autenticados pueden eliminar fotos de perfil"
+  ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'fotos-perfil');
+
+-- BUCKET "repositorio-documentos" (PRIVADO): documentos del módulo Repositorio.
+-- PASO 1: Crear bucket en Supabase Dashboard > Storage
+-- Nombre del bucket: repositorio-documentos
+-- Público: NO (privado)
+
+-- PASO 2: Configurar políticas del bucket en Supabase Dashboard > Storage
+-- Ir a Storage > repositorio-documentos > Policies
+
+-- Política SELECT (descargar archivos):
+--   Name: "Allow authenticated users to download"
+--   Operation: SELECT
+--   Target roles: authenticated
+--   Policy definition: true
+
+-- Política INSERT (subir archivos):
+--   Name: "Allow authenticated users to upload"
+--   Operation: INSERT
+--   Target roles: authenticated
+--   Policy definition: true
+
+-- Política UPDATE (actualizar archivos):
+--   Name: "Allow authenticated users to update"
+--   Operation: UPDATE
+--   Target roles: authenticated
+--   Policy definition: true
+
+-- Política DELETE (eliminar archivos):
+--   Name: "Allow authenticated users to delete"
+--   Operation: DELETE
+--   Target roles: authenticated
+--   Policy definition: true
+
+-- ============================================
+-- FIN DEL ESQUEMA COMPLETO
+-- ============================================

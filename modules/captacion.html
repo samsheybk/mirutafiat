@@ -767,7 +767,7 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeModalImportar()">Cancelar</button>
-        <button class="btn btn-captacion" id="btnImportar" onclick="importarPlantilla()" disabled>Importar</button>
+        <button class="btn btn-captacion" id="btnImportar" onclick="onBtnImportarClick()" disabled>Importar</button>
       </div>
     </div>
   </div>
@@ -1892,10 +1892,14 @@
     }
 
     /* ===== IMPORTAR PLANTILLA (EXCEL) ===== */
+    var importadoOK = false;
+
     function openModalImportar() {
+      importadoOK = false;
       document.getElementById('importFile').value = '';
       document.getElementById('importSteps').style.display = '';
       document.getElementById('importResult').style.display = 'none';
+      document.getElementById('btnImportar').textContent = 'Importar';
       document.getElementById('btnImportar').disabled = true;
       document.getElementById('modalImportar').classList.add('show');
     }
@@ -1908,9 +1912,16 @@
       var f = document.getElementById('importFile').files[0];
       document.getElementById('btnImportar').disabled = !f;
       if (f) {
+        importadoOK = false;
+        document.getElementById('btnImportar').textContent = 'Importar';
         document.getElementById('importSteps').style.display = '';
         document.getElementById('importResult').style.display = 'none';
       }
+    }
+
+    function onBtnImportarClick() {
+      if (importadoOK) openModalImportar();
+      else importarPlantilla();
     }
 
     function normalizeHeader(h) {
@@ -2041,7 +2052,9 @@
           importados += lote.length;
         }
         document.getElementById('importFile').value = '';
-        document.getElementById('btnImportar').disabled = true;
+        importadoOK = true;
+        document.getElementById('btnImportar').textContent = 'Volver a importar';
+        document.getElementById('btnImportar').disabled = false;
         document.getElementById('importSteps').style.display = 'none';
         var html = '<div style="margin-bottom:10px;">'
           + '<strong style="color:#059669;">✓ ' + importados + ' trabajador' + (importados !== 1 ? 'es' : '') + ' importado' + (importados !== 1 ? 's' : '') + '</strong>'

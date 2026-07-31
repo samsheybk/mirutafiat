@@ -10,7 +10,12 @@ function initModule(moduleName, tableName, fields) {
 }
 
 function switchTool(name) {
-  document.querySelectorAll('.panel-item').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.panel-item').forEach(el => {
+    el.classList.remove('active');
+    // Reset icon color
+    const icon = el.querySelector('i[class^="fi-"]');
+    if (icon) icon.style.color = '';
+  });
   document.querySelectorAll('.tool-section').forEach(el => el.classList.remove('active'));
   const item = document.querySelector(`.panel-item[data-tool="${name}"]`);
   const section = document.getElementById(`tool-${name}`);
@@ -19,6 +24,17 @@ function switchTool(name) {
   document.querySelectorAll('.toolbar-content').forEach(el => {
     el.style.display = el.dataset.toolbar === name ? 'flex' : 'none';
   });
+  
+  // Apply module color to active panel icon
+  const topnav = document.querySelector('.topnav');
+  if (topnav && item) {
+    const moduleColor = topnav.style.background || getComputedStyle(topnav).backgroundColor;
+    const icon = item.querySelector('i[class^="fi-"]');
+    if (icon) {
+      icon.style.color = moduleColor;
+    }
+  }
+  
   localStorage.setItem('fiat_tool_' + location.pathname, name);
 }
 

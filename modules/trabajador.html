@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalle del trabajador - FIAT Intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    .det-photo {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: #eee;
+      border: 3px solid var(--module-captacion);
+    }
+    .det-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    .det-photo-top {
+      width: 56px;
+      height: 56px;
+      cursor: pointer;
+    }
+    .det-lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      cursor: zoom-out;
+    }
+    .det-lightbox.show { display: flex; }
+    .det-lightbox img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+    .det-panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      padding: 20px 24px;
+    }
+    .det-tabbar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .det-section-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--module-captacion);
+      text-transform: uppercase;
+      margin: 8px 0;
+      letter-spacing: 0.4px;
+    }
+    .estado-activo { color: #059669; font-weight: 600; }
+    .estado-suspendido { color: #D97706; font-weight: 600; }
+    .estado-retirado { color: #DC2626; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <nav class="topnav" style="background:var(--module-captacion);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'">FIAT Venezuela<span>Intranet</span></div>
+      <div class="topnav-spacer"></div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Dashboard</option>
+        <option value="captacion.html" selected>Captación y Selección</option>
+        <option value="relaciones-laborales.html">Relaciones Laborales</option>
+        <option value="capacitacion.html">Capacitación y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="compensacion.html">Compensación</option>
+        <option value="repositorio.html">Repositorio</option>
+      </select>
+      <div class="nav-user">
+        <span id="navUserEmail"></span>
+        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-body">
+          <header class="topbar">
+            <div style="display:flex;align-items:center;gap:16px;flex:1;min-width:0;">
+              <div class="det-photo det-photo-top" id="detFotoWrap" onclick="openDetFotoLightbox()" title="Ver foto">
+                <img id="detFoto" src="" alt="">
+                <span id="detFotoInicial" style="font-size:26px;font-weight:700;color:#999;"></span>
+              </div>
+              <div style="flex:1;min-width:0;">
+                <div class="topbar-breadcrumb"><a href="captacion.html" style="color:var(--color-text-secondary);">Captación y Selección</a> / Plantilla activa</div>
+                <h1 id="detTitulo" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Detalle del trabajador</h1>
+                <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px;" id="detCedula"></div>
+                <div style="font-size:12px;color:var(--color-text-secondary);" id="detLaboral"></div>
+              </div>
+              <span id="detEstadoBadge" style="padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;"></span>
+            </div>
+            <button class="btn btn-outline" onclick="location.href='captacion.html'" style="flex-shrink:0;margin-left:16px;">← Volver a plantilla</button>
+          </header>
+
+          <div class="module-content" style="overflow-y:auto;">
+            <div id="detCargando" style="text-align:center;padding:60px;color:#999;">Cargando...</div>
+
+            <div id="detContenido" style="display:none;">
+              <div class="det-tabbar">
+                <button class="btn btn-sm det-tab active" data-dtab="datos" onclick="switchDetalleTab('datos',this)" style="background:var(--module-captacion);color:#fff;border:0;border-radius:4px;padding:6px 16px;">Datos</button>
+                <button class="btn btn-sm det-tab" data-dtab="documentos" onclick="switchDetalleTab('documentos',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Documentación</button>
+                <button class="btn btn-sm det-tab" data-dtab="familia" onclick="switchDetalleTab('familia',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Carga familiar</button>
+              </div>
+
+              <div class="det-panel" id="detDatosView">
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;">
+                  <input type="file" id="detFotoFile" accept="image/*" style="display:none;" onchange="onDetFotoChange()">
+                  <button class="btn btn-outline btn-sm" onclick="document.getElementById('detFotoFile').click()">Cambiar foto de perfil</button>
+                  <span style="font-size:12px;color:#666;">JPG/PNG (se guarda al pulsar Guardar)</span>
+                </div>
+                <form id="detDatosForm">
+                  <div class="det-section-label">Datos personales</div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+                    <div class="form-group">
+                      <label>Fecha de nacimiento</label>
+                      <input type="date" class="form-input" id="det_fecha_nacimiento">
+                    </div>
+                    <div class="form-group">
+                      <label>Lugar de nacimiento</label>
+                      <input type="text" class="form-input" id="det_lugar_nacimiento" placeholder="Estado, Ciudad">
+                    </div>
+                    <div class="form-group">
+                      <label>Sexo</label>
+                      <select class="form-select" id="det_sexo">
+                        <option value="">— Selecciona —</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Femenino">Femenino</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>Estado civil</label>
+                      <select class="form-select" id="det_estado_civil">
+                        <option value="">— Selecciona —</option>
+                        <option value="Soltero/a">Soltero/a</option>
+                        <option value="Casado/a">Casado/a</option>
+                        <option value="Divorciado/a">Divorciado/a</option>
+                        <option value="Viudo/a">Viudo/a</option>
+                        <option value="Concubinato">Concubinato</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>Correo</label>
+                      <input type="email" class="form-input" id="det_correo">
+                    </div>
+                    <div class="form-group">
+                      <label>Teléfono</label>
+                      <input type="text" class="form-input" id="det_telefono">
+                    </div>
+                    <div class="form-group" style="grid-column:span 3;">
+                      <label>Dirección</label>
+                      <input type="text" class="form-input" id="det_direccion">
+                    </div>
+                  </div>
+
+                  <div class="det-section-label">Tallas de ropa y calzado</div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;">
+                    <div class="form-group">
+                      <label>Talla de camisa</label>
+                      <select class="form-select" id="det_talla_camisa">
+                        <option value="">— Selecciona —</option>
+                        <option value="XS">XS</option>
+                        <option value="S">S</option>
+                        <option value="M">M</option>
+                        <option value="L">L</option>
+                        <option value="XL">XL</option>
+                        <option value="XXL">XXL</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>Talla de franela</label>
+                      <select class="form-select" id="det_talla_franela">
+                        <option value="">— Selecciona —</option>
+                        <option value="XS">XS</option>
+                        <option value="S">S</option>
+                        <option value="M">M</option>
+                        <option value="L">L</option>
+                        <option value="XL">XL</option>
+                        <option value="XXL">XXL</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>Talla de pantalón</label>
+                      <select class="form-select" id="det_talla_pantalon">
+                        <option value="">— Selecciona —</option>
+                        <option value="28">28</option>
+                        <option value="30">30</option>
+                        <option value="32">32</option>
+                        <option value="34">34</option>
+                        <option value="36">36</option>
+                        <option value="38">38</option>
+                        <option value="40">40</option>
+                        <option value="42">42</option>
+                        <option value="44">44</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label>Talla de calzado</label>
+                      <select class="form-select" id="det_talla_calzado">
+                        <option value="">— Selecciona —</option>
+                        <option value="34">34</option>
+                        <option value="35">35</option>
+                        <option value="36">36</option>
+                        <option value="37">37</option>
+                        <option value="38">38</option>
+                        <option value="39">39</option>
+                        <option value="40">40</option>
+                        <option value="41">41</option>
+                        <option value="42">42</option>
+                        <option value="43">43</option>
+                        <option value="44">44</option>
+                        <option value="45">45</option>
+                        <option value="46">46</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="det-section-label">Datos laborales</div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;">
+                    <div class="form-group">
+                      <label>Unidad</label>
+                      <input type="text" class="form-input" id="det_unidad" readonly style="background:var(--color-bg);">
+                    </div>
+                    <div class="form-group">
+                      <label>Cargo</label>
+                      <input type="text" class="form-input" id="det_cargo" readonly style="background:var(--color-bg);">
+                    </div>
+                    <div class="form-group">
+                      <label>Fecha de ingreso</label>
+                      <input type="text" class="form-input" id="det_ingreso" readonly style="background:var(--color-bg);">
+                    </div>
+                    <div class="form-group">
+                      <label>Estado</label>
+                      <input type="text" class="form-input" id="det_estado" readonly style="background:var(--color-bg);">
+                    </div>
+                  </div>
+                </form>
+                <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;">
+                  <button class="btn btn-captacion" onclick="saveDetalleDatos()">Guardar datos</button>
+                </div>
+              </div>
+
+              <div class="det-panel" id="detDocumentosView" style="display:none;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                  <span style="font-size:12px;color:#666;" id="detDocCount">0 documentos</span>
+                  <button class="btn btn-captacion btn-sm" onclick="openModalDoc()">+ Agregar documento</button>
+                </div>
+                <table class="data-table">
+                  <thead>
+                    <tr><th>Tipo</th><th>Número</th><th>Emisión</th><th>Vencimiento</th><th>Archivo</th><th style="width:150px;">Acción</th></tr>
+                  </thead>
+                  <tbody id="detDocTableBody">
+                    <tr><td colspan="6" style="text-align:center;padding:24px;color:#999;">Sin documentos registrados</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="det-panel" id="detFamiliaView" style="display:none;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                  <span style="font-size:12px;color:#666;" id="detFamCount">0 cargas familiares</span>
+                  <button class="btn btn-captacion btn-sm" onclick="openModalFamiliar()">+ Agregar carga familiar</button>
+                </div>
+                <table class="data-table">
+                  <thead>
+                    <tr><th>Parentesco</th><th>Nombre</th><th>Cédula</th><th>Nacimiento</th><th>Sexo</th><th style="width:150px;">Acción</th></tr>
+                  </thead>
+                  <tbody id="detFamTableBody">
+                    <tr><td colspan="6" style="text-align:center;padding:24px;color:#999;">Sin cargas familiares registradas</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalDocumento">
+    <div class="modal" style="max-width:520px;">
+      <div class="modal-header">
+        <h3 id="modalDocTitle">Agregar documento</h3>
+        <button class="modal-close" onclick="closeModalDoc()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="docForm">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label>Tipo de documento</label>
+              <select class="form-select" id="doc_tipo" required>
+                <option value="">— Selecciona —</option>
+                <option value="Cédula de identidad">Cédula de identidad</option>
+                <option value="RIF">RIF</option>
+                <option value="Pasaporte">Pasaporte</option>
+                <option value="Licencia de conducir">Licencia de conducir</option>
+                <option value="Certificado médico">Certificado médico</option>
+                <option value="Currículum vitae">Currículum vitae</option>
+                <option value="Título / Diploma">Título / Diploma</option>
+                <option value="Contrato de trabajo">Contrato de trabajo</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Número</label>
+              <input type="text" class="form-input" id="doc_numero" placeholder="Ej: V-12345678">
+            </div>
+            <div class="form-group">
+              <label>Fecha de emisión</label>
+              <input type="date" class="form-input" id="doc_fecha_emision">
+            </div>
+            <div class="form-group">
+              <label>Fecha de vencimiento</label>
+              <input type="date" class="form-input" id="doc_fecha_vencimiento">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Archivo (opcional, imagen o PDF hasta 2 MB)</label>
+            <input type="file" class="form-input" id="doc_archivo" accept=".pdf,image/*" onchange="onDocArchivoChange()">
+            <span style="font-size:12px;color:#666;" id="docArchivoInfo"></span>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModalDoc()">Cancelar</button>
+        <button class="btn btn-captacion" onclick="saveDoc()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalFamiliar">
+    <div class="modal" style="max-width:520px;">
+      <div class="modal-header">
+        <h3 id="modalFamiliarTitle">Agregar carga familiar</h3>
+        <button class="modal-close" onclick="closeModalFamiliar()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="familiarForm">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label>Parentesco</label>
+              <select class="form-select" id="fam_parentesco" required>
+                <option value="">— Selecciona —</option>
+                <option value="Esposo/a">Esposo/a</option>
+                <option value="Hijo/a">Hijo/a</option>
+                <option value="Padre">Padre</option>
+                <option value="Madre">Madre</option>
+                <option value="Hermano/a">Hermano/a</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Sexo</label>
+              <select class="form-select" id="fam_sexo">
+                <option value="">— Selecciona —</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+              </select>
+            </div>
+            <div class="form-group" style="grid-column:span 2;">
+              <label>Nombre completo</label>
+              <input type="text" class="form-input" id="fam_nombre" placeholder="Ej: María Rodríguez" required>
+            </div>
+            <div class="form-group">
+              <label>Cédula</label>
+              <input type="text" class="form-input" id="fam_cedula" placeholder="Ej: V-12345678">
+            </div>
+            <div class="form-group">
+              <label>Fecha de nacimiento</label>
+              <input type="date" class="form-input" id="fam_fecha_nacimiento">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModalFamiliar()">Cancelar</button>
+        <button class="btn btn-captacion" onclick="saveFamiliar()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="det-lightbox" id="detFotoLightbox" onclick="closeDetFotoLightbox()">
+    <img id="detFotoLightboxImg" src="" alt="Foto del trabajador">
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/modules.js"></script>
+  <script>
+    var detalleTrabajadorId = null;
+    var allUnidades = [];
+    var allCargos = [];
+    var detalleDocs = [];
+    var detalleFamilia = [];
+    var detalleDocEditId = null;
+    var detalleFamEditId = null;
+    var detalleFotoArchivo = null;
+    var detalleDocArchivo = null;
+    var detalleFotoActual = null;
+
+    function openDetFotoLightbox() {
+      if (!detalleFotoActual) return;
+      document.getElementById('detFotoLightboxImg').src = detalleFotoActual;
+      document.getElementById('detFotoLightbox').classList.add('show');
+    }
+
+    function closeDetFotoLightbox() {
+      document.getElementById('detFotoLightbox').classList.remove('show');
+    }
+
+    function getUnidadNombre(id) {
+      var u = allUnidades.find(function(x) { return x.id === id; });
+      return u ? u.nombre : '-';
+    }
+
+    function getCargoNombre(id) {
+      var c = allCargos.find(function(x) { return x.id === id; });
+      return c ? c.titulo : '-';
+    }
+
+    function switchDetalleTab(tab, btn) {
+      document.querySelectorAll('.det-tab').forEach(function(b) {
+        b.style.background = b === btn ? 'var(--module-captacion)' : 'transparent';
+        b.style.color = b === btn ? '#fff' : 'var(--color-text)';
+        b.style.border = b === btn ? '0' : '1px solid var(--border-color)';
+      });
+      document.getElementById('detDatosView').style.display = tab === 'datos' ? '' : 'none';
+      document.getElementById('detDocumentosView').style.display = tab === 'documentos' ? '' : 'none';
+      document.getElementById('detFamiliaView').style.display = tab === 'familia' ? '' : 'none';
+    }
+
+    function setDetFoto(url, nombreCompleto) {
+      detalleFotoActual = url || null;
+      var img = document.getElementById('detFoto');
+      var inicial = document.getElementById('detFotoInicial');
+      if (url) {
+        img.src = url;
+        img.style.display = '';
+        inicial.style.display = 'none';
+      } else {
+        img.style.display = 'none';
+        inicial.style.display = '';
+        inicial.textContent = (nombreCompleto || '?').trim().charAt(0).toUpperCase();
+      }
+    }
+
+    function onDetFotoChange() {
+      var f = document.getElementById('detFotoFile').files[0];
+      if (!f) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        detalleFotoArchivo = f;
+        setDetFoto(e.target.result, '');
+      };
+      reader.readAsDataURL(f);
+    }
+
+    async function cargarTrabajador() {
+      var params = new URLSearchParams(location.search);
+      var id = params.get('id');
+      if (!id) {
+        document.getElementById('detCargando').innerHTML = '<span style="color:#dc2626;">Falta el identificador del trabajador en la URL.</span>';
+        return;
+      }
+      try {
+        var u = await supabaseClient.from('est_unidades').select('*').order('nombre');
+        if (u.data) allUnidades = u.data;
+        var c = await supabaseClient.from('est_cargos').select('*').order('titulo');
+        if (c.data) allCargos = c.data;
+        var r = await supabaseClient.from('plantilla_trabajadores').select('*').eq('id', id).single();
+        if (r.error) throw r.error;
+        var t = r.data;
+        detalleTrabajadorId = t.id;
+        document.getElementById('detCargando').style.display = 'none';
+        document.getElementById('detContenido').style.display = '';
+        document.getElementById('detTitulo').textContent = t.nombres + ' ' + t.apellidos;
+        document.getElementById('detCedula').textContent = 'C.I.: ' + t.cedula;
+        document.getElementById('detLaboral').textContent = getCargoNombre(t.cargo_id) + ' · ' + getUnidadNombre(t.unidad_id) + ' · Ingreso: ' + (t.fecha_ingreso || '-');
+        var badge = document.getElementById('detEstadoBadge');
+        badge.textContent = t.estado;
+        badge.style.background = t.estado === 'Activo' ? '#059669' : t.estado === 'Suspendido' ? '#D97706' : '#DC2626';
+        setDetFoto(t.foto_url, t.nombres + ' ' + t.apellidos);
+        detalleFotoArchivo = null;
+        document.getElementById('det_fecha_nacimiento').value = t.fecha_nacimiento || '';
+        document.getElementById('det_lugar_nacimiento').value = t.lugar_nacimiento || '';
+        document.getElementById('det_sexo').value = t.sexo || '';
+        document.getElementById('det_estado_civil').value = t.estado_civil || '';
+        document.getElementById('det_correo').value = t.correo || '';
+        document.getElementById('det_telefono').value = t.telefono || '';
+        document.getElementById('det_direccion').value = t.direccion || '';
+        document.getElementById('det_talla_camisa').value = t.talla_camisa || '';
+        document.getElementById('det_talla_franela').value = t.talla_franela || '';
+        document.getElementById('det_talla_pantalon').value = t.talla_pantalon || '';
+        document.getElementById('det_talla_calzado').value = t.talla_calzado || '';
+        document.getElementById('det_unidad').value = getUnidadNombre(t.unidad_id);
+        document.getElementById('det_cargo').value = getCargoNombre(t.cargo_id);
+        document.getElementById('det_ingreso').value = t.fecha_ingreso || '';
+        document.getElementById('det_estado').value = t.estado;
+        switchDetalleTab('datos', document.querySelector('.det-tab[data-dtab="datos"]'));
+        loadDocumentos();
+        loadCargaFamiliar();
+      } catch (err) {
+        document.getElementById('detCargando').innerHTML = '<span style="color:#dc2626;">Error al cargar el trabajador: ' + err.message + '</span>';
+      }
+    }
+
+    async function saveDetalleDatos() {
+      if (!detalleTrabajadorId) return;
+      var payload = {
+        fecha_nacimiento: document.getElementById('det_fecha_nacimiento').value || null,
+        lugar_nacimiento: document.getElementById('det_lugar_nacimiento').value.trim() || null,
+        sexo: document.getElementById('det_sexo').value || null,
+        estado_civil: document.getElementById('det_estado_civil').value || null,
+        correo: document.getElementById('det_correo').value.trim() || null,
+        telefono: document.getElementById('det_telefono').value.trim() || null,
+        direccion: document.getElementById('det_direccion').value.trim() || null,
+        talla_camisa: document.getElementById('det_talla_camisa').value || null,
+        talla_franela: document.getElementById('det_talla_franela').value || null,
+        talla_pantalon: document.getElementById('det_talla_pantalon').value || null,
+        talla_calzado: document.getElementById('det_talla_calzado').value || null
+      };
+      try {
+        if (detalleFotoArchivo) {
+          var ext = (detalleFotoArchivo.name.split('.').pop() || 'jpg').toLowerCase();
+          var path = 'perfil/' + detalleTrabajadorId + '.' + ext;
+          var { error: upErr } = await supabaseClient.storage
+            .from('fotos-perfil')
+            .upload(path, detalleFotoArchivo, { upsert: true });
+          if (upErr) throw upErr;
+          var { data: pubData } = supabaseClient.storage
+            .from('fotos-perfil')
+            .getPublicUrl(path);
+          payload.foto_url = pubData.publicUrl;
+        }
+        var { error } = await supabaseClient.from('plantilla_trabajadores').update(payload).eq('id', detalleTrabajadorId);
+        if (error) throw error;
+        detalleFotoArchivo = null;
+        document.getElementById('detFotoFile').value = '';
+        alert('Datos guardados correctamente');
+      } catch (err) {
+        alert('Error al guardar: ' + err.message);
+      }
+    }
+
+    /* ===== DOCUMENTOS ===== */
+    async function loadDocumentos() {
+      try {
+        var { data, error } = await supabaseClient.from('trabajador_documentos').select('*').eq('trabajador_id', detalleTrabajadorId).order('created_at');
+        if (error) throw error;
+        detalleDocs = data || [];
+        document.getElementById('detDocCount').textContent = detalleDocs.length + ' documento' + (detalleDocs.length !== 1 ? 's' : '');
+        var tbody = document.getElementById('detDocTableBody');
+        if (!detalleDocs.length) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#999;">Sin documentos registrados</td></tr>';
+          return;
+        }
+        tbody.innerHTML = detalleDocs.map(function(d) {
+          var venc = d.fecha_vencimiento ? new Date(d.fecha_vencimiento) : null;
+          var vencClass = '';
+          if (venc) {
+            var diff = (venc - new Date()) / 86400000;
+            if (diff < 0) vencClass = 'color:#dc2626;font-weight:600;';
+            else if (diff <= 60) vencClass = 'color:#D97706;font-weight:600;';
+          }
+          var archivo = d.archivo_url
+            ? '<a href="' + d.archivo_url + '" target="_blank" title="Ver archivo">Ver</a>'
+            : '-';
+          return '<tr>'
+            + '<td>' + d.tipo + '</td>'
+            + '<td>' + (d.numero || '-') + '</td>'
+            + '<td>' + (d.fecha_emision || '-') + '</td>'
+            + '<td style="' + vencClass + '">' + (d.fecha_vencimiento || '-') + '</td>'
+            + '<td>' + archivo + '</td>'
+            + '<td><button class="btn btn-sm btn-outline" onclick="openModalDoc(\'' + d.id + '\')">Editar</button> <button class="btn btn-sm btn-outline" onclick="deleteDoc(\'' + d.id + '\')" style="color:#dc2626;">Eliminar</button></td>'
+            + '</tr>';
+        }).join('');
+      } catch (err) {
+        document.getElementById('detDocTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#dc2626;">Error: ' + err.message + '</td></tr>';
+      }
+    }
+
+    function openModalDoc(id) {
+      detalleDocEditId = id || null;
+      detalleDocArchivo = null;
+      document.getElementById('docForm').reset();
+      document.getElementById('docArchivoInfo').textContent = '';
+      if (id) {
+        var d = detalleDocs.find(function(x) { return x.id === id; });
+        if (d) {
+          document.getElementById('modalDocTitle').textContent = 'Editar documento';
+          document.getElementById('doc_tipo').value = d.tipo;
+          document.getElementById('doc_numero').value = d.numero || '';
+          document.getElementById('doc_fecha_emision').value = d.fecha_emision || '';
+          document.getElementById('doc_fecha_vencimiento').value = d.fecha_vencimiento || '';
+          if (d.archivo_url) document.getElementById('docArchivoInfo').textContent = 'Archivo actual adjunto. Sube uno nuevo solo si quieres reemplazarlo.';
+        }
+      } else {
+        document.getElementById('modalDocTitle').textContent = 'Agregar documento';
+      }
+      document.getElementById('modalDocumento').classList.add('show');
+    }
+
+    function closeModalDoc() {
+      document.getElementById('modalDocumento').classList.remove('show');
+    }
+
+    function onDocArchivoChange() {
+      var f = document.getElementById('doc_archivo').files[0];
+      if (!f) { detalleDocArchivo = null; document.getElementById('docArchivoInfo').textContent = ''; return; }
+      if (f.size > 2 * 1024 * 1024) {
+        alert('El archivo supera los 2 MB');
+        document.getElementById('doc_archivo').value = '';
+        detalleDocArchivo = null;
+        document.getElementById('docArchivoInfo').textContent = '';
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        detalleDocArchivo = e.target.result;
+        document.getElementById('docArchivoInfo').textContent = 'Archivo listo: ' + f.name;
+      };
+      reader.readAsDataURL(f);
+    }
+
+    async function saveDoc() {
+      var tipo = document.getElementById('doc_tipo').value;
+      if (!tipo) { alert('Selecciona el tipo de documento'); return; }
+      var payload = {
+        tipo: tipo,
+        numero: document.getElementById('doc_numero').value.trim() || null,
+        fecha_emision: document.getElementById('doc_fecha_emision').value || null,
+        fecha_vencimiento: document.getElementById('doc_fecha_vencimiento').value || null
+      };
+      if (detalleDocArchivo) payload.archivo_url = detalleDocArchivo;
+      try {
+        if (detalleDocEditId) {
+          var { error } = await supabaseClient.from('trabajador_documentos').update(payload).eq('id', detalleDocEditId);
+          if (error) throw error;
+        } else {
+          payload.trabajador_id = detalleTrabajadorId;
+          var { error: e2 } = await supabaseClient.from('trabajador_documentos').insert([payload]);
+          if (e2) throw e2;
+        }
+        closeModalDoc();
+        loadDocumentos();
+      } catch (err) {
+        alert('Error al guardar documento: ' + err.message);
+      }
+    }
+
+    async function deleteDoc(id) {
+      if (!confirm('¿Eliminar este documento?')) return;
+      try {
+        var { error } = await supabaseClient.from('trabajador_documentos').delete().eq('id', id);
+        if (error) throw error;
+        loadDocumentos();
+      } catch (err) {
+        alert('Error al eliminar: ' + err.message);
+      }
+    }
+
+    /* ===== CARGA FAMILIAR ===== */
+    async function loadCargaFamiliar() {
+      try {
+        var { data, error } = await supabaseClient.from('trabajador_carga_familiar').select('*').eq('trabajador_id', detalleTrabajadorId).order('created_at');
+        if (error) throw error;
+        detalleFamilia = data || [];
+        document.getElementById('detFamCount').textContent = detalleFamilia.length + ' carga' + (detalleFamilia.length !== 1 ? 's' : '') + ' familiar' + (detalleFamilia.length !== 1 ? 'es' : '');
+        var tbody = document.getElementById('detFamTableBody');
+        if (!detalleFamilia.length) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#999;">Sin cargas familiares registradas</td></tr>';
+          return;
+        }
+        tbody.innerHTML = detalleFamilia.map(function(f) {
+          return '<tr>'
+            + '<td>' + f.parentesco + '</td>'
+            + '<td><span style="font-weight:600;">' + f.nombre + '</span></td>'
+            + '<td>' + (f.cedula || '-') + '</td>'
+            + '<td>' + (f.fecha_nacimiento || '-') + '</td>'
+            + '<td>' + (f.sexo || '-') + '</td>'
+            + '<td><button class="btn btn-sm btn-outline" onclick="openModalFamiliar(\'' + f.id + '\')">Editar</button> <button class="btn btn-sm btn-outline" onclick="deleteFamiliar(\'' + f.id + '\')" style="color:#dc2626;">Eliminar</button></td>'
+            + '</tr>';
+        }).join('');
+      } catch (err) {
+        document.getElementById('detFamTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#dc2626;">Error: ' + err.message + '</td></tr>';
+      }
+    }
+
+    function openModalFamiliar(id) {
+      detalleFamEditId = id || null;
+      document.getElementById('familiarForm').reset();
+      if (id) {
+        var f = detalleFamilia.find(function(x) { return x.id === id; });
+        if (f) {
+          document.getElementById('modalFamiliarTitle').textContent = 'Editar carga familiar';
+          document.getElementById('fam_parentesco').value = f.parentesco;
+          document.getElementById('fam_sexo').value = f.sexo || '';
+          document.getElementById('fam_nombre').value = f.nombre;
+          document.getElementById('fam_cedula').value = f.cedula || '';
+          document.getElementById('fam_fecha_nacimiento').value = f.fecha_nacimiento || '';
+        }
+      } else {
+        document.getElementById('modalFamiliarTitle').textContent = 'Agregar carga familiar';
+      }
+      document.getElementById('modalFamiliar').classList.add('show');
+    }
+
+    function closeModalFamiliar() {
+      document.getElementById('modalFamiliar').classList.remove('show');
+    }
+
+    async function saveFamiliar() {
+      var parentesco = document.getElementById('fam_parentesco').value;
+      var nombre = document.getElementById('fam_nombre').value.trim();
+      if (!parentesco) { alert('Selecciona el parentesco'); return; }
+      if (!nombre) { alert('Indica el nombre completo'); return; }
+      var payload = {
+        parentesco: parentesco,
+        nombre: nombre,
+        cedula: document.getElementById('fam_cedula').value.trim() || null,
+        fecha_nacimiento: document.getElementById('fam_fecha_nacimiento').value || null,
+        sexo: document.getElementById('fam_sexo').value || null
+      };
+      try {
+        if (detalleFamEditId) {
+          var { error } = await supabaseClient.from('trabajador_carga_familiar').update(payload).eq('id', detalleFamEditId);
+          if (error) throw error;
+        } else {
+          payload.trabajador_id = detalleTrabajadorId;
+          var { error: e2 } = await supabaseClient.from('trabajador_carga_familiar').insert([payload]);
+          if (e2) throw e2;
+        }
+        closeModalFamiliar();
+        loadCargaFamiliar();
+      } catch (err) {
+        alert('Error al guardar carga familiar: ' + err.message);
+      }
+    }
+
+    async function deleteFamiliar(id) {
+      if (!confirm('¿Eliminar esta carga familiar?')) return;
+      try {
+        var { error } = await supabaseClient.from('trabajador_carga_familiar').delete().eq('id', id);
+        if (error) throw error;
+        loadCargaFamiliar();
+      } catch (err) {
+        alert('Error al eliminar: ' + err.message);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', cargarTrabajador);
+  </script>
+</body>
+</html>

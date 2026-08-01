@@ -1075,7 +1075,7 @@
           + '<td>' + getCargoNombre(t.cargo_id) + '</td>'
           + '<td>' + t.fecha_ingreso + '</td>'
           + '<td class="estado-' + t.estado.toLowerCase() + '">' + t.estado + '</td>'
-          + '<td><button class="btn btn-sm btn-outline" title="Ver detalle" onclick="location.href=\'trabajador.html?id=' + t.id + '\'"><i class="fi fi-sr-eye" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> <button class="btn btn-sm btn-outline" title="Editar" onclick="editarTrabajador(\'' + t.id + '\')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button></td>'
+          + '<td><button class="btn btn-sm btn-outline" title="Ver detalle" onclick="location.href=\'trabajador.html?id=' + t.id + '&modulo=relaciones\'"><i class="fi fi-sr-eye" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> <button class="btn btn-sm btn-outline" title="Editar" onclick="editarTrabajador(\'' + t.id + '\')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button></td>'
           + '</tr>';
       }).join('');
     }
@@ -1100,7 +1100,7 @@
           + '<td>' + getCargoNombre(t.cargo_id) + '</td>'
           + '<td>' + t.fecha_ingreso + ' → ' + (t.fecha_egreso || '-') + '</td>'
           + '<td class="estado-' + t.estado.toLowerCase() + '">' + t.estado + '</td>'
-          + '<td><button class="btn btn-sm btn-outline" title="Ver detalle" onclick="location.href=\'trabajador.html?id=' + t.id + '\'"><i class="fi fi-sr-eye" style="font-size:15px;line-height:1;pointer-events:none;"></i></button></td>'
+          + '<td><button class="btn btn-sm btn-outline" title="Ver detalle" onclick="location.href=\'trabajador.html?id=' + t.id + '&modulo=relaciones\'"><i class="fi fi-sr-eye" style="font-size:15px;line-height:1;pointer-events:none;"></i></button></td>'
           + '</tr>';
       }).join('');
     }

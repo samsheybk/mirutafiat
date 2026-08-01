@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curso - Capacitación y Desarrollo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
+  <style>
+    :root { --module-color: var(--module-capacitacion); }
+    body[data-modulo] { }
+    .module-content { padding: 24px; }
+    .det-panel { margin-bottom: 20px; }
+    .det-section-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--module-capacitacion);
+      text-transform: uppercase;
+      margin: 8px 0;
+      letter-spacing: 0.4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <nav class="topnav" style="background:var(--module-capacitacion);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'">FIAT Venezuela<span>Intranet</span></div>
+      <div class="topnav-spacer"></div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Dashboard</option>
+        <option value="captacion.html">Captación y Selección</option>
+        <option value="relaciones-laborales.html">Relaciones Laborales</option>
+        <option value="capacitacion.html" selected>Capacitación y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="compensacion.html">Compensación</option>
+        <option value="repositorio.html">Repositorio</option>
+      </select>
+      <div class="nav-user">
+        <span id="navUserEmail"></span>
+        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-body">
+          <header class="topbar">
+            <div style="display:flex;align-items:center;gap:16px;flex:1;min-width:0;">
+              <div style="flex:1;min-width:0;">
+                <div class="topbar-breadcrumb"><a href="capacitacion.html" style="color:var(--color-text-secondary);">Capacitación y Desarrollo</a> / Curso</div>
+                <h1 id="cursoTitulo" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Nuevo curso</h1>
+              </div>
+              <span id="cursoEstadoBadge" style="padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;"></span>
+              <button class="btn btn-capacitacion btn-sm" onclick="guardarCurso()" style="flex-shrink:0;">Guardar curso</button>
+              <button class="btn btn-outline" onclick="location.href='capacitacion.html'" style="flex-shrink:0;">← Volver</button>
+            </div>
+          </header>
+
+          <div class="module-content" style="overflow-y:auto;">
+            <div id="cursoCargando" style="text-align:center;padding:60px;color:#999;">Cargando...</div>
+
+            <div id="cursoContenido" style="display:none;">
+              <div class="det-panel">
+                <div class="det-section-label">Información del curso</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                  <div class="form-group" style="grid-column:span 2;">
+                    <label>Título del curso</label>
+                    <input type="text" class="form-input" id="cur_titulo" placeholder="Nombre del curso">
+                  </div>
+                  <div class="form-group" style="grid-column:span 2;">
+                    <label>Descripción</label>
+                    <textarea class="form-textarea" id="cur_descripcion" rows="4" placeholder="Describe el contenido y objetivo del curso"></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label>Estado</label>
+                    <select class="form-select" id="cur_estado">
+                      <option value="Borrador">Borrador</option>
+                      <option value="Publicado">Publicado</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group" style="margin-top:4px;">
+                  <label>Imagen de portada</label>
+                  <input type="file" id="cur_imagen" accept="image/*" onchange="onImagenChange()">
+                  <div id="curImagenPreview" style="margin-top:8px;"></div>
+                  <span style="font-size:12px;color:#666;">JPG/PNG (máximo 2 MB). Se guarda al pulsar Guardar curso.</span>
+                </div>
+              </div>
+
+              <div class="det-panel">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                  <div class="det-section-label" style="margin:0;">Módulos y videos</div>
+                  <button class="btn btn-capacitacion btn-sm" onclick="agregarModulo()">+ Agregar módulo</button>
+                </div>
+                <div id="modulosList">
+                  <div style="text-align:center;padding:24px;color:#999;">Sin módulos. Agrega uno para incluir videos y cuestionarios.</div>
+                </div>
+              </div>
+
+              <div class="det-panel">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                  <div class="det-section-label" style="margin:0;">Cuestionarios del curso</div>
+                  <button class="btn btn-capacitacion btn-sm" onclick="agregarQuizCurso()">+ Agregar cuestionario</button>
+                </div>
+                <div id="cuestionariosList">
+                  <div style="text-align:center;padding:24px;color:#999;">Sin cuestionarios. Puedes agregarlos dentro de cada módulo o al final del curso.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    var cursoId = null;
+    var modulos = [];
+    var cuestionarios = [];
+    var imagenArchivo = null;
+
+    function escapeHtml(s) {
+      return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function youtubeId(url) {
+      var u = String(url || '').trim();
+      var m = u.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+      return m ? m[1] : '';
+    }
+
+    function thumbUrl(id) {
+      return 'https://img.youtube.com/vi/' + id + '/hqdefault.jpg';
+    }
+
+    function onImagenChange() {
+      var f = document.getElementById('cur_imagen').files[0];
+      var prev = document.getElementById('curImagenPreview');
+      if (!f) { imagenArchivo = null; prev.innerHTML = ''; return; }
+      if (f.size > 2 * 1024 * 1024) {
+        showAlert('La imagen supera los 2 MB', 'warning');
+        document.getElementById('cur_imagen').value = '';
+        prev.innerHTML = '';
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        imagenArchivo = e.target.result;
+        prev.innerHTML = '<img src="' + e.target.result + '" alt="Portada" style="max-width:320px;border-radius:8px;border:1px solid var(--color-border);display:block;">';
+      };
+      reader.readAsDataURL(f);
+    }
+
+    /* ===== MÓDULOS Y VIDEOS ===== */
+    function updateModulo(i, campo, valor) {
+      if (modulos[i]) modulos[i][campo] = valor;
+    }
+
+    function updateVideo(modI, vI, campo, valor) {
+      var v = modulos[modI] && modulos[modI].videos[vI];
+      if (!v) return;
+      v[campo] = valor;
+      if (campo === 'url') {
+        var tid = youtubeId(valor);
+        var img = document.getElementById('vidThumb_' + modI + '_' + vI);
+        if (img) {
+          img.src = tid ? thumbUrl(tid) : '';
+          img.style.display = tid ? '' : 'none';
+        }
+      }
+    }
+
+    function crearVideoRow(modI, vI) {
+      var v = modulos[modI].videos[vI];
+      var tid = youtubeId(v.url);
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px;';
+      row.innerHTML =
+        '<input type="text" class="form-input" value="' + escapeHtml(v.titulo || '') + '" placeholder="Título del video" style="flex:1;min-width:140px;" oninput="updateVideo(' + modI + ',' + vI + ',\'titulo\',this.value)">'
+        + '<input type="text" class="form-input" value="' + escapeHtml(v.url || '') + '" placeholder="URL de YouTube" style="flex:2;min-width:220px;" oninput="updateVideo(' + modI + ',' + vI + ',\'url\',this.value)">'
+        + '<img id="vidThumb_' + modI + '_' + vI + '" src="' + (tid ? thumbUrl(tid) : '') + '" alt="" style="width:60px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--color-border);' + (tid ? '' : 'display:none;') + '">'
+        + '<button type="button" class="btn btn-sm btn-outline" title="Quitar video" onclick="eliminarVideo(' + modI + ',' + vI + ')" style="color:#dc2626;flex-shrink:0;">✕</button>';
+      return row;
+    }
+
+    /* ===== CUESTIONARIOS (dentro de módulos o a nivel de curso) ===== */
+    function getQuiz(key) {
+      var mm = key.match(/^m(\d+)c(\d+)$/);
+      if (mm) {
+        var mod = modulos[+mm[1]];
+        return mod ? (mod.quizzes[+mm[2]] || null) : null;
+      }
+      var cc = key.match(/^c(\d+)$/);
+      if (cc) return cuestionarios[+cc[1]] || null;
+      return null;
+    }
+
+    function getQuizArr(key) {
+      var mm = key.match(/^m(\d+)c(\d+)$/);
+      if (mm) {
+        var mod = modulos[+mm[1]];
+        return mod ? { arr: mod.quizzes, i: +mm[2] } : null;
+      }
+      var cc = key.match(/^c(\d+)$/);
+      if (cc) return { arr: cuestionarios, i: +cc[1] };
+      return null;
+    }
+
+    function updateQuiz(key, campo, valor) {
+      var q = getQuiz(key);
+      if (q) q[campo] = valor;
+    }
+
+    function updatePregunta(key, qi, campo, valor) {
+      var q = getQuiz(key);
+      if (q && q.preguntas[qi]) q.preguntas[qi][campo] = valor;
+    }
+
+    function updateRespuesta(key, qi, ri, campo, valor) {
+      var q = getQuiz(key);
+      if (q && q.preguntas[qi] && q.preguntas[qi].respuestas[ri]) q.preguntas[qi].respuestas[ri][campo] = valor;
+    }
+
+    function marcarCorrecta(key, qi, ri) {
+      var q = getQuiz(key);
+      if (q && q.preguntas[qi]) {
+        q.preguntas[qi].respuestas.forEach(function(r, j) { r.es_correcta = (j === ri); });
+      }
+    }
+
+    function crearRespuestaRow(key, qi, ri) {
+      var r = getQuiz(key).preguntas[qi].respuestas[ri];
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:6px;';
+      row.innerHTML =
+        '<input type="radio" name="resp_correcta_' + key + '_' + qi + '" ' + (r.es_correcta ? 'checked' : '') + ' title="Marcar como correcta" onchange="marcarCorrecta(\'' + key + '\',' + qi + ',' + ri + ')">'
+        + '<input type="text" class="form-input" value="' + escapeHtml(r.respuesta || '') + '" placeholder="Opción de respuesta" style="flex:1;" oninput="updateRespuesta(\'' + key + '\',' + qi + ',' + ri + ',\'respuesta\',this.value)">'
+        + '<button type="button" class="btn btn-sm btn-outline" title="Quitar opción" onclick="eliminarRespuesta(\'' + key + '\',' + qi + ',' + ri + ')" style="color:#dc2626;flex-shrink:0;">✕</button>';
+      return row;
+    }
+
+    function crearPreguntaCard(key, qi) {
+      var p = getQuiz(key).preguntas[qi];
+      var card = document.createElement('div');
+      card.style.cssText = 'border:1px solid var(--color-border);border-radius:8px;padding:12px;margin-bottom:10px;background:var(--color-surface);';
+      var head = document.createElement('div');
+      head.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px;';
+      head.innerHTML =
+        '<span style="font-weight:700;color:var(--module-capacitacion);flex-shrink:0;">Pregunta ' + (qi + 1) + '</span>'
+        + '<input type="text" class="form-input" value="' + escapeHtml(p.pregunta || '') + '" placeholder="Escribe la pregunta" style="flex:1;" oninput="updatePregunta(\'' + key + '\',' + qi + ',\'pregunta\',this.value)">'
+        + '<button type="button" class="btn btn-sm btn-outline" title="Quitar pregunta" onclick="eliminarPregunta(\'' + key + '\',' + qi + ')" style="color:#dc2626;flex-shrink:0;">✕</button>';
+      card.appendChild(head);
+      var rs = document.createElement('div');
+      rs.id = 'respuestas_' + key + '_' + qi;
+      p.respuestas.forEach(function(_, ri) { rs.appendChild(crearRespuestaRow(key, qi, ri)); });
+      card.appendChild(rs);
+      var addBtn = document.createElement('button');
+      addBtn.type = 'button';
+      addBtn.className = 'btn btn-outline btn-sm';
+      addBtn.textContent = '+ Agregar respuesta';
+      addBtn.onclick = function() { agregarRespuesta(key, qi); };
+      card.appendChild(addBtn);
+      return card;
+    }
+
+    function crearQuizCard(key, quiz) {
+      var card = document.createElement('div');
+      card.style.cssText = 'border:1px solid var(--color-border);border-radius:8px;padding:12px;margin:8px 0 0 0;background:var(--color-surface);';
+      var head = document.createElement('div');
+      head.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:8px;';
+      head.innerHTML =
+        '<span style="font-weight:700;color:var(--module-capacitacion);flex-shrink:0;">Cuestionario</span>'
+        + '<input type="text" class="form-input" value="' + escapeHtml(quiz.titulo || '') + '" placeholder="Título del cuestionario (ej. Evaluación del módulo 1)" style="flex:1;" oninput="updateQuiz(\'' + key + '\',\'titulo\',this.value)">'
+        + '<button type="button" class="btn btn-sm btn-outline" title="Quitar cuestionario" onclick="eliminarQuiz(\'' + key + '\')" style="color:#dc2626;flex-shrink:0;">✕</button>';
+      card.appendChild(head);
+      var preguntas = document.createElement('div');
+      preguntas.id = 'preguntas_' + key;
+      quiz.preguntas.forEach(function(_, qi) { preguntas.appendChild(crearPreguntaCard(key, qi)); });
+      card.appendChild(preguntas);
+      var addBtn = document.createElement('button');
+      addBtn.type = 'button';
+      addBtn.className = 'btn btn-outline btn-sm';
+      addBtn.textContent = '+ Agregar pregunta';
+      addBtn.onclick = function() { agregarPregunta(key); };
+      card.appendChild(addBtn);
+      return card;
+    }
+
+    function crearModuloCard(modI) {
+      var m = modulos[modI];
+      var card = document.createElement('div');
+      card.style.cssText = 'border:1px solid var(--color-border);border-radius:8px;padding:14px;margin-bottom:12px;background:var(--color-surface);';
+      var head = document.createElement('div');
+      head.style.cssText = 'display:flex;gap:8px;align-items:center;margin-bottom:10px;';
+      head.innerHTML =
+        '<span style="font-weight:700;color:var(--module-capacitacion);flex-shrink:0;">Módulo ' + (modI + 1) + '</span>'
+        + '<input type="text" class="form-input" value="' + escapeHtml(m.titulo || '') + '" placeholder="Título del módulo" style="flex:1;" oninput="updateModulo(' + modI + ',\'titulo\',this.value)">'
+        + '<button type="button" class="btn btn-sm btn-outline" title="Quitar módulo" onclick="eliminarModulo(' + modI + ')" style="color:#dc2626;flex-shrink:0;">✕</button>';
+      card.appendChild(head);
+
+      var vids = document.createElement('div');
+      vids.id = 'videos_' + modI;
+      m.videos.forEach(function(_, vI) { vids.appendChild(crearVideoRow(modI, vI)); });
+      card.appendChild(vids);
+      var addVid = document.createElement('button');
+      addVid.type = 'button';
+      addVid.className = 'btn btn-outline btn-sm';
+      addVid.textContent = '+ Agregar video';
+      addVid.onclick = function() { agregarVideo(modI); };
+      card.appendChild(addVid);
+
+      var quizLabel = document.createElement('div');
+      quizLabel.style.cssText = 'font-size:12px;font-weight:700;color:var(--module-capacitacion);text-transform:uppercase;margin:12px 0 6px;';
+      quizLabel.textContent = 'Cuestionarios del módulo';
+      card.appendChild(quizLabel);
+
+      var quizzes = document.createElement('div');
+      quizzes.id = 'quizzes_m' + modI;
+      m.quizzes.forEach(function(_, k) { quizzes.appendChild(crearQuizCard('m' + modI + 'c' + k, m.quizzes[k])); });
+      card.appendChild(quizzes);
+      var addQuiz = document.createElement('button');
+      addQuiz.type = 'button';
+      addQuiz.className = 'btn btn-outline btn-sm';
+      addQuiz.textContent = '+ Agregar cuestionario';
+      addQuiz.onclick = function() { agregarQuizEnModulo(modI); };
+      card.appendChild(addQuiz);
+
+      return card;
+    }
+
+    function renderModulos() {
+      var cont = document.getElementById('modulosList');
+      cont.innerHTML = '';
+      if (!modulos.length) {
+        cont.innerHTML = '<div style="text-align:center;padding:24px;color:#999;">Sin módulos. Agrega uno para incluir videos y cuestionarios.</div>';
+        return;
+      }
+      modulos.forEach(function(_, i) { cont.appendChild(crearModuloCard(i)); });
+    }
+
+    function renderCuestionarios() {
+      var cont = document.getElementById('cuestionariosList');
+      cont.innerHTML = '';
+      if (!cuestionarios.length) {
+        cont.innerHTML = '<div style="text-align:center;padding:24px;color:#999;">Sin cuestionarios. Puedes agregarlos dentro de cada módulo o al final del curso.</div>';
+        return;
+      }
+      cuestionarios.forEach(function(_, k) { cont.appendChild(crearQuizCard('c' + k, cuestionarios[k])); });
+    }
+
+    function agregarModulo() {
+      modulos.push({ id: null, titulo: '', videos: [], quizzes: [] });
+      renderModulos();
+    }
+
+    function eliminarModulo(i) {
+      modulos.splice(i, 1);
+      renderModulos();
+    }
+
+    function agregarVideo(modI) {
+      modulos[modI].videos.push({ id: null, titulo: '', url: '' });
+      renderModulos();
+    }
+
+    function eliminarVideo(modI, vI) {
+      modulos[modI].videos.splice(vI, 1);
+      renderModulos();
+    }
+
+    function agregarQuizEnModulo(modI) {
+      modulos[modI].quizzes.push({ id: null, titulo: '', preguntas: [] });
+      renderModulos();
+    }
+
+    function agregarQuizCurso() {
+      cuestionarios.push({ id: null, titulo: '', preguntas: [] });
+      renderCuestionarios();
+    }
+
+    function eliminarQuiz(key) {
+      var parent = getQuizArr(key);
+      if (!parent) return;
+      parent.arr.splice(parent.i, 1);
+      renderModulos();
+      renderCuestionarios();
+    }
+
+    function agregarPregunta(key) {
+      var q = getQuiz(key);
+      if (!q) return;
+      q.preguntas.push({ id: null, pregunta: '', respuestas: [] });
+      renderModulos();
+      renderCuestionarios();
+    }
+
+    function eliminarPregunta(key, qi) {
+      var q = getQuiz(key);
+      if (!q) return;
+      q.preguntas.splice(qi, 1);
+      renderModulos();
+      renderCuestionarios();
+    }
+
+    function agregarRespuesta(key, qi) {
+      var q = getQuiz(key);
+      if (!q) return;
+      q.preguntas[qi].respuestas.push({ id: null, respuesta: '', es_correcta: false });
+      renderModulos();
+      renderCuestionarios();
+    }
+
+    function eliminarRespuesta(key, qi, ri) {
+      var q = getQuiz(key);
+      if (!q) return;
+      q.preguntas[qi].respuestas.splice(ri, 1);
+      renderModulos();
+      renderCuestionarios();
+    }
+
+    /* ===== CARGA Y GUARDADO ===== */
+    function actualizarBadge() {
+      var badge = document.getElementById('cursoEstadoBadge');
+      var estado = document.getElementById('cur_estado').value;
+      badge.textContent = estado;
+      badge.style.background = estado === 'Publicado' ? '#059669' : '#D97706';
+    }
+
+    async function cargarQuizCompleto(q) {
+      var rp = await supabaseClient.from('cap_preguntas').select('*').eq('cuestionario_id', q.id).order('posicion');
+      if (rp.error) throw rp.error;
+      var preguntas = [];
+      for (var i = 0; i < (rp.data || []).length; i++) {
+        var p = rp.data[i];
+        var rr = await supabaseClient.from('cap_respuestas').select('*').eq('pregunta_id', p.id).order('posicion');
+        if (rr.error) throw rr.error;
+        preguntas.push({
+          id: p.id,
+          pregunta: p.pregunta,
+          respuestas: (rr.data || []).map(function(x) { return { id: x.id, respuesta: x.respuesta, es_correcta: !!x.es_correcta }; })
+        });
+      }
+      return { id: q.id, titulo: q.titulo, preguntas: preguntas };
+    }
+
+    async function cargarCurso() {
+      var params = new URLSearchParams(location.search);
+      var id = params.get('id');
+      try {
+        if (id) {
+          var r = await supabaseClient.from('cap_cursos').select('*').eq('id', id).single();
+          if (r.error) throw r.error;
+          var c = r.data;
+          cursoId = c.id;
+          document.getElementById('cur_titulo').value = c.titulo || '';
+          document.getElementById('cur_descripcion').value = c.descripcion || '';
+          document.getElementById('cur_estado').value = c.estado || 'Borrador';
+          if (c.imagen_url) {
+            document.getElementById('curImagenPreview').innerHTML = '<img src="' + c.imagen_url + '" alt="Portada" style="max-width:320px;border-radius:8px;border:1px solid var(--color-border);display:block;">';
+          }
+          document.getElementById('cursoTitulo').textContent = c.titulo;
+
+          var rm = await supabaseClient.from('cap_modulos').select('*').eq('curso_id', id).order('posicion');
+          if (rm.error) throw rm.error;
+          modulos = [];
+          for (var i = 0; i < (rm.data || []).length; i++) {
+            var m = rm.data[i];
+            var rv = await supabaseClient.from('cap_videos').select('*').eq('modulo_id', m.id).order('posicion');
+            if (rv.error) throw rv.error;
+            var rq = await supabaseClient.from('cap_cuestionarios').select('*').eq('modulo_id', m.id).order('posicion');
+            if (rq.error) throw rq.error;
+            var quizzes = [];
+            for (var k = 0; k < (rq.data || []).length; k++) {
+              quizzes.push(await cargarQuizCompleto(rq.data[k]));
+            }
+            modulos.push({
+              id: m.id,
+              titulo: m.titulo,
+              videos: (rv.data || []).map(function(v) { return { id: v.id, titulo: v.titulo, url: v.url }; }),
+              quizzes: quizzes
+            });
+          }
+
+          var rc = await supabaseClient.from('cap_cuestionarios').select('*').eq('curso_id', id).is('modulo_id', null).order('posicion');
+          if (rc.error) throw rc.error;
+          cuestionarios = [];
+          for (var k = 0; k < (rc.data || []).length; k++) {
+            cuestionarios.push(await cargarQuizCompleto(rc.data[k]));
+          }
+        } else {
+          document.getElementById('cur_estado').value = 'Borrador';
+          modulos = [];
+          cuestionarios = [];
+        }
+        renderModulos();
+        renderCuestionarios();
+        actualizarBadge();
+        document.getElementById('cursoCargando').style.display = 'none';
+        document.getElementById('cursoContenido').style.display = '';
+      } catch (err) {
+        document.getElementById('cursoCargando').innerHTML = '<span style="color:#dc2626;">Error al cargar el curso: ' + err.message + '</span>';
+      }
+    }
+
+    async function insertarQuiz(cursoId, moduloId, quiz, posicion) {
+      var iq = await supabaseClient.from('cap_cuestionarios').insert({
+        curso_id: cursoId,
+        modulo_id: moduloId,
+        titulo: (quiz.titulo || '').trim(),
+        posicion: posicion
+      }).select();
+      if (iq.error) throw iq.error;
+      var quizId = iq.data[0].id;
+      var preVal = [];
+      var preOrig = [];
+      quiz.preguntas.forEach(function(p, pi) {
+        if (!(p.pregunta || '').trim()) return;
+        preVal.push({ cuestionario_id: quizId, pregunta: p.pregunta.trim(), posicion: pi });
+        preOrig.push(pi);
+      });
+      if (!preVal.length) return;
+      var insP = await supabaseClient.from('cap_preguntas').insert(preVal).select();
+      if (insP.error) throw insP.error;
+      for (var k = 0; k < preOrig.length; k++) {
+        var pId = insP.data[k].id;
+        var rs = (quiz.preguntas[preOrig[k]].respuestas || []).filter(function(x) { return (x.respuesta || '').trim(); });
+        var rsVal = rs.map(function(x, j) {
+          return { pregunta_id: pId, respuesta: x.respuesta.trim(), es_correcta: !!x.es_correcta, posicion: j };
+        });
+        if (rsVal.length) {
+          var insR = await supabaseClient.from('cap_respuestas').insert(rsVal);
+          if (insR.error) throw insR.error;
+        }
+      }
+    }
+
+    async function guardarCurso() {
+      var titulo = document.getElementById('cur_titulo').value.trim();
+      if (!titulo) { showAlert('Escribe el título del curso', 'warning'); return; }
+      var payload = {
+        titulo: titulo,
+        descripcion: document.getElementById('cur_descripcion').value.trim() || null,
+        estado: document.getElementById('cur_estado').value
+      };
+      if (imagenArchivo) payload.imagen_url = imagenArchivo;
+      try {
+        if (cursoId) {
+          payload.updated_at = new Date().toISOString();
+          var { error } = await supabaseClient.from('cap_cursos').update(payload).eq('id', cursoId);
+          if (error) throw error;
+        } else {
+          var { data, error } = await supabaseClient.from('cap_cursos').insert(payload).select();
+          if (error) throw error;
+          if (data && data.length) {
+            cursoId = data[0].id;
+            history.replaceState(null, '', 'curso.html?id=' + cursoId);
+          }
+        }
+
+        var errMod = await supabaseClient.from('cap_modulos').delete().eq('curso_id', cursoId);
+        if (errMod.error) throw errMod.error;
+        var errQuiz = await supabaseClient.from('cap_cuestionarios').delete().eq('curso_id', cursoId);
+        if (errQuiz.error) throw errQuiz.error;
+
+        for (var i = 0; i < modulos.length; i++) {
+          var m = modulos[i];
+          if (!(m.titulo || '').trim()) continue;
+          var insM = await supabaseClient.from('cap_modulos').insert({
+            curso_id: cursoId,
+            titulo: m.titulo.trim(),
+            posicion: i
+          }).select();
+          if (insM.error) throw insM.error;
+          var mId = insM.data[0].id;
+
+          var vids = (m.videos || []).filter(function(v) { return (v.url || '').trim(); });
+          var vidsVal = vids.map(function(v, j) {
+            return { modulo_id: mId, titulo: (v.titulo || '').trim() || null, url: v.url.trim(), posicion: j };
+          });
+          if (vidsVal.length) {
+            var insV = await supabaseClient.from('cap_videos').insert(vidsVal);
+            if (insV.error) throw insV.error;
+          }
+
+          var quizzes = (m.quizzes || []).filter(function(q) { return (q.titulo || '').trim(); });
+          for (var k = 0; k < quizzes.length; k++) {
+            await insertarQuiz(cursoId, mId, quizzes[k], k);
+          }
+        }
+
+        var quizCurso = cuestionarios.filter(function(q) { return (q.titulo || '').trim(); });
+        for (var k = 0; k < quizCurso.length; k++) {
+          await insertarQuiz(cursoId, null, quizCurso[k], k);
+        }
+
+        document.getElementById('cursoTitulo').textContent = titulo;
+        actualizarBadge();
+        showAlert('Curso guardado', 'success');
+      } catch (err) {
+        showAlert('Error al guardar el curso: ' + err.message, 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', cargarCurso);
+  </script>
+</body>
+</html>

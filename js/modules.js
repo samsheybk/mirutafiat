@@ -111,7 +111,7 @@ async function saveModule() {
   });
 
   if (!payload[currentFields[0]]) {
-    alert('Completa los campos requeridos');
+    showAlert('Completa los campos requeridos', 'warning');
     return;
   }
 
@@ -121,7 +121,7 @@ async function saveModule() {
     closeModal();
     loadData();
   } catch (err) {
-    alert('Error al guardar: ' + err.message);
+    showAlert('Error al guardar: ' + err.message, 'error');
   }
 }
 

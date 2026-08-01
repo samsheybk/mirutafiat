@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acta de reunión - FIAT Intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    :root { --module-color: var(--module-relaciones); }
+    .det-panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      padding: 20px 24px;
+    }
+    .det-section-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--module-relaciones);
+      text-transform: uppercase;
+      margin: 8px 0;
+      letter-spacing: 0.4px;
+    }
+    .acta-preview {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 40px 48px;
+      font-family: Georgia, 'Times New Roman', serif;
+      color: #111;
+    }
+    .acta-preview h2 {
+      text-align: center;
+      font-size: 20px;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .acta-preview .subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: #444;
+      margin-bottom: 20px;
+    }
+    .acta-preview .tema {
+      text-align: center;
+      font-size: 17px;
+      font-weight: 700;
+      text-transform: uppercase;
+      border-top: 1.5px solid #111;
+      border-bottom: 1.5px solid #111;
+      padding: 10px 0;
+      margin: 16px 0 20px;
+    }
+    .acta-preview .line {
+      display: flex;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+    .acta-preview .line strong {
+      min-width: 120px;
+      display: inline-block;
+    }
+    .acta-preview .block-label {
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 12px;
+      margin: 18px 0 6px;
+    }
+    .acta-preview .block-text {
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      text-align: justify;
+    }
+    .acta-preview .firmas {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px 48px;
+      margin-top: 56px;
+    }
+    .acta-preview .firma {
+      text-align: center;
+      font-size: 12px;
+    }
+    .acta-preview .firma .nombre {
+      min-height: 34px;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .acta-preview .firma .raya {
+      border-bottom: 1.5px solid #111;
+      height: 44px;
+    }
+    .acta-preview .firma .caption {
+      font-size: 11px;
+      color: #444;
+      margin-top: 4px;
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-pdf {
+      background: #dc2626;
+      color: #fff;
+    }
+    .rich-editor {
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .rich-toolbar {
+      display: flex;
+      gap: 4px;
+      padding: 6px 8px;
+      background: var(--color-bg);
+      border-bottom: 1px solid var(--color-border);
+      flex-wrap: wrap;
+    }
+    .rich-btn {
+      border: 1px solid var(--color-border);
+      background: #fff;
+      border-radius: 4px;
+      padding: 3px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--color-text);
+      font-family: 'Inter', sans-serif;
+    }
+    .rich-btn:hover { background: #e5e7eb; }
+    .rich-content {
+      min-height: 70px;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 8px 10px;
+      font-size: 13px;
+      line-height: 1.55;
+      outline: none;
+      color: var(--color-text);
+    }
+    .rich-content:empty:before { content: attr(data-placeholder); color: #9ca3af; }
+    .rich-content ul { margin: 4px 0 4px 20px; }
+    .rich-content em, .block-text em { font-style: italic; }
+    .upper { text-transform: uppercase; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <nav class="topnav" style="background:var(--module-relaciones);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'">FIAT Venezuela<span>Intranet</span></div>
+      <div class="topnav-spacer"></div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Dashboard</option>
+        <option value="captacion.html">Captación y Selección</option>
+        <option value="relaciones-laborales.html" selected>Relaciones Laborales</option>
+        <option value="capacitacion.html">Capacitación y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="compensacion.html">Compensación</option>
+        <option value="repositorio.html">Repositorio</option>
+      </select>
+      <div class="nav-user">
+        <span id="navUserEmail"></span>
+        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-body" style="flex:1;">
+          <header class="topbar">
+            <div style="display:flex;align-items:center;gap:16px;flex:1;min-width:0;">
+              <div style="flex:1;min-width:0;">
+                <div class="topbar-breadcrumb"><a href="relaciones-laborales.html" style="color:var(--color-text-secondary);">Relaciones Laborales</a> / Actas y reuniones</div>
+                <h1 id="actaTitulo" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Nueva acta</h1>
+              </div>
+              <span id="actaEstadoBadge" style="padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;"></span>
+              <button class="btn btn-relaciones btn-sm" onclick="guardarActa()" style="flex-shrink:0;">Guardar acta</button>
+              <button class="btn btn-pdf btn-sm" disabled style="flex-shrink:0;opacity:.5;cursor:not-allowed;"><i class="fi fi-sr-file-pdf" style="font-size:15px;line-height:1;pointer-events:none;vertical-align:-2px;"></i> Descargar PDF</button>
+              <button class="btn btn-outline" onclick="location.href='relaciones-laborales.html'" style="flex-shrink:0;">← Volver</button>
+            </div>
+          </header>
+
+          <div class="module-content" style="overflow-y:auto;">
+            <div id="actaCargando" style="text-align:center;padding:60px;color:#999;">Cargando...</div>
+
+            <div id="actaContenido" style="display:none;">
+              <div class="det-panel" style="margin-bottom:20px;">
+                <div class="det-section-label">Datos del acta</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+                  <div class="form-group" style="grid-column:span 2;">
+                    <label>Tema</label>
+                    <input type="text" class="form-input" id="acta_tema" placeholder="Ej: Reunión de comité de relaciones laborales" oninput="renderPreview()">
+                  </div>
+                  <div class="form-group">
+                    <label>Fecha</label>
+                    <input type="date" class="form-input" id="acta_fecha" oninput="renderPreview()">
+                  </div>
+                  <div class="form-group" style="grid-column:span 2;">
+                    <label>Participantes</label>
+                    <input type="text" class="form-input upper" id="acta_participantes" placeholder="Nombres separados por coma" oninput="renderPreview()">
+                  </div>
+                  <div class="form-group">
+                    <label>Estado</label>
+                    <select class="form-select" id="acta_estado" onchange="renderPreview()">
+                      <option value="Programada">Programada</option>
+                      <option value="Realizada">Realizada</option>
+                      <option value="Pendiente">Pendiente</option>
+                      <option value="Cancelada">Cancelada</option>
+                    </select>
+                  </div>
+                  <div class="form-group" style="grid-column:span 3;">
+                    <label>Descripción</label>
+                    <div class="rich-editor">
+                      <div class="rich-toolbar">
+                        <button type="button" class="rich-btn" data-cmd="bold" title="Negrita"><b>B</b></button>
+                        <button type="button" class="rich-btn" data-cmd="italic" title="Cursiva"><i>I</i></button>
+                        <button type="button" class="rich-btn" data-cmd="insertUnorderedList" title="Lista con viñetas">• Lista</button>
+                        <button type="button" class="rich-btn" data-cmd="removeFormat" title="Quitar formato">Limpiar</button>
+                      </div>
+                      <div class="rich-content" contenteditable="true" data-placeholder="Redacta la descripción..." id="acta_descripcion" oninput="renderPreview()"></div>
+                    </div>
+                  </div>
+                  <div class="form-group" style="grid-column:span 3;">
+                    <label>Acuerdos y compromisos</label>
+                    <div id="actaAcuerdosList" style="display:flex;flex-direction:column;gap:8px;"></div>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="agregarAcuerdo()" style="margin-top:10px;">+ Agregar acuerdo</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="det-panel">
+                <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;" onclick="togglePreview()">
+                  <div class="det-section-label" style="margin:0;">Vista previa del documento</div>
+                  <span id="actaPreviewToggle" style="font-size:14px;color:var(--module-relaciones);font-weight:700;">▸</span>
+                </div>
+                <div id="actaPreviewWrap" style="display:none;margin-top:16px;">
+                  <div class="acta-preview" id="actaPreview"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    var actaId = null;
+    var acuerdos = [];
+
+    function escapeHtml(s) {
+      return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function aFecha(s) {
+      if (!s) return '';
+      if (s instanceof Date && !isNaN(s.getTime())) {
+        var m = s.getMonth() + 1;
+        var d = s.getDate();
+        return s.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (d < 10 ? '0' : '') + d;
+      }
+      return String(s).slice(0, 10);
+    }
+
+    function fechaCorta(s) {
+      if (!s) return '';
+      var f = aFecha(s);
+      var p = f.split('-');
+      return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : String(s);
+    }
+
+    function crearFilaAcuerdo(a, i) {
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:8px;align-items:flex-start;';
+      row.innerHTML =
+        '<input type="text" class="form-input" value="' + escapeHtml(a.descripcion || '') + '" placeholder="Descripción del acuerdo/compromiso" style="flex:1;" oninput="actualizarAcuerdo(' + i + ', \'descripcion\', this.value)">'
+        + '<input type="date" class="form-input" value="' + escapeHtml(aFecha(a.fecha_tope)) + '" title="Fecha tope de entrega" style="width:150px;" oninput="actualizarAcuerdo(' + i + ', \'fecha_tope\', this.value)" onchange="actualizarAcuerdo(' + i + ', \'fecha_tope\', this.value)">'
+        + '<button type="button" class="btn btn-sm btn-outline" title="Quitar acuerdo" onclick="eliminarAcuerdo(' + i + ')" style="color:#dc2626;flex-shrink:0;width:36px;">✕</button>';
+      return row;
+    }
+
+    function renderAcuerdos() {
+      var cont = document.getElementById('actaAcuerdosList');
+      cont.innerHTML = '';
+      acuerdos.forEach(function(a, i) {
+        cont.appendChild(crearFilaAcuerdo(a, i));
+      });
+      renderPreview();
+    }
+
+    function actualizarAcuerdo(i, campo, valor) {
+      if (acuerdos[i]) acuerdos[i][campo] = valor;
+      renderPreview();
+    }
+
+    function eliminarAcuerdo(i) {
+      acuerdos.splice(i, 1);
+      renderAcuerdos();
+    }
+
+    function agregarAcuerdo() {
+      acuerdos.push({ id: null, descripcion: '', fecha_tope: '' });
+      document.getElementById('actaAcuerdosList').appendChild(
+        crearFilaAcuerdo(acuerdos[acuerdos.length - 1], acuerdos.length - 1)
+      );
+      renderPreview();
+    }
+
+    function participantesLista() {
+      var v = document.getElementById('acta_participantes').value;
+      return v.split(/[,;\n]/).map(function(x) { return x.trim().toUpperCase(); }).filter(Boolean);
+    }
+
+    function ricaTexto(id) {
+      var el = document.getElementById(id);
+      return (el && el.innerHTML || '').replace(/^<br\s*\/?>$/i, '').trim();
+    }
+
+    function renderPreview() {
+      var tema = document.getElementById('acta_tema').value.trim();
+      var fecha = document.getElementById('acta_fecha').value;
+      var estado = document.getElementById('acta_estado').value;
+      var descripcion = ricaTexto('acta_descripcion');
+      var participantes = participantesLista();
+
+      var fechaLarga = fecha ? new Date(fecha + 'T00:00:00').toLocaleDateString('es-VE', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
+      var html = '<h2>FIAT VENEZUELA</h2>'
+        + '<div class="subtitle">Relaciones Laborales</div>'
+        + '<div class="tema">' + escapeHtml(tema || 'ACTA DE REUNIÓN') + '</div>'
+        + '<div class="line"><strong>Fecha:</strong>' + escapeHtml(fechaLarga || '-') + '</div>'
+        + '<div class="line"><strong>Estado:</strong>' + escapeHtml(estado) + '</div>';
+
+      if (descripcion) {
+        html += '<div class="block-label">Descripción</div><div class="block-text">' + descripcion + '</div>';
+      }
+
+      var acuerdosHtml = '';
+      acuerdos.forEach(function(a) {
+        var txt = (a.descripcion || '').trim();
+        if (!txt) return;
+        acuerdosHtml += '<div>' + escapeHtml(txt) + (a.fecha_tope ? ' <em>(Fecha tope: ' + escapeHtml(fechaCorta(a.fecha_tope)) + ')</em>' : '') + '</div>';
+      });
+      if (acuerdosHtml) {
+        html += '<div class="block-label">Acuerdos y compromisos</div><div class="block-text">' + acuerdosHtml + '</div>';
+      }
+
+      html += '<div class="block-label">Participantes</div><div class="block-text">' + (participantes.length ? participantes.map(escapeHtml).join(', ') : 'No registrados') + '</div>';
+
+      var firmas = '';
+      participantes.forEach(function(p, i) {
+        firmas += '<div class="firma"><div class="nombre">' + escapeHtml(p) + '</div><div class="raya"></div><div class="caption">Firma</div></div>';
+      });
+      if (participantes.length % 2 !== 0) {
+        firmas += '<div class="firma"><div class="nombre">&nbsp;</div><div class="raya"></div><div class="caption">Firma</div></div>';
+      }
+      if (!participantes.length) {
+        firmas += '<div class="firma"><div class="nombre">&nbsp;</div><div class="raya"></div><div class="caption">Firma</div></div>'
+          + '<div class="firma"><div class="nombre">&nbsp;</div><div class="raya"></div><div class="caption">Firma</div></div>';
+      }
+      html += '<div class="firmas">' + firmas + '</div>';
+
+      document.getElementById('actaPreview').innerHTML = html;
+    }
+
+    function togglePreview() {
+      var wrap = document.getElementById('actaPreviewWrap');
+      var toggle = document.getElementById('actaPreviewToggle');
+      var abierto = wrap.style.display !== 'none';
+      wrap.style.display = abierto ? 'none' : '';
+      toggle.textContent = abierto ? '▸' : '▾';
+    }
+
+    async function cargarActa() {
+      var params = new URLSearchParams(location.search);
+      var id = params.get('id');
+      try {
+        if (id) {
+          var r = await supabaseClient.from('rl_actas').select('*').eq('id', id).single();
+          if (r.error) throw r.error;
+          var a = r.data;
+          actaId = a.id;
+          document.getElementById('acta_tema').value = a.tema || '';
+          document.getElementById('acta_fecha').value = a.fecha || '';
+          document.getElementById('acta_participantes').value = a.participantes || '';
+          document.getElementById('acta_estado').value = a.estado || 'Programada';
+          document.getElementById('acta_descripcion').innerHTML = a.descripcion || '';
+          document.getElementById('actaTitulo').textContent = a.tema;
+
+          var ra = await supabaseClient.from('rl_acta_acuerdos').select('*').eq('acta_id', a.id).order('id');
+          if (ra.error) throw ra.error;
+          acuerdos = (ra.data || []).map(function(x) {
+            return { id: x.id, descripcion: x.descripcion, fecha_tope: aFecha(x.fecha_tope) };
+          });
+          if (!acuerdos.length && a.acuerdos) {
+            var tmp = document.createElement('div');
+            tmp.innerHTML = a.acuerdos || '';
+            acuerdos.push({ id: null, descripcion: tmp.textContent.trim(), fecha_tope: '' });
+          }
+        } else {
+          document.getElementById('acta_fecha').value = new Date().toISOString().slice(0, 10);
+          document.getElementById('acta_estado').value = 'Programada';
+          acuerdos = [];
+        }
+        renderAcuerdos();
+        document.getElementById('actaCargando').style.display = 'none';
+        document.getElementById('actaContenido').style.display = '';
+        actualizarBadge();
+        renderPreview();
+      } catch (err) {
+        document.getElementById('actaCargando').innerHTML = '<span style="color:#dc2626;">Error al cargar el acta: ' + err.message + '</span>';
+      }
+    }
+
+    function actualizarBadge() {
+      var badge = document.getElementById('actaEstadoBadge');
+      var estado = document.getElementById('acta_estado').value;
+      badge.textContent = estado;
+      badge.style.background = estado === 'Realizada' ? '#059669' : estado === 'Cancelada' ? '#dc2626' : estado === 'Pendiente' ? '#D97706' : '#2563eb';
+    }
+
+    async function guardarActa() {
+      var tema = document.getElementById('acta_tema').value.trim();
+      var fecha = document.getElementById('acta_fecha').value;
+      if (!tema || !fecha) { showAlert('Completa tema y fecha', 'warning'); return; }
+      var payload = {
+        tema: tema,
+        fecha: fecha,
+        participantes: document.getElementById('acta_participantes').value.trim().toUpperCase() || null,
+        estado: document.getElementById('acta_estado').value,
+        descripcion: ricaTexto('acta_descripcion') || null
+      };
+      try {
+        if (actaId) {
+          var { error } = await supabaseClient.from('rl_actas').update(payload).eq('id', actaId);
+          if (error) throw error;
+        } else {
+          var { data, error } = await supabaseClient.from('rl_actas').insert(payload).select();
+          if (error) throw error;
+          if (data && data.length) {
+            actaId = data[0].id;
+            history.replaceState(null, '', 'acta.html?id=' + actaId);
+          }
+        }
+        var errAc = await supabaseClient.from('rl_acta_acuerdos').delete().eq('acta_id', actaId);
+        if (errAc.error) throw errAc.error;
+        var validos = acuerdos.filter(function(a) { return (a.descripcion || '').trim(); });
+        if (validos.length) {
+          var filas = validos.map(function(a) {
+            return { acta_id: actaId, descripcion: a.descripcion.trim(), fecha_tope: a.fecha_tope || null };
+          });
+          var ins = await supabaseClient.from('rl_acta_acuerdos').insert(filas);
+          if (ins.error) throw ins.error;
+        }
+        document.getElementById('actaTitulo').textContent = tema;
+        actualizarBadge();
+        showAlert('Acta guardada', 'success');
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    function htmlASegmentos(html) {
+      var tmp = document.createElement('div');
+      tmp.innerHTML = html || '';
+      var piezas = [];
+      function emitir(texto, bold, italic) {
+        var partes = String(texto).split('\n');
+        for (var i = 0; i < partes.length; i++) {
+          if (i > 0) piezas.push({ br: true });
+          if (partes[i]) piezas.push({ text: partes[i], bold: !!bold, italic: !!italic });
+        }
+      }
+      function caminar(nodo, bold, italic) {
+        var hijos = nodo.childNodes;
+        for (var i = 0; i < hijos.length; i++) {
+          var n = hijos[i];
+          if (n.nodeType === 3) emitir(n.nodeValue, bold, italic);
+          else if (n.nodeType === 1) {
+            var tag = n.nodeName.toLowerCase();
+            if (tag === 'br') { piezas.push({ br: true }); }
+            else if (tag === 'li') { emitir('• ', bold, italic); caminar(n, bold, italic); piezas.push({ br: true }); }
+            else if (tag === 'strong' || tag === 'b') { caminar(n, true, italic); }
+            else if (tag === 'em' || tag === 'i') { caminar(n, bold, true); }
+            else { caminar(n, bold, italic); }
+          }
+        }
+      }
+      caminar(tmp, false, false);
+      return piezas;
+    }
+
+    function envolverRico(segs, doc, maxW) {
+      var lineas = [];
+      var actual = [];
+      var anchoActual = 0;
+      var base = doc.getFont();
+      for (var i = 0; i < segs.length; i++) {
+        var s = segs[i];
+        if (s.br) {
+          if (actual.length) { lineas.push(actual); actual = []; }
+          anchoActual = 0;
+          continue;
+        }
+        var estilo = (s.bold ? 'bold' : 'normal') + (s.italic ? 'italic' : '');
+        doc.setFont(base.fontName, estilo);
+        var w = doc.getTextWidth(s.text);
+        if (anchoActual + w > maxW && anchoActual > 0) { lineas.push(actual); actual = []; anchoActual = 0; }
+        actual.push(s);
+        anchoActual += w;
+      }
+      if (actual.length) lineas.push(actual);
+      doc.setFont(base.fontName, base.fontStyle);
+      return lineas;
+    }
+
+    function pintarRico(doc, lineas, x, y) {
+      var fs = 10;
+      doc.setFontSize(fs);
+      var avance = Math.ceil(fs * 1.2);
+      for (var i = 0; i < lineas.length; i++) {
+        if (y > 270) { doc.addPage(); y = 20; }
+        var xc = x;
+        for (var j = 0; j < lineas[i].length; j++) {
+          var s = lineas[i][j];
+          var estilo = (s.bold ? 'bold' : 'normal') + (s.italic ? 'italic' : '');
+          doc.setFont('helvetica', estilo);
+          doc.text(s.text, xc, y);
+          xc += doc.getTextWidth(s.text);
+        }
+        y += avance;
+      }
+      return y;
+    }
+
+    function descargarPDF() {
+      if (!window.jspdf) { showAlert('La librería PDF aún está cargando, intenta de nuevo', 'warning'); return; }
+      var doc = new window.jspdf.jsPDF();
+      var ancho = doc.internal.pageSize.getWidth();
+      var margen = 20;
+      var maxW = ancho - margen * 2;
+      var y = 20;
+      var ih = function(fs) { return Math.ceil(fs * 1.2); };
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.text('FIAT VENEZUELA', ancho / 2, y, { align: 'center' });
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text('Relaciones Laborales', ancho / 2, y + 7, { align: 'center' });
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.text('ACTA DE REUNIÓN', ancho / 2, y + 16, { align: 'center' });
+      doc.setLineWidth(0.6);
+      doc.line(margen, y + 21, ancho - margen, y + 21);
+      y = y + 21 + 9;
+
+      var tema = document.getElementById('acta_tema').value.trim() || 'Sin tema';
+      var fecha = document.getElementById('acta_fecha').value;
+      var estado = document.getElementById('acta_estado').value;
+      var descripcion = ricaTexto('acta_descripcion');
+      var acuerdosValidos = acuerdos.filter(function(a) { return (a.descripcion || '').trim(); });
+      var participantes = participantesLista();
+
+      var fechaLarga = fecha ? new Date(fecha + 'T00:00:00').toLocaleDateString('es-VE', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(13);
+      var lineasTema = doc.splitTextToSize(tema.toUpperCase(), maxW);
+      for (var k = 0; k < lineasTema.length; k++) {
+        doc.text(lineasTema[k], margen, y + k * ih(13));
+      }
+      y += lineasTema.length * ih(13) + 4;
+      doc.setLineWidth(0.3);
+      doc.line(margen, y, ancho - margen, y);
+      y += 10;
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text('Fecha: ', margen, y);
+      doc.setFont('helvetica', 'normal');
+      doc.text(fechaLarga, margen + 16, y);
+      y += ih(10);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Estado: ', margen, y);
+      doc.setFont('helvetica', 'normal');
+      doc.text(estado, margen + 16, y);
+      y += ih(10) + 4;
+
+      if (descripcion) {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.text('DESCRIPCIÓN', margen, y);
+        y += ih(11);
+        doc.setFontSize(10);
+        var lineasDes = envolverRico(htmlASegmentos(descripcion), doc, maxW);
+        y = pintarRico(doc, lineasDes, margen, y) + 6;
+      }
+
+      if (acuerdosValidos.length) {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.text('ACUERDOS Y COMPROMISOS', margen, y);
+        y += ih(11);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        var bala = '• ';
+        var balaW = doc.getTextWidth(bala);
+        var xAc = margen + balaW;
+        var acMaxW = maxW - balaW;
+        for (var i = 0; i < acuerdosValidos.length; i++) {
+          var ac = acuerdosValidos[i];
+          var textoAc = ac.descripcion.trim();
+          if (ac.fecha_tope) textoAc += ' (Fecha tope: ' + fechaCorta(ac.fecha_tope) + ')';
+          var lAc = doc.splitTextToSize(textoAc, acMaxW);
+          var altoAc = lAc.length * ih(10) + 3;
+          if (y + altoAc > 270) { doc.addPage(); y = 20; }
+          doc.text(bala, margen, y);
+          for (var k = 0; k < lAc.length; k++) {
+            doc.text(lAc[k], xAc, y + k * ih(10));
+          }
+          y += altoAc;
+        }
+        y += 6;
+      }
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('PARTICIPANTES', margen, y);
+      y += ih(11);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      var textoPar = participantes.length ? participantes.join(', ') : 'No registrados';
+      var lPar = doc.splitTextToSize(textoPar, maxW);
+      if (y + lPar.length * ih(10) > 270) { doc.addPage(); y = 20; }
+      for (var k = 0; k < lPar.length; k++) {
+        doc.text(lPar[k], margen, y + k * ih(10));
+      }
+      y += lPar.length * ih(10) + 8;
+
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('FIRMAS', margen, y);
+      y += ih(11);
+      doc.setFont('helvetica', 'normal');
+
+      var colX1 = margen;
+      var colX2 = ancho / 2 + 10;
+      var colAncho = ancho / 2 - margen - 10;
+      var fsFirma = 10;
+
+      if (!participantes.length) {
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(10);
+        doc.text('Sin participantes registrados', colX1, y);
+        doc.line(colX1, y + 4, colX1 + colAncho, y + 4);
+        y += 18;
+      }
+
+      var fila = y;
+      for (var i = 0; i < participantes.length; i += 2) {
+        var noms = [];
+        var altos = [];
+        for (var j = 0; j < 2; j++) {
+          if (i + j >= participantes.length) { noms.push(null); altos.push(0); continue; }
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(fsFirma);
+          var lNombre = doc.splitTextToSize(participantes[i + j], colAncho);
+          noms.push(lNombre);
+          altos.push(lNombre.length * ih(fsFirma) + 18);
+        }
+        var altoFila = Math.max(altos[0], altos[1]);
+        if (fila + altoFila > 270) { doc.addPage(); fila = 20; }
+        for (var j = 0; j < 2; j++) {
+          if (noms[j] === null) continue;
+          var x = (j === 0) ? colX1 : colX2;
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(fsFirma);
+          for (var k = 0; k < noms[j].length; k++) {
+            doc.text(noms[j][k], x, fila + k * ih(fsFirma), { align: 'center' });
+          }
+          var yFirma = fila + noms[j].length * ih(fsFirma) + 4;
+          doc.setLineWidth(0.4);
+          doc.line(x, yFirma, x + colAncho, yFirma);
+          doc.setFont('helvetica', 'italic');
+          doc.setFontSize(9);
+          doc.text('Firma', x + colAncho / 2, yFirma + 6, { align: 'center' });
+        }
+        fila += altoFila;
+      }
+
+      var nombreArchivo = 'acta-' + (tema.replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase() || 'reunion') + '.pdf';
+      doc.save(nombreArchivo);
+    }
+
+    var richBtns = document.querySelectorAll('.rich-btn');
+    richBtns.forEach(function(btn) {
+      btn.addEventListener('mousedown', function(e) { e.preventDefault(); });
+      btn.addEventListener('click', function() {
+        var editor = btn.closest('.rich-editor').querySelector('.rich-content');
+        document.execCommand(btn.getAttribute('data-cmd'), false, null);
+        editor.focus();
+        renderPreview();
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', cargarActa);
+  </script>
+</body>
+</html>

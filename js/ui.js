@@ -80,3 +80,19 @@ function showConfirm(message, confirmText) {
     `);
   });
 }
+
+// ============================================
+// ESTADOS DE CARGA (tablas y contenedores)
+// ============================================
+
+function tableLoadingHTML(colspan) {
+  return '<tr><td colspan="' + (colspan || 1) + '" style="text-align:center;padding:40px;">'
+    + '<div class="spinner" style="margin:0 auto 12px;"></div>'
+    + '<div style="font-size:13px;color:var(--color-text-secondary);">Cargando...</div>'
+    + '</td></tr>';
+}
+
+function containerLoadingHTML() {
+  return '<div class="empty-state"><div class="spinner" style="margin:0 auto 12px;"></div>'
+    + '<div class="empty-state-text">Cargando...</div></div>';
+}

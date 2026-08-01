@@ -234,6 +234,69 @@ CREATE TABLE IF NOT EXISTS trabajador_carga_familiar (
 );
 
 -- ============================================
+-- 4.1) RELACIONES LABORALES - CONCEPTOS Y EQUIPOS
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS rl_conceptos (
+  id BIGSERIAL PRIMARY KEY,
+  nombre TEXT NOT NULL UNIQUE,
+  descripcion TEXT,
+  activo BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS rl_equipos (
+  id BIGSERIAL PRIMARY KEY,
+  tipo TEXT NOT NULL DEFAULT 'Otro' CHECK (tipo IN ('Vehículo','Teléfono','Tablet','Laptop','Otro')),
+  descripcion TEXT,
+  marca TEXT,
+  modelo TEXT,
+  serial TEXT,
+  codigo TEXT,
+  estado TEXT NOT NULL DEFAULT 'Disponible' CHECK (estado IN ('Disponible','Asignado','En mantenimiento','Baja')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS rl_asignaciones (
+  id BIGSERIAL PRIMARY KEY,
+  equipo_id BIGINT NOT NULL REFERENCES rl_equipos(id) ON DELETE CASCADE,
+  trabajador_id UUID NOT NULL REFERENCES plantilla_trabajadores(id) ON DELETE CASCADE,
+  fecha_asignacion DATE NOT NULL DEFAULT CURRENT_DATE,
+  fecha_devolucion DATE,
+  estado TEXT NOT NULL DEFAULT 'Activa' CHECK (estado IN ('Activa','Devuelta')),
+  notas TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS rl_actas (
+  id BIGSERIAL PRIMARY KEY,
+  tema TEXT NOT NULL,
+  fecha DATE NOT NULL DEFAULT CURRENT_DATE,
+  participantes TEXT,
+  estado TEXT NOT NULL DEFAULT 'Programada' CHECK (estado IN ('Programada','Realizada','Pendiente','Cancelada')),
+  descripcion TEXT,
+  acuerdos TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS rl_acta_acuerdos (
+  id BIGSERIAL PRIMARY KEY,
+  acta_id BIGINT NOT NULL REFERENCES rl_actas(id) ON DELETE CASCADE,
+  descripcion TEXT NOT NULL,
+  fecha_tope DATE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_rl_acta_acuerdos_acta_id ON rl_acta_acuerdos (acta_id);
+
+ALTER TABLE relaciones_registros ADD COLUMN IF NOT EXISTS trabajador_id UUID REFERENCES plantilla_trabajadores(id) ON DELETE SET NULL;
+ALTER TABLE relaciones_registros ADD COLUMN IF NOT EXISTS concepto_id BIGINT REFERENCES rl_conceptos(id) ON DELETE SET NULL;
+
+-- ============================================
 -- 5) REPOSITORIO
 -- ============================================
 
@@ -337,6 +400,7 @@ ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS talla_camisa TEXT;
 ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS talla_pantalon TEXT;
 ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS talla_calzado TEXT;
 ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS talla_franela TEXT;
+ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS conducta_civil TEXT;
 
 -- ============================================
 -- ROW LEVEL SECURITY (RLS)
@@ -357,6 +421,11 @@ ALTER TABLE requisiciones_solicitudes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE plantilla_trabajadores ENABLE ROW LEVEL SECURITY;
 ALTER TABLE trabajador_documentos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE trabajador_carga_familiar ENABLE ROW LEVEL SECURITY;
+ALTER TABLE rl_conceptos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE rl_equipos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE rl_asignaciones ENABLE ROW LEVEL SECURITY;
+ALTER TABLE rl_actas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE rl_acta_acuerdos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE repo_categorias ENABLE ROW LEVEL SECURITY;
 ALTER TABLE repo_subcategorias ENABLE ROW LEVEL SECURITY;
 ALTER TABLE repo_documentos ENABLE ROW LEVEL SECURITY;
@@ -382,6 +451,75 @@ CREATE POLICY "Usuarios autenticados pueden insertar relaciones"
 DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar relaciones" ON relaciones_registros;
 CREATE POLICY "Usuarios autenticados pueden actualizar relaciones"
   ON relaciones_registros FOR UPDATE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar relaciones" ON relaciones_registros;
+CREATE POLICY "Usuarios autenticados pueden eliminar relaciones"
+  ON relaciones_registros FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver conceptos" ON rl_conceptos;
+CREATE POLICY "Usuarios autenticados pueden ver conceptos"
+  ON rl_conceptos FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear conceptos" ON rl_conceptos;
+CREATE POLICY "Usuarios autenticados pueden crear conceptos"
+  ON rl_conceptos FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar conceptos" ON rl_conceptos;
+CREATE POLICY "Usuarios autenticados pueden actualizar conceptos"
+  ON rl_conceptos FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar conceptos" ON rl_conceptos;
+CREATE POLICY "Usuarios autenticados pueden eliminar conceptos"
+  ON rl_conceptos FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver equipos" ON rl_equipos;
+CREATE POLICY "Usuarios autenticados pueden ver equipos"
+  ON rl_equipos FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear equipos" ON rl_equipos;
+CREATE POLICY "Usuarios autenticados pueden crear equipos"
+  ON rl_equipos FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar equipos" ON rl_equipos;
+CREATE POLICY "Usuarios autenticados pueden actualizar equipos"
+  ON rl_equipos FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar equipos" ON rl_equipos;
+CREATE POLICY "Usuarios autenticados pueden eliminar equipos"
+  ON rl_equipos FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver asignaciones" ON rl_asignaciones;
+CREATE POLICY "Usuarios autenticados pueden ver asignaciones"
+  ON rl_asignaciones FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear asignaciones" ON rl_asignaciones;
+CREATE POLICY "Usuarios autenticados pueden crear asignaciones"
+  ON rl_asignaciones FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar asignaciones" ON rl_asignaciones;
+CREATE POLICY "Usuarios autenticados pueden actualizar asignaciones"
+  ON rl_asignaciones FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar asignaciones" ON rl_asignaciones;
+CREATE POLICY "Usuarios autenticados pueden eliminar asignaciones"
+  ON rl_asignaciones FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver actas" ON rl_actas;
+CREATE POLICY "Usuarios autenticados pueden ver actas"
+  ON rl_actas FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear actas" ON rl_actas;
+CREATE POLICY "Usuarios autenticados pueden crear actas"
+  ON rl_actas FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar actas" ON rl_actas;
+CREATE POLICY "Usuarios autenticados pueden actualizar actas"
+  ON rl_actas FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar actas" ON rl_actas;
+CREATE POLICY "Usuarios autenticados pueden eliminar actas"
+  ON rl_actas FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver acuerdos de actas" ON rl_acta_acuerdos;
+CREATE POLICY "Usuarios autenticados pueden ver acuerdos de actas"
+  ON rl_acta_acuerdos FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear acuerdos de actas" ON rl_acta_acuerdos;
+CREATE POLICY "Usuarios autenticados pueden crear acuerdos de actas"
+  ON rl_acta_acuerdos FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar acuerdos de actas" ON rl_acta_acuerdos;
+CREATE POLICY "Usuarios autenticados pueden actualizar acuerdos de actas"
+  ON rl_acta_acuerdos FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar acuerdos de actas" ON rl_acta_acuerdos;
+CREATE POLICY "Usuarios autenticados pueden eliminar acuerdos de actas"
+  ON rl_acta_acuerdos FOR DELETE TO authenticated USING (true);
 
 DROP POLICY IF EXISTS "Usuarios autenticados pueden leer capacitacion" ON capacitacion_cursos;
 CREATE POLICY "Usuarios autenticados pueden leer capacitacion"
@@ -591,6 +729,26 @@ CREATE TRIGGER update_repo_subcategorias_updated_at
 DROP TRIGGER IF EXISTS update_repo_documentos_updated_at ON repo_documentos;
 CREATE TRIGGER update_repo_documentos_updated_at
   BEFORE UPDATE ON repo_documentos
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+DROP TRIGGER IF EXISTS update_rl_conceptos_updated_at ON rl_conceptos;
+CREATE TRIGGER update_rl_conceptos_updated_at
+  BEFORE UPDATE ON rl_conceptos
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+DROP TRIGGER IF EXISTS update_rl_equipos_updated_at ON rl_equipos;
+CREATE TRIGGER update_rl_equipos_updated_at
+  BEFORE UPDATE ON rl_equipos
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+DROP TRIGGER IF EXISTS update_rl_asignaciones_updated_at ON rl_asignaciones;
+CREATE TRIGGER update_rl_asignaciones_updated_at
+  BEFORE UPDATE ON rl_asignaciones
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+DROP TRIGGER IF EXISTS update_rl_actas_updated_at ON rl_actas;
+CREATE TRIGGER update_rl_actas_updated_at
+  BEFORE UPDATE ON rl_actas
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- ============================================

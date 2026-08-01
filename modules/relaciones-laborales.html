@@ -9,6 +9,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
+  <style>
+    :root { --module-color: var(--module-relaciones); }
+    .estado-activo { color: #059669; font-weight: 600; }
+    .estado-suspendido { color: #D97706; font-weight: 600; }
+    .estado-retirado { color: #DC2626; font-weight: 600; }
+  </style>
 </head>
 <body>
   <div class="app-layout">
@@ -34,91 +40,317 @@
     <div class="main-content">
       <div class="module-layout">
         <div class="module-panel">
-          <div class="panel-item active" data-tool="registros" onclick="switchTool('registros')" title="Registros laborales"><span class="panel-item-indicator bg-relaciones"></span><i class="fi fi-sr-clipboard-list" style="font-size:24px;pointer-events:none;"></i>
+          <div class="panel-item active" data-tool="registros" onclick="switchTool('registros')" title="Registros laborales">
+            <span class="panel-item-indicator bg-relaciones"></span>
+            <i class="fi fi-sr-clipboard-list" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="contratos" onclick="switchTool('contratos')" title="Contratos colectivos"><span class="panel-item-indicator bg-relaciones"></span><i class="fi fi-sr-handshake" style="font-size:24px;pointer-events:none;"></i>
+          <div class="panel-item" data-tool="conceptos" onclick="switchTool('conceptos')" title="Conceptos">
+            <span class="panel-item-indicator bg-relaciones"></span>
+            <i class="fi fi-sr-tags" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="actas" onclick="switchTool('actas')" title="Actas y reuniones"><span class="panel-item-indicator bg-relaciones"></span><i class="fi fi-sr-users" style="font-size:24px;pointer-events:none;"></i>
+          <div class="panel-item" data-tool="equipos" onclick="switchTool('equipos')" title="Asignación de equipos">
+            <span class="panel-item-indicator bg-relaciones"></span>
+            <i class="fi fi-sr-box" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="reportes" onclick="switchTool('reportes')" title="Reportes"><span class="panel-item-indicator bg-relaciones"></span><i class="fi fi-sr-chart-pie" style="font-size:24px;pointer-events:none;"></i>
+          <div class="panel-item" data-tool="plantilla" onclick="switchTool('plantilla')" title="Plantilla activa">
+            <span class="panel-item-indicator bg-relaciones"></span>
+            <i class="fi fi-sr-briefcase" style="font-size:24px;pointer-events:none;"></i>
+          </div>
+          <div class="panel-item" data-tool="actas" onclick="switchTool('actas')" title="Actas y reuniones">
+            <span class="panel-item-indicator bg-relaciones"></span>
+            <i class="fi fi-sr-users" style="font-size:24px;pointer-events:none;"></i>
           </div>
         </div>
 
         <div class="module-body">
-          <header class="topbar">
-            <div><h1>Relaciones Laborales</h1><div class="topbar-breadcrumb">Inicio / Relaciones Laborales</div></div>
+          <header class="topbar" style="gap:16px;">
+            <div class="toolbar-content" data-toolbar="registros" style="display:flex;align-items:center;gap:16px;width:100%;">
+              <input type="text" class="form-input" id="regSearch" placeholder="Buscar por trabajador, concepto..." oninput="filterRegistros()" style="flex:1;max-width:380px;height:36px;">
+              <button class="btn btn-relaciones btn-sm" onclick="rlOpenRegistroModal()">+ Nuevo registro</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="conceptos" style="display:none;align-items:center;gap:16px;width:100%;">
+              <input type="text" class="form-input" id="conSearch" placeholder="Buscar concepto..." oninput="filterConceptos()" style="flex:1;max-width:320px;height:36px;">
+              <button class="btn btn-relaciones btn-sm" onclick="rlOpenConceptoModal()">+ Nuevo concepto</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="equipos" style="display:none;align-items:center;gap:16px;width:100%;">
+              <div style="display:flex;gap:8px;align-items:center;">
+                <button class="btn btn-sm eq-tab active" data-etab="asignaciones" onclick="switchEquiposView('asignaciones',this)" style="background:var(--module-relaciones);color:#fff;border:0;border-radius:4px;padding:6px 16px;">Asignaciones</button>
+                <button class="btn btn-sm eq-tab" data-etab="catalogo" onclick="switchEquiposView('catalogo',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Catálogo de equipos</button>
+              </div>
+              <div style="flex:1;"></div>
+              <input type="text" class="form-input" id="eqSearch" placeholder="Buscar equipo o trabajador..." oninput="filterEquipos()" style="max-width:300px;height:36px;">
+              <button class="btn btn-relaciones btn-sm" id="btnNuevaAsignacion" onclick="rlOpenAsignacionModal()">+ Nueva asignación</button>
+              <button class="btn btn-relaciones btn-sm" id="btnNuevoEquipo" style="display:none;" onclick="rlOpenEquipoModal()">+ Nuevo equipo</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="plantilla" style="display:none;align-items:center;gap:16px;width:100%;">
+              <input type="text" class="form-input" id="plantSearch" placeholder="Buscar por nombre, cédula, cargo..." oninput="filterPlantilla()" style="flex:1;max-width:340px;height:36px;">
+              <select class="form-select" id="filtroUnidad" onchange="filterPlantilla()" style="max-width:280px;height:36px;"></select>
+            </div>
+            <div class="toolbar-content" data-toolbar="actas" style="display:none;align-items:center;gap:16px;width:100%;">
+              <input type="text" class="form-input" id="actaSearch" placeholder="Buscar por tema, participante..." oninput="filterActas()" style="flex:1;max-width:340px;height:36px;">
+              <button class="btn btn-relaciones btn-sm" onclick="location.href='acta.html?nuevo=1'">+ Nueva acta</button>
+            </div>
           </header>
 
-          <div class="module-content">
-          <div class="tool-section active" id="tool-registros">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-relaciones);">Registros laborales</h2>
-              <button class="btn btn-relaciones" onclick="openModal()">+ Nuevo registro</button>
+          <div class="module-content" style="overflow-y:auto;">
+            <div class="tool-section active" id="tool-registros">
+              <div class="tool-section-header">
+                <h2 style="color:var(--module-relaciones);">Registros laborales</h2>
+                <span style="font-size:12px;color:var(--color-text-secondary);" id="regCount">0 registros</span>
+              </div>
+              <div style="height:calc(100vh - 240px);overflow-y:auto;">
+                <table class="data-table">
+                  <thead>
+                    <tr><th>Trabajador</th><th>Concepto</th><th>Fecha</th><th>Estado</th><th>Descripción</th><th style="width:150px;">Acción</th></tr>
+                  </thead>
+                  <tbody id="regTableBody">
+                    <tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">No hay registros</td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <table class="data-table">
-              <thead><tr><th>Trabajador</th><th>Tipo</th><th>Fecha</th><th>Estado</th></tr></thead>
-              <tbody id="moduleTableBody">
-                <tr><td colspan="4" style="text-align:center;padding:40px;color:#999;">No hay registros</td></tr>
-              </tbody>
-            </table>
-          </div>
 
-          <div class="tool-section" id="tool-contratos">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-relaciones);">Contratos colectivos</h2>
-              <button class="btn btn-relaciones">+ Nuevo contrato</button>
+            <div class="tool-section" id="tool-conceptos">
+              <div class="tool-section-header">
+                <h2 style="color:var(--module-relaciones);">Conceptos</h2>
+                <span style="font-size:12px;color:var(--color-text-secondary);">Los conceptos se usan como tipos en los registros laborales</span>
+              </div>
+              <table class="data-table">
+                <thead>
+                  <tr><th>Concepto</th><th>Descripción</th><th>Estado</th><th style="width:170px;">Acción</th></tr>
+                </thead>
+                <tbody id="conTableBody">
+                  <tr><td colspan="4" style="text-align:center;padding:40px;color:#999;">Sin conceptos registrados</td></tr>
+                </tbody>
+              </table>
             </div>
-            <table class="data-table">
-              <thead><tr><th>Título</th><th>Fecha firma</th><th>Vigencia</th><th>Estado</th></tr></thead>
-              <tbody><tr><td colspan="4" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
-            </table>
-          </div>
 
-          <div class="tool-section" id="tool-actas">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-relaciones);">Actas y reuniones</h2>
-              <button class="btn btn-relaciones">+ Nueva acta</button>
+            <div class="tool-section" id="tool-equipos">
+              <div id="eqAsignacionesView">
+                <div class="tool-section-header">
+                  <h2 style="color:var(--module-relaciones);">Asignaciones de equipos</h2>
+                  <span style="font-size:12px;color:var(--color-text-secondary);" id="asigCount">0 asignaciones</span>
+                </div>
+                <div style="height:calc(100vh - 240px);overflow-y:auto;">
+                  <table class="data-table">
+                    <thead>
+                      <tr><th>Trabajador</th><th>Equipo</th><th>Asignación</th><th>Devolución</th><th>Estado</th><th style="width:180px;">Acción</th></tr>
+                    </thead>
+                    <tbody id="asigTableBody">
+                      <tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">Sin asignaciones registradas</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div id="eqCatalogoView" style="display:none;">
+                <div class="tool-section-header">
+                  <h2 style="color:var(--module-relaciones);">Catálogo de equipos</h2>
+                  <span style="font-size:12px;color:var(--color-text-secondary);" id="eqCount">0 equipos</span>
+                </div>
+                <table class="data-table">
+                  <thead>
+                    <tr><th>Tipo</th><th>Equipo</th><th>Marca / Modelo</th><th>Serial</th><th>Código</th><th>Estado</th><th style="width:150px;">Acción</th></tr>
+                  </thead>
+                  <tbody id="eqTableBody">
+                    <tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Sin equipos registrados</td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <table class="data-table">
-              <thead><tr><th>Tema</th><th>Fecha</th><th>Participantes</th><th>Estado</th></tr></thead>
-              <tbody><tr><td colspan="4" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
-            </table>
-          </div>
 
-          <div class="tool-section" id="tool-reportes">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-relaciones);">Reportes</h2>
+            <div class="tool-section" id="tool-plantilla">
+              <div class="tool-section-header">
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <button class="btn btn-sm plantilla-tab active" data-tab="activo" onclick="switchPlantillaView('activo',this)" style="background:var(--module-relaciones);color:#fff;border:0;border-radius:4px;padding:6px 16px;">Personal Activo</button>
+                  <button class="btn btn-sm plantilla-tab" data-tab="historico" onclick="switchPlantillaView('historico',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Histórico</button>
+                </div>
+                <span style="font-size:12px;color:var(--color-text-secondary);" id="plantCount">0 trabajadores</span>
+              </div>
+              <div id="plantillaActivoView" style="height:calc(100vh - 240px);overflow-y:auto;">
+                <table class="data-table">
+                  <thead>
+                    <tr><th>Trabajador</th><th>Cédula</th><th>Unidad</th><th>Cargo</th><th>Ingreso</th><th>Estado</th><th style="width:120px;">Acción</th></tr>
+                  </thead>
+                  <tbody id="plantTableBody">
+                    <tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay trabajadores registrados</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div id="plantillaHistoricoView" style="display:none;height:calc(100vh - 240px);overflow-y:auto;">
+                <div class="tool-section-header">
+                  <span style="font-size:12px;color:var(--color-text-secondary);" id="histCount">0 registros</span>
+                </div>
+                <table class="data-table">
+                  <thead>
+                    <tr><th>Trabajador</th><th>Cédula</th><th>Unidad</th><th>Cargo</th><th>Período</th><th>Estado</th><th style="width:120px;">Acción</th></tr>
+                  </thead>
+                  <tbody id="histTableBody">
+                    <tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay registros históricos</td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <div class="empty-state">
-              <h3>Reportes laborales</h3>
-              <p>Los reportes estadísticos estarán disponibles próximamente.</p>
+
+            <div class="tool-section" id="tool-actas">
+              <div class="tool-section-header">
+                <h2 style="color:var(--module-relaciones);">Actas y reuniones</h2>
+                <span style="font-size:12px;color:var(--color-text-secondary);" id="actaCount">0 actas</span>
+              </div>
+              <div style="height:calc(100vh - 240px);overflow-y:auto;">
+                <table class="data-table">
+                  <thead>
+                    <tr><th>Tema</th><th>Fecha</th><th>Participantes</th><th>Estado</th><th>Descripción</th><th style="width:150px;">Acción</th></tr>
+                  </thead>
+                  <tbody id="actaTableBody">
+                    <tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">Sin actas registradas</td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  </div>
 
-  <div class="modal-overlay" id="modal">
+  <div class="modal-overlay" id="modalRegistro">
     <div class="modal">
-      <div class="modal-header"><h3>Nuevo registro laboral</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+      <div class="modal-header"><h3 id="modalRegistroTitle">Nuevo registro laboral</h3><button class="modal-close" onclick="rlCloseModal('modalRegistro')">&times;</button></div>
       <div class="modal-body">
-        <form id="moduleForm">
-          <div class="form-group"><label>Trabajador</label><input type="text" class="form-input" id="trabajador" required></div>
-          <div class="form-group"><label>Tipo</label>
-            <select class="form-select" id="tipo"><option>Contrato</option><option>Permiso</option><option>Notificación</option><option>Sanción</option></select>
+        <form id="registroForm">
+          <div class="form-group"><label>Trabajador</label>
+            <select class="form-select" id="reg_trabajador_id"><option value="">— Selecciona —</option></select>
           </div>
-          <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="fecha" required></div>
+          <div class="form-group"><label>Concepto</label>
+            <select class="form-select" id="reg_concepto_id"><option value="">— Selecciona —</option></select>
+          </div>
+          <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="reg_fecha"></div>
           <div class="form-group"><label>Estado</label>
-            <select class="form-select" id="estado"><option value="Activo">Activo</option><option value="Pendiente">Pendiente</option><option value="Finalizado">Finalizado</option></select>
+            <select class="form-select" id="reg_estado">
+              <option value="Activo">Activo</option>
+              <option value="Pendiente">Pendiente</option>
+              <option value="Finalizado">Finalizado</option>
+            </select>
           </div>
-          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="descripcion" rows="3"></textarea></div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="reg_descripcion" rows="3"></textarea></div>
         </form>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
-        <button class="btn btn-relaciones" onclick="saveModule()">Guardar</button>
+        <button class="btn btn-outline" onclick="rlCloseModal('modalRegistro')">Cancelar</button>
+        <button class="btn btn-relaciones" onclick="rlSaveRegistro()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalConcepto">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalConceptoTitle">Nuevo concepto</h3><button class="modal-close" onclick="rlCloseModal('modalConcepto')">&times;</button></div>
+      <div class="modal-body">
+        <form id="conceptoForm">
+          <div class="form-group"><label>Nombre del concepto</label><input type="text" class="form-input" id="con_nombre" placeholder="Ej: Sanción, Permiso, Contrato..." required></div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="con_descripcion" rows="3"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="rlCloseModal('modalConcepto')">Cancelar</button>
+        <button class="btn btn-relaciones" onclick="rlSaveConcepto()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalEquipo">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalEquipoTitle">Nuevo equipo</h3><button class="modal-close" onclick="rlCloseModal('modalEquipo')">&times;</button></div>
+      <div class="modal-body">
+        <form id="equipoForm">
+          <div class="form-group"><label>Tipo de equipo</label>
+            <select class="form-select" id="eq_tipo">
+              <option value="Vehículo">Vehículo</option>
+              <option value="Teléfono">Teléfono</option>
+              <option value="Tablet">Tablet</option>
+              <option value="Laptop">Laptop</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Descripción</label><input type="text" class="form-input" id="eq_descripcion" placeholder="Ej: Chevrolet Spark, iPhone 11, HP ProBook..." required></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group"><label>Marca</label><input type="text" class="form-input" id="eq_marca"></div>
+            <div class="form-group"><label>Modelo</label><input type="text" class="form-input" id="eq_modelo"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group"><label>Serial</label><input type="text" class="form-input" id="eq_serial"></div>
+            <div class="form-group"><label>Código interno</label><input type="text" class="form-input" id="eq_codigo"></div>
+          </div>
+          <div class="form-group"><label>Estado</label>
+            <select class="form-select" id="eq_estado">
+              <option value="Disponible">Disponible</option>
+              <option value="En mantenimiento">En mantenimiento</option>
+              <option value="Baja">Baja</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="rlCloseModal('modalEquipo')">Cancelar</button>
+        <button class="btn btn-relaciones" onclick="rlSaveEquipo()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalAsignacion">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalAsignacionTitle">Nueva asignación de equipo</h3><button class="modal-close" onclick="rlCloseModal('modalAsignacion')">&times;</button></div>
+      <div class="modal-body">
+        <form id="asignacionForm">
+          <div class="form-group"><label>Trabajador</label>
+            <select class="form-select" id="asig_trabajador_id"><option value="">— Selecciona —</option></select>
+          </div>
+          <div class="form-group"><label>Equipo</label>
+            <select class="form-select" id="asig_equipo_id"><option value="">— Selecciona —</option></select>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group"><label>Fecha de asignación</label><input type="date" class="form-input" id="asig_fecha_asignacion"></div>
+            <div class="form-group"><label>Fecha de devolución</label><input type="date" class="form-input" id="asig_fecha_devolucion"></div>
+          </div>
+          <div class="form-group"><label>Estado</label>
+            <select class="form-select" id="asig_estado">
+              <option value="Activa">Activa</option>
+              <option value="Devuelta">Devuelta</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Notas</label><textarea class="form-textarea" id="asig_notas" rows="2"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="rlCloseModal('modalAsignacion')">Cancelar</button>
+        <button class="btn btn-relaciones" onclick="rlSaveAsignacion()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalEditarTrabajador">
+    <div class="modal">
+      <div class="modal-header"><h3>Editar trabajador</h3><button class="modal-close" onclick="rlCloseModal('modalEditarTrabajador')">&times;</button></div>
+      <div class="modal-body">
+        <div class="form-group"><label>Unidad</label>
+          <select class="form-select" id="trab_unidad_id"></select>
+        </div>
+        <div class="form-group"><label>Cargo</label>
+          <select class="form-select" id="trab_cargo_id"></select>
+        </div>
+        <div class="form-group"><label>Fecha de ingreso</label><input type="date" class="form-input" id="trab_fecha_ingreso"></div>
+        <div class="form-group"><label>Estado</label>
+          <select class="form-select" id="trab_estado" onchange="document.getElementById('trabEgresoWrap').style.display = this.value === 'Retirado' ? '' : 'none';">
+            <option value="Activo">Activo</option>
+            <option value="Suspendido">Suspendido</option>
+            <option value="Retirado">Retirado</option>
+          </select>
+        </div>
+        <div class="form-group" id="trabEgresoWrap" style="display:none;"><label>Fecha de egreso</label><input type="date" class="form-input" id="trab_fecha_egreso"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="rlCloseModal('modalEditarTrabajador')">Cancelar</button>
+        <button class="btn btn-relaciones" onclick="saveTrabajador()">Guardar</button>
       </div>
     </div>
   </div>
@@ -127,7 +359,801 @@
   <script src="../js/supabase-config.js"></script>
   <script src="../js/ui.js"></script>
   <script src="../js/auth.js"></script>
-  <script src="../js/modules.js"></script>
-  <script>initModule('relaciones', 'relaciones_registros', ['trabajador','tipo','fecha','estado','descripcion']);</script>
+  <script>
+    var rlTrabajadores = [];
+    var rlUnidades = [];
+    var rlCargos = [];
+    var rlConceptos = [];
+    var rlEquipos = [];
+    var rlAsignaciones = [];
+    var rlRegistros = [];
+    var rlActas = [];
+    var currentPlantillaView = 'activo';
+    var currentEquiposView = 'asignaciones';
+    var editRegistroId = null;
+    var editConceptoId = null;
+    var editEquipoId = null;
+    var editAsignacionId = null;
+    var editTrabajadorId = null;
+
+    function switchTool(name) {
+      document.querySelectorAll('.panel-item').forEach(function(el) {
+        el.classList.remove('active');
+        var icon = el.querySelector('i.fi');
+        if (icon) icon.style.color = '';
+      });
+      document.querySelectorAll('.tool-section').forEach(function(el) { el.classList.remove('active'); });
+      document.querySelectorAll('.toolbar-content').forEach(function(el) {
+        el.style.display = el.dataset.toolbar === name ? 'flex' : 'none';
+      });
+      var item = document.querySelector('.panel-item[data-tool="' + name + '"]');
+      var section = document.getElementById('tool-' + name);
+      if (item) {
+        item.classList.add('active');
+        var icon = item.querySelector('i.fi');
+        if (icon) icon.style.color = 'var(--module-relaciones)';
+      }
+      if (section) section.classList.add('active');
+      localStorage.setItem('fiat_tool_' + location.pathname, name);
+      if (name === 'registros') filterRegistros();
+      if (name === 'conceptos') filterConceptos();
+      if (name === 'equipos') filterEquipos();
+      if (name === 'plantilla') filterPlantilla();
+      if (name === 'actas') filterActas();
+    }
+
+    function switchPlantillaView(tab, btn) {
+      currentPlantillaView = tab;
+      document.querySelectorAll('.plantilla-tab').forEach(function(b) {
+        b.style.background = b === btn ? 'var(--module-relaciones)' : 'transparent';
+        b.style.color = b === btn ? '#fff' : 'var(--color-text)';
+        b.style.border = b === btn ? '0' : '1px solid var(--border-color)';
+      });
+      document.getElementById('plantillaActivoView').style.display = tab === 'activo' ? '' : 'none';
+      document.getElementById('plantillaHistoricoView').style.display = tab === 'historico' ? '' : 'none';
+      filterPlantilla();
+    }
+
+    function switchEquiposView(tab, btn) {
+      currentEquiposView = tab;
+      document.querySelectorAll('.eq-tab').forEach(function(b) {
+        b.style.background = b === btn ? 'var(--module-relaciones)' : 'transparent';
+        b.style.color = b === btn ? '#fff' : 'var(--color-text)';
+        b.style.border = b === btn ? '0' : '1px solid var(--border-color)';
+      });
+      document.getElementById('eqAsignacionesView').style.display = tab === 'asignaciones' ? '' : 'none';
+      document.getElementById('eqCatalogoView').style.display = tab === 'catalogo' ? '' : 'none';
+      document.getElementById('btnNuevaAsignacion').style.display = tab === 'asignaciones' ? '' : 'none';
+      document.getElementById('btnNuevoEquipo').style.display = tab === 'catalogo' ? '' : 'none';
+      filterEquipos();
+    }
+
+    function rlOpenModal(id) { document.getElementById(id).classList.add('show'); }
+    function rlCloseModal(id) { document.getElementById(id).classList.remove('show'); }
+
+    function getUnidadNombre(id) {
+      var u = rlUnidades.find(function(x) { return x.id === id; });
+      return u ? u.nombre : '-';
+    }
+
+    function getCargoNombre(id) {
+      var c = rlCargos.find(function(x) { return x.id === id; });
+      return c ? c.titulo : '-';
+    }
+
+    function getTrabajador(id) {
+      return rlTrabajadores.find(function(x) { return String(x.id) === String(id); });
+    }
+
+    function getConcepto(id) {
+      return rlConceptos.find(function(x) { return String(x.id) === String(id); });
+    }
+
+    function getEquipo(id) {
+      return rlEquipos.find(function(x) { return String(x.id) === String(id); });
+    }
+
+    function equipoNombre(e) {
+      if (!e) return '-';
+      var base = e.descripcion || e.tipo || 'Equipo';
+      var extra = [];
+      if (e.marca) extra.push(e.marca);
+      if (e.modelo) extra.push(e.modelo);
+      if (e.serial) extra.push('S/N ' + e.serial);
+      return base + (extra.length ? ' — ' + extra.join(' ') : '');
+    }
+
+    function rlBadge(estado) {
+      var map = {
+        'Activo': 'badge-active', 'Abierto': 'badge-active', 'Activa': 'badge-active', 'Disponible': 'badge-active', 'Programada': 'badge-active',
+        'Pendiente': 'badge-pending', 'Asignado': 'badge-pending', 'En mantenimiento': 'badge-pending', 'En curso': 'badge-pending',
+        'Finalizado': 'badge-inactive', 'Devuelta': 'badge-inactive', 'Baja': 'badge-inactive', 'Inactivo': 'badge-inactive', 'Cerrado': 'badge-inactive', 'Realizada': 'badge-inactive', 'Cancelada': 'badge-inactive'
+      };
+      return map[estado] || 'badge-pending';
+    }
+
+    async function rlFetch(table, orderCol) {
+      try {
+        var r = await supabaseClient.from(table).select('*').order(orderCol || 'created_at', { ascending: false });
+        if (r.error) return [];
+        return r.data || [];
+      } catch (e) { return []; }
+    }
+
+    async function loadRelacionesData() {
+      try {
+        var [u, c, t, co, eq, as, rg, ac] = await Promise.all([
+          rlFetch('est_unidades', 'nombre'),
+          rlFetch('est_cargos', 'titulo'),
+          rlFetch('plantilla_trabajadores', 'apellidos'),
+          rlFetch('rl_conceptos', 'nombre'),
+          rlFetch('rl_equipos', 'descripcion'),
+          rlFetch('rl_asignaciones', 'fecha_asignacion'),
+          rlFetch('relaciones_registros', 'fecha'),
+          rlFetch('rl_actas', 'fecha')
+        ]);
+        rlUnidades = u; rlCargos = c; rlTrabajadores = t; rlConceptos = co; rlEquipos = eq; rlAsignaciones = as; rlRegistros = rg; rlActas = ac;
+        populateUnidadSelect();
+        populateTrabajadorModalSelects();
+        renderRegistros();
+        renderConceptos();
+        renderAsignaciones();
+        renderEquipos();
+        renderActas();
+        filterPlantilla();
+      } catch (e) {
+        showAlert('Error al cargar datos: ' + e.message, 'error');
+      }
+    }
+
+    /* ===== REGISTROS LABORALES ===== */
+
+    function populateRegistroSelects() {
+      var sTrab = document.getElementById('reg_trabajador_id');
+      var sCon = document.getElementById('reg_concepto_id');
+      if (sTrab) {
+        sTrab.innerHTML = '<option value="">— Selecciona —</option>';
+        rlTrabajadores.forEach(function(t) {
+          sTrab.innerHTML += '<option value="' + t.id + '">' + t.nombres + ' ' + t.apellidos + ' — C.I. ' + t.cedula + '</option>';
+        });
+      }
+      if (sCon) {
+        sCon.innerHTML = '<option value="">— Selecciona —</option>';
+        rlConceptos.filter(function(x) { return x.activo !== false; }).forEach(function(c) {
+          sCon.innerHTML += '<option value="' + c.id + '">' + c.nombre + '</option>';
+        });
+      }
+    }
+
+    function rlOpenRegistroModal(id) {
+      editRegistroId = id || null;
+      populateRegistroSelects();
+      document.getElementById('modalRegistroTitle').textContent = id ? 'Editar registro laboral' : 'Nuevo registro laboral';
+      if (id) {
+        var r = rlRegistros.find(function(x) { return String(x.id) === String(id); });
+        if (r) {
+          document.getElementById('reg_trabajador_id').value = r.trabajador_id || '';
+          document.getElementById('reg_concepto_id').value = r.concepto_id || '';
+          document.getElementById('reg_fecha').value = r.fecha || '';
+          document.getElementById('reg_estado').value = r.estado || 'Activo';
+          document.getElementById('reg_descripcion').value = r.descripcion || '';
+        }
+      } else {
+        document.getElementById('reg_fecha').value = new Date().toISOString().slice(0, 10);
+        document.getElementById('reg_estado').value = 'Activo';
+        document.getElementById('reg_descripcion').value = '';
+      }
+      rlOpenModal('modalRegistro');
+    }
+
+    async function rlSaveRegistro() {
+      var trabajadorId = document.getElementById('reg_trabajador_id').value;
+      var conceptoId = document.getElementById('reg_concepto_id').value;
+      var fecha = document.getElementById('reg_fecha').value;
+      var estado = document.getElementById('reg_estado').value;
+      var descripcion = document.getElementById('reg_descripcion').value.trim();
+      if (!trabajadorId || !conceptoId || !fecha) { showAlert('Completa trabajador, concepto y fecha', 'warning'); return; }
+      var t = getTrabajador(trabajadorId);
+      var con = getConcepto(conceptoId);
+      var payload = {
+        trabajador_id: trabajadorId,
+        trabajador: t ? t.nombres + ' ' + t.apellidos : '',
+        concepto_id: conceptoId,
+        tipo: con ? con.nombre : '',
+        fecha: fecha,
+        estado: estado,
+        descripcion: descripcion || null
+      };
+      try {
+        if (editRegistroId) {
+          var { error } = await supabaseClient.from('relaciones_registros').update(payload).eq('id', editRegistroId);
+          if (error) throw error;
+        } else {
+          var { error } = await supabaseClient.from('relaciones_registros').insert(payload);
+          if (error) throw error;
+        }
+        rlCloseModal('modalRegistro');
+        showAlert('Registro guardado correctamente', 'success');
+        await loadRelacionesData();
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    function renderRegistros() {
+      var q = (document.getElementById('regSearch').value || '').trim().toLowerCase();
+      var data = rlRegistros.filter(function(r) {
+        if (!q) return true;
+        var t = getTrabajador(r.trabajador_id);
+        var con = getConcepto(r.concepto_id);
+        var texto = (t ? t.nombres + ' ' + t.apellidos + ' ' + t.cedula : (r.trabajador || '')) + ' ' + (con ? con.nombre : (r.tipo || '')) + ' ' + (r.descripcion || '');
+        return texto.toLowerCase().indexOf(q) !== -1;
+      });
+      var tbody = document.getElementById('regTableBody');
+      var countEl = document.getElementById('regCount');
+      if (countEl) countEl.textContent = data.length + ' registro' + (data.length !== 1 ? 's' : '');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">' + (q ? 'Sin resultados' : 'No hay registros') + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(function(r) {
+        var t = getTrabajador(r.trabajador_id);
+        var con = getConcepto(r.concepto_id);
+        var nombre = t ? t.nombres + ' ' + t.apellidos : (r.trabajador || '-');
+        var cedula = t ? t.cedula : '';
+        var concepto = con ? con.nombre : (r.tipo || '-');
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + nombre + '</span><div style="font-size:11px;color:var(--color-text-secondary);">C.I. ' + cedula + '</div></td>'
+          + '<td>' + concepto + '</td>'
+          + '<td>' + r.fecha + '</td>'
+          + '<td><span class="badge ' + rlBadge(r.estado) + '">' + r.estado + '</span></td>'
+          + '<td>' + (r.descripcion || '-') + '</td>'
+          + '<td><button class="btn btn-sm btn-outline" title="Editar" onclick="rlOpenRegistroModal(' + r.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> <button class="btn btn-sm btn-outline" title="Eliminar" onclick="rlDeleteRegistro(' + r.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;"></i></button></td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function filterRegistros() { renderRegistros(); }
+
+    async function rlDeleteRegistro(id) {
+      if (!(await showConfirm('¿Eliminar este registro laboral?'))) return;
+      try {
+        var { error } = await supabaseClient.from('relaciones_registros').delete().eq('id', id);
+        if (error) throw error;
+        showAlert('Registro eliminado', 'success');
+        await loadRelacionesData();
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== CONCEPTOS ===== */
+
+    function rlOpenConceptoModal(id) {
+      editConceptoId = id || null;
+      document.getElementById('modalConceptoTitle').textContent = id ? 'Editar concepto' : 'Nuevo concepto';
+      if (id) {
+        var c = rlConceptos.find(function(x) { return String(x.id) === String(id); });
+        if (c) {
+          document.getElementById('con_nombre').value = c.nombre || '';
+          document.getElementById('con_descripcion').value = c.descripcion || '';
+        }
+      } else {
+        document.getElementById('con_nombre').value = '';
+        document.getElementById('con_descripcion').value = '';
+      }
+      rlOpenModal('modalConcepto');
+    }
+
+    async function rlSaveConcepto() {
+      var nombre = document.getElementById('con_nombre').value.trim();
+      var descripcion = document.getElementById('con_descripcion').value.trim();
+      if (!nombre) { showAlert('Escribe el nombre del concepto', 'warning'); return; }
+      var payload = { nombre: nombre, descripcion: descripcion || null };
+      try {
+        if (editConceptoId) {
+          var { error } = await supabaseClient.from('rl_conceptos').update(payload).eq('id', editConceptoId);
+          if (error) throw error;
+        } else {
+          var { error } = await supabaseClient.from('rl_conceptos').insert(payload);
+          if (error) throw error;
+        }
+        rlCloseModal('modalConcepto');
+        showAlert('Concepto guardado', 'success');
+        await loadRelacionesData();
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    function renderConceptos() {
+      var q = (document.getElementById('conSearch').value || '').trim().toLowerCase();
+      var data = rlConceptos.filter(function(c) {
+        if (!q) return true;
+        return (c.nombre + ' ' + (c.descripcion || '')).toLowerCase().indexOf(q) !== -1;
+      });
+      var tbody = document.getElementById('conTableBody');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:40px;color:#999;">' + (q ? 'Sin resultados' : 'Sin conceptos registrados') + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(function(c) {
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + c.nombre + '</span></td>'
+          + '<td>' + (c.descripcion || '-') + '</td>'
+          + '<td><span class="badge ' + (c.activo !== false ? 'badge-active' : 'badge-inactive') + '">' + (c.activo !== false ? 'Activo' : 'Inactivo') + '</span></td>'
+          + '<td>'
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="rlOpenConceptoModal(' + c.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="' + (c.activo !== false ? 'Desactivar' : 'Activar') + '" onclick="rlToggleConcepto(' + c.id + ')"><i class="fi fi-sr-power" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="rlDeleteConcepto(' + c.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;"></i></button>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function filterConceptos() { renderConceptos(); }
+
+    async function rlToggleConcepto(id) {
+      var c = rlConceptos.find(function(x) { return String(x.id) === String(id); });
+      if (!c) return;
+      var nuevo = c.activo !== false ? false : true;
+      try {
+        var { error } = await supabaseClient.from('rl_conceptos').update({ activo: nuevo }).eq('id', id);
+        if (error) throw error;
+        await loadRelacionesData();
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'error');
+      }
+    }
+
+    async function rlDeleteConcepto(id) {
+      if (!(await showConfirm('¿Eliminar este concepto? Los registros que lo usan lo conservarán como texto.'))) return;
+      try {
+        var { error } = await supabaseClient.from('rl_conceptos').delete().eq('id', id);
+        if (error) throw error;
+        showAlert('Concepto eliminado', 'success');
+        await loadRelacionesData();
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== EQUIPOS (CATÁLOGO) ===== */
+
+    function rlOpenEquipoModal(id) {
+      editEquipoId = id || null;
+      document.getElementById('modalEquipoTitle').textContent = id ? 'Editar equipo' : 'Nuevo equipo';
+      if (id) {
+        var e = rlEquipos.find(function(x) { return String(x.id) === String(id); });
+        if (e) {
+          document.getElementById('eq_tipo').value = e.tipo || 'Otro';
+          document.getElementById('eq_descripcion').value = e.descripcion || '';
+          document.getElementById('eq_marca').value = e.marca || '';
+          document.getElementById('eq_modelo').value = e.modelo || '';
+          document.getElementById('eq_serial').value = e.serial || '';
+          document.getElementById('eq_codigo').value = e.codigo || '';
+          document.getElementById('eq_estado').value = e.estado || 'Disponible';
+        }
+      } else {
+        document.getElementById('eq_tipo').value = 'Otro';
+        document.getElementById('eq_descripcion').value = '';
+        document.getElementById('eq_marca').value = '';
+        document.getElementById('eq_modelo').value = '';
+        document.getElementById('eq_serial').value = '';
+        document.getElementById('eq_codigo').value = '';
+        document.getElementById('eq_estado').value = 'Disponible';
+      }
+      rlOpenModal('modalEquipo');
+    }
+
+    async function rlSaveEquipo() {
+      var tipo = document.getElementById('eq_tipo').value;
+      var descripcion = document.getElementById('eq_descripcion').value.trim();
+      if (!descripcion) { showAlert('Escribe la descripción del equipo', 'warning'); return; }
+      var payload = {
+        tipo: tipo,
+        descripcion: descripcion,
+        marca: document.getElementById('eq_marca').value.trim() || null,
+        modelo: document.getElementById('eq_modelo').value.trim() || null,
+        serial: document.getElementById('eq_serial').value.trim() || null,
+        codigo: document.getElementById('eq_codigo').value.trim() || null,
+        estado: document.getElementById('eq_estado').value
+      };
+      try {
+        if (editEquipoId) {
+          var { error } = await supabaseClient.from('rl_equipos').update(payload).eq('id', editEquipoId);
+          if (error) throw error;
+        } else {
+          var { error } = await supabaseClient.from('rl_equipos').insert(payload);
+          if (error) throw error;
+        }
+        rlCloseModal('modalEquipo');
+        showAlert('Equipo guardado', 'success');
+        await loadRelacionesData();
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    function renderEquipos() {
+      var q = (document.getElementById('eqSearch').value || '').trim().toLowerCase();
+      var data = rlEquipos.filter(function(e) {
+        if (!q) return true;
+        return (equipoNombre(e) + ' ' + (e.codigo || '') + ' ' + e.tipo).toLowerCase().indexOf(q) !== -1;
+      });
+      var tbody = document.getElementById('eqTableBody');
+      var countEl = document.getElementById('eqCount');
+      if (countEl) countEl.textContent = data.length + ' equipo' + (data.length !== 1 ? 's' : '');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">' + (q ? 'Sin resultados' : 'Sin equipos registrados') + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(function(e) {
+        var estado = e.estado;
+        var disp = estado === 'Disponible' || estado === 'En mantenimiento' || estado === 'Baja';
+        return '<tr>'
+          + '<td>' + e.tipo + '</td>'
+          + '<td><span style="font-weight:600;">' + (e.descripcion || '-') + '</span></td>'
+          + '<td>' + ((e.marca || '-') + (e.modelo ? ' / ' + e.modelo : '')) + '</td>'
+          + '<td>' + (e.serial || '-') + '</td>'
+          + '<td>' + (e.codigo || '-') + '</td>'
+          + '<td><span class="badge ' + rlBadge(estado) + '">' + estado + '</span></td>'
+          + '<td><button class="btn btn-sm btn-outline" title="Editar" onclick="rlOpenEquipoModal(' + e.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> <button class="btn btn-sm btn-outline" title="Eliminar" onclick="rlDeleteEquipo(' + e.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;"></i></button></td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    async function rlDeleteEquipo(id) {
+      if (!(await showConfirm('¿Eliminar este equipo? Se eliminarán también sus asignaciones.'))) return;
+      try {
+        var { error } = await supabaseClient.from('rl_equipos').delete().eq('id', id);
+        if (error) throw error;
+        showAlert('Equipo eliminado', 'success');
+        await loadRelacionesData();
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== ASIGNACIONES DE EQUIPOS ===== */
+
+    function populateTrabajadorSelect() {
+      var sel = document.getElementById('asig_trabajador_id');
+      if (!sel) return;
+      sel.innerHTML = '<option value="">— Selecciona —</option>';
+      rlTrabajadores.forEach(function(t) {
+        sel.innerHTML += '<option value="' + t.id + '">' + t.nombres + ' ' + t.apellidos + ' — C.I. ' + t.cedula + '</option>';
+      });
+    }
+
+    function rlOpenAsignacionModal(id) {
+      editAsignacionId = id || null;
+      populateTrabajadorSelect();
+      var keepEquipoId = null;
+      document.getElementById('modalAsignacionTitle').textContent = id ? 'Editar asignación' : 'Nueva asignación de equipo';
+      if (id) {
+        var a = rlAsignaciones.find(function(x) { return String(x.id) === String(id); });
+        if (a) {
+          keepEquipoId = a.equipo_id;
+          document.getElementById('asig_trabajador_id').value = a.trabajador_id || '';
+          document.getElementById('asig_fecha_asignacion').value = a.fecha_asignacion || '';
+          document.getElementById('asig_fecha_devolucion').value = a.fecha_devolucion || '';
+          document.getElementById('asig_estado').value = a.estado || 'Activa';
+          document.getElementById('asig_notas').value = a.notas || '';
+        }
+      } else {
+        document.getElementById('asig_fecha_asignacion').value = new Date().toISOString().slice(0, 10);
+        document.getElementById('asig_fecha_devolucion').value = '';
+        document.getElementById('asig_estado').value = 'Activa';
+        document.getElementById('asig_notas').value = '';
+      }
+      var sel = document.getElementById('asig_equipo_id');
+      sel.innerHTML = '<option value="">— Selecciona —</option>';
+      rlEquipos.forEach(function(e) {
+        var ok = e.estado === 'Disponible' || String(e.id) === String(keepEquipoId);
+        if (!ok) return;
+        var selected = String(e.id) === String(keepEquipoId) ? ' selected' : '';
+        sel.innerHTML += '<option value="' + e.id + '"' + selected + '>' + equipoNombre(e) + '</option>';
+      });
+      rlOpenModal('modalAsignacion');
+    }
+
+    async function recomputeEquiposEstado() {
+      try {
+        var asigs = await rlFetch('rl_asignaciones');
+        var eqs = await rlFetch('rl_equipos');
+        var activas = {};
+        asigs.forEach(function(a) { if (a.estado === 'Activa') activas[a.equipo_id] = true; });
+        var updates = [];
+        eqs.forEach(function(e) {
+          if (e.estado === 'Baja' || e.estado === 'En mantenimiento') return;
+          var nuevo = activas[e.id] ? 'Asignado' : 'Disponible';
+          if (e.estado !== nuevo) updates.push(supabaseClient.from('rl_equipos').update({ estado: nuevo }).eq('id', e.id));
+        });
+        await Promise.all(updates);
+      } catch (e) { /* noop */ }
+    }
+
+    async function rlSaveAsignacion() {
+      var trabajadorId = document.getElementById('asig_trabajador_id').value;
+      var equipoId = document.getElementById('asig_equipo_id').value;
+      var fechaAsig = document.getElementById('asig_fecha_asignacion').value;
+      var fechaDev = document.getElementById('asig_fecha_devolucion').value || null;
+      var estado = document.getElementById('asig_estado').value;
+      var notas = document.getElementById('asig_notas').value.trim();
+      if (!trabajadorId || !equipoId || !fechaAsig) { showAlert('Completa trabajador, equipo y fecha de asignación', 'warning'); return; }
+      var payload = {
+        trabajador_id: trabajadorId,
+        equipo_id: equipoId,
+        fecha_asignacion: fechaAsig,
+        fecha_devolucion: fechaDev,
+        estado: estado,
+        notas: notas || null
+      };
+      try {
+        if (editAsignacionId) {
+          var { error } = await supabaseClient.from('rl_asignaciones').update(payload).eq('id', editAsignacionId);
+          if (error) throw error;
+        } else {
+          var { error } = await supabaseClient.from('rl_asignaciones').insert(payload);
+          if (error) throw error;
+        }
+        rlCloseModal('modalAsignacion');
+        await recomputeEquiposEstado();
+        showAlert('Asignación guardada', 'success');
+        await loadRelacionesData();
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    function renderAsignaciones() {
+      var q = (document.getElementById('eqSearch').value || '').trim().toLowerCase();
+      var data = rlAsignaciones.filter(function(a) {
+        if (!q) return true;
+        var t = getTrabajador(a.trabajador_id);
+        var e = getEquipo(a.equipo_id);
+        var texto = (t ? t.nombres + ' ' + t.apellidos + ' ' + t.cedula : '') + ' ' + equipoNombre(e);
+        return texto.toLowerCase().indexOf(q) !== -1;
+      });
+      var tbody = document.getElementById('asigTableBody');
+      var countEl = document.getElementById('asigCount');
+      if (countEl) countEl.textContent = data.length + ' asignación' + (data.length !== 1 ? 'es' : '');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">' + (q ? 'Sin resultados' : 'Sin asignaciones registradas') + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(function(a) {
+        var t = getTrabajador(a.trabajador_id);
+        var e = getEquipo(a.equipo_id);
+        var nombre = t ? t.nombres + ' ' + t.apellidos : '-';
+        var cedula = t ? t.cedula : '';
+        var accion = '';
+        if (a.estado === 'Activa') {
+          accion += '<button class="btn btn-sm btn-relaciones" style="padding:4px 10px;font-size:11px;" onclick="rlDevolverAsignacion(' + a.id + ')">Devolver</button> ';
+        }
+        accion += '<button class="btn btn-sm btn-outline" title="Editar" onclick="rlOpenAsignacionModal(' + a.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> ';
+        accion += '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="rlDeleteAsignacion(' + a.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;"></i></button>';
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + nombre + '</span><div style="font-size:11px;color:var(--color-text-secondary);">C.I. ' + cedula + '</div></td>'
+          + '<td>' + equipoNombre(e) + (e ? '<div style="font-size:11px;color:var(--color-text-secondary);">' + e.tipo + '</div>' : '') + '</td>'
+          + '<td>' + a.fecha_asignacion + '</td>'
+          + '<td>' + (a.fecha_devolucion || '-') + '</td>'
+          + '<td><span class="badge ' + rlBadge(a.estado) + '">' + a.estado + '</span></td>'
+          + '<td>' + accion + '</td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    async function rlDevolverAsignacion(id) {
+      if (!(await showConfirm('¿Registrar la devolución de este equipo?'))) return;
+      try {
+        var { error } = await supabaseClient.from('rl_asignaciones').update({
+          estado: 'Devuelta',
+          fecha_devolucion: new Date().toISOString().slice(0, 10)
+        }).eq('id', id);
+        if (error) throw error;
+        await recomputeEquiposEstado();
+        showAlert('Equipo devuelto', 'success');
+        await loadRelacionesData();
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'error');
+      }
+    }
+
+    async function rlDeleteAsignacion(id) {
+      if (!(await showConfirm('¿Eliminar esta asignación?'))) return;
+      try {
+        var { error } = await supabaseClient.from('rl_asignaciones').delete().eq('id', id);
+        if (error) throw error;
+        await recomputeEquiposEstado();
+        showAlert('Asignación eliminada', 'success');
+        await loadRelacionesData();
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    function filterEquipos() {
+      if (currentEquiposView === 'asignaciones') renderAsignaciones();
+      else renderEquipos();
+    }
+
+    /* ===== ACTAS Y REUNIONES ===== */
+
+    function renderActas() {
+      var q = (document.getElementById('actaSearch').value || '').trim().toLowerCase();
+      var data = rlActas.filter(function(a) {
+        if (!q) return true;
+        return (a.tema + ' ' + (a.participantes || '') + ' ' + (a.descripcion || '') + ' ' + a.estado).toLowerCase().indexOf(q) !== -1;
+      });
+      var tbody = document.getElementById('actaTableBody');
+      var countEl = document.getElementById('actaCount');
+      if (countEl) countEl.textContent = data.length + ' acta' + (data.length !== 1 ? 's' : '');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">' + (q ? 'Sin resultados' : 'Sin actas registradas') + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(function(a) {
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + a.tema + '</span>' + (a.acuerdos ? '<div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px;"><span style="font-weight:600;">Acuerdos:</span> ' + a.acuerdos + '</div>' : '') + '</td>'
+          + '<td>' + a.fecha + '</td>'
+          + '<td>' + (a.participantes || '-') + '</td>'
+          + '<td><span class="badge ' + rlBadge(a.estado) + '">' + a.estado + '</span></td>'
+          + '<td>' + (a.descripcion || '-') + '</td>'
+          + '<td><button class="btn btn-sm btn-outline" title="Ver / editar" onclick="location.href=\'acta.html?id=' + a.id + '\'"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> <button class="btn btn-sm btn-outline" title="Eliminar" onclick="rlDeleteActa(' + a.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;"></i></button></td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function filterActas() { renderActas(); }
+
+    async function rlDeleteActa(id) {
+      if (!(await showConfirm('¿Eliminar esta acta?'))) return;
+      try {
+        var { error } = await supabaseClient.from('rl_actas').delete().eq('id', id);
+        if (error) throw error;
+        showAlert('Acta eliminada', 'success');
+        await loadRelacionesData();
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== PLANTILLA ACTIVA ===== */
+
+    function populateUnidadSelect() {
+      var sel = document.getElementById('filtroUnidad');
+      if (!sel) return;
+      var val = sel.value;
+      sel.innerHTML = '<option value="">Todas las unidades</option>';
+      rlUnidades.forEach(function(u) {
+        sel.innerHTML += '<option value="' + u.id + '">' + u.nombre + '</option>';
+      });
+      if (val) sel.value = val;
+    }
+
+    function populateTrabajadorModalSelects() {
+      var su = document.getElementById('trab_unidad_id');
+      var sc = document.getElementById('trab_cargo_id');
+      if (su) {
+        su.innerHTML = '<option value="">— Selecciona —</option>';
+        rlUnidades.forEach(function(u) { su.innerHTML += '<option value="' + u.id + '">' + u.nombre + '</option>'; });
+      }
+      if (sc) {
+        sc.innerHTML = '<option value="">— Selecciona —</option>';
+        rlCargos.forEach(function(c) { sc.innerHTML += '<option value="' + c.id + '">' + c.titulo + '</option>'; });
+      }
+    }
+
+    function filterPlantilla() {
+      var q = (document.getElementById('plantSearch').value || '').trim().toLowerCase();
+      var unidadFiltro = document.getElementById('filtroUnidad').value;
+      if (currentPlantillaView === 'activo') renderActivos(q, unidadFiltro);
+      else renderHistoricos(q);
+    }
+
+    function renderActivos(q, unidadFiltro) {
+      var data = rlTrabajadores.filter(function(t) { return t.estado === 'Activo' || t.estado === 'Suspendido'; });
+      if (unidadFiltro) data = data.filter(function(t) { return t.unidad_id === unidadFiltro; });
+      if (q) data = data.filter(function(t) {
+        var texto = t.nombres + ' ' + t.apellidos + ' ' + t.cedula + ' ' + getUnidadNombre(t.unidad_id) + ' ' + getCargoNombre(t.cargo_id);
+        return texto.toLowerCase().indexOf(q) !== -1;
+      });
+      var tbody = document.getElementById('plantTableBody');
+      document.getElementById('plantCount').textContent = data.length + ' trabajador' + (data.length !== 1 ? 'es' : '');
+      if (!data.length) {
+        var msg = (q || unidadFiltro) ? 'Sin resultados' : 'No hay trabajadores activos (total BD: ' + rlTrabajadores.length + ')';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">' + msg + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(function(t) {
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + t.nombres + ' ' + t.apellidos + '</span></td>'
+          + '<td>' + t.cedula + '</td>'
+          + '<td>' + getUnidadNombre(t.unidad_id) + '</td>'
+          + '<td>' + getCargoNombre(t.cargo_id) + '</td>'
+          + '<td>' + t.fecha_ingreso + '</td>'
+          + '<td class="estado-' + t.estado.toLowerCase() + '">' + t.estado + '</td>'
+          + '<td><button class="btn btn-sm btn-outline" title="Ver detalle" onclick="location.href=\'trabajador.html?id=' + t.id + '\'"><i class="fi fi-sr-eye" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> <button class="btn btn-sm btn-outline" title="Editar" onclick="editarTrabajador(\'' + t.id + '\')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button></td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function renderHistoricos(q) {
+      var data = rlTrabajadores.filter(function(t) { return t.estado === 'Retirado'; });
+      if (q) data = data.filter(function(t) {
+        var texto = t.nombres + ' ' + t.apellidos + ' ' + t.cedula + ' ' + getUnidadNombre(t.unidad_id) + ' ' + getCargoNombre(t.cargo_id);
+        return texto.toLowerCase().indexOf(q) !== -1;
+      });
+      var tbody = document.getElementById('histTableBody');
+      document.getElementById('histCount').textContent = data.length + ' registro' + (data.length !== 1 ? 's' : '');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">' + (q ? 'Sin resultados' : 'No hay registros históricos') + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(function(t) {
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + t.nombres + ' ' + t.apellidos + '</span></td>'
+          + '<td>' + t.cedula + '</td>'
+          + '<td>' + getUnidadNombre(t.unidad_id) + '</td>'
+          + '<td>' + getCargoNombre(t.cargo_id) + '</td>'
+          + '<td>' + t.fecha_ingreso + ' → ' + (t.fecha_egreso || '-') + '</td>'
+          + '<td class="estado-' + t.estado.toLowerCase() + '">' + t.estado + '</td>'
+          + '<td><button class="btn btn-sm btn-outline" title="Ver detalle" onclick="location.href=\'trabajador.html?id=' + t.id + '\'"><i class="fi fi-sr-eye" style="font-size:15px;line-height:1;pointer-events:none;"></i></button></td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function editarTrabajador(id) {
+      var t = getTrabajador(id);
+      if (!t) return;
+      editTrabajadorId = id;
+      document.getElementById('trab_unidad_id').value = t.unidad_id || '';
+      document.getElementById('trab_cargo_id').value = t.cargo_id || '';
+      document.getElementById('trab_fecha_ingreso').value = t.fecha_ingreso || '';
+      document.getElementById('trab_estado').value = t.estado;
+      document.getElementById('trab_fecha_egreso').value = t.fecha_egreso || '';
+      document.getElementById('trabEgresoWrap').style.display = t.estado === 'Retirado' ? '' : 'none';
+      rlOpenModal('modalEditarTrabajador');
+    }
+
+    async function saveTrabajador() {
+      var unidadId = document.getElementById('trab_unidad_id').value;
+      var cargoId = document.getElementById('trab_cargo_id').value;
+      var fechaIngreso = document.getElementById('trab_fecha_ingreso').value;
+      var estado = document.getElementById('trab_estado').value;
+      var fechaEgreso = document.getElementById('trab_fecha_egreso').value || null;
+      if (!unidadId || !cargoId || !fechaIngreso) { showAlert('Completa unidad, cargo y fecha de ingreso', 'warning'); return; }
+      try {
+        var { error } = await supabaseClient.from('plantilla_trabajadores').update({
+          unidad_id: unidadId,
+          cargo_id: cargoId,
+          fecha_ingreso: fechaIngreso,
+          estado: estado,
+          fecha_egreso: fechaEgreso
+        }).eq('id', editTrabajadorId);
+        if (error) throw error;
+        rlCloseModal('modalEditarTrabajador');
+        showAlert('Trabajador actualizado', 'success');
+        await loadRelacionesData();
+      } catch (err) {
+        showAlert('Error: ' + err.message, 'error');
+      }
+    }
+
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('modal-overlay')) {
+        e.target.classList.remove('show');
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var saved = localStorage.getItem('fiat_tool_' + location.pathname);
+      if (saved && document.getElementById('tool-' + saved)) switchTool(saved);
+    });
+
+    loadRelacionesData();
+  </script>
 </body>
 </html>

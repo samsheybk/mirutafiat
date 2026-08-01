@@ -428,6 +428,7 @@
       margin-bottom: 8px;
     }
   </style>
+  <style>:root { --module-color: var(--module-repositorio); }</style>
 </head>
 <body>
   <div class="app-layout">
@@ -671,6 +672,9 @@
     // ============================================
 
     async function loadCategorias() {
+      const container = document.getElementById('categoriesContainer');
+      if (container) container.innerHTML = containerLoadingHTML();
+      
       const { data, error } = await supabaseClient
         .from('repo_categorias')
         .select('*')
@@ -702,6 +706,9 @@
     }
 
     async function loadDocumentos() {
+      const container = document.getElementById('documentsContainer');
+      if (container) container.innerHTML = containerLoadingHTML();
+      
       const { data, error } = await supabaseClient
         .from('repo_documentos')
         .select('*, repo_categorias(nombre, color), repo_subcategorias(nombre)')

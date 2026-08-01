@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
   <style>
+    :root { --module-color: var(--module-captacion); }
     .det-photo {
       width: 88px;
       height: 88px;
@@ -167,6 +168,10 @@
                     <div class="form-group">
                       <label>Teléfono</label>
                       <input type="text" class="form-input" id="det_telefono">
+                    </div>
+                    <div class="form-group">
+                      <label>Conducta civil</label>
+                      <input type="text" class="form-input" id="det_conducta_civil">
                     </div>
                     <div class="form-group" style="grid-column:span 3;">
                       <label>Dirección</label>
@@ -510,6 +515,7 @@
         document.getElementById('det_correo').value = t.correo || '';
         document.getElementById('det_telefono').value = t.telefono || '';
         document.getElementById('det_direccion').value = t.direccion || '';
+        document.getElementById('det_conducta_civil').value = t.conducta_civil || '';
         document.getElementById('det_talla_camisa').value = t.talla_camisa || '';
         document.getElementById('det_talla_franela').value = t.talla_franela || '';
         document.getElementById('det_talla_pantalon').value = t.talla_pantalon || '';
@@ -536,6 +542,7 @@
         correo: document.getElementById('det_correo').value.trim() || null,
         telefono: document.getElementById('det_telefono').value.trim() || null,
         direccion: document.getElementById('det_direccion').value.trim() || null,
+        conducta_civil: document.getElementById('det_conducta_civil').value.trim() || null,
         talla_camisa: document.getElementById('det_talla_camisa').value || null,
         talla_franela: document.getElementById('det_talla_franela').value || null,
         talla_pantalon: document.getElementById('det_talla_pantalon').value || null,

@@ -10,6 +10,10 @@
   <link rel="stylesheet" href="../css/styles.css">
   <style>
     :root { --module-color: var(--module-captacion); }
+    body[data-modulo="relaciones"] {
+      --module-captacion: var(--module-relaciones);
+      --module-color: var(--module-relaciones);
+    }
     .det-photo {
       width: 88px;
       height: 88px;
@@ -123,6 +127,7 @@
                 <button class="btn btn-sm det-tab active" data-dtab="datos" onclick="switchDetalleTab('datos',this)" style="background:var(--module-captacion);color:#fff;border:0;border-radius:4px;padding:6px 16px;">Datos</button>
                 <button class="btn btn-sm det-tab" data-dtab="documentos" onclick="switchDetalleTab('documentos',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Documentación</button>
                 <button class="btn btn-sm det-tab" data-dtab="familia" onclick="switchDetalleTab('familia',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Carga familiar</button>
+                <button class="btn btn-sm det-tab" data-dtab="contrato" onclick="switchDetalleTab('contrato',this)" style="display:none;background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Contrato firmado</button>
               </div>
 
               <div class="det-panel" id="detDatosView">
@@ -171,7 +176,11 @@
                     </div>
                     <div class="form-group">
                       <label>Conducta civil</label>
-                      <input type="text" class="form-input" id="det_conducta_civil">
+                      <select class="form-select" id="det_conducta_civil">
+                        <option value="PENDIENTE" selected>PENDIENTE</option>
+                        <option value="APTO">APTO</option>
+                        <option value="NO APTO">NO APTO</option>
+                      </select>
                     </div>
                     <div class="form-group" style="grid-column:span 3;">
                       <label>Dirección</label>
@@ -179,65 +188,67 @@
                     </div>
                   </div>
 
-                  <div class="det-section-label">Tallas de ropa y calzado</div>
-                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;">
-                    <div class="form-group">
-                      <label>Talla de camisa</label>
-                      <select class="form-select" id="det_talla_camisa">
-                        <option value="">— Selecciona —</option>
-                        <option value="XS">XS</option>
-                        <option value="S">S</option>
-                        <option value="M">M</option>
-                        <option value="L">L</option>
-                        <option value="XL">XL</option>
-                        <option value="XXL">XXL</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label>Talla de franela</label>
-                      <select class="form-select" id="det_talla_franela">
-                        <option value="">— Selecciona —</option>
-                        <option value="XS">XS</option>
-                        <option value="S">S</option>
-                        <option value="M">M</option>
-                        <option value="L">L</option>
-                        <option value="XL">XL</option>
-                        <option value="XXL">XXL</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label>Talla de pantalón</label>
-                      <select class="form-select" id="det_talla_pantalon">
-                        <option value="">— Selecciona —</option>
-                        <option value="28">28</option>
-                        <option value="30">30</option>
-                        <option value="32">32</option>
-                        <option value="34">34</option>
-                        <option value="36">36</option>
-                        <option value="38">38</option>
-                        <option value="40">40</option>
-                        <option value="42">42</option>
-                        <option value="44">44</option>
-                      </select>
-                    </div>
-                    <div class="form-group">
-                      <label>Talla de calzado</label>
-                      <select class="form-select" id="det_talla_calzado">
-                        <option value="">— Selecciona —</option>
-                        <option value="34">34</option>
-                        <option value="35">35</option>
-                        <option value="36">36</option>
-                        <option value="37">37</option>
-                        <option value="38">38</option>
-                        <option value="39">39</option>
-                        <option value="40">40</option>
-                        <option value="41">41</option>
-                        <option value="42">42</option>
-                        <option value="43">43</option>
-                        <option value="44">44</option>
-                        <option value="45">45</option>
-                        <option value="46">46</option>
-                      </select>
+                  <div id="detTallasWrap">
+                    <div class="det-section-label">Tallas de ropa y calzado</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;">
+                      <div class="form-group">
+                        <label>Talla de camisa</label>
+                        <select class="form-select" id="det_talla_camisa">
+                          <option value="">— Selecciona —</option>
+                          <option value="XS">XS</option>
+                          <option value="S">S</option>
+                          <option value="M">M</option>
+                          <option value="L">L</option>
+                          <option value="XL">XL</option>
+                          <option value="XXL">XXL</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label>Talla de franela</label>
+                        <select class="form-select" id="det_talla_franela">
+                          <option value="">— Selecciona —</option>
+                          <option value="XS">XS</option>
+                          <option value="S">S</option>
+                          <option value="M">M</option>
+                          <option value="L">L</option>
+                          <option value="XL">XL</option>
+                          <option value="XXL">XXL</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label>Talla de pantalón</label>
+                        <select class="form-select" id="det_talla_pantalon">
+                          <option value="">— Selecciona —</option>
+                          <option value="28">28</option>
+                          <option value="30">30</option>
+                          <option value="32">32</option>
+                          <option value="34">34</option>
+                          <option value="36">36</option>
+                          <option value="38">38</option>
+                          <option value="40">40</option>
+                          <option value="42">42</option>
+                          <option value="44">44</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label>Talla de calzado</label>
+                        <select class="form-select" id="det_talla_calzado">
+                          <option value="">— Selecciona —</option>
+                          <option value="34">34</option>
+                          <option value="35">35</option>
+                          <option value="36">36</option>
+                          <option value="37">37</option>
+                          <option value="38">38</option>
+                          <option value="39">39</option>
+                          <option value="40">40</option>
+                          <option value="41">41</option>
+                          <option value="42">42</option>
+                          <option value="43">43</option>
+                          <option value="44">44</option>
+                          <option value="45">45</option>
+                          <option value="46">46</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
 
@@ -294,6 +305,31 @@
                     <tr><td colspan="6" style="text-align:center;padding:24px;color:#999;">Sin cargas familiares registradas</td></tr>
                   </tbody>
                 </table>
+              </div>
+
+              <div class="det-panel" id="detContratoView" style="display:none;">
+                <div style="margin-bottom:8px;">
+                  <div class="det-section-label">Contrato de trabajo firmado</div>
+                  <span style="font-size:12px;color:#666;" id="detContratoInfo">Sin contrato firmado adjuntado</span>
+                </div>
+                <div id="detContratoBox" style="display:none;border:1px solid var(--color-border);border-radius:8px;padding:16px;margin-bottom:12px;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+                    <div>
+                      <div style="font-weight:600;" id="detContratoNombre"></div>
+                      <div style="font-size:12px;color:#666;" id="detContratoFecha"></div>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                      <a id="detContratoVer" class="btn btn-outline btn-sm" target="_blank" rel="noopener">Ver PDF</a>
+                      <button class="btn btn-outline btn-sm" onclick="eliminarContrato()" style="color:#dc2626;">Quitar</button>
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                  <input type="file" id="detContratoFile" accept=".pdf,application/pdf" style="display:none;" onchange="onContratoChange()">
+                  <button class="btn btn-captacion btn-sm" onclick="document.getElementById('detContratoFile').click()">+ Adjuntar contrato firmado</button>
+                  <button class="btn btn-outline btn-sm" id="detContratoGuardar" style="display:none;" onclick="guardarContrato()">Guardar contrato</button>
+                  <span style="font-size:12px;color:#666;" id="detContratoNomFile"></span>
+                </div>
               </div>
             </div>
           </div>
@@ -424,6 +460,8 @@
     var detalleFotoArchivo = null;
     var detalleDocArchivo = null;
     var detalleFotoActual = null;
+    var detalleContratoId = null;
+    var detalleContratoArchivo = null;
 
     function openDetFotoLightbox() {
       if (!detalleFotoActual) return;
@@ -445,6 +483,32 @@
       return c ? c.titulo : '-';
     }
 
+    function aplicarModuloContexto() {
+      var mod = new URLSearchParams(location.search).get('modulo');
+      if (mod === 'relaciones') {
+        document.body.setAttribute('data-modulo', 'relaciones');
+        var navSel = document.getElementById('navSelect');
+        if (navSel) navSel.value = 'relaciones-laborales.html';
+        var crumb = document.querySelector('.topbar-breadcrumb a');
+        if (crumb) {
+          crumb.href = 'relaciones-laborales.html';
+          crumb.textContent = 'Relaciones Laborales';
+        }
+        var back = document.querySelector('.topbar .btn-outline');
+        if (back) {
+          back.setAttribute('onclick', "location.href='relaciones-laborales.html'");
+          back.textContent = '← Volver';
+        }
+        document.title = 'Detalle del trabajador - Relaciones Laborales';
+        var tabFam = document.querySelector('.det-tab[data-dtab="familia"]');
+        if (tabFam) tabFam.style.display = 'none';
+        var tabContrato = document.querySelector('.det-tab[data-dtab="contrato"]');
+        if (tabContrato) tabContrato.style.display = '';
+        var tallas = document.getElementById('detTallasWrap');
+        if (tallas) tallas.style.display = 'none';
+      }
+    }
+
     function switchDetalleTab(tab, btn) {
       document.querySelectorAll('.det-tab').forEach(function(b) {
         b.style.background = b === btn ? 'var(--module-captacion)' : 'transparent';
@@ -454,6 +518,7 @@
       document.getElementById('detDatosView').style.display = tab === 'datos' ? '' : 'none';
       document.getElementById('detDocumentosView').style.display = tab === 'documentos' ? '' : 'none';
       document.getElementById('detFamiliaView').style.display = tab === 'familia' ? '' : 'none';
+      document.getElementById('detContratoView').style.display = tab === 'contrato' ? '' : 'none';
     }
 
     function setDetFoto(url, nombreCompleto) {
@@ -515,7 +580,7 @@
         document.getElementById('det_correo').value = t.correo || '';
         document.getElementById('det_telefono').value = t.telefono || '';
         document.getElementById('det_direccion').value = t.direccion || '';
-        document.getElementById('det_conducta_civil').value = t.conducta_civil || '';
+        document.getElementById('det_conducta_civil').value = t.conducta_civil || 'PENDIENTE';
         document.getElementById('det_talla_camisa').value = t.talla_camisa || '';
         document.getElementById('det_talla_franela').value = t.talla_franela || '';
         document.getElementById('det_talla_pantalon').value = t.talla_pantalon || '';
@@ -527,6 +592,7 @@
         switchDetalleTab('datos', document.querySelector('.det-tab[data-dtab="datos"]'));
         loadDocumentos();
         loadCargaFamiliar();
+        if (new URLSearchParams(location.search).get('modulo') === 'relaciones') loadContrato();
       } catch (err) {
         document.getElementById('detCargando').innerHTML = '<span style="color:#dc2626;">Error al cargar el trabajador: ' + err.message + '</span>';
       }
@@ -692,6 +758,100 @@
       }
     }
 
+    /* ===== CONTRATO FIRMADO ===== */
+    async function loadContrato() {
+      try {
+        var { data, error } = await supabaseClient.from('trabajador_documentos')
+          .select('*').eq('trabajador_id', detalleTrabajadorId).eq('tipo', 'Contrato firmado')
+          .order('created_at', { ascending: false }).limit(1);
+        if (error) throw error;
+        var c = (data && data[0]) || null;
+        detalleContratoId = c ? c.id : null;
+        var info = document.getElementById('detContratoInfo');
+        var box = document.getElementById('detContratoBox');
+        if (c && c.archivo_url) {
+          info.textContent = 'Contrato firmado adjuntado.';
+          box.style.display = '';
+          document.getElementById('detContratoNombre').textContent = 'Contrato firmado.pdf';
+          document.getElementById('detContratoFecha').textContent = c.created_at ? 'Adjuntado: ' + new Date(c.created_at).toLocaleDateString('es-VE') : '';
+          document.getElementById('detContratoVer').href = c.archivo_url;
+        } else {
+          info.textContent = 'Sin contrato firmado adjuntado';
+          box.style.display = 'none';
+        }
+      } catch (err) {
+        document.getElementById('detContratoInfo').textContent = 'Error: ' + err.message;
+      }
+    }
+
+    function onContratoChange() {
+      var f = document.getElementById('detContratoFile').files[0];
+      if (!f) {
+        detalleContratoArchivo = null;
+        document.getElementById('detContratoGuardar').style.display = 'none';
+        document.getElementById('detContratoNomFile').textContent = '';
+        return;
+      }
+      if (!/\.pdf$/i.test(f.name)) {
+        showAlert('Solo se permiten archivos PDF', 'warning');
+        document.getElementById('detContratoFile').value = '';
+        return;
+      }
+      if (f.size > 4 * 1024 * 1024) {
+        showAlert('El PDF supera los 4 MB', 'warning');
+        document.getElementById('detContratoFile').value = '';
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        detalleContratoArchivo = e.target.result;
+        document.getElementById('detContratoNomFile').textContent = f.name;
+        document.getElementById('detContratoGuardar').style.display = '';
+      };
+      reader.readAsDataURL(f);
+    }
+
+    async function guardarContrato() {
+      if (!detalleContratoArchivo) { showAlert('Selecciona un archivo PDF primero', 'warning'); return; }
+      try {
+        var payload = {
+          trabajador_id: detalleTrabajadorId,
+          tipo: 'Contrato firmado',
+          archivo_url: detalleContratoArchivo
+        };
+        if (detalleContratoId) {
+          var { error } = await supabaseClient.from('trabajador_documentos').update(payload).eq('id', detalleContratoId);
+          if (error) throw error;
+        } else {
+          var { error: e2 } = await supabaseClient.from('trabajador_documentos').insert([payload]);
+          if (e2) throw e2;
+        }
+        detalleContratoArchivo = null;
+        document.getElementById('detContratoFile').value = '';
+        document.getElementById('detContratoGuardar').style.display = 'none';
+        document.getElementById('detContratoNomFile').textContent = '';
+        await loadContrato();
+        loadDocumentos();
+        showAlert('Contrato firmado guardado', 'success');
+      } catch (err) {
+        showAlert('Error al guardar contrato: ' + err.message, 'error');
+      }
+    }
+
+    async function eliminarContrato() {
+      if (!detalleContratoId) return;
+      if (!(await showConfirm('¿Quitar el contrato firmado adjuntado?'))) return;
+      try {
+        var { error } = await supabaseClient.from('trabajador_documentos').delete().eq('id', detalleContratoId);
+        if (error) throw error;
+        detalleContratoId = null;
+        await loadContrato();
+        loadDocumentos();
+      } catch (err) {
+        showAlert('Error al quitar contrato: ' + err.message, 'error');
+      }
+    }
+
     /* ===== CARGA FAMILIAR ===== */
     async function loadCargaFamiliar() {
       try {
@@ -781,7 +941,10 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', cargarTrabajador);
+    document.addEventListener('DOMContentLoaded', function() {
+      aplicarModuloContexto();
+      cargarTrabajador();
+    });
   </script>
 </body>
 </html>

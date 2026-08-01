@@ -54,12 +54,12 @@
           <div class="tool-section active" id="tool-cursos">
             <div class="tool-section-header">
               <h2 style="color:var(--module-capacitacion);">Cursos</h2>
-              <button class="btn btn-capacitacion" onclick="openModal()">+ Nuevo curso</button>
+              <button class="btn btn-capacitacion" onclick="location.href='curso.html'">+ Nuevo curso</button>
             </div>
             <table class="data-table">
-              <thead><tr><th>Curso</th><th>Instructor</th><th>Fecha inicio</th><th>Duración</th><th>Estado</th></tr></thead>
-              <tbody id="moduleTableBody">
-                <tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">No hay cursos registrados</td></tr>
+              <thead><tr><th>Portada</th><th>Curso</th><th>Módulos</th><th>Preguntas</th><th>Estado</th><th>Creado</th><th>Acciones</th></tr></thead>
+              <tbody id="cursosBody">
+                <tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Cargando cursos...</td></tr>
               </tbody>
             </table>
           </div>
@@ -102,35 +102,77 @@
   </div>
   </div>
 
-  <div class="modal-overlay" id="modal">
-    <div class="modal">
-      <div class="modal-header"><h3>Nuevo curso</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
-      <div class="modal-body">
-        <form id="moduleForm">
-          <div class="form-group"><label>Nombre del curso</label><input type="text" class="form-input" id="nombre" required></div>
-          <div class="form-group"><label>Instructor</label><input type="text" class="form-input" id="instructor" required></div>
-          <div class="form-row">
-            <div class="form-group"><label>Fecha inicio</label><input type="date" class="form-input" id="fecha_inicio" required></div>
-            <div class="form-group"><label>Duración (horas)</label><input type="number" class="form-input" id="duracion" min="1" required></div>
-          </div>
-          <div class="form-group"><label>Estado</label>
-            <select class="form-select" id="estado"><option value="Programado">Programado</option><option value="En curso">En curso</option><option value="Finalizado">Finalizado</option></select>
-          </div>
-          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="descripcion" rows="3"></textarea></div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
-        <button class="btn btn-capacitacion" onclick="saveModule()">Guardar</button>
-      </div>
-    </div>
-  </div>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/supabase-config.js"></script>
   <script src="../js/ui.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/modules.js"></script>
-  <script>initModule('capacitacion', 'capacitacion_cursos', ['nombre','instructor','fecha_inicio','duracion','estado','descripcion']);</script>
+  <script>
+    function escCursos(s) {
+      return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    async function cargarCursos() {
+      var tbody = document.getElementById('cursosBody');
+      if (!tbody) return;
+      tbody.innerHTML = '<tr><td colspan="7" class="loading"><div class="spinner"></div>Cargando...</td></tr>';
+
+      try {
+        var rc = await supabaseClient.from('cap_cursos').select('*').order('created_at', { ascending: false });
+        if (rc.error) throw rc.error;
+        if (!rc.data || !rc.data.length) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay cursos registrados</td></tr>';
+          return;
+        }
+
+        var rm = await supabaseClient.from('cap_modulos').select('curso_id');
+        var rq = await supabaseClient.from('cap_cuestionarios').select('id,curso_id');
+        var rp = await supabaseClient.from('cap_preguntas').select('cuestionario_id');
+        var modCount = {};
+        var preCount = {};
+        var quizCurso = {};
+        (rq.data || []).forEach(function(q) { quizCurso[q.id] = q.curso_id; });
+        (rm.data || []).forEach(function(m) { modCount[m.curso_id] = (modCount[m.curso_id] || 0) + 1; });
+        (rp.data || []).forEach(function(p) {
+          var cid = quizCurso[p.cuestionario_id];
+          if (cid) preCount[cid] = (preCount[cid] || 0) + 1;
+        });
+
+        tbody.innerHTML = rc.data.map(function(c) {
+          var img = c.imagen_url
+            ? '<img src="' + c.imagen_url + '" alt="Portada" style="width:56px;height:38px;object-fit:cover;border-radius:4px;border:1px solid var(--color-border);">'
+            : '<span style="color:#bbb;">—</span>';
+          var fecha = c.created_at ? new Date(c.created_at).toLocaleDateString() : '-';
+          return '<tr>' +
+            '<td>' + img + '</td>' +
+            '<td><a href="curso.html?id=' + c.id + '" style="font-weight:600;color:var(--module-capacitacion);text-decoration:none;">' + escCursos(c.titulo) + '</a></td>' +
+            '<td style="text-align:center;">' + (modCount[c.id] || 0) + '</td>' +
+            '<td style="text-align:center;">' + (preCount[c.id] || 0) + '</td>' +
+            '<td><span class="badge ' + getBadgeClass(c.estado) + '">' + escCursos(c.estado || '-') + '</span></td>' +
+            '<td>' + fecha + '</td>' +
+            '<td>' +
+              '<button class="btn btn-sm btn-outline" onclick="location.href=\'curso.html?id=' + c.id + '\'">Editar</button> ' +
+              '<button class="btn btn-sm btn-outline" style="color:#dc2626;" onclick="eliminarCurso(' + c.id + ')">Eliminar</button>' +
+            '</td>' +
+          '</tr>';
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar: ' + escCursos(err.message) + '</td></tr>';
+      }
+    }
+
+    async function eliminarCurso(id) {
+      if (!confirm('¿Eliminar este curso y todo su contenido (módulos, videos, cuestionario)?')) return;
+      try {
+        var res = await supabaseClient.from('cap_cursos').delete().eq('id', id);
+        if (res.error) throw res.error;
+        cargarCursos();
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', cargarCursos);
+  </script>
 </body>
 </html>

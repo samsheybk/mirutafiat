@@ -77,6 +77,8 @@ function getBadgeClass(estado) {
   const map = {
     'Abierto': 'badge-active',
     'Activo': 'badge-active',
+    'Publicado': 'badge-active',
+    'Borrador': 'badge-pending',
     'Programado': 'badge-active',
     'En curso': 'badge-pending',
     'Pendiente': 'badge-pending',

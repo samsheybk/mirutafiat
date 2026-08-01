@@ -871,5 +871,159 @@ CREATE POLICY "Autenticados pueden eliminar documentos del repositorio"
 --   Policy definition: true
 
 -- ============================================
+-- CAPACITACIÓN Y DESARROLLO: CURSOS, MÓDULOS, VIDEOS Y CUESTIONARIOS
+-- Nota: un módulo puede tener varios videos y varios cuestionarios;
+-- también existen cuestionarios a nivel de curso (modulo_id NULL).
+-- Si ya ejecutaste la versión anterior, ejecuta antes:
+--   DROP TABLE IF EXISTS cap_respuestas, cap_preguntas, cap_cuestionarios, cap_videos, cap_modulos CASCADE;
+--   (conserva cap_cursos)
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS cap_cursos (
+  id BIGSERIAL PRIMARY KEY,
+  titulo TEXT NOT NULL,
+  descripcion TEXT,
+  imagen_url TEXT,
+  estado TEXT NOT NULL DEFAULT 'Borrador',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID REFERENCES auth.users(id)
+);
+
+CREATE TABLE IF NOT EXISTS cap_modulos (
+  id BIGSERIAL PRIMARY KEY,
+  curso_id BIGINT NOT NULL REFERENCES cap_cursos(id) ON DELETE CASCADE,
+  titulo TEXT NOT NULL,
+  posicion INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_cap_modulos_curso ON cap_modulos(curso_id);
+
+CREATE TABLE IF NOT EXISTS cap_videos (
+  id BIGSERIAL PRIMARY KEY,
+  modulo_id BIGINT NOT NULL REFERENCES cap_modulos(id) ON DELETE CASCADE,
+  titulo TEXT,
+  url TEXT NOT NULL,
+  posicion INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_cap_videos_modulo ON cap_videos(modulo_id);
+
+CREATE TABLE IF NOT EXISTS cap_cuestionarios (
+  id BIGSERIAL PRIMARY KEY,
+  curso_id BIGINT NOT NULL REFERENCES cap_cursos(id) ON DELETE CASCADE,
+  modulo_id BIGINT REFERENCES cap_modulos(id) ON DELETE CASCADE,
+  titulo TEXT NOT NULL,
+  posicion INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_cap_cuestionarios_curso ON cap_cuestionarios(curso_id);
+CREATE INDEX IF NOT EXISTS idx_cap_cuestionarios_modulo ON cap_cuestionarios(modulo_id);
+
+CREATE TABLE IF NOT EXISTS cap_preguntas (
+  id BIGSERIAL PRIMARY KEY,
+  cuestionario_id BIGINT NOT NULL REFERENCES cap_cuestionarios(id) ON DELETE CASCADE,
+  pregunta TEXT NOT NULL,
+  posicion INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_cap_preguntas_cuestionario ON cap_preguntas(cuestionario_id);
+
+CREATE TABLE IF NOT EXISTS cap_respuestas (
+  id BIGSERIAL PRIMARY KEY,
+  pregunta_id BIGINT NOT NULL REFERENCES cap_preguntas(id) ON DELETE CASCADE,
+  respuesta TEXT NOT NULL,
+  es_correcta BOOLEAN NOT NULL DEFAULT FALSE,
+  posicion INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_cap_respuestas_pregunta ON cap_respuestas(pregunta_id);
+
+ALTER TABLE cap_cursos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cap_modulos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cap_videos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cap_cuestionarios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cap_preguntas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cap_respuestas ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden leer cursos" ON cap_cursos;
+CREATE POLICY "Usuarios autenticados pueden leer cursos"
+  ON cap_cursos FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear cursos" ON cap_cursos;
+CREATE POLICY "Usuarios autenticados pueden crear cursos"
+  ON cap_cursos FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar cursos" ON cap_cursos;
+CREATE POLICY "Usuarios autenticados pueden actualizar cursos"
+  ON cap_cursos FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar cursos" ON cap_cursos;
+CREATE POLICY "Usuarios autenticados pueden eliminar cursos"
+  ON cap_cursos FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver modulos" ON cap_modulos;
+CREATE POLICY "Usuarios autenticados pueden ver modulos"
+  ON cap_modulos FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear modulos" ON cap_modulos;
+CREATE POLICY "Usuarios autenticados pueden crear modulos"
+  ON cap_modulos FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar modulos" ON cap_modulos;
+CREATE POLICY "Usuarios autenticados pueden actualizar modulos"
+  ON cap_modulos FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar modulos" ON cap_modulos;
+CREATE POLICY "Usuarios autenticados pueden eliminar modulos"
+  ON cap_modulos FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver videos" ON cap_videos;
+CREATE POLICY "Usuarios autenticados pueden ver videos"
+  ON cap_videos FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear videos" ON cap_videos;
+CREATE POLICY "Usuarios autenticados pueden crear videos"
+  ON cap_videos FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar videos" ON cap_videos;
+CREATE POLICY "Usuarios autenticados pueden actualizar videos"
+  ON cap_videos FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar videos" ON cap_videos;
+CREATE POLICY "Usuarios autenticados pueden eliminar videos"
+  ON cap_videos FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver cuestionarios" ON cap_cuestionarios;
+CREATE POLICY "Usuarios autenticados pueden ver cuestionarios"
+  ON cap_cuestionarios FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear cuestionarios" ON cap_cuestionarios;
+CREATE POLICY "Usuarios autenticados pueden crear cuestionarios"
+  ON cap_cuestionarios FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar cuestionarios" ON cap_cuestionarios;
+CREATE POLICY "Usuarios autenticados pueden actualizar cuestionarios"
+  ON cap_cuestionarios FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar cuestionarios" ON cap_cuestionarios;
+CREATE POLICY "Usuarios autenticados pueden eliminar cuestionarios"
+  ON cap_cuestionarios FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver preguntas" ON cap_preguntas;
+CREATE POLICY "Usuarios autenticados pueden ver preguntas"
+  ON cap_preguntas FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear preguntas" ON cap_preguntas;
+CREATE POLICY "Usuarios autenticados pueden crear preguntas"
+  ON cap_preguntas FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar preguntas" ON cap_preguntas;
+CREATE POLICY "Usuarios autenticados pueden actualizar preguntas"
+  ON cap_preguntas FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar preguntas" ON cap_preguntas;
+CREATE POLICY "Usuarios autenticados pueden eliminar preguntas"
+  ON cap_preguntas FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver respuestas" ON cap_respuestas;
+CREATE POLICY "Usuarios autenticados pueden ver respuestas"
+  ON cap_respuestas FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear respuestas" ON cap_respuestas;
+CREATE POLICY "Usuarios autenticados pueden crear respuestas"
+  ON cap_respuestas FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar respuestas" ON cap_respuestas;
+CREATE POLICY "Usuarios autenticados pueden actualizar respuestas"
+  ON cap_respuestas FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar respuestas" ON cap_respuestas;
+CREATE POLICY "Usuarios autenticados pueden eliminar respuestas"
+  ON cap_respuestas FOR DELETE TO authenticated USING (true);
+
+-- ============================================
 -- FIN DEL ESQUEMA COMPLETO
 -- ============================================

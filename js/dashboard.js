@@ -15,7 +15,7 @@ async function loadModuleCounts() {
 
   try {
     const { count: capacitacionCount } = await supabaseClient
-      .from('capacitacion_cursos')
+      .from('cap_cursos')
       .select('*', { count: 'exact', head: true });
     document.getElementById('count-capacitacion').textContent = (capacitacionCount || 0) + ' cursos';
   } catch (_) {}

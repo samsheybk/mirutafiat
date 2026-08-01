@@ -775,6 +775,7 @@
   <script src="../js/vendor/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/supabase-config.js"></script>
+  <script src="../js/ui.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/modules.js"></script>
   <script>
@@ -906,15 +907,15 @@
 
     async function confirmDescarta() {
       var motivo = document.getElementById('descartaMotivo').value.trim();
-      if (!motivo) { alert('Debes indicar el motivo del descarte'); return; }
+      if (!motivo) { showAlert('Debes indicar el motivo del descarte', 'warning'); return; }
       try {
         var user = await getCurrentUser();
-        if (!user) { alert('Error: sesión no encontrada. Recarga la página.'); return; }
+        if (!user) { showAlert('Error: sesión no encontrada. Recarga la página.', 'error'); return; }
         console.log('descartaCandidatoId:', descartaCandidatoId, 'tipo:', typeof descartaCandidatoId);
         console.log('allCandidatos.length:', allCandidatos.length);
         if (allCandidatos.length > 0) console.log('Primer candidato ID:', allCandidatos[0].id, 'tipo:', typeof allCandidatos[0].id);
         var estadoActual = allCandidatos.find(function(c) { return c.id === descartaCandidatoId; });
-        if (!estadoActual) { alert('Error: candidato no encontrado en memoria. ID buscado: ' + descartaCandidatoId); return; }
+        if (!estadoActual) { showAlert('Error: candidato no encontrado en memoria. ID buscado: ' + descartaCandidatoId, 'error'); return; }
         estadoActual = estadoActual.estado_kanban;
         var { error: e1 } = await supabaseClient.from('ats_candidatos').update({ estado_kanban: 'No elegible' }).eq('id', descartaCandidatoId);
         if (e1) throw e1;
@@ -931,7 +932,7 @@
         closeDescarta();
         loadATSCandidatos();
       } catch (err) {
-        alert('Error al descartar: ' + err.message);
+        showAlert('Error al descartar: ' + err.message, 'error');
       }
     }
 
@@ -982,13 +983,13 @@
       var cargo = document.getElementById('ats_cargo').value.trim();
       var notas = document.getElementById('ats_notas').value.trim();
 
-      if (!cedula || !nombres || !apellidos) { alert('Completa cédula, nombres y apellidos'); return; }
-      if (!validarCedulaVE(cedula)) { alert('La cédula debe comenzar con V o E seguido solo de números (ej: V12345678)'); return; }
-      if (telefono && !validarTelefonoVE(telefono)) { alert('El teléfono debe ser un número venezolano válido (ej: 0412-1234567)'); return; }
-      if (correo && !validarCorreoDominio(correo)) { alert('El correo debe tener un dominio válido (ej: usuario@dominio.com)'); return; }
+      if (!cedula || !nombres || !apellidos) { showAlert('Completa cédula, nombres y apellidos', 'warning'); return; }
+      if (!validarCedulaVE(cedula)) { showAlert('La cédula debe comenzar con V o E seguido solo de números (ej: V12345678)', 'warning'); return; }
+      if (telefono && !validarTelefonoVE(telefono)) { showAlert('El teléfono debe ser un número venezolano válido (ej: 0412-1234567)', 'warning'); return; }
+      if (correo && !validarCorreoDominio(correo)) { showAlert('El correo debe tener un dominio válido (ej: usuario@dominio.com)', 'warning'); return; }
 
       if (existingCandidatoId) {
-        var confirmar = confirm('Esta cédula ya existe. ¿Deseas actualizar los datos?\n\nLos datos anteriores serán reemplazados.\nEl historial de movimientos NO se verá afectado.');
+        var confirmar = await showConfirm('Esta cédula ya existe. ¿Deseas actualizar los datos?\n\nLos datos anteriores serán reemplazados.\nEl historial de movimientos NO se verá afectado.');
         if (!confirmar) return;
       }
 
@@ -1008,7 +1009,7 @@
         closeModalATS();
         loadATSCandidatos();
       } catch (err) {
-        alert('Error: ' + err.message);
+        showAlert('Error: ' + err.message, 'error');
       }
     }
 
@@ -1060,7 +1061,7 @@
         closeEstadoPicker();
         loadATSCandidatos();
       } catch (err) {
-        alert('Error al cambiar estado: ' + err.message);
+        showAlert('Error al cambiar estado: ' + err.message, 'error');
       }
     }
 
@@ -1090,7 +1091,7 @@
         populateIngresoCargos();
         document.getElementById('modalIngreso').classList.add('show');
       } catch (err) {
-        alert('Error: ' + err.message);
+        showAlert('Error: ' + err.message, 'error');
       }
     }
 
@@ -1117,8 +1118,8 @@
       var unidadId = document.getElementById('ingreso_unidad_id').value;
       var cargoId = document.getElementById('ingreso_cargo_id').value;
       var fecha = document.getElementById('ingreso_fecha').value;
-      if (!unidadId || !cargoId || !fecha) { alert('Completa todos los campos'); return; }
-      if (!confirm('¿Confirmar ingreso del trabajador a la nómina?')) return;
+      if (!unidadId || !cargoId || !fecha) { showAlert('Completa todos los campos', 'warning'); return; }
+      if (!(await showConfirm('¿Confirmar ingreso del trabajador a la nómina?'))) return;
       try {
         var user = await getCurrentUser();
         var { data: c, error: e1 } = await supabaseClient.from('ats_candidatos').select('*').eq('id', ingresoCandidatoId).single();
@@ -1139,9 +1140,9 @@
         if (e4) throw e4;
         closeIngreso();
         loadATSCandidatos();
-        alert('Trabajador ingresado exitosamente a la nómina.');
+        showAlert('Trabajador ingresado exitosamente a la nómina.', 'success');
       } catch (err) {
-        alert('Error al ingresar: ' + err.message);
+        showAlert('Error al ingresar: ' + err.message, 'error');
       }
     }
 
@@ -1184,7 +1185,7 @@
         if (error) throw error;
         await openFichaTecnica(fichaActualId);
       } catch (err) {
-        alert('Error al guardar comentario: ' + err.message);
+        showAlert('Error al guardar comentario: ' + err.message, 'error');
       }
     }
 
@@ -1237,7 +1238,7 @@
 
         document.getElementById('modalFicha').classList.add('show');
       } catch (err) {
-        alert('Error al cargar ficha: ' + err.message);
+        showAlert('Error al cargar ficha: ' + err.message, 'error');
       }
     }
 
@@ -1418,7 +1419,7 @@
       var nombre = document.getElementById('unidad_nombre').value.trim();
       var tipo = document.getElementById('unidad_tipo').value;
       var padre = document.getElementById('unidad_padre').value;
-      if (!nombre) { alert('Ingresa el nombre de la unidad'); return; }
+      if (!nombre) { showAlert('Ingresa el nombre de la unidad', 'warning'); return; }
       try {
         if (editingUnidadId) {
           var { error } = await supabaseClient.from('est_unidades').update({ nombre: nombre, tipo: tipo, unidad_padre_id: padre || null }).eq('id', editingUnidadId);
@@ -1430,7 +1431,7 @@
         await loadEstructura();
         closeModalUnidad();
       } catch (err) {
-        alert('Error: ' + err.message);
+        showAlert('Error: ' + err.message, 'error');
       }
     }
 
@@ -1447,13 +1448,13 @@
     }
 
     async function eliminarUnidad(id) {
-      if (!confirm('¿Eliminar esta unidad? Los cargos asignados a ella quedarán huérfanos.')) return;
+      if (!(await showConfirm('¿Eliminar esta unidad? Los cargos asignados a ella quedarán huérfanos.'))) return;
       try {
         var { error } = await supabaseClient.from('est_unidades').delete().eq('id', id);
         if (error) throw error;
         await loadEstructura();
       } catch (err) {
-        alert('Error: ' + err.message);
+        showAlert('Error: ' + err.message, 'error');
       }
     }
 
@@ -1480,8 +1481,8 @@
       var unidadId = document.getElementById('cargo_unidad_id').value;
       var jefeId = document.getElementById('cargo_jefe_id').value;
       var vacantes = parseInt(document.getElementById('cargo_vacantes').value) || 0;
-      if (!titulo) { alert('Ingresa el título del cargo'); return; }
-      if (!unidadId) { alert('Selecciona una unidad'); return; }
+      if (!titulo) { showAlert('Ingresa el título del cargo', 'warning'); return; }
+      if (!unidadId) { showAlert('Selecciona una unidad', 'warning'); return; }
       
       // Bloquear botón y mostrar estado "Guardando..."
       var btnGuardar = event.target;
@@ -1554,7 +1555,7 @@
         btnGuardar.disabled = false;
         btnGuardar.textContent = textoOriginal;
         btnGuardar.style.opacity = '1';
-        alert('Error: ' + err.message);
+        showAlert('Error: ' + err.message, 'error');
       }
     }
 
@@ -1600,14 +1601,14 @@
     }
 
     async function eliminarCargo(id) {
-      if (!confirm('¿Eliminar este cargo?')) return;
+      if (!(await showConfirm('¿Eliminar este cargo?'))) return;
       try {
         var { error } = await supabaseClient.from('est_cargos').delete().eq('id', id);
         if (error) throw error;
         closeModalCargo();
         await loadEstructura();
       } catch (err) {
-        alert('Error: ' + err.message);
+        showAlert('Error: ' + err.message, 'error');
       }
     }
 
@@ -1699,7 +1700,7 @@
         renderOrganigrama();
         document.getElementById('modalOrganigrama').classList.add('show');
       } catch (err) {
-        alert('Error al generar organigrama: ' + err.message);
+        showAlert('Error al generar organigrama: ' + err.message, 'error');
       }
     }
 
@@ -1850,7 +1851,7 @@
       var fechaIngreso = document.getElementById('trab_fecha_ingreso').value;
       var estado = document.getElementById('trab_estado').value;
       var fechaEgreso = document.getElementById('trab_fecha_egreso').value || null;
-      if (!unidadId || !cargoId || !fechaIngreso) { alert('Completa unidad, cargo y fecha de ingreso'); return; }
+      if (!unidadId || !cargoId || !fechaIngreso) { showAlert('Completa unidad, cargo y fecha de ingreso', 'warning'); return; }
       try {
         if (editingTrabId) {
           var { error } = await supabaseClient.from('plantilla_trabajadores').update({
@@ -1862,7 +1863,7 @@
         await loadPlantilla();
         closeModalTrab();
       } catch (err) {
-        alert('Error: ' + err.message);
+        showAlert('Error: ' + err.message, 'error');
       }
     }
 
@@ -1874,7 +1875,7 @@
         if (c.data) allCargos = c.data;
         var t = await supabaseClient.from('plantilla_trabajadores').select('*').order('apellidos');
         if (t.error) {
-          alert('Error BD plantilla: ' + t.error.message);
+          showAlert('Error BD plantilla: ' + t.error.message, 'error');
         } else if (t.data) {
           allTrabajadores = t.data;
         }
@@ -1887,7 +1888,7 @@
         if (val) filtroUnidad.value = val;
         filterPlantilla();
       } catch (e) {
-        alert('Error al cargar plantilla: ' + e.message);
+        showAlert('Error al cargar plantilla: ' + e.message, 'error');
       }
     }
 
@@ -1976,13 +1977,13 @@
         };
         XLSX.writeFile(wb, 'plantilla-activa.xlsx');
       } catch (err) {
-        alert('Error al generar la plantilla: ' + err.message);
+        showAlert('Error al generar la plantilla: ' + err.message, 'error');
       }
     }
 
     async function importarPlantilla() {
       var file = document.getElementById('importFile').files[0];
-      if (!file) { alert('Selecciona un archivo Excel'); return; }
+      if (!file) { showAlert('Selecciona un archivo Excel', 'warning'); return; }
       var btn = document.getElementById('btnImportar');
       btn.disabled = true;
       try {
@@ -2067,7 +2068,7 @@
         document.getElementById('importResult').style.display = '';
         await loadPlantilla();
       } catch (err) {
-        alert('Error al importar: ' + err.message);
+        showAlert('Error al importar: ' + err.message, 'error');
         btn.disabled = false;
       }
     }
@@ -2180,18 +2181,18 @@
       var tipo = document.getElementById('sol_tipo').value;
       var vacantes = parseInt(document.getElementById('sol_vacantes').value, 10);
       var justificacion = document.getElementById('sol_justificacion').value.trim();
-      if (!tipo) { alert('Selecciona el tipo de solicitud'); return; }
-      if (!vacantes || vacantes < 1) { alert('Indica las vacantes solicitadas'); return; }
-      if (!justificacion) { alert('La justificación es obligatoria'); return; }
+      if (!tipo) { showAlert('Selecciona el tipo de solicitud', 'warning'); return; }
+      if (!vacantes || vacantes < 1) { showAlert('Indica las vacantes solicitadas', 'warning'); return; }
+      if (!justificacion) { showAlert('La justificación es obligatoria', 'warning'); return; }
       var cargo_id = null, unidad_id = null, cargo_titulo = null;
       if (tipo === 'aumento_vacantes') {
         cargo_id = document.getElementById('sol_cargo_id').value;
-        if (!cargo_id) { alert('Selecciona el cargo'); return; }
+        if (!cargo_id) { showAlert('Selecciona el cargo', 'warning'); return; }
       } else {
         unidad_id = document.getElementById('sol_unidad_id').value;
         cargo_titulo = document.getElementById('sol_cargo_titulo').value.trim();
-        if (!unidad_id) { alert('Selecciona la unidad'); return; }
-        if (!cargo_titulo) { alert('Indica el título del nuevo cargo'); return; }
+        if (!unidad_id) { showAlert('Selecciona la unidad', 'warning'); return; }
+        if (!cargo_titulo) { showAlert('Indica el título del nuevo cargo', 'warning'); return; }
       }
       try {
         var user = await getCurrentUser();
@@ -2203,9 +2204,9 @@
         if (error) throw error;
         closeModalSolicitud();
         loadSolicitudes();
-        alert('Solicitud enviada correctamente');
+        showAlert('Solicitud enviada correctamente', 'success');
       } catch (err) {
-        alert('Error al enviar solicitud: ' + err.message);
+        showAlert('Error al enviar solicitud: ' + err.message, 'error');
       }
     }
 
@@ -2257,7 +2258,7 @@
       try {
         if (sol.tipo === 'aumento_vacantes') {
           var cargo = allCargos.find(function(c) { return c.id === sol.cargo_id; });
-          if (!cargo) { alert('Cargo no encontrado'); return; }
+          if (!cargo) { showAlert('Cargo no encontrado', 'error'); return; }
           var nuevasVacantes = (parseInt(cargo.vacantes, 10) || 0) + sol.vacantes_solicitadas;
           var { error } = await supabaseClient.from('est_cargos').update({ vacantes: nuevasVacantes }).eq('id', sol.cargo_id);
           if (error) throw error;
@@ -2266,7 +2267,7 @@
           await loadEstructura();
           loadRequisiciones();
           loadSolicitudes();
-          alert('Vacantes actualizadas: ' + cargo.titulo + ' ahora tiene ' + nuevasVacantes + ' vacantes');
+          showAlert('Vacantes actualizadas: ' + cargo.titulo + ' ahora tiene ' + nuevasVacantes + ' vacantes', 'success');
         } else {
           solAprobadaId = id;
           document.getElementById('modalCargoTitle').textContent = 'Crear cargo (solicitud aprobada)';
@@ -2280,7 +2281,7 @@
           document.getElementById('modalCargo').classList.add('show');
         }
       } catch (err) {
-        alert('Error: ' + err.message);
+        showAlert('Error: ' + err.message, 'error');
       }
     }
 
@@ -2303,14 +2304,14 @@
 
     async function confirmRechazo() {
       var motivo = document.getElementById('rechazoMotivo').value.trim();
-      if (!motivo) { alert('Indica el motivo del rechazo'); return; }
+      if (!motivo) { showAlert('Indica el motivo del rechazo', 'warning'); return; }
       try {
         var { error } = await supabaseClient.from('requisiciones_solicitudes').update({ estado: 'Rechazada', justificacion: motivo }).eq('id', rechazoSolId);
         if (error) throw error;
         closeModalRechazo();
         loadSolicitudes();
       } catch (err) {
-        alert('Error: ' + err.message);
+        showAlert('Error: ' + err.message, 'error');
       }
     }
 

@@ -405,6 +405,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/supabase-config.js"></script>
+  <script src="../js/ui.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/modules.js"></script>
   <script>
@@ -561,9 +562,9 @@
         if (count === 0) throw new Error('0 filas actualizadas. Revisa la política de UPDATE en plantilla_trabajadores (RLS).');
         detalleFotoArchivo = null;
         document.getElementById('detFotoFile').value = '';
-        alert('Datos guardados correctamente');
+        showAlert('Datos guardados correctamente', 'success');
       } catch (err) {
-        alert('Error al guardar: ' + err.message);
+        showAlert('Error al guardar: ' + err.message, 'error');
       }
     }
 
@@ -633,7 +634,7 @@
       var f = document.getElementById('doc_archivo').files[0];
       if (!f) { detalleDocArchivo = null; document.getElementById('docArchivoInfo').textContent = ''; return; }
       if (f.size > 2 * 1024 * 1024) {
-        alert('El archivo supera los 2 MB');
+        showAlert('El archivo supera los 2 MB', 'warning');
         document.getElementById('doc_archivo').value = '';
         detalleDocArchivo = null;
         document.getElementById('docArchivoInfo').textContent = '';
@@ -649,7 +650,7 @@
 
     async function saveDoc() {
       var tipo = document.getElementById('doc_tipo').value;
-      if (!tipo) { alert('Selecciona el tipo de documento'); return; }
+      if (!tipo) { showAlert('Selecciona el tipo de documento', 'warning'); return; }
       var payload = {
         tipo: tipo,
         numero: document.getElementById('doc_numero').value.trim() || null,
@@ -669,18 +670,18 @@
         closeModalDoc();
         loadDocumentos();
       } catch (err) {
-        alert('Error al guardar documento: ' + err.message);
+        showAlert('Error al guardar documento: ' + err.message, 'error');
       }
     }
 
     async function deleteDoc(id) {
-      if (!confirm('¿Eliminar este documento?')) return;
+      if (!(await showConfirm('¿Eliminar este documento?'))) return;
       try {
         var { error } = await supabaseClient.from('trabajador_documentos').delete().eq('id', id);
         if (error) throw error;
         loadDocumentos();
       } catch (err) {
-        alert('Error al eliminar: ' + err.message);
+        showAlert('Error al eliminar: ' + err.message, 'error');
       }
     }
 
@@ -737,8 +738,8 @@
     async function saveFamiliar() {
       var parentesco = document.getElementById('fam_parentesco').value;
       var nombre = document.getElementById('fam_nombre').value.trim();
-      if (!parentesco) { alert('Selecciona el parentesco'); return; }
-      if (!nombre) { alert('Indica el nombre completo'); return; }
+      if (!parentesco) { showAlert('Selecciona el parentesco', 'warning'); return; }
+      if (!nombre) { showAlert('Indica el nombre completo', 'warning'); return; }
       var payload = {
         parentesco: parentesco,
         nombre: nombre,
@@ -758,18 +759,18 @@
         closeModalFamiliar();
         loadCargaFamiliar();
       } catch (err) {
-        alert('Error al guardar carga familiar: ' + err.message);
+        showAlert('Error al guardar carga familiar: ' + err.message, 'error');
       }
     }
 
     async function deleteFamiliar(id) {
-      if (!confirm('¿Eliminar esta carga familiar?')) return;
+      if (!(await showConfirm('¿Eliminar esta carga familiar?'))) return;
       try {
         var { error } = await supabaseClient.from('trabajador_carga_familiar').delete().eq('id', id);
         if (error) throw error;
         loadCargaFamiliar();
       } catch (err) {
-        alert('Error al eliminar: ' + err.message);
+        showAlert('Error al eliminar: ' + err.message, 'error');
       }
     }
 

@@ -12,6 +12,9 @@
   <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
   <script>var bcrypt = dcodeIO.bcrypt;</script>
   <style>
+    .module-content {
+      overflow-y: auto;
+    }
     .password-wrap {
       position: relative;
     }
@@ -366,6 +369,50 @@
       font-weight: 700;
       color: var(--module-repositorio);
     }
+    .repo-subcat-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .repo-subcat-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--module-repositorio);
+      background: var(--module-repositorio)1A;
+      border-radius: 6px;
+      padding: 4px 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .repo-subcat-tag:hover {
+      background: var(--module-repositorio)33;
+    }
+    .repo-subcat-tag-del {
+      font-size: 11px;
+      opacity: 0.6;
+    }
+    .repo-subcat-tag-del:hover {
+      opacity: 1;
+      color: #e11d48;
+    }
+    .repo-subcat-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      margin-top: 8px;
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    .repo-subcat-add:hover {
+      color: var(--module-repositorio);
+    }
     .empty-state {
       text-align: center;
       padding: 60px 20px;
@@ -415,8 +462,6 @@
           </div>
           <div class="panel-item" data-tool="categorias" onclick="switchTool('categorias')" title="Categorías"><span class="panel-item-indicator bg-repositorio"></span><i class="fi fi-sr-folder-tree" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="subcategorias" onclick="switchTool('subcategorias')" title="Subcategorías"><span class="panel-item-indicator bg-repositorio"></span><i class="fi fi-sr-folder-open" style="font-size:24px;pointer-events:none;"></i>
-          </div>
         </div>
 
         <div class="module-body">
@@ -456,20 +501,6 @@
                 <button class="btn btn-repositorio" onclick="openCategoryModal()">+ Nueva categoría</button>
               </div>
               <div id="categoriesContainer"></div>
-            </div>
-
-            <!-- Vista Subcategorías -->
-            <div class="tool-section" id="tool-subcategorias">
-              <div class="tool-section-header">
-                <h2 style="color:var(--module-repositorio);">Subcategorías</h2>
-                <button class="btn btn-repositorio" onclick="openSubcategoryModal()">+ Nueva subcategoría</button>
-              </div>
-              <div class="repo-toolbar" style="margin-bottom:16px;">
-                <select class="repo-filter-select" id="filterSubcatCategoria" onchange="loadSubcategorias()">
-                  <option value="">Selecciona una categoría</option>
-                </select>
-              </div>
-              <div id="subcategoriesContainer"></div>
             </div>
           </div>
         </div>
@@ -604,6 +635,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/supabase-config.js"></script>
+  <script src="../js/ui.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/modules.js"></script>
   <script>
@@ -615,14 +647,21 @@
     let selectedFile = null;
     let currentView = 'list';
     let editingDocId = null;
+    let editingCategoryId = null;
     let downloadingDocId = null;
     let pendingAction = 'download';
     let currentUser = null;
 
     // Inicialización
     document.addEventListener('DOMContentLoaded', async () => {
+      const savedTool = localStorage.getItem('fiat_tool_' + location.pathname);
+      if (savedTool && document.getElementById(`tool-${savedTool}`)) {
+        switchTool(savedTool);
+      }
+      
       currentUser = await getCurrentUser();
       await loadCategorias();
+      await loadSubcategorias();
       await loadDocumentos();
       await loadNotifications();
     });
@@ -648,17 +687,9 @@
     }
 
     async function loadSubcategorias() {
-      const categoriaId = document.getElementById('filterSubcatCategoria').value;
-      
-      if (!categoriaId) {
-        document.getElementById('subcategoriesContainer').innerHTML = '<div class="empty-state"><div class="empty-state-icon"><i class="fi fi-sr-folder-open"></i></div><div class="empty-state-text">Selecciona una categoría para ver sus subcategorías</div></div>';
-        return;
-      }
-      
       const { data, error } = await supabaseClient
         .from('repo_subcategorias')
-        .select('*, repo_categorias(nombre)')
-        .eq('categoria_id', categoriaId)
+        .select('*, repo_categorias(nombre, color)')
         .order('nombre');
       
       if (error) {
@@ -667,7 +698,7 @@
       }
       
       subcategorias = data || [];
-      renderSubcategorias();
+      renderCategorias();
     }
 
     async function loadDocumentos() {
@@ -683,6 +714,7 @@
       
       documentos = data || [];
       renderDocumentos();
+      renderCategorias();
     }
 
     async function loadNotifications() {
@@ -834,39 +866,26 @@
       
       container.innerHTML = categorias.map(cat => {
         const count = documentos.filter(d => d.categoria_id === cat.id).length;
+        const catSubs = subcategorias.filter(s => s.categoria_id === cat.id);
         return `
           <div class="repo-category-card" onclick="editCategory('${cat.id}')">
             <div class="repo-category-icon" style="background:${cat.color}20;color:${cat.color};">${categoryIconHtml(cat.icono)}</div>
             <div class="repo-category-info">
               <div class="repo-category-name">${cat.nombre}</div>
               <div class="repo-category-desc">${cat.descripcion || 'Sin descripción'}</div>
+              ${catSubs.length > 0 ? `
+              <div class="repo-subcat-tags">
+                ${catSubs.map(sub => `
+                  <span class="repo-subcat-tag" onclick="event.stopPropagation();editSubcategory('${sub.id}')">
+                    <i class="fi fi-sr-folder-open"></i> ${sub.nombre}
+                    <i class="fi fi-sr-trash repo-subcat-tag-del" onclick="event.stopPropagation();deleteSubcategory('${sub.id}')" title="Eliminar subcategoría"></i>
+                  </span>
+                `).join('')}
+              </div>` : ''}
+              <div class="repo-subcat-add" onclick="event.stopPropagation();openSubcategoryModal('${cat.id}')"><i class="fi fi-sr-plus"></i> Subcategoría</div>
             </div>
             <div class="repo-category-count">${count}</div>
             <button class="btn btn-sm btn-outline" onclick="event.stopPropagation();deleteCategory('${cat.id}')" title="Eliminar"><i class="fi fi-sr-trash"></i></button>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderSubcategorias() {
-      const container = document.getElementById('subcategoriesContainer');
-      
-      if (subcategorias.length === 0) {
-        container.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><i class="fi fi-sr-folder-open"></i></div><div class="empty-state-text">No hay subcategorías</div></div>';
-        return;
-      }
-      
-      container.innerHTML = subcategorias.map(sub => {
-        const count = documentos.filter(d => d.subcategoria_id === sub.id).length;
-        return `
-          <div class="repo-category-card" onclick="editSubcategory('${sub.id}')">
-            <div class="repo-category-icon" style="background:var(--module-repositorio);color:white;"><i class="fi fi-sr-folder-open"></i></div>
-            <div class="repo-category-info">
-              <div class="repo-category-name">${sub.nombre}</div>
-              <div class="repo-category-desc">${sub.descripcion || 'Sin descripción'}</div>
-            </div>
-            <div class="repo-category-count">${count}</div>
-            <button class="btn btn-sm btn-outline" onclick="event.stopPropagation();deleteSubcategory('${sub.id}')" title="Eliminar"><i class="fi fi-sr-trash"></i></button>
           </div>
         `;
       }).join('');
@@ -937,19 +956,19 @@
     }
 
     function updateCategoriaSelects() {
-      const selects = ['filterCategoria', 'docCategoria', 'filterSubcatCategoria', 'subcatCategoria'];
+      const selects = ['filterCategoria', 'docCategoria', 'subcatCategoria'];
       
       selects.forEach(selectId => {
         const select = document.getElementById(selectId);
         if (!select) return;
         
         const currentValue = select.value;
-        const firstOption = selectId === 'filterCategoria' || selectId === 'filterSubcatCategoria' 
+        const firstOption = selectId === 'filterCategoria' 
           ? '<option value="">Todas las categorías</option>'
           : '<option value="">Selecciona una categoría</option>';
         
         select.innerHTML = firstOption + categorias.map(cat => 
-          `<option value="${cat.id}">${cat.icono} ${cat.nombre}</option>`
+          `<option value="${cat.id}">${cat.nombre}</option>`
         ).join('');
         
         if (currentValue) select.value = currentValue;
@@ -993,7 +1012,7 @@
       if (!file) return;
       
       if (file.size > 20 * 1024 * 1024) {
-        alert('El archivo no puede superar los 20MB');
+        showAlert('El archivo no puede superar los 20MB', 'warning');
         input.value = '';
         return;
       }
@@ -1002,7 +1021,7 @@
       const ext = '.' + file.name.split('.').pop().toLowerCase();
       
       if (!validTypes.includes(ext)) {
-        alert('Tipo de archivo no permitido. Solo se aceptan PDF, Word, Excel y PowerPoint.');
+        showAlert('Tipo de archivo no permitido. Solo se aceptan PDF, Word, Excel y PowerPoint.', 'warning');
         input.value = '';
         return;
       }
@@ -1063,12 +1082,12 @@
       const protegido = document.getElementById('docProtegido').checked;
       
       if (!titulo || !categoriaId) {
-        alert('Completa los campos obligatorios');
+        showAlert('Completa los campos obligatorios', 'warning');
         return;
       }
       
       if (!selectedFile && !editingDocId) {
-        alert('Selecciona un archivo');
+        showAlert('Selecciona un archivo', 'warning');
         return;
       }
       
@@ -1078,12 +1097,12 @@
         const confirm = document.getElementById('docPasswordConfirm').value;
         
         if (!password || password.length < 6) {
-          alert('La contraseña debe tener al menos 6 caracteres');
+          showAlert('La contraseña debe tener al menos 6 caracteres', 'warning');
           return;
         }
         
         if (password !== confirm) {
-          alert('Las contraseñas no coinciden');
+          showAlert('Las contraseñas no coinciden', 'warning');
           return;
         }
         
@@ -1176,7 +1195,7 @@
         await loadNotifications();
       } catch (error) {
         console.error('Error guardando documento:', error);
-        alert('Error: ' + error.message);
+        showAlert('Error: ' + error.message, 'error');
       }
     }
 
@@ -1211,7 +1230,7 @@
     }
 
     async function deleteDocument(id) {
-      if (!confirm('¿Estás seguro de eliminar este documento?')) return;
+      if (!(await showConfirm('¿Estás seguro de eliminar este documento?'))) return;
       
       try {
         const doc = documentos.find(d => d.id === id);
@@ -1228,7 +1247,7 @@
         await loadDocumentos();
       } catch (error) {
         console.error('Error eliminando documento:', error);
-        alert('Error: ' + error.message);
+        showAlert('Error: ' + error.message, 'error');
       }
     }
 
@@ -1257,7 +1276,7 @@
       const isValid = await bcrypt.compare(password, doc.password_hash);
       
       if (!isValid) {
-        alert('Contraseña incorrecta');
+        showAlert('Contraseña incorrecta', 'warning');
         return;
       }
       
@@ -1286,7 +1305,7 @@
         URL.revokeObjectURL(url);
       } catch (error) {
         console.error('Error descargando:', error);
-        alert('Error: ' + error.message);
+        showAlert('Error: ' + error.message, 'error');
       }
     }
 
@@ -1343,6 +1362,7 @@
     // ============================================
 
     function openCategoryModal() {
+      editingCategoryId = null;
       document.getElementById('categoryModalTitle').textContent = 'Nueva categoría';
       document.getElementById('categoryForm').reset();
       document.getElementById('catIcono').value = 'fi-sr-folder';
@@ -1358,14 +1378,23 @@
       const color = document.getElementById('catColor').value || '#8b5cf6';
       
       if (!nombre) {
-        alert('El nombre es obligatorio');
+        showAlert('El nombre es obligatorio', 'warning');
         return;
       }
       
       try {
-        const { error } = await supabaseClient
-          .from('repo_categorias')
-          .insert([{ nombre, descripcion, icono, color }]);
+        let error;
+        
+        if (editingCategoryId) {
+          ({ error } = await supabaseClient
+            .from('repo_categorias')
+            .update({ nombre, descripcion, icono, color })
+            .eq('id', editingCategoryId));
+        } else {
+          ({ error } = await supabaseClient
+            .from('repo_categorias')
+            .insert([{ nombre, descripcion, icono, color }]));
+        }
         
         if (error) throw error;
         
@@ -1373,7 +1402,7 @@
         await loadCategorias();
       } catch (error) {
         console.error('Error guardando categoría:', error);
-        alert('Error: ' + error.message);
+        showAlert('Error: ' + error.message, 'error');
       }
     }
 
@@ -1381,6 +1410,7 @@
       const cat = categorias.find(c => c.id === id);
       if (!cat) return;
       
+      editingCategoryId = id;
       document.getElementById('categoryModalTitle').textContent = 'Editar categoría';
       document.getElementById('catNombre').value = cat.nombre;
       document.getElementById('catDescripcion').value = cat.descripcion || '';
@@ -1395,11 +1425,11 @@
       const count = documentos.filter(d => d.categoria_id === id).length;
       
       if (count > 0) {
-        alert(`No se puede eliminar esta categoría porque tiene ${count} documento(s) asociado(s)`);
+        showAlert(`No se puede eliminar esta categoría porque tiene ${count} documento(s) asociado(s)`, 'warning');
         return;
       }
       
-      if (!confirm('¿Estás seguro de eliminar esta categoría?')) return;
+      if (!(await showConfirm('¿Estás seguro de eliminar esta categoría?'))) return;
       
       try {
         const { error } = await supabaseClient
@@ -1412,7 +1442,7 @@
         await loadCategorias();
       } catch (error) {
         console.error('Error eliminando categoría:', error);
-        alert('Error: ' + error.message);
+        showAlert('Error: ' + error.message, 'error');
       }
     }
 
@@ -1420,9 +1450,10 @@
     // GESTIÓN DE SUBCATEGORÍAS
     // ============================================
 
-    function openSubcategoryModal() {
+    function openSubcategoryModal(categoriaId) {
       document.getElementById('subcategoryModalTitle').textContent = 'Nueva subcategoría';
       document.getElementById('subcategoryForm').reset();
+      if (categoriaId) document.getElementById('subcatCategoria').value = categoriaId;
       openModal('modalSubcategory');
     }
 
@@ -1432,7 +1463,7 @@
       const descripcion = document.getElementById('subcatDescripcion').value.trim();
       
       if (!categoriaId || !nombre) {
-        alert('Completa los campos obligatorios');
+        showAlert('Completa los campos obligatorios', 'warning');
         return;
       }
       
@@ -1444,11 +1475,10 @@
         if (error) throw error;
         
         closeModal('modalSubcategory');
-        document.getElementById('filterSubcatCategoria').value = categoriaId;
         await loadSubcategorias();
       } catch (error) {
         console.error('Error guardando subcategoría:', error);
-        alert('Error: ' + error.message);
+        showAlert('Error: ' + error.message, 'error');
       }
     }
 
@@ -1468,11 +1498,11 @@
       const count = documentos.filter(d => d.subcategoria_id === id).length;
       
       if (count > 0) {
-        alert(`No se puede eliminar esta subcategoría porque tiene ${count} documento(s) asociado(s)`);
+        showAlert(`No se puede eliminar esta subcategoría porque tiene ${count} documento(s) asociado(s)`, 'warning');
         return;
       }
       
-      if (!confirm('¿Estás seguro de eliminar esta subcategoría?')) return;
+      if (!(await showConfirm('¿Estás seguro de eliminar esta subcategoría?'))) return;
       
       try {
         const { error } = await supabaseClient
@@ -1485,7 +1515,7 @@
         await loadSubcategorias();
       } catch (error) {
         console.error('Error eliminando subcategoría:', error);
-        alert('Error: ' + error.message);
+        showAlert('Error: ' + error.message, 'error');
       }
     }
 

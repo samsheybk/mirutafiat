@@ -74,6 +74,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (emailEl) emailEl.textContent = user.email || '';
 
     logoutBtn.addEventListener('click', async () => {
+      if (!(await showConfirm('¿Estás seguro de cerrar tu sesión?'))) return;
       await handleLogout();
       window.location.href = '/index.html';
     });

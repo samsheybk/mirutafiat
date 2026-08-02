@@ -19,7 +19,7 @@
 <body>
   <div class="app-layout">
     <nav class="topnav" style="background:var(--module-relaciones);">
-      <div class="topnav-brand" onclick="location.href='../dashboard.html'">FIAT Venezuela<span>Intranet</span></div>
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><img class="topnav-logo" src="../icons/logo FIAT.webp" alt="FIAT">VEN<span>-Intranet</span></div>
       <div class="topnav-spacer"></div>
       <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
         <option value="../dashboard.html">Dashboard</option>
@@ -30,6 +30,8 @@
         <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
         <option value="compensacion.html">Compensación</option>
         <option value="repositorio.html">Repositorio</option>
+        <option value="chatfiat.html">ChatFIAT</option>
+        <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
       </select>
       <div class="nav-user">
         <span id="navUserEmail"></span>
@@ -1075,7 +1077,7 @@
           + '<td>' + getCargoNombre(t.cargo_id) + '</td>'
           + '<td>' + t.fecha_ingreso + '</td>'
           + '<td class="estado-' + t.estado.toLowerCase() + '">' + t.estado + '</td>'
-          + '<td><button class="btn btn-sm btn-outline" title="Ver detalle" onclick="location.href=\'trabajador.html?id=' + t.id + '&modulo=relaciones\'"><i class="fi fi-sr-eye" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> <button class="btn btn-sm btn-outline" title="Editar" onclick="editarTrabajador(\'' + t.id + '\')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button></td>'
+          + '<td><button class="btn btn-sm btn-outline" title="Ver detalle" onclick="location.href=\'trabajador.html?id=' + t.id + '&modulo=relaciones\'"><i class="fi fi-sr-eye" style="font-size:15px;line-height:1;pointer-events:none;"></i></button></td>'
           + '</tr>';
       }).join('');
     }

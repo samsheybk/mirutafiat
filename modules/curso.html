@@ -27,7 +27,7 @@
 <body>
   <div class="app-layout">
     <nav class="topnav" style="background:var(--module-capacitacion);">
-      <div class="topnav-brand" onclick="location.href='../dashboard.html'">FIAT Venezuela<span>Intranet</span></div>
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><img class="topnav-logo" src="../icons/logo FIAT.webp" alt="FIAT">VEN<span>-Intranet</span></div>
       <div class="topnav-spacer"></div>
       <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
         <option value="../dashboard.html">Dashboard</option>
@@ -38,6 +38,8 @@
         <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
         <option value="compensacion.html">Compensación</option>
         <option value="repositorio.html">Repositorio</option>
+        <option value="chatfiat.html">ChatFIAT</option>
+        <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
       </select>
       <div class="nav-user">
         <span id="navUserEmail"></span>
@@ -61,7 +63,19 @@
           </header>
 
           <div class="module-content" style="overflow-y:auto;">
-            <div id="cursoCargando" style="text-align:center;padding:60px;color:#999;">Cargando...</div>
+            <div id="cursoCargando">
+              <div class="skeleton-panel" style="margin-bottom:20px;">
+                <div class="skeleton skeleton-block" style="width:34%"></div>
+                <div class="skeleton" style="width:92%"></div>
+                <div class="skeleton" style="width:70%"></div>
+              </div>
+              <div class="skeleton-panel">
+                <div class="skeleton skeleton-block" style="width:26%"></div>
+                <div class="skeleton" style="width:88%"></div>
+                <div class="skeleton" style="width:80%"></div>
+                <div class="skeleton" style="width:56%"></div>
+              </div>
+            </div>
 
             <div id="cursoContenido" style="display:none;">
               <div class="det-panel">

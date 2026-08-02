@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cargo - Capacitación y Desarrollo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
+  <style>
+    :root { --module-color: var(--module-capacitacion); }
+    .module-content { padding: 24px; }
+    .det-panel { margin-bottom: 20px; }
+    .det-section-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--module-capacitacion);
+      text-transform: uppercase;
+      margin: 8px 0;
+      letter-spacing: 0.4px;
+    }
+    .car-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    .car-item-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .badge-nivel {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 20px;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .curso-check-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+    .curso-check-item:hover { background: rgba(234, 88, 12, 0.05); }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <nav class="topnav" style="background:var(--module-capacitacion);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><img class="topnav-logo" src="../icons/logo FIAT.webp" alt="FIAT">VEN<span>-Intranet</span></div>
+      <div class="topnav-spacer"></div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Dashboard</option>
+        <option value="captacion.html">Captación y Selección</option>
+        <option value="relaciones-laborales.html">Relaciones Laborales</option>
+        <option value="capacitacion.html" selected>Capacitación y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="compensacion.html">Compensación</option>
+        <option value="repositorio.html">Repositorio</option>
+        <option value="chatfiat.html">ChatFIAT</option>
+        <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
+      </select>
+      <div class="nav-user">
+        <span id="navUserEmail"></span>
+        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-body">
+          <header class="topbar">
+            <div style="display:flex;align-items:center;gap:16px;flex:1;min-width:0;">
+              <div style="flex:1;min-width:0;">
+                <div class="topbar-breadcrumb"><a href="capacitacion.html" style="color:var(--color-text-secondary);">Capacitación y Desarrollo</a> / Cargo</div>
+                <h1 id="cargoTitulo" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><span class="skeleton skeleton-block" style="width:240px;display:inline-block;"></span></h1>
+              </div>
+              <button class="btn btn-outline" onclick="location.href='capacitacion.html'" style="flex-shrink:0;">← Volver</button>
+            </div>
+          </header>
+
+          <div class="module-content" style="overflow-y:auto;">
+            <div id="cargoCargando">
+              <div class="skeleton-panel" style="margin-bottom:20px;">
+                <div class="skeleton skeleton-block" style="width:34%"></div>
+                <div class="skeleton" style="width:92%"></div>
+                <div class="skeleton" style="width:70%"></div>
+              </div>
+              <div class="skeleton-panel">
+                <div class="skeleton skeleton-block" style="width:26%"></div>
+                <div class="skeleton" style="width:88%"></div>
+                <div class="skeleton" style="width:80%"></div>
+                <div class="skeleton" style="width:56%"></div>
+              </div>
+            </div>
+
+            <div id="cargoContenido" style="display:none;">
+              <div class="det-panel">
+                <div class="det-section-label">Información del cargo</div>
+                <div id="cargoInfo" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px;"></div>
+                <div id="cargoProposito" style="display:none;"></div>
+              </div>
+
+              <div class="det-panel">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                  <div class="det-section-label" style="margin:0;">Competencias</div>
+                </div>
+                <div id="competenciasList"></div>
+                <div style="display:flex;gap:8px;margin-top:10px;">
+                  <input type="text" id="nuevaCompetencia" class="form-input" placeholder="Nombre de la competencia (ej. Trabajo en equipo)" style="flex:1;">
+                  <select id="nivelCompetencia" class="form-select" style="width:160px;">
+                    <option value="Básico">Básico</option>
+                    <option value="Intermedio">Intermedio</option>
+                    <option value="Avanzado">Avanzado</option>
+                  </select>
+                  <button class="btn btn-capacitacion" onclick="agregarCompetencia()" style="color:#fff;">+ Agregar</button>
+                </div>
+              </div>
+
+              <div class="det-panel">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                  <div class="det-section-label" style="margin:0;">Skills</div>
+                </div>
+                <div id="skillsList"></div>
+                <div style="display:flex;gap:8px;margin-top:10px;">
+                  <input type="text" id="nuevoSkill" class="form-input" placeholder="Nombre del skill (ej. Excel, Inglés)" style="flex:1;">
+                  <select id="nivelSkill" class="form-select" style="width:160px;">
+                    <option value="Básico">Básico</option>
+                    <option value="Intermedio">Intermedio</option>
+                    <option value="Avanzado">Avanzado</option>
+                  </select>
+                  <button class="btn btn-capacitacion" onclick="agregarSkill()" style="color:#fff;">+ Agregar</button>
+                </div>
+              </div>
+
+              <div class="det-panel">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                  <div class="det-section-label" style="margin:0;">Cursos obligatorios</div>
+                  <button class="btn btn-capacitacion btn-sm" onclick="openCursosModal()" style="color:#fff;">Seleccionar cursos</button>
+                </div>
+                <p style="margin:0 0 12px;font-size:13px;color:var(--color-text-secondary);">Selecciona los cursos de Capacitación y Desarrollo que son obligatorios para este cargo.</p>
+                <div id="cursosResumen">
+                  <div class="skeleton" style="width:70%"></div>
+                  <div class="skeleton" style="width:45%;margin-top:8px;"></div>
+                  <div class="skeleton" style="width:58%;margin-top:8px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="cursosModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Seleccionar cursos obligatorios</h3>
+        <button class="modal-close" onclick="closeCursosModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="position:relative; margin-bottom:14px;">
+          <i class="fi fi-sr-search" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#999; font-size:14px;"></i>
+          <input type="text" id="buscarCursosModal" class="form-input" placeholder="Buscar curso..." style="padding-left:35px; width:100%;" oninput="renderModalCursos()">
+        </div>
+        <div id="modalCursosList" style="max-height:320px;overflow-y:auto;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeCursosModal()">Cancelar</button>
+        <button class="btn btn-capacitacion" onclick="guardarCursosObligatorios()" style="color:#fff;">Guardar selección</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    var cargoId = null;
+    var competencias = [];
+    var skills = [];
+    var cursos = [];
+    var cursosObligatorios = {};
+
+    function escHtml(s) {
+      return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function paramsUrl() {
+      var p = new URLSearchParams(window.location.search);
+      return p;
+    }
+
+    function nivelColor(nivel) {
+      if (nivel === 'Avanzado') return '#dc2626';
+      if (nivel === 'Intermedio') return '#ea580c';
+      return '#059669';
+    }
+
+    async function cargarCargo() {
+      cargoId = paramsUrl().get('id');
+      if (!cargoId) {
+        showAlert('Falta el parámetro id del cargo', 'error');
+        return;
+      }
+      try {
+        var rc = await supabaseClient.from('est_cargos').select('*').eq('id', cargoId).single();
+        if (rc.error) throw rc.error;
+        var cargo = rc.data;
+
+        var [ru, rj] = await Promise.all([
+          supabaseClient.from('est_unidades').select('id,titulo').eq('id', cargo.unidad_id).single(),
+          cargo.jefe_inmediato_id
+            ? supabaseClient.from('est_cargos').select('id,titulo').eq('id', cargo.jefe_inmediato_id).single()
+            : Promise.resolve({ data: null })
+        ]);
+
+        document.getElementById('cargoTitulo').textContent = cargo.titulo;
+        document.getElementById('cargoInfo').innerHTML =
+          '<div class="form-group"><label>Unidad</label><div style="font-weight:600;">' + escHtml(ru.data ? ru.data.titulo : '—') + '</div></div>' +
+          '<div class="form-group"><label>Jefe inmediato</label><div style="font-weight:600;">' + escHtml(rj.data ? rj.data.titulo : '—') + '</div></div>' +
+          '<div class="form-group"><label>Vacantes</label><div style="font-weight:600;">' + (cargo.vacantes || 0) + '</div></div>';
+
+        if (cargo.proposito_general) {
+          document.getElementById('cargoProposito').style.display = 'block';
+          document.getElementById('cargoProposito').innerHTML =
+            '<div class="form-group"><label>Propósito general</label><div style="font-size:13px;color:var(--color-text-secondary);">' + escHtml(cargo.proposito_general) + '</div></div>';
+        }
+
+        await cargarCompetencias();
+        await cargarCursos();
+      } catch (err) {
+        showAlert('Error al cargar el cargo: ' + err.message, 'error');
+      }
+    }
+
+    async function cargarCompetencias() {
+      var r = await supabaseClient.from('car_competencias').select('*').eq('cargo_id', cargoId).order('created_at');
+      if (r.error) throw r.error;
+      competencias = (r.data || []).filter(function(c) { return c.tipo === 'competencia'; });
+      skills = (r.data || []).filter(function(c) { return c.tipo === 'skill'; });
+      renderCompetencias();
+      renderSkills();
+    }
+
+    function renderCompetencias() {
+      var el = document.getElementById('competenciasList');
+      if (!competencias.length) {
+        el.innerHTML = '<div style="text-align:center;padding:24px;color:#999;">Sin competencias configuradas.</div>';
+        return;
+      }
+      el.innerHTML = competencias.map(function(c) {
+        return '<div class="car-item">' +
+          '<div class="car-item-left">' +
+            '<span style="font-weight:600;">' + escHtml(c.nombre) + '</span>' +
+            (c.nivel ? '<span class="badge-nivel" style="background:' + nivelColor(c.nivel) + ';">' + escHtml(c.nivel) + '</span>' : '') +
+          '</div>' +
+          '<button class="btn btn-sm btn-outline" style="color:#dc2626;" onclick="eliminarCompetencia(' + c.id + ')">Eliminar</button>' +
+        '</div>';
+      }).join('');
+    }
+
+    function renderSkills() {
+      var el = document.getElementById('skillsList');
+      if (!skills.length) {
+        el.innerHTML = '<div style="text-align:center;padding:24px;color:#999;">Sin skills configurados.</div>';
+        return;
+      }
+      el.innerHTML = skills.map(function(c) {
+        return '<div class="car-item">' +
+          '<div class="car-item-left">' +
+            '<span style="font-weight:600;">' + escHtml(c.nombre) + '</span>' +
+            (c.nivel ? '<span class="badge-nivel" style="background:' + nivelColor(c.nivel) + ';">' + escHtml(c.nivel) + '</span>' : '') +
+          '</div>' +
+          '<button class="btn btn-sm btn-outline" style="color:#dc2626;" onclick="eliminarSkill(' + c.id + ')">Eliminar</button>' +
+        '</div>';
+      }).join('');
+    }
+
+    async function agregarCompetencia() {
+      var nombre = document.getElementById('nuevaCompetencia').value.trim();
+      var nivel = document.getElementById('nivelCompetencia').value;
+      if (!nombre) { showAlert('Escribe el nombre de la competencia', 'warning'); return; }
+      try {
+        var r = await supabaseClient.from('car_competencias').insert([{ cargo_id: cargoId, tipo: 'competencia', nombre: nombre, nivel: nivel }]);
+        if (r.error) throw r.error;
+        document.getElementById('nuevaCompetencia').value = '';
+        await cargarCompetencias();
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function agregarSkill() {
+      var nombre = document.getElementById('nuevoSkill').value.trim();
+      var nivel = document.getElementById('nivelSkill').value;
+      if (!nombre) { showAlert('Escribe el nombre del skill', 'warning'); return; }
+      try {
+        var r = await supabaseClient.from('car_competencias').insert([{ cargo_id: cargoId, tipo: 'skill', nombre: nombre, nivel: nivel }]);
+        if (r.error) throw r.error;
+        document.getElementById('nuevoSkill').value = '';
+        await cargarCompetencias();
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function eliminarCompetencia(id) {
+      if (!(await showConfirm('¿Eliminar esta competencia?'))) return;
+      try {
+        var r = await supabaseClient.from('car_competencias').delete().eq('id', id);
+        if (r.error) throw r.error;
+        await cargarCompetencias();
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    async function eliminarSkill(id) {
+      if (!(await showConfirm('¿Eliminar este skill?'))) return;
+      try {
+        var r = await supabaseClient.from('car_competencias').delete().eq('id', id);
+        if (r.error) throw r.error;
+        await cargarCompetencias();
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    async function cargarCursos() {
+      var rc = await supabaseClient.from('cap_cursos').select('id,titulo,imagen_url,estado').order('titulo');
+      if (rc.error) throw rc.error;
+      cursos = rc.data || [];
+
+      var ro = await supabaseClient.from('car_cursos_obligatorios').select('curso_id').eq('cargo_id', cargoId);
+      if (ro.error) throw ro.error;
+      cursosObligatorios = {};
+      (ro.data || []).forEach(function(o) { cursosObligatorios[String(o.curso_id)] = true; });
+
+      renderCursosResumen();
+    }
+
+    function cursosInfo(id) {
+      for (var i = 0; i < cursos.length; i++) {
+        if (String(cursos[i].id) === String(id)) return cursos[i];
+      }
+      return null;
+    }
+
+    function renderCursosResumen() {
+      var el = document.getElementById('cursosResumen');
+      if (!cursos.length) {
+        el.innerHTML = '<div style="text-align:center;padding:24px;color:#999;">No hay cursos registrados en Capacitación y Desarrollo.</div>';
+        return;
+      }
+      var ids = Object.keys(cursosObligatorios);
+      if (!ids.length) {
+        el.innerHTML = '<div style="text-align:center;padding:24px;color:#999;">Ningún curso obligatorio seleccionado.</div>';
+        return;
+      }
+      el.innerHTML = ids.map(function(id) {
+        var c = cursosInfo(id);
+        if (!c) return '';
+        var img = c.imagen_url
+          ? '<img src="' + escHtml(c.imagen_url) + '" alt="Portada" style="width:56px;height:38px;object-fit:cover;border-radius:4px;border:1px solid var(--color-border);flex-shrink:0;">'
+          : '<span style="color:#bbb;flex-shrink:0;width:56px;text-align:center;">—</span>';
+        return '<div class="car-item">' +
+          '<div class="car-item-left">' +
+            img +
+            '<div style="flex:1;min-width:0;">' +
+              '<div style="font-weight:600;">' + escHtml(c.titulo) + '</div>' +
+              '<div style="font-size:12px;color:var(--color-text-secondary);">' + escHtml(c.estado || '') + '</div>' +
+            '</div>' +
+          '</div>' +
+          '<button class="btn btn-sm btn-outline" style="color:#dc2626;" onclick="toggleCursoObligatorio(' + id + ', false)">Quitar</button>' +
+        '</div>';
+      }).join('');
+    }
+
+    var modalSeleccion = {};
+
+    function openCursosModal() {
+      modalSeleccion = {};
+      Object.keys(cursosObligatorios).forEach(function(id) { modalSeleccion[id] = true; });
+      var s = document.getElementById('buscarCursosModal');
+      if (s) s.value = '';
+      renderModalCursos();
+      document.getElementById('cursosModal').classList.add('show');
+    }
+
+    function closeCursosModal() {
+      document.getElementById('cursosModal').classList.remove('show');
+    }
+
+    function renderModalCursos() {
+      var el = document.getElementById('modalCursosList');
+      var q = (document.getElementById('buscarCursosModal').value || '').toLowerCase().trim();
+      var lista = cursos;
+      if (q) {
+        lista = cursos.filter(function(c) {
+          return String(c.titulo || '').toLowerCase().indexOf(q) !== -1;
+        });
+      }
+      if (!cursos.length) {
+        el.innerHTML = '<div style="text-align:center;padding:24px;color:#999;">No hay cursos registrados en Capacitación y Desarrollo.</div>';
+        return;
+      }
+      if (!lista.length) {
+        el.innerHTML = '<div style="text-align:center;padding:24px;color:#999;">Sin resultados para "' + escHtml(q) + '".</div>';
+        return;
+      }
+      el.innerHTML = lista.map(function(c) {
+        var marcado = !!modalSeleccion[String(c.id)];
+        var img = c.imagen_url
+          ? '<img src="' + escHtml(c.imagen_url) + '" alt="Portada" style="width:56px;height:38px;object-fit:cover;border-radius:4px;border:1px solid var(--color-border);flex-shrink:0;">'
+          : '<span style="color:#bbb;flex-shrink:0;width:56px;text-align:center;">—</span>';
+        return '<label class="curso-check-item">' +
+          '<input type="checkbox" ' + (marcado ? 'checked' : '') + ' onchange="toggleModalCurso(' + c.id + ', this.checked)">' +
+          img +
+          '<div style="flex:1;min-width:0;">' +
+            '<div style="font-weight:600;">' + escHtml(c.titulo) + '</div>' +
+            '<div style="font-size:12px;color:var(--color-text-secondary);">' + escHtml(c.estado || '') + '</div>' +
+          '</div>' +
+          (marcado ? '<span class="badge badge-active">Obligatorio</span>' : '<span style="color:#bbb;font-size:12px;">Opcional</span>') +
+        '</label>';
+      }).join('');
+    }
+
+    function toggleModalCurso(id, checked) {
+      if (checked) modalSeleccion[String(id)] = true;
+      else delete modalSeleccion[String(id)];
+      renderModalCursos();
+    }
+
+    async function guardarCursosObligatorios() {
+      try {
+        var aEliminar = Object.keys(cursosObligatorios).filter(function(id) { return !modalSeleccion[id]; });
+        var aAgregar = Object.keys(modalSeleccion).filter(function(id) { return !cursosObligatorios[id]; });
+
+        for (var i = 0; i < aEliminar.length; i++) {
+          var rd = await supabaseClient.from('car_cursos_obligatorios').delete().eq('cargo_id', cargoId).eq('curso_id', aEliminar[i]);
+          if (rd.error) throw rd.error;
+        }
+        if (aAgregar.length) {
+          var ri = await supabaseClient.from('car_cursos_obligatorios').insert(aAgregar.map(function(id) { return { cargo_id: cargoId, curso_id: id }; }));
+          if (ri.error) throw ri.error;
+        }
+
+        cursosObligatorios = {};
+        Object.keys(modalSeleccion).forEach(function(id) { cursosObligatorios[id] = true; });
+        renderCursosResumen();
+        closeCursosModal();
+        showAlert('Cursos obligatorios actualizados', 'success');
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function toggleCursoObligatorio(cursoId, obligatorio) {
+      try {
+        if (obligatorio) {
+          var r = await supabaseClient.from('car_cursos_obligatorios').insert([{ cargo_id: cargoId, curso_id: cursoId }]);
+          if (r.error) throw r.error;
+          cursosObligatorios[String(cursoId)] = true;
+        } else {
+          var r2 = await supabaseClient.from('car_cursos_obligatorios').delete().eq('cargo_id', cargoId).eq('curso_id', cursoId);
+          if (r2.error) throw r2.error;
+          delete cursosObligatorios[String(cursoId)];
+        }
+        renderCursosResumen();
+      } catch (err) {
+        showAlert('Error al actualizar: ' + err.message, 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        await cargarCargo();
+        document.getElementById('cargoCargando').style.display = 'none';
+        document.getElementById('cargoContenido').style.display = 'block';
+      } catch (err) {
+        document.getElementById('cargoCargando').textContent = 'Error al cargar: ' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>

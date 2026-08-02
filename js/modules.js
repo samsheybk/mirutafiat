@@ -7,6 +7,12 @@ function initModule(moduleName, tableName, fields) {
   currentTable = tableName;
   currentFields = fields;
   loadData();
+  restoreTool();
+}
+
+function restoreTool() {
+  const saved = localStorage.getItem('fiat_tool_' + location.pathname);
+  if (saved && document.getElementById('tool-' + saved)) switchTool(saved);
 }
 
 function switchTool(name) {
@@ -42,7 +48,7 @@ async function loadData() {
   const tbody = document.getElementById('moduleTableBody');
   if (!tbody) return;
 
-  tbody.innerHTML = '<tr><td colspan="10" class="loading"><div class="spinner"></div>Cargando...</td></tr>';
+  tbody.innerHTML = skeletonTableRows(currentFields.length + 2, 6);
 
   try {
     const { data, error } = await supabaseClient
@@ -77,7 +83,9 @@ function getBadgeClass(estado) {
   const map = {
     'Abierto': 'badge-active',
     'Activo': 'badge-active',
+    'Activa': 'badge-active',
     'Publicado': 'badge-active',
+    'Publicada': 'badge-active',
     'Borrador': 'badge-pending',
     'Programado': 'badge-active',
     'En curso': 'badge-pending',
@@ -85,6 +93,11 @@ function getBadgeClass(estado) {
     'En revisión': 'badge-pending',
     'En investigación': 'badge-pending',
     'Reportado': 'badge-pending',
+    'Pagado': 'badge-active',
+    'Cancelado': 'badge-inactive',
+    'Vencida': 'badge-inactive',
+    'Archivada': 'badge-inactive',
+    'Cerrada': 'badge-inactive',
     'Cerrado': 'badge-inactive',
     'Finalizado': 'badge-inactive',
     'Inactivo': 'badge-inactive',

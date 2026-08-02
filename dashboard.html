@@ -12,7 +12,7 @@
 <body>
   <div class="app-layout">
     <nav class="topnav">
-      <div class="topnav-brand" onclick="location.href='dashboard.html'">FIAT Venezuela<span>Intranet</span></div>
+      <div class="topnav-brand" onclick="location.href='dashboard.html'"><img class="topnav-logo" src="icons/logo FIAT.webp" alt="FIAT">VEN<span>-Intranet</span></div>
       <div class="topnav-spacer"></div>
       <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
         <option value="dashboard.html">Dashboard</option>
@@ -23,6 +23,8 @@
         <option value="modules/seguridad-salud.html">Seguridad y Salud Laboral</option>
         <option value="modules/compensacion.html">Compensación</option>
         <option value="modules/repositorio.html">Repositorio</option>
+        <option value="modules/chatfiat.html">ChatFIAT</option>
+        <option value="modules/desarrollo-organizacional.html">Desarrollo organizacional</option>
       </select>
       <div class="nav-user">
         <span id="navUserEmail"></span>
@@ -88,6 +90,20 @@
             <h3>Repositorio</h3>
             <p>Documentos, formatos, manuales y material de apoyo</p>
             <div class="module-count" id="count-repositorio">0 documentos</div>
+          </div>
+          <div class="module-card" onclick="location.href='modules/chatfiat.html'">
+            <div class="module-card-accent bg-chatfiat"></div>
+            <div class="module-icon text-chatfiat">CF</div>
+            <h3>ChatFIAT</h3>
+            <p>La red social interna de FIAT Venezuela</p>
+            <div class="module-count">Próximamente</div>
+          </div>
+          <div class="module-card" onclick="location.href='modules/desarrollo-organizacional.html'">
+            <div class="module-card-accent bg-desarrollo"></div>
+            <div class="module-icon text-desarrollo">DO</div>
+            <h3>Desarrollo organizacional</h3>
+            <p>Indicadores de gestión por plaza de empleo</p>
+            <div class="module-count">Próximamente</div>
           </div>
         </div>
       </div>

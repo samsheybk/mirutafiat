@@ -9,12 +9,25 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
-  <style>:root { --module-color: var(--module-capacitacion); }</style>
+  <style>
+    :root { --module-color: var(--module-capacitacion); }
+    .cursos-grid { display: grid; grid-template-columns: repeat(auto-fill, 300px); gap: 16px; justify-content: start; max-height: calc(100vh - 200px); overflow-y: auto; padding: 2px; }
+    .curso-card { background: var(--color-surface); border: 1px solid var(--color-border); cursor: pointer; width: 300px; transition: box-shadow .15s ease; }
+    .curso-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,.15); }
+    .curso-thumb { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; }
+    .curso-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .curso-thumb-ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 28px; font-weight: 700; }
+    .curso-badge { position: absolute; top: 8px; left: 8px; z-index: 2; padding: 2px 8px; font-size: 11px; font-weight: 600; color: #fff; }
+    .curso-card-body { padding: 10px; }
+    .curso-card-title { font-size: 13px; font-weight: 600; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .curso-card-meta { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; }
+    .tabla-scroll { height: calc(100vh - 190px); overflow-y: auto; }
+  </style>
 </head>
 <body>
   <div class="app-layout">
     <nav class="topnav" style="background:var(--module-capacitacion);">
-      <div class="topnav-brand" onclick="location.href='../dashboard.html'">FIAT Venezuela<span>Intranet</span></div>
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><img class="topnav-logo" src="../icons/logo FIAT.webp" alt="FIAT">VEN<span>-Intranet</span></div>
       <div class="topnav-spacer"></div>
       <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
         <option value="../dashboard.html">Dashboard</option>
@@ -25,6 +38,8 @@
         <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
         <option value="compensacion.html">Compensación</option>
         <option value="repositorio.html">Repositorio</option>
+        <option value="chatfiat.html">ChatFIAT</option>
+        <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
       </select>
       <div class="nav-user">
         <span id="navUserEmail"></span>
@@ -43,32 +58,68 @@
           </div>
           <div class="panel-item" data-tool="planes" onclick="switchTool('planes')" title="Planes de formación"><span class="panel-item-indicator bg-capacitacion"></span><i class="fi fi-sr-book" style="font-size:24px;pointer-events:none;"></i>
           </div>
+          <div class="panel-item" data-tool="cargos" onclick="switchTool('cargos')" title="Cargos"><span class="panel-item-indicator bg-capacitacion"></span><i class="fi fi-sr-briefcase" style="font-size:24px;pointer-events:none;"></i>
+          </div>
         </div>
 
         <div class="module-body">
-          <header class="topbar">
-            <div><h1>Capacitación y Desarrollo</h1><div class="topbar-breadcrumb">Inicio / Capacitación y Desarrollo</div></div>
+          <header class="topbar" style="gap:16px;">
+            <div class="toolbar-content" data-toolbar="cursos" style="display:flex;align-items:center;gap:16px;width:100%;">
+              <input type="text" class="form-input" id="buscarCurso" placeholder="Buscar curso..." oninput="filtrarCursos()" style="flex:1;max-width:400px;height:36px;">
+              <select class="form-select" id="filtroEstadoCurso" onchange="filtrarCursos()" style="width:170px;height:36px;">
+                <option value="">Todos los estados</option>
+                <option value="Borrador">Borrador</option>
+                <option value="Publicado">Publicado</option>
+              </select>
+              <select class="form-select" id="ordenCursos" onchange="setOrdenCursos(this.value)" style="width:170px;height:36px;">
+                <option value="recientes">Más recientes</option>
+                <option value="titulo">Título (A-Z)</option>
+              </select>
+              <div class="view-toggle">
+                <button type="button" class="active" id="vistaTablaBtn" onclick="setVistaCursos('tabla')">Tabla</button>
+                <button type="button" id="vistaGridBtn" onclick="setVistaCursos('grid')">Cuadrícula</button>
+              </div>
+              <button class="btn btn-capacitacion btn-sm" onclick="location.href='curso.html'" style="margin-left:auto;">+ Nuevo curso</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="talleres" style="display:none;align-items:center;gap:16px;width:100%;">
+              <h2 style="font-size:18px;font-weight:700;color:var(--module-capacitacion);">Talleres</h2>
+              <button class="btn btn-capacitacion btn-sm" style="margin-left:auto;">+ Nuevo taller</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="evaluaciones" style="display:none;align-items:center;gap:16px;width:100%;">
+              <h2 style="font-size:18px;font-weight:700;color:var(--module-capacitacion);">Evaluaciones</h2>
+              <button class="btn btn-capacitacion btn-sm" style="margin-left:auto;">+ Nueva evaluación</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="planes" style="display:none;align-items:center;gap:16px;width:100%;">
+              <h2 style="font-size:18px;font-weight:700;color:var(--module-capacitacion);">Planes de formación</h2>
+              <button class="btn btn-capacitacion btn-sm" style="margin-left:auto;">+ Nuevo plan</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="cargos" style="display:none;align-items:center;gap:16px;width:100%;">
+              <h2 style="font-size:18px;font-weight:700;color:var(--module-capacitacion);">Cargos</h2>
+              <input type="text" id="buscarCargo" class="form-input" placeholder="Buscar cargo..." style="width:240px;height:36px;margin-left:16px;" oninput="filtrarCargos()">
+            </div>
           </header>
 
           <div class="module-content">
           <div class="tool-section active" id="tool-cursos">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-capacitacion);">Cursos</h2>
-              <button class="btn btn-capacitacion" onclick="location.href='curso.html'">+ Nuevo curso</button>
+            <div id="cursosVistaTabla">
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Portada</th><th>Curso</th><th>Módulos</th><th>Preguntas</th><th>Estado</th><th>Creado</th><th>Acciones</th></tr></thead>
+                  <tbody id="cursosBody">
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <table class="data-table">
-              <thead><tr><th>Portada</th><th>Curso</th><th>Módulos</th><th>Preguntas</th><th>Estado</th><th>Creado</th><th>Acciones</th></tr></thead>
-              <tbody id="cursosBody">
-                <tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Cargando cursos...</td></tr>
-              </tbody>
-            </table>
+
+            <div id="cursosVistaGrid" class="cursos-grid" style="display:none;"></div>
           </div>
 
           <div class="tool-section" id="tool-talleres">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-capacitacion);">Talleres</h2>
-              <button class="btn btn-capacitacion">+ Nuevo taller</button>
-            </div>
             <table class="data-table">
               <thead><tr><th>Taller</th><th>Facilitador</th><th>Fecha</th><th>Duración</th><th>Estado</th></tr></thead>
               <tbody><tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
@@ -76,10 +127,6 @@
           </div>
 
           <div class="tool-section" id="tool-evaluaciones">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-capacitacion);">Evaluaciones</h2>
-              <button class="btn btn-capacitacion">+ Nueva evaluación</button>
-            </div>
             <table class="data-table">
               <thead><tr><th>Participante</th><th>Curso</th><th>Fecha</th><th>Calificación</th><th>Estado</th></tr></thead>
               <tbody><tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
@@ -87,14 +134,25 @@
           </div>
 
           <div class="tool-section" id="tool-planes">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-capacitacion);">Planes de formación</h2>
-              <button class="btn btn-capacitacion">+ Nuevo plan</button>
-            </div>
             <table class="data-table">
               <thead><tr><th>Plan</th><th>Departamento</th><th>Fecha inicio</th><th>Fecha fin</th><th>Estado</th></tr></thead>
               <tbody><tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
             </table>
+          </div>
+
+          <div class="tool-section" id="tool-cargos">
+            <div class="tabla-scroll">
+              <table class="data-table">
+                <thead><tr><th>Cargo</th><th>Unidad</th><th>Jefe inmediato</th><th>Vacantes</th><th>Competencias</th><th>Skills</th><th>Cursos obligatorios</th><th>Acciones</th></tr></thead>
+                <tbody id="cargosBody">
+                  <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -112,18 +170,32 @@
       return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
+    var cursosCache = [];
+    var cursosVista = localStorage.getItem('fiat_cursos_vista') || 'tabla';
+    var cursosOrden = 'recientes';
+
+    var cursoGradients = [
+      'linear-gradient(135deg,#2563EB,#1E40AF)',
+      'linear-gradient(135deg,#7C3AED,#5B21B6)',
+      'linear-gradient(135deg,#DB2777,#BE185D)',
+      'linear-gradient(135deg,#059669,#047857)',
+      'linear-gradient(135deg,#EA580C,#C2410C)',
+      'linear-gradient(135deg,#0891B2,#0E7490)'
+    ];
+    function cursoGradiente(id) {
+      var h = 0, s = String(id);
+      for (var i = 0; i < s.length; i++) h += s.charCodeAt(i);
+      return cursoGradients[h % cursoGradients.length];
+    }
+
     async function cargarCursos() {
       var tbody = document.getElementById('cursosBody');
-      if (!tbody) return;
-      tbody.innerHTML = '<tr><td colspan="7" class="loading"><div class="spinner"></div>Cargando...</td></tr>';
-
+      if (tbody) tbody.innerHTML = skeletonTableRows(7, 5);
+      var grid = document.getElementById('cursosVistaGrid');
+      if (grid && cursosVista === 'grid') grid.innerHTML = skeletonCards(6);
       try {
         var rc = await supabaseClient.from('cap_cursos').select('*').order('created_at', { ascending: false });
         if (rc.error) throw rc.error;
-        if (!rc.data || !rc.data.length) {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay cursos registrados</td></tr>';
-          return;
-        }
 
         var rm = await supabaseClient.from('cap_modulos').select('curso_id');
         var rq = await supabaseClient.from('cap_cuestionarios').select('id,curso_id');
@@ -138,27 +210,115 @@
           if (cid) preCount[cid] = (preCount[cid] || 0) + 1;
         });
 
-        tbody.innerHTML = rc.data.map(function(c) {
-          var img = c.imagen_url
-            ? '<img src="' + c.imagen_url + '" alt="Portada" style="width:56px;height:38px;object-fit:cover;border-radius:4px;border:1px solid var(--color-border);">'
-            : '<span style="color:#bbb;">—</span>';
-          var fecha = c.created_at ? new Date(c.created_at).toLocaleDateString() : '-';
-          return '<tr>' +
-            '<td>' + img + '</td>' +
-            '<td><a href="curso.html?id=' + c.id + '" style="font-weight:600;color:var(--module-capacitacion);text-decoration:none;">' + escCursos(c.titulo) + '</a></td>' +
-            '<td style="text-align:center;">' + (modCount[c.id] || 0) + '</td>' +
-            '<td style="text-align:center;">' + (preCount[c.id] || 0) + '</td>' +
-            '<td><span class="badge ' + getBadgeClass(c.estado) + '">' + escCursos(c.estado || '-') + '</span></td>' +
-            '<td>' + fecha + '</td>' +
-            '<td>' +
-              '<button class="btn btn-sm btn-outline" onclick="location.href=\'curso.html?id=' + c.id + '\'">Editar</button> ' +
-              '<button class="btn btn-sm btn-outline" style="color:#dc2626;" onclick="eliminarCurso(' + c.id + ')">Eliminar</button>' +
-            '</td>' +
-          '</tr>';
-        }).join('');
+        cursosCache = (rc.data || []).map(function(c) {
+          return {
+            id: c.id,
+            titulo: c.titulo || '',
+            estado: c.estado || '',
+            imagen_url: c.imagen_url || '',
+            modulos: modCount[c.id] || 0,
+            preguntas: preCount[c.id] || 0,
+            fecha: c.created_at ? new Date(c.created_at).toLocaleDateString() : '-',
+            creado: c.created_at ? new Date(c.created_at) : null
+          };
+        });
+        renderCursos();
       } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar: ' + escCursos(err.message) + '</td></tr>';
+        var tbody = document.getElementById('cursosBody');
+        if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar: ' + escCursos(err.message) + '</td></tr>';
+        var grid = document.getElementById('cursosVistaGrid');
+        if (grid) grid.innerHTML = '';
       }
+    }
+
+    function getCursosFiltrados() {
+      var q = (document.getElementById('buscarCurso').value || '').toLowerCase().trim();
+      var est = document.getElementById('filtroEstadoCurso').value;
+      var lista = cursosCache.filter(function(c) {
+        if (est && c.estado !== est) return false;
+        if (q && c.titulo.toLowerCase().indexOf(q) === -1) return false;
+        return true;
+      });
+      lista = lista.slice();
+      if (cursosOrden === 'titulo') {
+        lista.sort(function(a, b) { return a.titulo.localeCompare(b.titulo, 'es'); });
+      } else {
+        lista.sort(function(a, b) { return (b.creado ? b.creado.getTime() : 0) - (a.creado ? a.creado.getTime() : 0); });
+      }
+      return lista;
+    }
+
+    function renderCursos() {
+      var lista = getCursosFiltrados();
+      var tbody = document.getElementById('cursosBody');
+      var grid = document.getElementById('cursosVistaGrid');
+
+      if (!lista.length) {
+        var msg = cursosCache.length ? 'Sin resultados' : 'No hay cursos registrados';
+        if (cursosVista === 'grid') grid.innerHTML = '<div style="text-align:center;padding:40px;color:#999;">' + msg + '</div>';
+        else tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">' + msg + '</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = lista.map(function(c) {
+        var img = c.imagen_url
+          ? '<img src="' + c.imagen_url + '" alt="Portada" style="width:56px;height:38px;object-fit:cover;border-radius:4px;border:1px solid var(--color-border);">'
+          : '<span style="color:#bbb;">—</span>';
+        return '<tr>' +
+          '<td>' + img + '</td>' +
+          '<td><a href="curso.html?id=' + c.id + '" style="font-weight:600;color:var(--module-capacitacion);text-decoration:none;">' + escCursos(c.titulo) + '</a></td>' +
+          '<td style="text-align:center;">' + c.modulos + '</td>' +
+          '<td style="text-align:center;">' + c.preguntas + '</td>' +
+          '<td><span class="badge ' + getBadgeClass(c.estado) + '">' + escCursos(c.estado || '-') + '</span></td>' +
+          '<td>' + c.fecha + '</td>' +
+          '<td>' +
+            '<button class="btn btn-sm btn-outline" onclick="location.href=\'curso.html?id=' + c.id + '\'">Editar</button> ' +
+            '<button class="btn btn-sm btn-outline" style="color:#dc2626;" onclick="eliminarCurso(' + c.id + ')">Eliminar</button>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+
+      grid.innerHTML = lista.map(function(c) {
+        var thumb = c.imagen_url
+          ? '<img src="' + c.imagen_url + '" alt="' + escCursos(c.titulo) + '" onerror="this.remove()">'
+          : '';
+        var letra = escCursos((c.titulo || 'C').charAt(0).toUpperCase());
+        return '<div class="curso-card" onclick="location.href=\'curso.html?id=' + c.id + '\'">' +
+          '<div class="curso-thumb">' +
+            '<div class="curso-thumb-ph" style="background:' + cursoGradiente(c.id) + ';">' + letra + '</div>' +
+            thumb +
+            '<span class="curso-badge badge-' + (c.estado === 'Publicado' ? 'active" style="background:#059669;' : 'pending" style="background:#ea580c;') + '">' + escCursos(c.estado || '-') + '</span>' +
+          '</div>' +
+          '<div class="curso-card-body">' +
+            '<div class="curso-card-title">' + escCursos(c.titulo) + '</div>' +
+          '<div class="curso-card-meta">' + c.modulos + ' módulos · ' + c.preguntas + ' preguntas · ' + c.fecha + '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+
+      uiFadeIn(tbody);
+      uiFadeIn(grid);
+    }
+
+    function filtrarCursos() {
+      renderCursos();
+    }
+
+    function setOrdenCursos(orden) {
+      cursosOrden = orden;
+      renderCursos();
+    }
+
+    function setVistaCursos(vista) {
+      cursosVista = vista;
+      localStorage.setItem('fiat_cursos_vista', vista);
+      document.getElementById('vistaTablaBtn').classList.toggle('active', vista === 'tabla');
+      document.getElementById('vistaGridBtn').classList.toggle('active', vista === 'grid');
+      var tabla = document.getElementById('cursosVistaTabla');
+      var grid = document.getElementById('cursosVistaGrid');
+      if (tabla) tabla.style.display = vista === 'tabla' ? 'block' : 'none';
+      if (grid) grid.style.display = vista === 'grid' ? 'block' : 'none';
+      renderCursos();
     }
 
     async function eliminarCurso(id) {
@@ -172,7 +332,94 @@
       }
     }
 
-    document.addEventListener('DOMContentLoaded', cargarCursos);
+    var cargosCache = [];
+
+    async function cargarCargos() {
+      var tbody = document.getElementById('cargosBody');
+      if (!tbody) return;
+      tbody.innerHTML = skeletonTableRows(8, 5);
+
+      try {
+        var rc = await supabaseClient.from('est_cargos').select('*').order('titulo');
+        if (rc.error) throw rc.error;
+
+        var [ru, rj, rcomp, rcur] = await Promise.all([
+          supabaseClient.from('est_unidades').select('id,titulo').order('titulo'),
+          supabaseClient.from('est_cargos').select('id,titulo').order('titulo'),
+          supabaseClient.from('car_competencias').select('cargo_id,tipo'),
+          supabaseClient.from('car_cursos_obligatorios').select('cargo_id')
+        ]);
+        var unidades = {};
+        (ru.data || []).forEach(function(u) { unidades[u.id] = u.titulo; });
+        var jefes = {};
+        (rj.data || []).forEach(function(j) { jefes[j.id] = j.titulo; });
+
+        var compCount = {};
+        var skillCount = {};
+        (rcomp.data || []).forEach(function(c) {
+          var k = String(c.cargo_id);
+          if (c.tipo === 'skill') skillCount[k] = (skillCount[k] || 0) + 1;
+          else compCount[k] = (compCount[k] || 0) + 1;
+        });
+        var curCount = {};
+        (rcur.data || []).forEach(function(c) { var k = String(c.cargo_id); curCount[k] = (curCount[k] || 0) + 1; });
+
+        cargosCache = (rc.data || []).map(function(c) {
+          return {
+            id: c.id,
+            titulo: c.titulo,
+            unidad: unidades[c.unidad_id] || '—',
+            jefe: jefes[c.jefe_inmediato_id] || '—',
+            vacantes: c.vacantes || 0,
+            competencias: compCount[String(c.id)] || 0,
+            skills: skillCount[String(c.id)] || 0,
+            cursos: curCount[String(c.id)] || 0
+          };
+        });
+        renderCargos('');
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar: ' + escCursos(err.message) + '</td></tr>';
+      }
+    }
+
+    function renderCargos(q) {
+      var tbody = document.getElementById('cargosBody');
+      var lista = cargosCache;
+      if (q) {
+        q = q.toLowerCase();
+        lista = lista.filter(function(c) {
+          return c.titulo.toLowerCase().indexOf(q) !== -1 || c.unidad.toLowerCase().indexOf(q) !== -1;
+        });
+      }
+      if (!lista.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#999;">' + (q ? 'Sin resultados para "' + escCursos(q) + '"' : 'No hay cargos registrados. Créalos desde Captación y Selección.') + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = lista.map(function(c) {
+        return '<tr>' +
+          '<td><a href="cargo.html?id=' + c.id + '" style="font-weight:600;color:var(--module-capacitacion);text-decoration:none;">' + escCursos(c.titulo) + '</a></td>' +
+          '<td>' + escCursos(c.unidad) + '</td>' +
+          '<td>' + escCursos(c.jefe) + '</td>' +
+          '<td style="text-align:center;">' + c.vacantes + '</td>' +
+          '<td style="text-align:center;">' + c.competencias + '</td>' +
+          '<td style="text-align:center;">' + c.skills + '</td>' +
+          '<td style="text-align:center;">' + c.cursos + '</td>' +
+          '<td><a class="btn btn-capacitacion btn-sm" href="cargo.html?id=' + c.id + '" style="color:#fff;">Configurar</a></td>' +
+        '</tr>';
+      }).join('');
+    }
+
+    function filtrarCargos() {
+      renderCargos(document.getElementById('buscarCargo').value);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      cargarCursos();
+      cargarCargos();
+      var saved = localStorage.getItem('fiat_tool_' + location.pathname);
+      if (saved && document.getElementById('tool-' + saved)) switchTool(saved);
+      setVistaCursos(cursosVista);
+    });
   </script>
 </body>
 </html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChatFIAT - FIAT Intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
+  <style>:root { --module-color: var(--module-chatfiat); }</style>
+</head>
+<body>
+  <div class="app-layout">
+    <nav class="topnav" style="background:var(--module-chatfiat);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><img class="topnav-logo" src="../icons/logo FIAT.webp" alt="FIAT">VEN<span>-Intranet</span></div>
+      <div class="topnav-spacer"></div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Dashboard</option>
+        <option value="captacion.html">Captación y Selección</option>
+        <option value="relaciones-laborales.html">Relaciones Laborales</option>
+        <option value="capacitacion.html">Capacitación y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="compensacion.html">Compensación</option>
+        <option value="repositorio.html">Repositorio</option>
+        <option value="chatfiat.html" selected>ChatFIAT</option>
+        <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
+      </select>
+      <div class="nav-user">
+        <span id="navUserEmail"></span>
+        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-panel">
+          <div class="panel-item active" data-tool="inicio" onclick="switchTool('inicio')" title="Inicio"><span class="panel-item-indicator bg-chatfiat"></span><i class="fi fi-sr-house-building" style="font-size:24px;pointer-events:none;"></i>
+          </div>
+          <div class="panel-item" data-tool="mensajes" onclick="switchTool('mensajes')" title="Mensajes"><span class="panel-item-indicator bg-chatfiat"></span><i class="fi fi-sr-envelope" style="font-size:24px;pointer-events:none;"></i>
+          </div>
+        </div>
+
+        <div class="module-body">
+          <header class="topbar" style="gap:16px;">
+            <div class="toolbar-content" data-toolbar="inicio" style="display:flex;align-items:center;gap:16px;width:100%;">
+              <h1 style="font-size:18px;font-weight:700;">ChatFIAT</h1>
+            </div>
+            <div class="toolbar-content" data-toolbar="mensajes" style="display:none;align-items:center;gap:16px;width:100%;">
+              <h1 style="font-size:18px;font-weight:700;">Mensajes</h1>
+            </div>
+          </header>
+
+          <div class="module-content">
+            <div class="tool-section active" id="tool-inicio">
+              <div class="empty-state">
+                <div style="font-size:32px;font-weight:700;color:var(--module-chatfiat);">ChatFIAT</div>
+                <p style="margin-top:8px;color:var(--color-text-secondary);">La red social interna de FIAT Venezuela.</p>
+                <p style="margin-top:4px;font-size:12px;color:#999;">Aquí construiremos las herramientas de publicación y comunidad.</p>
+              </div>
+            </div>
+
+            <div class="tool-section" id="tool-mensajes">
+              <div class="empty-state">
+                <p style="color:var(--color-text-secondary);">Mensajes</p>
+                <p style="margin-top:4px;font-size:12px;color:#999;">Próximamente.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/modules.js"></script>
+</body>
+</html>

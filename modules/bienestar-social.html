@@ -9,12 +9,37 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
-  <style>:root { --module-color: var(--module-bienestar); }</style>
+  <style>
+    :root { --module-color: var(--module-bienestar); }
+    .historias-grid { display: grid; grid-template-columns: repeat(auto-fill, 300px); gap: 16px; justify-content: start; max-height: calc(100vh - 200px); overflow-y: auto; padding: 2px; }
+    .historia-card { background: var(--color-surface); border: 1px solid var(--color-border); width: 300px; transition: box-shadow .15s ease; }
+    .historia-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,.15); }
+    .historia-thumb { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; }
+    .historia-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .historia-thumb-ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 28px; font-weight: 700; }
+    .historia-badge { position: absolute; top: 8px; left: 8px; z-index: 2; padding: 2px 8px; font-size: 11px; font-weight: 600; color: #fff; }
+    .historia-card-body { padding: 10px; }
+    .historia-card-title { font-size: 13px; font-weight: 600; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .historia-card-meta { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; }
+    .historia-card-excerpt { font-size: 12px; color: var(--color-text-secondary); margin-top: 6px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    /* Constructor de preguntas de encuestas */
+    .enc-pregunta { border: 1px solid var(--color-border); padding: 12px; margin-bottom: 12px; background: var(--color-bg); }
+    .enc-pregunta-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .enc-pregunta-num { flex-shrink: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: var(--module-bienestar); color: #fff; font-size: 12px; font-weight: 700; border-radius: 4px; }
+    .enc-pregunta-head .form-input { flex: 1; }
+    .enc-pregunta-head .modal-close { width: 26px; height: 26px; flex-shrink: 0; }
+    .enc-opciones { margin-bottom: 8px; }
+    .enc-opcion { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .enc-opcion-radio { flex-shrink: 0; width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--module-bienestar); background: #fff; }
+    .enc-opcion .form-input { flex: 1; }
+    .enc-opcion .modal-close { width: 24px; height: 24px; flex-shrink: 0; }
+    .enc-preguntas-hint { font-size: 12px; color: var(--color-text-secondary); padding: 8px 0; }
+  </style>
 </head>
 <body>
   <div class="app-layout">
     <nav class="topnav" style="background:var(--module-bienestar);">
-      <div class="topnav-brand" onclick="location.href='../dashboard.html'">FIAT Venezuela<span>Intranet</span></div>
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><img class="topnav-logo" src="../icons/logo FIAT.webp" alt="FIAT">VEN<span>-Intranet</span></div>
       <div class="topnav-spacer"></div>
       <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
         <option value="../dashboard.html">Dashboard</option>
@@ -25,6 +50,8 @@
         <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
         <option value="compensacion.html">Compensación</option>
         <option value="repositorio.html">Repositorio</option>
+        <option value="chatfiat.html">ChatFIAT</option>
+        <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
       </select>
       <div class="nav-user">
         <span id="navUserEmail"></span>
@@ -35,93 +62,373 @@
     <div class="main-content">
       <div class="module-layout">
         <div class="module-panel">
-          <div class="panel-item active" data-tool="programas" onclick="switchTool('programas')" title="Programas sociales"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-heart" style="font-size:24px;pointer-events:none;"></i>
+          <div class="panel-item active" data-tool="plantilla" onclick="switchTool('plantilla')" title="Plantilla de trabajadores"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-users" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="actividades" onclick="switchTool('actividades')" title="Actividades"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-star" style="font-size:24px;pointer-events:none;"></i>
+          <div class="panel-item" data-tool="prestamos" onclick="switchTool('prestamos')" title="Préstamos"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-hand-holding-usd" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="beneficios" onclick="switchTool('beneficios')" title="Beneficios"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-gift" style="font-size:24px;pointer-events:none;"></i>
+          <div class="panel-item" data-tool="polizas" onclick="switchTool('polizas')" title="Pólizas"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-shield" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="solicitudes" onclick="switchTool('solicitudes')" title="Solicitudes"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-envelope-open" style="font-size:24px;pointer-events:none;"></i>
+          <div class="panel-item" data-tool="historias" onclick="switchTool('historias')" title="Historias de gente FIAT"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-circle-book-open" style="font-size:24px;pointer-events:none;"></i>
+          </div>
+          <div class="panel-item" data-tool="encuestas" onclick="switchTool('encuestas')" title="Encuestas"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-square-poll-horizontal" style="font-size:24px;pointer-events:none;"></i>
+          </div>
+          <div class="panel-item" data-tool="calendario" onclick="switchTool('calendario')" title="Calendario"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-calendar" style="font-size:24px;pointer-events:none;"></i>
           </div>
         </div>
 
         <div class="module-body">
-          <header class="topbar">
-            <div><h1>Bienestar Social</h1><div class="topbar-breadcrumb">Inicio / Bienestar Social</div></div>
+          <header class="topbar" style="gap:16px;">
+            <div class="toolbar-content" data-toolbar="plantilla" style="display:flex;align-items:center;gap:16px;width:100%;">
+              <input type="text" class="form-input" id="buscarPlantilla" placeholder="Buscar trabajador..." oninput="filtrarPlantilla()" style="flex:1;max-width:340px;height:36px;">
+              <select class="form-select" id="filtroUnidadPlantilla" onchange="filtrarPlantilla()" style="width:220px;height:36px;">
+                <option value="">Todas las unidades</option>
+              </select>
+              <span id="plantillaCount" style="font-size:12px;color:var(--color-text-secondary);">0 trabajadores</span>
+            </div>
+            <div class="toolbar-content" data-toolbar="prestamos" style="display:none;align-items:center;gap:16px;width:100%;">
+              <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Préstamos</h2>
+              <button class="btn btn-bienestar btn-sm" onclick="openModalPrestamo()" style="margin-left:auto;">+ Nuevo préstamo</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="polizas" style="display:none;align-items:center;gap:16px;width:100%;">
+              <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Pólizas</h2>
+              <button class="btn btn-bienestar btn-sm" onclick="openModalPoliza()" style="margin-left:auto;">+ Nueva póliza</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="historias" style="display:none;align-items:center;gap:16px;width:100%;">
+              <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Historias de gente FIAT</h2>
+              <button class="btn btn-bienestar btn-sm" onclick="openModalHistoria()" style="margin-left:auto;">+ Nueva historia</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="encuestas" style="display:none;align-items:center;gap:16px;width:100%;">
+              <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Encuestas</h2>
+              <button class="btn btn-bienestar btn-sm" onclick="openModalEncuesta()" style="margin-left:auto;">+ Nueva encuesta</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="calendario" style="display:none;align-items:center;gap:16px;width:100%;">
+              <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Calendario</h2>
+              <button class="btn btn-bienestar btn-sm" onclick="openModalCalendario()" style="margin-left:auto;">+ Nuevo evento</button>
+            </div>
           </header>
 
           <div class="module-content">
-          <div class="tool-section active" id="tool-programas">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-bienestar);">Programas sociales</h2>
-              <button class="btn btn-bienestar" onclick="openModal()">+ Nuevo programa</button>
+            <div class="tool-section active" id="tool-plantilla">
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Trabajador</th><th>Cédula</th><th>Unidad</th><th>Cargo</th><th>Estado</th><th style="width:120px;">Acciones</th></tr></thead>
+                  <tbody id="plantillaBody">
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <table class="data-table">
-              <thead><tr><th>Programa</th><th>Responsable</th><th>Fecha inicio</th><th>Fecha fin</th><th>Estado</th></tr></thead>
-              <tbody id="moduleTableBody">
-                <tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">No hay programas registrados</td></tr>
-              </tbody>
-            </table>
-          </div>
 
-          <div class="tool-section" id="tool-actividades">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-bienestar);">Actividades</h2>
-              <button class="btn btn-bienestar">+ Nueva actividad</button>
+            <div class="tool-section" id="tool-prestamos">
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Trabajador</th><th>Monto</th><th>Cuotas</th><th>Cuota actual</th><th>Fecha</th><th>Estado</th><th style="width:120px;">Acciones</th></tr></thead>
+                  <tbody id="prestamosBody">
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <table class="data-table">
-              <thead><tr><th>Actividad</th><th>Fecha</th><th>Lugar</th><th>Participantes</th><th>Estado</th></tr></thead>
-              <tbody><tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
-            </table>
-          </div>
 
-          <div class="tool-section" id="tool-beneficios">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-bienestar);">Beneficios</h2>
-              <button class="btn btn-bienestar">+ Nuevo beneficio</button>
+            <div class="tool-section" id="tool-polizas">
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Póliza</th><th>Proveedor</th><th>Tipo</th><th>Inicio</th><th>Fin</th><th>Estado</th><th style="width:120px;">Acciones</th></tr></thead>
+                  <tbody id="polizasBody">
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <table class="data-table">
-              <thead><tr><th>Beneficio</th><th>Tipo</th><th>Monto</th><th>Vigencia</th><th>Estado</th></tr></thead>
-              <tbody><tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
-            </table>
-          </div>
 
-          <div class="tool-section" id="tool-solicitudes">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-bienestar);">Solicitudes</h2>
-              <button class="btn btn-bienestar">+ Nueva solicitud</button>
+            <div class="tool-section" id="tool-historias">
+              <div id="historiasGrid" class="historias-grid">
+                <div class="skeleton-card"><div class="skeleton skeleton-thumb"></div><div class="skeleton-card-body"><div class="skeleton" style="width:85%"></div><div class="skeleton" style="width:60%"></div><div class="skeleton" style="width:42%"></div></div></div>
+                <div class="skeleton-card"><div class="skeleton skeleton-thumb"></div><div class="skeleton-card-body"><div class="skeleton" style="width:85%"></div><div class="skeleton" style="width:60%"></div><div class="skeleton" style="width:42%"></div></div></div>
+                <div class="skeleton-card"><div class="skeleton skeleton-thumb"></div><div class="skeleton-card-body"><div class="skeleton" style="width:85%"></div><div class="skeleton" style="width:60%"></div><div class="skeleton" style="width:42%"></div></div></div>
+                <div class="skeleton-card"><div class="skeleton skeleton-thumb"></div><div class="skeleton-card-body"><div class="skeleton" style="width:85%"></div><div class="skeleton" style="width:60%"></div><div class="skeleton" style="width:42%"></div></div></div>
+                <div class="skeleton-card"><div class="skeleton skeleton-thumb"></div><div class="skeleton-card-body"><div class="skeleton" style="width:85%"></div><div class="skeleton" style="width:60%"></div><div class="skeleton" style="width:42%"></div></div></div>
+                <div class="skeleton-card"><div class="skeleton skeleton-thumb"></div><div class="skeleton-card-body"><div class="skeleton" style="width:85%"></div><div class="skeleton" style="width:60%"></div><div class="skeleton" style="width:42%"></div></div></div>
+              </div>
             </div>
-            <table class="data-table">
-              <thead><tr><th>Solicitante</th><th>Tipo</th><th>Fecha</th><th>Estado</th></tr></thead>
-              <tbody><tr><td colspan="4" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
-            </table>
+
+            <div class="tool-section" id="tool-encuestas">
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Encuesta</th><th>Descripción</th><th>Inicio</th><th>Fin</th><th>Estado</th><th style="width:120px;">Acciones</th></tr></thead>
+                  <tbody id="encuestasBody">
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="tool-section" id="tool-calendario">
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Evento</th><th>Fecha</th><th>Hora</th><th>Lugar</th><th>Tipo</th><th style="width:120px;">Acciones</th></tr></thead>
+                  <tbody id="calendarioBody">
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <div class="modal-overlay" id="modalTallas">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalTallasTitle">Detalle del trabajador</h3><button class="modal-close" onclick="bsHideModal('modalTallas')">&times;</button></div>
+      <div class="modal-body">
+        <div class="form-row">
+          <div class="form-group"><label>Nombre</label><input type="text" class="form-input" id="tallas_nombre" readonly style="background:var(--color-bg);"></div>
+          <div class="form-group"><label>Cédula</label><input type="text" class="form-input" id="tallas_cedula" readonly style="background:var(--color-bg);"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Unidad</label><input type="text" class="form-input" id="tallas_unidad" readonly style="background:var(--color-bg);"></div>
+          <div class="form-group"><label>Cargo</label><input type="text" class="form-input" id="tallas_cargo" readonly style="background:var(--color-bg);"></div>
+        </div>
+        <div style="font-size:12px;font-weight:600;color:var(--module-bienestar);margin:14px 0 8px;">Tallas de ropa y calzado</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div class="form-group">
+            <label>Talla de camisa</label>
+            <select class="form-select" id="tallas_camisa">
+              <option value="">— Selecciona —</option>
+              <option value="XS">XS</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="XXL">XXL</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Talla de franela</label>
+            <select class="form-select" id="tallas_franela">
+              <option value="">— Selecciona —</option>
+              <option value="XS">XS</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="XXL">XXL</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Talla de pantalón</label>
+            <select class="form-select" id="tallas_pantalon">
+              <option value="">— Selecciona —</option>
+              <option value="28">28</option>
+              <option value="30">30</option>
+              <option value="32">32</option>
+              <option value="34">34</option>
+              <option value="36">36</option>
+              <option value="38">38</option>
+              <option value="40">40</option>
+              <option value="42">42</option>
+              <option value="44">44</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Talla de calzado</label>
+            <select class="form-select" id="tallas_calzado">
+              <option value="">— Selecciona —</option>
+              <option value="34">34</option>
+              <option value="35">35</option>
+              <option value="36">36</option>
+              <option value="37">37</option>
+              <option value="38">38</option>
+              <option value="39">39</option>
+              <option value="40">40</option>
+              <option value="41">41</option>
+              <option value="42">42</option>
+              <option value="43">43</option>
+              <option value="44">44</option>
+              <option value="45">45</option>
+              <option value="46">46</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="bsHideModal('modalTallas')">Cancelar</button>
+        <button class="btn btn-bienestar" onclick="saveTallas()">Guardar tallas</button>
+      </div>
+    </div>
   </div>
 
-  <div class="modal-overlay" id="modal">
+  <div class="modal-overlay" id="modalPrestamo">
     <div class="modal">
-      <div class="modal-header"><h3>Nuevo programa social</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+      <div class="modal-header"><h3 id="modalPrestamoTitle">Nuevo préstamo</h3><button class="modal-close" onclick="bsHideModal('modalPrestamo')">&times;</button></div>
       <div class="modal-body">
-        <form id="moduleForm">
-          <div class="form-group"><label>Nombre del programa</label><input type="text" class="form-input" id="nombre" required></div>
-          <div class="form-group"><label>Responsable</label><input type="text" class="form-input" id="responsable" required></div>
+        <form id="formPrestamo">
+          <div class="form-group"><label>Trabajador</label>
+            <select class="form-select" id="pres_trabajador_id" required></select>
+          </div>
           <div class="form-row">
-            <div class="form-group"><label>Fecha inicio</label><input type="date" class="form-input" id="fecha_inicio" required></div>
-            <div class="form-group"><label>Fecha fin</label><input type="date" class="form-input" id="fecha_fin"></div>
+            <div class="form-group"><label>Monto (Bs.)</label><input type="number" step="0.01" min="0" class="form-input" id="pres_monto" required></div>
+            <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="pres_fecha" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Cuotas</label><input type="number" min="1" class="form-input" id="pres_cuotas" value="1" required></div>
+            <div class="form-group"><label>Cuota actual</label><input type="number" min="1" class="form-input" id="pres_cuota_actual" value="1" required></div>
           </div>
           <div class="form-group"><label>Estado</label>
-            <select class="form-select" id="estado"><option value="Activo">Activo</option><option value="Pendiente">Pendiente</option><option value="Finalizado">Finalizado</option></select>
+            <select class="form-select" id="pres_estado"><option value="Activo">Activo</option><option value="Pagado">Pagado</option><option value="Cancelado">Cancelado</option></select>
           </div>
-          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="descripcion" rows="3"></textarea></div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="pres_descripcion" rows="3"></textarea></div>
         </form>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
-        <button class="btn btn-bienestar" onclick="saveModule()">Guardar</button>
+        <button class="btn btn-outline" onclick="bsHideModal('modalPrestamo')">Cancelar</button>
+        <button class="btn btn-bienestar" onclick="savePrestamo()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalPoliza">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalPolizaTitle">Nueva póliza</h3><button class="modal-close" onclick="bsHideModal('modalPoliza')">&times;</button></div>
+      <div class="modal-body">
+        <form id="formPoliza">
+          <div class="form-row">
+            <div class="form-group"><label>Nombre</label><input type="text" class="form-input" id="pol_nombre" required></div>
+            <div class="form-group"><label>Proveedor</label><input type="text" class="form-input" id="pol_proveedor"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Tipo</label><input type="text" class="form-input" id="pol_tipo" placeholder="Ej: Vida, Salud"></div>
+            <div class="form-group"><label>Estado</label>
+              <select class="form-select" id="pol_estado"><option value="Activa">Activa</option><option value="Vencida">Vencida</option><option value="Cancelada">Cancelada</option></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Fecha inicio</label><input type="date" class="form-input" id="pol_fecha_inicio"></div>
+            <div class="form-group"><label>Fecha fin</label><input type="date" class="form-input" id="pol_fecha_fin"></div>
+          </div>
+          <div class="form-group"><label>Cobertura</label><textarea class="form-textarea" id="pol_cobertura" rows="2"></textarea></div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="pol_descripcion" rows="2"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="bsHideModal('modalPoliza')">Cancelar</button>
+        <button class="btn btn-bienestar" onclick="savePoliza()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalHistoria">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalHistoriaTitle">Nueva historia</h3><button class="modal-close" onclick="bsHideModal('modalHistoria')">&times;</button></div>
+      <div class="modal-body">
+        <form id="formHistoria">
+          <div class="form-row">
+            <div class="form-group"><label>Título</label><input type="text" class="form-input" id="hist_titulo" required></div>
+            <div class="form-group"><label>Autor</label><input type="text" class="form-input" id="hist_autor"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="hist_fecha" required></div>
+            <div class="form-group"><label>Estado</label>
+              <select class="form-select" id="hist_estado"><option value="Publicada">Publicada</option><option value="Borrador">Borrador</option><option value="Archivada">Archivada</option></select>
+            </div>
+          </div>
+          <div class="form-group"><label>URL de foto</label><input type="text" class="form-input" id="hist_foto_url" placeholder="https://..."></div>
+          <div class="form-group"><label>Contenido</label><textarea class="form-textarea" id="hist_contenido" rows="4"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="bsHideModal('modalHistoria')">Cancelar</button>
+        <button class="btn btn-bienestar" onclick="saveHistoria()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalEncuesta">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalEncuestaTitle">Nueva encuesta</h3><button class="modal-close" onclick="bsHideModal('modalEncuesta')">&times;</button></div>
+      <div class="modal-body">
+        <form id="formEncuesta">
+          <div class="form-group"><label>Título</label><input type="text" class="form-input" id="enc_titulo" required></div>
+          <div class="form-row">
+            <div class="form-group"><label>Fecha inicio</label><input type="date" class="form-input" id="enc_fecha_inicio"></div>
+            <div class="form-group"><label>Fecha fin</label><input type="date" class="form-input" id="enc_fecha_fin"></div>
+          </div>
+          <div class="form-group"><label>Estado</label>
+            <select class="form-select" id="enc_estado"><option value="Activa">Activa</option><option value="Pendiente">Pendiente</option><option value="Cerrada">Cerrada</option></select>
+          </div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="enc_descripcion" rows="3"></textarea></div>
+          <div class="form-group">
+            <label>Preguntas (selección simple)</label>
+            <div id="encPreguntasList"><div class="enc-preguntas-hint">Agrega las preguntas de la encuesta. Cada pregunta tendrá opciones de selección simple.</div></div>
+            <button type="button" class="btn btn-bienestar btn-sm" onclick="bsAddPregunta()">+ Agregar pregunta</button>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="bsHideModal('modalEncuesta')">Cancelar</button>
+        <button class="btn btn-bienestar" onclick="saveEncuesta()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalCompartirEncuesta">
+    <div class="modal">
+      <div class="modal-header"><h3 id="encShareTitulo">Compartir encuesta</h3><button class="modal-close" onclick="bsHideModal('modalCompartirEncuesta')">&times;</button></div>
+      <div class="modal-body">
+        <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:14px;line-height:1.6;">Comparte este enlace con tus trabajadores para que puedan llenar la encuesta. Solo se puede llenar mientras la encuesta esté <b>Activa</b>.</p>
+        <div style="display:flex;gap:8px;align-items:stretch;">
+          <input type="text" class="form-input" id="encLinkInput" readonly onclick="this.select()" style="flex:1;font-size:12px;">
+          <button class="btn btn-bienestar" style="flex-shrink:0;" onclick="copyEncuestLink()"><i class="fi fi-sr-copy" style="font-size:14px;line-height:1;pointer-events:none;vertical-align:-1px;"></i> Copiar</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="bsHideModal('modalCompartirEncuesta')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalCalendario">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalCalendarioTitle">Nuevo evento</h3><button class="modal-close" onclick="bsHideModal('modalCalendario')">&times;</button></div>
+      <div class="modal-body">
+        <form id="formCalendario">
+          <div class="form-group"><label>Título</label><input type="text" class="form-input" id="cal_titulo" required></div>
+          <div class="form-row">
+            <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="cal_fecha" required></div>
+            <div class="form-group"><label>Hora</label><input type="time" class="form-input" id="cal_hora"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Lugar</label><input type="text" class="form-input" id="cal_lugar"></div>
+            <div class="form-group"><label>Tipo</label><input type="text" class="form-input" id="cal_tipo" placeholder="Ej: Actividad, Celebración"></div>
+          </div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="cal_descripcion" rows="3"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="bsHideModal('modalCalendario')">Cancelar</button>
+        <button class="btn btn-bienestar" onclick="saveCalendario()">Guardar</button>
       </div>
     </div>
   </div>
@@ -131,6 +438,808 @@
   <script src="../js/ui.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/modules.js"></script>
-  <script>initModule('bienestar', 'bienestar_programas', ['nombre','responsable','fecha_inicio','fecha_fin','estado','descripcion']);</script>
+  <script>
+    function escBienestar(s) {
+      return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function closeModal() {
+      document.querySelectorAll('.modal-overlay.show').forEach(function(m) { m.classList.remove('show'); });
+    }
+
+    function bsShowModal(id) {
+      document.getElementById(id).classList.add('show');
+    }
+
+    function bsHideModal(id) {
+      document.getElementById(id).classList.remove('show');
+    }
+
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('show');
+    });
+
+    /* ===== PLANTILLA DE TRABAJADORES ===== */
+    var bienestarTrabajadores = [];
+    var bienestarUnidades = [];
+    var bienestarCargos = [];
+    var detalleTrabajadorId = null;
+
+    function getUnidadNombre(id) {
+      var u = bienestarUnidades.find(function(x) { return x.id === id; });
+      return u ? u.nombre : '-';
+    }
+
+    function getCargoNombre(id) {
+      var c = bienestarCargos.find(function(x) { return x.id === id; });
+      return c ? c.titulo : '-';
+    }
+
+    function getTrabajadorNombre(id) {
+      var t = bienestarTrabajadores.find(function(x) { return x.id === id; });
+      return t ? (t.nombres + ' ' + t.apellidos) : '-';
+    }
+
+    function getTrabajadorCedula(id) {
+      var t = bienestarTrabajadores.find(function(x) { return x.id === id; });
+      return t ? t.cedula : '';
+    }
+
+    async function loadPlantilla() {
+      try {
+        var [trabRes, uniRes, carRes] = await Promise.all([
+          supabaseClient.from('plantilla_trabajadores').select('*').order('apellidos'),
+          supabaseClient.from('est_unidades').select('*').order('nombre'),
+          supabaseClient.from('est_cargos').select('*').order('titulo')
+        ]);
+        if (trabRes.error) throw trabRes.error;
+        if (uniRes.error) throw uniRes.error;
+        if (carRes.error) throw carRes.error;
+        bienestarTrabajadores = trabRes.data || [];
+        bienestarUnidades = uniRes.data || [];
+        bienestarCargos = carRes.data || [];
+        var sel = document.getElementById('filtroUnidadPlantilla');
+        sel.innerHTML = '<option value="">Todas las unidades</option>';
+        bienestarUnidades.forEach(function(u) {
+          sel.innerHTML += '<option value="' + u.id + '">' + escBienestar(u.nombre) + '</option>';
+        });
+        filtrarPlantilla();
+      } catch (err) {
+        document.getElementById('plantillaBody').innerHTML =
+          '<tr><td colspan="6" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar la plantilla: ' + escBienestar(err.message) + '</td></tr>';
+      }
+    }
+
+    function filtrarPlantilla() {
+      var q = document.getElementById('buscarPlantilla').value.trim().toLowerCase();
+      var unidadFiltro = document.getElementById('filtroUnidadPlantilla').value;
+      var data = bienestarTrabajadores.filter(function(t) {
+        if (unidadFiltro && t.unidad_id !== unidadFiltro) return false;
+        if (q) {
+          var texto = t.nombres + ' ' + t.apellidos + ' ' + t.cedula + ' ' + getUnidadNombre(t.unidad_id) + ' ' + getCargoNombre(t.cargo_id);
+          if (texto.toLowerCase().indexOf(q) === -1) return false;
+        }
+        return true;
+      });
+      document.getElementById('plantillaCount').textContent = data.length + ' trabajador' + (data.length !== 1 ? 'es' : '');
+      var tbody = document.getElementById('plantillaBody');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">' + ((q || unidadFiltro) ? 'Sin resultados' : 'No hay trabajadores registrados') + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(function(t) {
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + escBienestar(t.nombres + ' ' + t.apellidos) + '</span></td>'
+          + '<td>' + escBienestar(t.cedula) + '</td>'
+          + '<td>' + escBienestar(getUnidadNombre(t.unidad_id)) + '</td>'
+          + '<td>' + escBienestar(getCargoNombre(t.cargo_id)) + '</td>'
+          + '<td class="estado-' + (t.estado || '').toLowerCase() + '">' + escBienestar(t.estado || '-') + '</td>'
+          + '<td><button class="btn btn-sm btn-bienestar" title="Ver detalle y tallas" onclick="openModalTallas(\'' + t.id + '\')"><i class="fi fi-sr-eye" style="font-size:15px;line-height:1;pointer-events:none;"></i> Ver</button></td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function openModalTallas(id) {
+      detalleTrabajadorId = id;
+      var t = bienestarTrabajadores.find(function(x) { return x.id === id; });
+      if (!t) return;
+      document.getElementById('modalTallasTitle').textContent = 'Detalle del trabajador';
+      document.getElementById('tallas_nombre').value = t.nombres + ' ' + t.apellidos;
+      document.getElementById('tallas_cedula').value = t.cedula;
+      document.getElementById('tallas_unidad').value = getUnidadNombre(t.unidad_id);
+      document.getElementById('tallas_cargo').value = getCargoNombre(t.cargo_id);
+      document.getElementById('tallas_camisa').value = t.talla_camisa || '';
+      document.getElementById('tallas_franela').value = t.talla_franela || '';
+      document.getElementById('tallas_pantalon').value = t.talla_pantalon || '';
+      document.getElementById('tallas_calzado').value = t.talla_calzado || '';
+      bsShowModal('modalTallas');
+    }
+
+    async function saveTallas() {
+      if (!detalleTrabajadorId) return;
+      var payload = {
+        talla_camisa: document.getElementById('tallas_camisa').value || null,
+        talla_franela: document.getElementById('tallas_franela').value || null,
+        talla_pantalon: document.getElementById('tallas_pantalon').value || null,
+        talla_calzado: document.getElementById('tallas_calzado').value || null
+      };
+      try {
+        var { error, count } = await supabaseClient
+          .from('plantilla_trabajadores')
+          .update(payload, { count: 'exact' })
+          .eq('id', detalleTrabajadorId);
+        if (error) throw error;
+        if (count === 0) throw new Error('0 filas actualizadas. Revisa la política de UPDATE en plantilla_trabajadores (RLS).');
+        var t = bienestarTrabajadores.find(function(x) { return x.id === detalleTrabajadorId; });
+        if (t) Object.assign(t, payload);
+        bsHideModal('modalTallas');
+        showAlert('Tallas guardadas correctamente', 'success');
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== PRÉSTAMOS ===== */
+    var bienestarPrestamos = [];
+    var editingPrestamoId = null;
+
+    async function loadPrestamos() {
+      try {
+        var { data, error } = await supabaseClient.from('bienestar_prestamos').select('*').order('fecha', { ascending: false });
+        if (error) throw error;
+        bienestarPrestamos = data || [];
+        renderPrestamos();
+      } catch (err) {
+        document.getElementById('prestamosBody').innerHTML =
+          '<tr><td colspan="7" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar préstamos: ' + escBienestar(err.message) + '</td></tr>';
+      }
+    }
+
+    function renderPrestamos() {
+      var tbody = document.getElementById('prestamosBody');
+      if (!bienestarPrestamos.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay préstamos registrados</td></tr>';
+        return;
+      }
+      tbody.innerHTML = bienestarPrestamos.map(function(p) {
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + escBienestar(getTrabajadorNombre(p.trabajador_id)) + '</span></td>'
+          + '<td>Bs. ' + Number(p.monto || 0).toLocaleString() + '</td>'
+          + '<td style="text-align:center;">' + p.cuotas + '</td>'
+          + '<td style="text-align:center;">' + p.cuota_actual + '</td>'
+          + '<td>' + (p.fecha || '-') + '</td>'
+          + '<td><span class="badge ' + getBadgeClass(p.estado) + '">' + escBienestar(p.estado) + '</span></td>'
+          + '<td>'
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalPrestamo(' + p.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deletePrestamo(' + p.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function openModalPrestamo(id) {
+      editingPrestamoId = id || null;
+      var sel = document.getElementById('pres_trabajador_id');
+      sel.innerHTML = '<option value="">— Selecciona —</option>';
+      bienestarTrabajadores.forEach(function(t) {
+        sel.innerHTML += '<option value="' + t.id + '">' + escBienestar(t.nombres + ' ' + t.apellidos) + ' (' + escBienestar(t.cedula) + ')</option>';
+      });
+      document.getElementById('formPrestamo').reset();
+      document.getElementById('modalPrestamoTitle').textContent = id ? 'Editar préstamo' : 'Nuevo préstamo';
+      if (id) {
+        var p = bienestarPrestamos.find(function(x) { return x.id === id; });
+        if (p) {
+          sel.value = p.trabajador_id || '';
+          document.getElementById('pres_monto').value = p.monto;
+          document.getElementById('pres_fecha').value = p.fecha || '';
+          document.getElementById('pres_cuotas').value = p.cuotas;
+          document.getElementById('pres_cuota_actual').value = p.cuota_actual;
+          document.getElementById('pres_estado').value = p.estado;
+          document.getElementById('pres_descripcion').value = p.descripcion || '';
+        }
+      }
+      bsShowModal('modalPrestamo');
+    }
+
+    async function savePrestamo() {
+      var trabajador_id = document.getElementById('pres_trabajador_id').value;
+      var monto = parseFloat(document.getElementById('pres_monto').value);
+      var fecha = document.getElementById('pres_fecha').value;
+      if (!trabajador_id || isNaN(monto) || monto <= 0 || !fecha) {
+        showAlert('Completa los campos requeridos', 'warning');
+        return;
+      }
+      var payload = {
+        trabajador_id: trabajador_id,
+        monto: monto,
+        fecha: fecha,
+        cuotas: parseInt(document.getElementById('pres_cuotas').value) || 1,
+        cuota_actual: parseInt(document.getElementById('pres_cuota_actual').value) || 1,
+        estado: document.getElementById('pres_estado').value,
+        descripcion: document.getElementById('pres_descripcion').value.trim() || null
+      };
+      try {
+        if (editingPrestamoId) {
+          var { error } = await supabaseClient.from('bienestar_prestamos').update(payload).eq('id', editingPrestamoId);
+          if (error) throw error;
+        } else {
+          var { error } = await supabaseClient.from('bienestar_prestamos').insert([payload]);
+          if (error) throw error;
+        }
+        bsHideModal('modalPrestamo');
+        loadPrestamos();
+        showAlert(editingPrestamoId ? 'Préstamo actualizado' : 'Préstamo creado', 'success');
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deletePrestamo(id) {
+      var ok = await showConfirm('¿Eliminar este préstamo?', 'Eliminar');
+      if (!ok) return;
+      try {
+        var { error } = await supabaseClient.from('bienestar_prestamos').delete().eq('id', id);
+        if (error) throw error;
+        loadPrestamos();
+        showAlert('Préstamo eliminado', 'success');
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== PÓLIZAS ===== */
+    var bienestarPolizas = [];
+    var editingPolizaId = null;
+
+    async function loadPolizas() {
+      try {
+        var { data, error } = await supabaseClient.from('bienestar_polizas').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        bienestarPolizas = data || [];
+        renderPolizas();
+      } catch (err) {
+        document.getElementById('polizasBody').innerHTML =
+          '<tr><td colspan="7" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar pólizas: ' + escBienestar(err.message) + '</td></tr>';
+      }
+    }
+
+    function renderPolizas() {
+      var tbody = document.getElementById('polizasBody');
+      if (!bienestarPolizas.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay pólizas registradas</td></tr>';
+        return;
+      }
+      tbody.innerHTML = bienestarPolizas.map(function(p) {
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + escBienestar(p.nombre) + '</span></td>'
+          + '<td>' + escBienestar(p.proveedor || '-') + '</td>'
+          + '<td>' + escBienestar(p.tipo || '-') + '</td>'
+          + '<td>' + (p.fecha_inicio || '-') + '</td>'
+          + '<td>' + (p.fecha_fin || '-') + '</td>'
+          + '<td><span class="badge ' + getBadgeClass(p.estado) + '">' + escBienestar(p.estado) + '</span></td>'
+          + '<td>'
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalPoliza(' + p.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deletePoliza(' + p.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function openModalPoliza(id) {
+      editingPolizaId = id || null;
+      document.getElementById('formPoliza').reset();
+      document.getElementById('modalPolizaTitle').textContent = id ? 'Editar póliza' : 'Nueva póliza';
+      if (id) {
+        var p = bienestarPolizas.find(function(x) { return x.id === id; });
+        if (p) {
+          document.getElementById('pol_nombre').value = p.nombre;
+          document.getElementById('pol_proveedor').value = p.proveedor || '';
+          document.getElementById('pol_tipo').value = p.tipo || '';
+          document.getElementById('pol_cobertura').value = p.cobertura || '';
+          document.getElementById('pol_fecha_inicio').value = p.fecha_inicio || '';
+          document.getElementById('pol_fecha_fin').value = p.fecha_fin || '';
+          document.getElementById('pol_estado').value = p.estado;
+          document.getElementById('pol_descripcion').value = p.descripcion || '';
+        }
+      }
+      bsShowModal('modalPoliza');
+    }
+
+    async function savePoliza() {
+      var nombre = document.getElementById('pol_nombre').value.trim();
+      if (!nombre) {
+        showAlert('El nombre de la póliza es obligatorio', 'warning');
+        return;
+      }
+      var payload = {
+        nombre: nombre,
+        proveedor: document.getElementById('pol_proveedor').value.trim() || null,
+        tipo: document.getElementById('pol_tipo').value.trim() || null,
+        cobertura: document.getElementById('pol_cobertura').value.trim() || null,
+        fecha_inicio: document.getElementById('pol_fecha_inicio').value || null,
+        fecha_fin: document.getElementById('pol_fecha_fin').value || null,
+        estado: document.getElementById('pol_estado').value,
+        descripcion: document.getElementById('pol_descripcion').value.trim() || null
+      };
+      try {
+        if (editingPolizaId) {
+          var { error } = await supabaseClient.from('bienestar_polizas').update(payload).eq('id', editingPolizaId);
+          if (error) throw error;
+        } else {
+          var { error } = await supabaseClient.from('bienestar_polizas').insert([payload]);
+          if (error) throw error;
+        }
+        bsHideModal('modalPoliza');
+        loadPolizas();
+        showAlert(editingPolizaId ? 'Póliza actualizada' : 'Póliza creada', 'success');
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deletePoliza(id) {
+      var ok = await showConfirm('¿Eliminar esta póliza?', 'Eliminar');
+      if (!ok) return;
+      try {
+        var { error } = await supabaseClient.from('bienestar_polizas').delete().eq('id', id);
+        if (error) throw error;
+        loadPolizas();
+        showAlert('Póliza eliminada', 'success');
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== HISTORIAS DE GENTE FIAT ===== */
+    var bienestarHistorias = [];
+    var editingHistoriaId = null;
+    var historiaGradients = ['#db2777', '#7c3aed', '#0d9488', '#ea580c', '#2563eb', '#059669', '#d97706'];
+
+    function historiaGradiente(id) {
+      var s = String(id);
+      var n = 0;
+      for (var i = 0; i < s.length; i++) n += s.charCodeAt(i);
+      return historiaGradients[n % historiaGradients.length];
+    }
+
+    async function loadHistorias() {
+      try {
+        var { data, error } = await supabaseClient.from('bienestar_historias').select('*').order('fecha', { ascending: false });
+        if (error) throw error;
+        bienestarHistorias = data || [];
+        renderHistorias();
+      } catch (err) {
+        document.getElementById('historiasGrid').innerHTML =
+          '<div class="empty-state"><div class="empty-state-text" style="color:#dc2626;">Error al cargar historias: ' + escBienestar(err.message) + '</div></div>';
+      }
+    }
+
+    function renderHistorias() {
+      var grid = document.getElementById('historiasGrid');
+      if (!bienestarHistorias.length) {
+        grid.innerHTML = '<div class="empty-state"><div class="empty-state-text">No hay historias publicadas</div></div>';
+        return;
+      }
+      grid.innerHTML = bienestarHistorias.map(function(h) {
+        var letra = (h.titulo || '?').charAt(0).toUpperCase();
+        var thumb = h.foto_url
+          ? '<img src="' + escBienestar(h.foto_url) + '" alt="" onerror="this.style.display=\'none\';">'
+          : '';
+        return '<div class="historia-card">'
+          + '<div class="historia-thumb">'
+          + thumb
+          + '<div class="historia-thumb-ph" style="background:' + historiaGradiente(h.id) + ';">' + escBienestar(letra) + '</div>'
+          + '<span class="historia-badge badge-' + (h.estado === 'Publicada' ? 'active" style="background:#059669;' : 'pending" style="background:#d97706;') + '">' + escBienestar(h.estado || '-') + '</span>'
+          + '</div>'
+          + '<div class="historia-card-body">'
+          + '<div class="historia-card-title">' + escBienestar(h.titulo) + '</div>'
+          + '<div class="historia-card-meta">' + escBienestar(h.autor || 'Autor no indicado') + ' · ' + (h.fecha || '-') + '</div>'
+          + '<div class="historia-card-excerpt">' + escBienestar(h.contenido || '') + '</div>'
+          + '</div>'
+          + '<div style="padding:0 10px 10px;display:flex;gap:8px;">'
+          + '<button class="btn btn-bienestar btn-sm" onclick="openModalHistoria(' + h.id + ')">Editar</button>'
+          + '<button class="btn btn-outline btn-sm" onclick="deleteHistoria(' + h.id + ')">Eliminar</button>'
+          + '</div>'
+          + '</div>';
+      }).join('');
+      uiFadeIn(grid);
+    }
+
+    function openModalHistoria(id) {
+      editingHistoriaId = id || null;
+      document.getElementById('formHistoria').reset();
+      document.getElementById('modalHistoriaTitle').textContent = id ? 'Editar historia' : 'Nueva historia';
+      if (id) {
+        var h = bienestarHistorias.find(function(x) { return x.id === id; });
+        if (h) {
+          document.getElementById('hist_titulo').value = h.titulo;
+          document.getElementById('hist_autor').value = h.autor || '';
+          document.getElementById('hist_foto_url').value = h.foto_url || '';
+          document.getElementById('hist_contenido').value = h.contenido || '';
+          document.getElementById('hist_fecha').value = h.fecha || '';
+          document.getElementById('hist_estado').value = h.estado;
+        }
+      }
+      bsShowModal('modalHistoria');
+    }
+
+    async function saveHistoria() {
+      var titulo = document.getElementById('hist_titulo').value.trim();
+      var fecha = document.getElementById('hist_fecha').value;
+      if (!titulo || !fecha) {
+        showAlert('El título y la fecha son obligatorios', 'warning');
+        return;
+      }
+      var payload = {
+        titulo: titulo,
+        autor: document.getElementById('hist_autor').value.trim() || null,
+        foto_url: document.getElementById('hist_foto_url').value.trim() || null,
+        contenido: document.getElementById('hist_contenido').value.trim() || null,
+        fecha: fecha,
+        estado: document.getElementById('hist_estado').value
+      };
+      try {
+        if (editingHistoriaId) {
+          var { error } = await supabaseClient.from('bienestar_historias').update(payload).eq('id', editingHistoriaId);
+          if (error) throw error;
+        } else {
+          var { error } = await supabaseClient.from('bienestar_historias').insert([payload]);
+          if (error) throw error;
+        }
+        bsHideModal('modalHistoria');
+        loadHistorias();
+        showAlert(editingHistoriaId ? 'Historia actualizada' : 'Historia creada', 'success');
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteHistoria(id) {
+      var ok = await showConfirm('¿Eliminar esta historia?', 'Eliminar');
+      if (!ok) return;
+      try {
+        var { error } = await supabaseClient.from('bienestar_historias').delete().eq('id', id);
+        if (error) throw error;
+        loadHistorias();
+        showAlert('Historia eliminada', 'success');
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== ENCUESTAS ===== */
+    var bienestarEncuestas = [];
+    var editingEncuestaId = null;
+    var encuestaPreguntas = [];
+
+    async function loadEncuestas() {
+      try {
+        var { data, error } = await supabaseClient.from('bienestar_encuestas').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        bienestarEncuestas = data || [];
+        renderEncuestas();
+      } catch (err) {
+        document.getElementById('encuestasBody').innerHTML =
+          '<tr><td colspan="6" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar encuestas: ' + escBienestar(err.message) + '</td></tr>';
+      }
+    }
+
+    function renderEncuestas() {
+      var tbody = document.getElementById('encuestasBody');
+      if (!bienestarEncuestas.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">No hay encuestas registradas</td></tr>';
+        return;
+      }
+      tbody.innerHTML = bienestarEncuestas.map(function(e) {
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + escBienestar(e.titulo) + '</span></td>'
+          + '<td>' + escBienestar(e.descripcion || '-') + '</td>'
+          + '<td>' + (e.fecha_inicio || '-') + '</td>'
+          + '<td>' + (e.fecha_fin || '-') + '</td>'
+          + '<td><span class="badge ' + getBadgeClass(e.estado) + '">' + escBienestar(e.estado) + '</span></td>'
+          + '<td>'
+          + '<button class="btn btn-sm btn-outline" title="Compartir" onclick="openCompartirEncuesta(' + e.id + ')"><i class="fi fi-sr-share" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalEncuesta(' + e.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteEncuesta(' + e.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function renderEncuestaPreguntas() {
+      var box = document.getElementById('encPreguntasList');
+      if (!box) return;
+      if (!encuestaPreguntas.length) {
+        box.innerHTML = '<div class="enc-preguntas-hint">Agrega las preguntas de la encuesta. Cada pregunta tendrá opciones de selección simple.</div>';
+        return;
+      }
+      box.innerHTML = encuestaPreguntas.map(function(p, i) {
+        var opciones = p.opciones.map(function(op, j) {
+          return '<div class="enc-opcion">'
+            + '<span class="enc-opcion-radio"></span>'
+            + '<input type="text" class="form-input" value="' + escBienestar(op) + '" placeholder="Opción ' + (j + 1) + '..." oninput="encuestaPreguntas[' + i + '].opciones[' + j + ']=this.value">'
+            + '<button type="button" class="modal-close" title="Quitar opción" onclick="encuestaPreguntas[' + i + '].opciones.splice(' + j + ',1);renderEncuestaPreguntas()">&times;</button>'
+            + '</div>';
+        }).join('');
+        return '<div class="enc-pregunta">'
+          + '<div class="enc-pregunta-head">'
+          + '<span class="enc-pregunta-num">' + (i + 1) + '</span>'
+          + '<input type="text" class="form-input" value="' + escBienestar(p.pregunta) + '" placeholder="Escribe la pregunta..." oninput="encuestaPreguntas[' + i + '].pregunta=this.value">'
+          + '<button type="button" class="modal-close" title="Eliminar pregunta" onclick="encuestaPreguntas.splice(' + i + ',1);renderEncuestaPreguntas()">&times;</button>'
+          + '</div>'
+          + '<div class="enc-opciones">' + opciones + '</div>'
+          + '<button type="button" class="btn btn-outline btn-sm" onclick="encuestaPreguntas[' + i + '].opciones.push(\'\');renderEncuestaPreguntas()">+ Agregar opción</button>'
+          + '</div>';
+      }).join('');
+    }
+
+    function bsAddPregunta() {
+      encuestaPreguntas.push({ pregunta: '', opciones: ['', ''] });
+      renderEncuestaPreguntas();
+    }
+
+    function encuestaShareLink(id) {
+      var path = location.pathname.split('/');
+      var idx = path.indexOf('modules');
+      var root = idx > 0 ? path.slice(0, idx).join('/') + '/' : '/';
+      return location.origin + root + 'encuesta.html?id=' + id;
+    }
+
+    function openCompartirEncuesta(id, titulo) {
+      var e = titulo ? null : bienestarEncuestas.find(function(x) { return x.id === id; });
+      document.getElementById('encShareTitulo').textContent = 'Compartir: ' + (titulo || (e && e.titulo) || 'Encuesta');
+      document.getElementById('encLinkInput').value = encuestaShareLink(id);
+      bsShowModal('modalCompartirEncuesta');
+    }
+
+    function copyEncuestLink() {
+      var input = document.getElementById('encLinkInput');
+      input.select();
+      var copiado = false;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(input.value).then(function() { copiado = true; });
+      }
+      try { copiado = document.execCommand('copy') || copiado; } catch (e) {}
+      showAlert('Enlace copiado al portapapeles', 'success');
+    }
+
+    async function openModalEncuesta(id) {
+      editingEncuestaId = id || null;
+      document.getElementById('formEncuesta').reset();
+      document.getElementById('modalEncuestaTitle').textContent = id ? 'Editar encuesta' : 'Nueva encuesta';
+      encuestaPreguntas = [];
+      if (id) {
+        var e = bienestarEncuestas.find(function(x) { return x.id === id; });
+        if (e) {
+          document.getElementById('enc_titulo').value = e.titulo;
+          document.getElementById('enc_descripcion').value = e.descripcion || '';
+          document.getElementById('enc_fecha_inicio').value = e.fecha_inicio || '';
+          document.getElementById('enc_fecha_fin').value = e.fecha_fin || '';
+          document.getElementById('enc_estado').value = e.estado;
+        }
+        try {
+          var { data, error } = await supabaseClient
+            .from('bienestar_encuesta_preguntas')
+            .select('*')
+            .eq('encuesta_id', id)
+            .order('orden');
+          if (error) throw error;
+          encuestaPreguntas = (data || []).map(function(p) {
+            return {
+              pregunta: p.pregunta || '',
+              opciones: (p.opciones && p.opciones.length) ? p.opciones.slice() : ['', '']
+            };
+          });
+        } catch (err) {
+          encuestaPreguntas = [];
+        }
+      }
+      if (!encuestaPreguntas.length) encuestaPreguntas.push({ pregunta: '', opciones: ['', ''] });
+      renderEncuestaPreguntas();
+      bsShowModal('modalEncuesta');
+    }
+
+    async function saveEncuesta() {
+      var titulo = document.getElementById('enc_titulo').value.trim();
+      if (!titulo) {
+        showAlert('El título es obligatorio', 'warning');
+        return;
+      }
+      var preguntasValidas = encuestaPreguntas.map(function(p) {
+        return {
+          pregunta: (p.pregunta || '').trim(),
+          opciones: (p.opciones || []).map(function(o) { return (o || '').trim(); }).filter(Boolean)
+        };
+      }).filter(function(p) { return p.pregunta || p.opciones.length; });
+
+      for (var i = 0; i < preguntasValidas.length; i++) {
+        if (!preguntasValidas[i].pregunta) {
+          showAlert('La pregunta ' + (i + 1) + ' no tiene texto', 'warning');
+          return;
+        }
+        if (preguntasValidas[i].opciones.length < 2) {
+          showAlert('La pregunta ' + (i + 1) + ' debe tener al menos 2 opciones', 'warning');
+          return;
+        }
+      }
+      if (!preguntasValidas.length) {
+        showAlert('Debes agregar al menos una pregunta con 2 o más opciones', 'warning');
+        return;
+      }
+
+      var payload = {
+        titulo: titulo,
+        descripcion: document.getElementById('enc_descripcion').value.trim() || null,
+        fecha_inicio: document.getElementById('enc_fecha_inicio').value || null,
+        fecha_fin: document.getElementById('enc_fecha_fin').value || null,
+        estado: document.getElementById('enc_estado').value
+      };
+      try {
+        var encuestaId;
+        if (editingEncuestaId) {
+          var { count, error: errCount } = await supabaseClient
+            .from('bienestar_encuesta_respuestas')
+            .select('id', { count: 'exact', head: true })
+            .eq('encuesta_id', editingEncuestaId);
+          if (errCount) throw errCount;
+          if (count > 0) {
+            var ok = await showConfirm('Esta encuesta ya tiene ' + count + ' respuesta(s). Si cambias las preguntas, las respuestas anteriores se eliminarán. ¿Continuar?', 'Continuar');
+            if (!ok) return;
+          }
+          var { error } = await supabaseClient.from('bienestar_encuestas').update(payload).eq('id', editingEncuestaId);
+          if (error) throw error;
+          encuestaId = editingEncuestaId;
+          var { error: errDel } = await supabaseClient.from('bienestar_encuesta_preguntas').delete().eq('encuesta_id', encuestaId);
+          if (errDel) throw errDel;
+        } else {
+          var { data: ins, error: errIns } = await supabaseClient.from('bienestar_encuestas').insert([payload]).select();
+          if (errIns) throw errIns;
+          encuestaId = ins[0].id;
+        }
+        var preguntasPayload = preguntasValidas.map(function(p, i) {
+          return {
+            encuesta_id: encuestaId,
+            pregunta: p.pregunta,
+            opciones: p.opciones,
+            orden: i + 1
+          };
+        });
+        var { error: errPreg } = await supabaseClient.from('bienestar_encuesta_preguntas').insert(preguntasPayload);
+        if (errPreg) throw errPreg;
+
+        bsHideModal('modalEncuesta');
+        loadEncuestas();
+        openCompartirEncuesta(encuestaId, titulo);
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteEncuesta(id) {
+      var ok = await showConfirm('¿Eliminar esta encuesta?', 'Eliminar');
+      if (!ok) return;
+      try {
+        var { error } = await supabaseClient.from('bienestar_encuestas').delete().eq('id', id);
+        if (error) throw error;
+        loadEncuestas();
+        showAlert('Encuesta eliminada', 'success');
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== CALENDARIO ===== */
+    var bienestarCalendario = [];
+    var editingCalendarioId = null;
+
+    async function loadCalendario() {
+      try {
+        var { data, error } = await supabaseClient.from('bienestar_calendario').select('*').order('fecha');
+        if (error) throw error;
+        bienestarCalendario = data || [];
+        renderCalendario();
+      } catch (err) {
+        document.getElementById('calendarioBody').innerHTML =
+          '<tr><td colspan="6" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar el calendario: ' + escBienestar(err.message) + '</td></tr>';
+      }
+    }
+
+    function renderCalendario() {
+      var tbody = document.getElementById('calendarioBody');
+      if (!bienestarCalendario.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">No hay eventos registrados</td></tr>';
+        return;
+      }
+      var hoy = new Date().toISOString().slice(0, 10);
+      tbody.innerHTML = bienestarCalendario.map(function(c) {
+        var proximo = c.fecha >= hoy;
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + escBienestar(c.titulo) + '</span></td>'
+          + '<td>' + (c.fecha || '-') + '</td>'
+          + '<td>' + escBienestar(c.hora || '-') + '</td>'
+          + '<td>' + escBienestar(c.lugar || '-') + '</td>'
+          + '<td>' + escBienestar(c.tipo || '-') + '</td>'
+          + '<td>'
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalCalendario(' + c.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteCalendario(' + c.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function openModalCalendario(id) {
+      editingCalendarioId = id || null;
+      document.getElementById('formCalendario').reset();
+      document.getElementById('modalCalendarioTitle').textContent = id ? 'Editar evento' : 'Nuevo evento';
+      if (id) {
+        var c = bienestarCalendario.find(function(x) { return x.id === id; });
+        if (c) {
+          document.getElementById('cal_titulo').value = c.titulo;
+          document.getElementById('cal_fecha').value = c.fecha || '';
+          document.getElementById('cal_hora').value = c.hora || '';
+          document.getElementById('cal_lugar').value = c.lugar || '';
+          document.getElementById('cal_tipo').value = c.tipo || '';
+          document.getElementById('cal_descripcion').value = c.descripcion || '';
+        }
+      }
+      bsShowModal('modalCalendario');
+    }
+
+    async function saveCalendario() {
+      var titulo = document.getElementById('cal_titulo').value.trim();
+      var fecha = document.getElementById('cal_fecha').value;
+      if (!titulo || !fecha) {
+        showAlert('El título y la fecha son obligatorios', 'warning');
+        return;
+      }
+      var payload = {
+        titulo: titulo,
+        fecha: fecha,
+        hora: document.getElementById('cal_hora').value || null,
+        lugar: document.getElementById('cal_lugar').value.trim() || null,
+        tipo: document.getElementById('cal_tipo').value.trim() || null,
+        descripcion: document.getElementById('cal_descripcion').value.trim() || null
+      };
+      try {
+        if (editingCalendarioId) {
+          var { error } = await supabaseClient.from('bienestar_calendario').update(payload).eq('id', editingCalendarioId);
+          if (error) throw error;
+        } else {
+          var { error } = await supabaseClient.from('bienestar_calendario').insert([payload]);
+          if (error) throw error;
+        }
+        bsHideModal('modalCalendario');
+        loadCalendario();
+        showAlert(editingCalendarioId ? 'Evento actualizado' : 'Evento creado', 'success');
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteCalendario(id) {
+      var ok = await showConfirm('¿Eliminar este evento?', 'Eliminar');
+      if (!ok) return;
+      try {
+        var { error } = await supabaseClient.from('bienestar_calendario').delete().eq('id', id);
+        if (error) throw error;
+        loadCalendario();
+        showAlert('Evento eliminado', 'success');
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== INICIALIZACIÓN ===== */
+    document.addEventListener('DOMContentLoaded', function() {
+      restoreTool();
+      loadPlantilla().then(function() {
+        loadPrestamos();
+      });
+      loadPolizas();
+      loadHistorias();
+      loadEncuestas();
+      loadCalendario();
+    });
+  </script>
 </body>
 </html>

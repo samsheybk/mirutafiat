@@ -21,6 +21,8 @@
   --module-compensacion: #7c3aed;
   --module-plantilla: #0d9488;
   --module-repositorio: #06b6d4;
+  --module-chatfiat: #4f46e5;
+  --module-desarrollo: #d97706;
 }
 
 html, body {
@@ -176,6 +178,15 @@ a {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-left: 8px;
+}
+
+.topnav-logo {
+  height: 34px;
+  width: auto;
+  margin-right: 10px;
+  display: inline-block;
+  vertical-align: middle;
+  filter: brightness(0) invert(1);
 }
 
 .topnav-spacer {
@@ -417,7 +428,8 @@ a {
 .panel-item.active .panel-item-indicator.bg-seguridad ~ i.fi { color: var(--module-seguridad); }
 .panel-item.active .panel-item-indicator.bg-compensacion ~ i.fi { color: var(--module-compensacion); }
 .panel-item.active .panel-item-indicator.bg-repositorio ~ i.fi { color: var(--module-repositorio); }
-
+.panel-item.active .panel-item-indicator.bg-chatfiat ~ i.fi { color: var(--module-chatfiat); }
+.panel-item.active .panel-item-indicator.bg-desarrollo ~ i.fi { color: var(--module-desarrollo); }
 .panel-item-indicator {
   position: absolute;
   top: 0;
@@ -609,6 +621,8 @@ a {
 .btn-compensacion { background: var(--module-compensacion); }
 .btn-plantilla { background: var(--module-plantilla); }
 .btn-repositorio { background: var(--module-repositorio); }
+.btn-chatfiat { background: var(--module-chatfiat); }
+.btn-desarrollo { background: var(--module-desarrollo); }
 
 .border-captacion { border-color: var(--module-captacion); }
 .border-relaciones { border-color: var(--module-relaciones); }
@@ -618,6 +632,8 @@ a {
 .border-compensacion { border-color: var(--module-compensacion); }
 .border-plantilla { border-color: var(--module-plantilla); }
 .border-repositorio { border-color: var(--module-repositorio); }
+.border-chatfiat { border-color: var(--module-chatfiat); }
+.border-desarrollo { border-color: var(--module-desarrollo); }
 
 .text-captacion { color: var(--module-captacion); }
 .text-relaciones { color: var(--module-relaciones); }
@@ -627,6 +643,8 @@ a {
 .text-compensacion { color: var(--module-compensacion); }
 .text-plantilla { color: var(--module-plantilla); }
 .text-repositorio { color: var(--module-repositorio); }
+.text-chatfiat { color: var(--module-chatfiat); }
+.text-desarrollo { color: var(--module-desarrollo); }
 
 .bg-captacion { background: var(--module-captacion); }
 .bg-relaciones { background: var(--module-relaciones); }
@@ -636,6 +654,8 @@ a {
 .bg-compensacion { background: var(--module-compensacion); }
 .bg-plantilla { background: var(--module-plantilla); }
 .bg-repositorio { background: var(--module-repositorio); }
+.bg-chatfiat { background: var(--module-chatfiat); }
+.bg-desarrollo { background: var(--module-desarrollo); }
 
 /* ===== EMPTY STATE ===== */
 .empty-state {
@@ -749,6 +769,60 @@ a {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* ===== SKELETON LOADING ===== */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  height: 14px;
+  background: var(--color-border);
+  border-radius: 4px;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+  animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+.skeleton-block { height: 18px; }
+.skeleton-thumb {
+  height: auto;
+  aspect-ratio: 16/9;
+  border-radius: 6px;
+}
+.skeleton-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: 14px;
+}
+.skeleton-card-body .skeleton { margin-top: 8px; }
+.skeleton-card-body .skeleton:first-child { margin-top: 0; }
+.skeleton-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  padding: 24px;
+}
+.skeleton-panel .skeleton { margin-top: 10px; }
+.skeleton-panel .skeleton:first-child { margin-top: 0; }
+.skeleton-table td { padding: 12px 16px; }
+.skeleton-table td .skeleton { height: 13px; }
+.skeleton-table td:nth-child(4n+1) .skeleton { width: 90%; }
+.skeleton-table td:nth-child(4n+2) .skeleton { width: 68%; }
+.skeleton-table td:nth-child(4n+3) .skeleton { width: 78%; }
+.skeleton-table td:nth-child(4n+4) .skeleton { width: 55%; }
+
+/* ===== TRANSICIONES DE CONTENIDO ===== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+.tool-section.active { animation: fadeIn .22s ease; }
+.fade-in { animation: fadeIn .22s ease; }
 
 /* ===== UTILITIES ===== */
 .mt-4 { margin-top: 16px; }

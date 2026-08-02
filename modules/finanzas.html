@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finanzas - FIAT Intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
+  <style>
+    :root { --module-color: var(--module-finanzas); }
+    .tool-section.active { height: 100%; overflow-y: auto; padding-right: 4px; }
+    .tabla-scroll { overflow-x: auto; }
+    .toolbar-content[data-toolbar="movimientos"] .form-input,
+    .toolbar-content[data-toolbar="movimientos"] .form-select,
+    .toolbar-content[data-toolbar="reportes"] .form-input,
+    .toolbar-content[data-toolbar="reportes"] .form-select { height: 36px; }
+    .fin-hint { font-size: 12px; color: var(--color-text-secondary); padding: 4px 0 14px; }
+    .fin-filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; background: var(--color-surface); border: 1px solid var(--color-border); padding: 12px; margin-bottom: 14px; }
+    .fin-filters .form-group { margin: 0; min-width: 150px; }
+    .fin-filters .form-group.fin-grow { flex: 1; min-width: 200px; }
+    .fin-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .fin-card { background: var(--color-surface); border: 1px solid var(--color-border); border-top: 3px solid var(--module-finanzas); padding: 14px 16px; }
+    .fin-card .fin-card-label { font-size: 12px; color: var(--color-text-secondary); }
+    .fin-card .fin-card-value { font-size: 20px; font-weight: 700; margin-top: 4px; }
+    .fin-card .fin-card-sub { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+    .fin-sec-title { font-size: 14px; font-weight: 700; margin: 18px 0 8px; display: flex; align-items: center; gap: 8px; }
+    .fin-sec-title i.fi { color: var(--module-finanzas); font-size: 18px; }
+    .fin-bar-row { display: flex; align-items: center; gap: 10px; }
+    .fin-bar-track { flex: 1; background: var(--color-bg); height: 10px; border-radius: 2px; overflow: hidden; }
+    .fin-bar-ing { background: #059669; height: 100%; }
+    .fin-bar-egr { background: #dc2626; height: 100%; }
+    .fin-tipo-gasto { color: #dc2626; font-weight: 600; }
+    .fin-tipo-ingreso { color: #059669; font-weight: 600; }
+    .fin-pos { color: #059669; font-weight: 700; }
+    .fin-neg { color: #dc2626; font-weight: 700; }
+    .fin-resumen { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <nav class="topnav" style="background:var(--module-finanzas);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><img class="topnav-logo" src="../icons/logo FIAT.webp" alt="FIAT">VEN<span>-Intranet</span></div>
+      <div class="topnav-spacer"></div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Dashboard</option>
+        <option value="captacion.html">Captación y Selección</option>
+        <option value="relaciones-laborales.html">Relaciones Laborales</option>
+        <option value="capacitacion.html">Capacitación y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="compensacion.html">Compensación</option>
+        <option value="finanzas.html" selected>Finanzas</option>
+        <option value="repositorio.html">Repositorio</option>
+        <option value="chatfiat.html">ChatFIAT</option>
+        <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
+      </select>
+      <div class="nav-user">
+        <span id="navUserEmail"></span>
+        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-panel">
+          <div class="panel-item active" data-tool="movimientos" onclick="switchTool('movimientos')" title="Registro de movimientos"><span class="panel-item-indicator bg-finanzas"></span><i class="fi fi-sr-receipt" style="font-size:24px;pointer-events:none;"></i>
+          </div>
+          <div class="panel-item" data-tool="reportes" onclick="switchTool('reportes')" title="Reportes financieros"><span class="panel-item-indicator bg-finanzas"></span><i class="fi fi-sr-chart-histogram" style="font-size:24px;pointer-events:none;"></i>
+          </div>
+        </div>
+
+        <div class="module-body">
+          <header class="topbar" style="gap:16px;">
+            <div class="toolbar-content" data-toolbar="movimientos" style="display:flex;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
+              <div class="form-group" style="margin:0;"><label>Tipo</label>
+                <select class="form-select" id="fil_tipo" onchange="renderMovimientos()"><option value="">Todos</option><option value="Gasto">Gasto</option><option value="Ingreso">Ingreso</option></select>
+              </div>
+              <div class="form-group" style="margin:0;"><label>Categoría</label>
+                <select class="form-select" id="fil_categoria" onchange="renderMovimientos()"></select>
+              </div>
+              <div class="form-group" style="margin:0;"><label>Mes</label>
+                <input type="month" class="form-input" id="fil_mes" onchange="renderMovimientos()">
+              </div>
+              <div class="form-group" style="margin:0;flex:1;min-width:180px;"><label>Buscar</label>
+                <input type="text" class="form-input" id="fil_buscar" placeholder="Concepto, proveedor o responsable..." oninput="renderMovimientos()">
+              </div>
+              <button class="btn btn-finanzas btn-sm" onclick="openModalMovimiento()">+ Registrar movimiento</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="reportes" style="display:none;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
+              <div class="form-group" style="margin:0;"><label>Período</label>
+                <select class="form-select" id="rep_periodo" onchange="togglePeriodo();renderReportes()">
+                  <option value="Mes">Mes</option>
+                  <option value="Año">Año</option>
+                  <option value="Todo">Todo</option>
+                  <option value="Rango">Rango de fechas</option>
+                </select>
+              </div>
+              <div class="form-group" id="rep_mesGroup" style="margin:0;"><label>Mes</label>
+                <select class="form-select" id="rep_mes" onchange="renderReportes()"></select>
+              </div>
+              <div class="form-group" id="rep_anioGroup" style="margin:0;"><label>Año</label>
+                <select class="form-select" id="rep_anio" onchange="renderReportes()"></select>
+              </div>
+              <div class="form-group" id="rep_desdeGroup" style="margin:0;display:none;"><label>Desde</label>
+                <input type="date" class="form-input" id="rep_desde" onchange="renderReportes()">
+              </div>
+              <div class="form-group" id="rep_hastaGroup" style="margin:0;display:none;"><label>Hasta</label>
+                <input type="date" class="form-input" id="rep_hasta" onchange="renderReportes()">
+              </div>
+              <div class="form-group" style="margin:0;"><label>Movimiento</label>
+                <select class="form-select" id="rep_tipo" onchange="renderReportes()"><option value="">Todos</option><option value="Gasto">Gasto</option><option value="Ingreso">Ingreso</option></select>
+              </div>
+            </div>
+          </header>
+
+          <div class="module-content">
+            <div class="tool-section active" id="tool-movimientos">
+              <div class="fin-hint">Registro de <b>gastos</b> e <b>ingresos</b> de la operación (recepción y distribución de vehículos). Los montos se registran en bolívares.</div>
+              <div class="fin-resumen" id="movResumen"></div>
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Fecha</th><th>Tipo</th><th>Concepto</th><th>Monto (Bs.)</th><th>Pago</th><th>Proveedor</th><th>Área</th><th>Estado</th><th style="width:110px;">Acciones</th></tr></thead>
+                  <tbody id="movimientosBody">
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="tool-section" id="tool-reportes">
+              <div class="fin-resumen" id="repPeriodoLabel"></div>
+              <div class="fin-cards" id="repCards"></div>
+
+              <div class="fin-sec-title"><i class="fi fi-sr-chart-pie"></i> Resumen por categoría</div>
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Categoría</th><th>Tipo</th><th style="text-align:center;">Movimientos</th><th>Monto (Bs.)</th></tr></thead>
+                  <tbody id="repCatBody"></tbody>
+                </table>
+              </div>
+
+              <div class="fin-sec-title" id="repEvoTitle"><i class="fi fi-sr-chart-histogram"></i> Evolución mensual</div>
+              <div id="repEvo"></div>
+
+              <div class="fin-sec-title"><i class="fi fi-sr-receipt"></i> Últimos movimientos del período</div>
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Fecha</th><th>Concepto</th><th>Tipo</th><th>Monto (Bs.)</th><th>Estado</th></tr></thead>
+                  <tbody id="repUltBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalMovimiento">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalMovimientoTitle">Registrar movimiento</h3><button class="modal-close" onclick="finHideModal('modalMovimiento')">&times;</button></div>
+      <div class="modal-body">
+        <form id="formMovimiento">
+          <div class="form-row">
+            <div class="form-group"><label>Tipo</label>
+              <select class="form-select" id="mov_tipo" onchange="movCategorias();movEstados();"><option value="Gasto">Gasto</option><option value="Ingreso">Ingreso</option></select>
+            </div>
+            <div class="form-group"><label>Categoría</label>
+              <select class="form-select" id="mov_categoria" required></select>
+            </div>
+          </div>
+          <div class="form-group"><label>Concepto</label><input type="text" class="form-input" id="mov_concepto" placeholder="Ej: Combustible flota de reparto" required></div>
+          <div class="form-row">
+            <div class="form-group"><label>Monto (Bs.)</label><input type="number" step="0.01" min="0.01" class="form-input" id="mov_monto" required></div>
+            <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="mov_fecha" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Método de pago</label>
+              <select class="form-select" id="mov_metodo_pago"><option value="">—</option><option value="Efectivo">Efectivo</option><option value="Transferencia">Transferencia</option><option value="Tarjeta">Tarjeta</option><option value="Cheque">Cheque</option><option value="Otro">Otro</option></select>
+            </div>
+            <div class="form-group"><label>Estado</label>
+              <select class="form-select" id="mov_estado"></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Proveedor / Beneficiario</label><input type="text" class="form-input" id="mov_proveedor" placeholder="Ej: Proveedor XYZ, C.A."></div>
+            <div class="form-group"><label>Área</label><input type="text" class="form-input" id="mov_area" placeholder="Ej: Recepción, Distribución, Administración"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Responsable</label><input type="text" class="form-input" id="mov_responsable" placeholder="Nombre de quien gestiona"></div>
+            <div class="form-group"><label>Comprobante (URL)</label><input type="url" class="form-input" id="mov_comprobante_url" placeholder="https://..."></div>
+          </div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="mov_descripcion" rows="2"></textarea></div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="mov_observaciones" rows="2"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="finHideModal('modalMovimiento')">Cancelar</button>
+        <button class="btn btn-finanzas" onclick="saveMovimiento()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/modules.js"></script>
+  <script>
+    var FIN_CATEGORIAS = {
+      Gasto: ['Combustible y lubricantes', 'Mantenimiento de vehículos', 'Repuestos', 'Viáticos y traslados', 'Papelería y oficina', 'Servicios básicos', 'Comunicaciones', 'Equipos y herramientas', 'Seguros', 'Impuestos y tasas', 'Suministros de seguridad', 'Publicidad y marketing', 'Otros gastos'],
+      Ingreso: ['Venta de vehículos', 'Comisiones por venta', 'Repuestos y accesorios', 'Servicios de taller', 'Otros ingresos']
+    };
+    var FIN_MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+    var finMovimientos = [];
+    var editingMovId = null;
+
+    function finEscape(s) {
+      return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function finShowModal(id) {
+      document.getElementById(id).classList.add('show');
+    }
+
+    function finHideModal(id) {
+      document.getElementById(id).classList.remove('show');
+    }
+
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('show');
+    });
+
+    function fmtBs(n) {
+      return 'Bs. ' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function todayISO() {
+      var d = new Date();
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    function movCategorias() {
+      var tipo = document.getElementById('mov_tipo').value;
+      var sel = document.getElementById('mov_categoria');
+      var actual = sel.value;
+      sel.innerHTML = (FIN_CATEGORIAS[tipo] || []).map(function(c) {
+        return '<option value="' + finEscape(c) + '">' + finEscape(c) + '</option>';
+      }).join('');
+      if (actual && FIN_CATEGORIAS[tipo].indexOf(actual) !== -1) sel.value = actual;
+    }
+
+    function movEstados() {
+      var tipo = document.getElementById('mov_tipo').value;
+      var sel = document.getElementById('mov_estado');
+      var actual = sel.value;
+      var opts = tipo === 'Gasto' ? ['Registrado', 'Reembolsado', 'Anulado'] : ['Registrado', 'Anulado'];
+      sel.innerHTML = opts.map(function(s) { return '<option value="' + s + '">' + s + '</option>'; }).join('');
+      if (opts.indexOf(actual) !== -1) sel.value = actual;
+      else sel.value = 'Registrado';
+    }
+
+    /* ===== MOVIMIENTOS ===== */
+    async function loadMovimientos() {
+      try {
+        var { data, error } = await supabaseClient.from('finanzas_movimientos').select('*').order('fecha', { ascending: false });
+        if (error) throw error;
+        finMovimientos = data || [];
+        llenarFiltroCategorias();
+        renderMovimientos();
+      } catch (err) {
+        document.getElementById('movimientosBody').innerHTML =
+          '<tr><td colspan="9" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar los movimientos: ' + finEscape(err.message) + '</td></tr>';
+      }
+    }
+
+    function llenarFiltroCategorias() {
+      var sel = document.getElementById('fil_categoria');
+      var actual = sel.value;
+      var set = {};
+      Object.keys(FIN_CATEGORIAS).forEach(function(t) {
+        FIN_CATEGORIAS[t].forEach(function(c) { set[c] = true; });
+      });
+      sel.innerHTML = '<option value="">Todas</option>' + Object.keys(set).sort().map(function(c) {
+        return '<option value="' + finEscape(c) + '">' + finEscape(c) + '</option>';
+      }).join('');
+      if (actual) sel.value = actual;
+    }
+
+    function movimientosFiltrados() {
+      var tipo = document.getElementById('fil_tipo').value;
+      var categoria = document.getElementById('fil_categoria').value;
+      var mes = document.getElementById('fil_mes').value;
+      var buscar = document.getElementById('fil_buscar').value.trim().toLowerCase();
+      return finMovimientos.filter(function(m) {
+        if (tipo && m.tipo !== tipo) return false;
+        if (categoria && m.categoria !== categoria) return false;
+        if (mes && (m.fecha || '').indexOf(mes) !== 0) return false;
+        if (buscar) {
+          var hay = [m.concepto, m.proveedor, m.responsable, m.categoria, m.observaciones, m.descripcion].join(' ').toLowerCase();
+          if (hay.indexOf(buscar) === -1) return false;
+        }
+        return true;
+      });
+    }
+
+    function renderMovimientos() {
+      var lista = movimientosFiltrados();
+      var totGastos = 0, totIngresos = 0;
+      lista.forEach(function(m) {
+        if (m.tipo === 'Gasto') totGastos += Number(m.monto) || 0;
+        else totIngresos += Number(m.monto) || 0;
+      });
+      document.getElementById('movResumen').innerHTML =
+        lista.length + ' movimiento(s) · <span class="fin-tipo-gasto">Gastos: ' + fmtBs(totGastos) + '</span> · <span class="fin-tipo-ingreso">Ingresos: ' + fmtBs(totIngresos) + '</span>';
+
+      var tbody = document.getElementById('movimientosBody');
+      if (!lista.length) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#999;">No hay movimientos que coincidan con los filtros</td></tr>';
+        return;
+      }
+      tbody.innerHTML = lista.map(function(m) {
+        return '<tr>'
+          + '<td>' + finEscape(m.fecha) + '</td>'
+          + '<td><span class="' + (m.tipo === 'Gasto' ? 'fin-tipo-gasto' : 'fin-tipo-ingreso') + '">' + finEscape(m.tipo) + '</span></td>'
+          + '<td><span style="font-weight:600;">' + finEscape(m.concepto) + '</span><div style="font-size:12px;color:var(--color-text-secondary);">' + finEscape(m.categoria) + '</div></td>'
+          + '<td style="font-weight:700;">' + fmtBs(m.monto) + '</td>'
+          + '<td>' + finEscape(m.metodo_pago || '-') + '</td>'
+          + '<td>' + finEscape(m.proveedor || '-') + '</td>'
+          + '<td>' + finEscape(m.area || '-') + '</td>'
+          + '<td><span class="badge ' + getBadgeClass(m.estado) + '">' + finEscape(m.estado) + '</span></td>'
+          + '<td>'
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalMovimiento(' + m.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteMovimiento(' + m.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+      uiFadeIn(tbody);
+    }
+
+    function openModalMovimiento(id) {
+      editingMovId = id || null;
+      document.getElementById('formMovimiento').reset();
+      document.getElementById('mov_tipo').value = 'Gasto';
+      movCategorias();
+      movEstados();
+      document.getElementById('mov_fecha').value = todayISO();
+      document.getElementById('modalMovimientoTitle').textContent = id ? 'Editar movimiento' : 'Registrar movimiento';
+      if (id) {
+        var m = finMovimientos.find(function(x) { return x.id === id; });
+        if (m) {
+          document.getElementById('mov_tipo').value = m.tipo || 'Gasto';
+          movCategorias();
+          document.getElementById('mov_categoria').value = m.categoria || '';
+          document.getElementById('mov_concepto').value = m.concepto || '';
+          document.getElementById('mov_descripcion').value = m.descripcion || '';
+          document.getElementById('mov_monto').value = m.monto;
+          document.getElementById('mov_fecha').value = m.fecha || todayISO();
+          document.getElementById('mov_metodo_pago').value = m.metodo_pago || '';
+          movEstados();
+          document.getElementById('mov_estado').value = m.estado || 'Registrado';
+          document.getElementById('mov_proveedor').value = m.proveedor || '';
+          document.getElementById('mov_area').value = m.area || '';
+          document.getElementById('mov_responsable').value = m.responsable || '';
+          document.getElementById('mov_comprobante_url').value = m.comprobante_url || '';
+          document.getElementById('mov_observaciones').value = m.observaciones || '';
+        }
+      }
+      finShowModal('modalMovimiento');
+    }
+
+    async function saveMovimiento() {
+      var concepto = document.getElementById('mov_concepto').value.trim();
+      if (!concepto) {
+        showAlert('El concepto es obligatorio', 'warning');
+        return;
+      }
+      var monto = parseFloat(document.getElementById('mov_monto').value);
+      if (!monto || monto <= 0) {
+        showAlert('El monto debe ser mayor que 0', 'warning');
+        return;
+      }
+      var fecha = document.getElementById('mov_fecha').value;
+      if (!fecha) {
+        showAlert('La fecha es obligatoria', 'warning');
+        return;
+      }
+      var tipo = document.getElementById('mov_tipo').value;
+      var payload = {
+        tipo: tipo,
+        categoria: document.getElementById('mov_categoria').value,
+        concepto: concepto,
+        descripcion: document.getElementById('mov_descripcion').value.trim() || null,
+        monto: monto,
+        fecha: fecha,
+        metodo_pago: document.getElementById('mov_metodo_pago').value || null,
+        estado: document.getElementById('mov_estado').value,
+        proveedor: document.getElementById('mov_proveedor').value.trim() || null,
+        area: document.getElementById('mov_area').value.trim() || null,
+        responsable: document.getElementById('mov_responsable').value.trim() || null,
+        comprobante_url: document.getElementById('mov_comprobante_url').value.trim() || null,
+        observaciones: document.getElementById('mov_observaciones').value.trim() || null
+      };
+      try {
+        if (editingMovId) {
+          var { error } = await supabaseClient.from('finanzas_movimientos').update(payload).eq('id', editingMovId);
+          if (error) throw error;
+        } else {
+          var { error } = await supabaseClient.from('finanzas_movimientos').insert([payload]);
+          if (error) throw error;
+        }
+        finHideModal('modalMovimiento');
+        loadMovimientos();
+        renderReportes();
+        showAlert(editingMovId ? 'Movimiento actualizado' : 'Movimiento registrado', 'success');
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteMovimiento(id) {
+      var ok = await showConfirm('¿Eliminar este movimiento financiero?', 'Eliminar');
+      if (!ok) return;
+      try {
+        var { error } = await supabaseClient.from('finanzas_movimientos').delete().eq('id', id);
+        if (error) throw error;
+        loadMovimientos();
+        renderReportes();
+        showAlert('Movimiento eliminado', 'success');
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== REPORTES ===== */
+    function periodoFiltro() {
+      var p = document.getElementById('rep_periodo').value;
+      var desde = null, hasta = null;
+      if (p === 'Mes') {
+        var mes = parseInt(document.getElementById('rep_mes').value, 10);
+        var anio = parseInt(document.getElementById('rep_anio').value, 10);
+        var mm = (mes < 10 ? '0' : '') + mes;
+        desde = anio + '-' + mm + '-01';
+        hasta = anio + '-' + mm + '-' + new Date(anio, mes, 0).getDate();
+      } else if (p === 'Año') {
+        var anio2 = parseInt(document.getElementById('rep_anio').value, 10);
+        desde = anio2 + '-01-01';
+        hasta = anio2 + '-12-31';
+      } else if (p === 'Rango') {
+        desde = document.getElementById('rep_desde').value;
+        hasta = document.getElementById('rep_hasta').value;
+        if (desde && hasta && desde > hasta) {
+          showAlert('La fecha "desde" debe ser anterior a "hasta"', 'warning');
+          return null;
+        }
+        if (!desde || !hasta) {
+          showAlert('Seleccione las fechas del rango', 'warning');
+          return null;
+        }
+      }
+      return { p: p, desde: desde, hasta: hasta };
+    }
+
+    function movimientosDelPeriodo() {
+      var pf = periodoFiltro();
+      if (!pf) return null;
+      var tipo = document.getElementById('rep_tipo').value;
+      return finMovimientos.filter(function(m) {
+        if (tipo && m.tipo !== tipo) return false;
+        if (pf.desde && (m.fecha || '') < pf.desde) return false;
+        if (pf.hasta && (m.fecha || '') > pf.hasta) return false;
+        return true;
+      });
+    }
+
+    function etiquetaPeriodo(pf) {
+      if (pf.p === 'Mes') {
+        var mes = parseInt(document.getElementById('rep_mes').value, 10);
+        return FIN_MESES[mes - 1] + ' ' + document.getElementById('rep_anio').value;
+      }
+      if (pf.p === 'Año') return 'Año ' + document.getElementById('rep_anio').value;
+      if (pf.p === 'Rango') return 'Del ' + pf.desde + ' al ' + pf.hasta;
+      return 'Todo el historial';
+    }
+
+    function renderReportes() {
+      var lista = movimientosDelPeriodo();
+      if (!lista) return;
+      var pf = periodoFiltro();
+      document.getElementById('repPeriodoLabel').textContent = 'Período: ' + etiquetaPeriodo(pf) + ' · ' + lista.length + ' movimiento(s)';
+
+      var totIng = 0, totEgr = 0;
+      lista.forEach(function(m) {
+        if (m.tipo === 'Ingreso') totIng += Number(m.monto) || 0;
+        else totEgr += Number(m.monto) || 0;
+      });
+
+      var cards = '';
+      var tipoFiltro = document.getElementById('rep_tipo').value;
+      if (tipoFiltro !== 'Ingreso') {
+        cards += '<div class="fin-card"><div class="fin-card-label"><i class="fi fi-sr-money-bill-wave" style="color:#dc2626;"></i> Total gastos</div><div class="fin-card-value fin-neg">' + fmtBs(totEgr) + '</div><div class="fin-card-sub">' + lista.filter(function(m) { return m.tipo === 'Gasto'; }).length + ' gastos</div></div>';
+      }
+      if (tipoFiltro !== 'Gasto') {
+        cards += '<div class="fin-card"><div class="fin-card-label"><i class="fi fi-sr-coins" style="color:#059669;"></i> Total ingresos</div><div class="fin-card-value fin-pos">' + fmtBs(totIng) + '</div><div class="fin-card-sub">' + lista.filter(function(m) { return m.tipo === 'Ingreso'; }).length + ' ingresos</div></div>';
+      }
+      if (!tipoFiltro) {
+        var balance = totIng - totEgr;
+        cards += '<div class="fin-card"><div class="fin-card-label"><i class="fi fi-sr-arrow-trend-up"></i> Balance del período</div><div class="fin-card-value ' + (balance >= 0 ? 'fin-pos' : 'fin-neg') + '">' + fmtBs(balance) + '</div><div class="fin-card-sub">' + (balance >= 0 ? 'Superávit' : 'Déficit') + '</div></div>';
+      }
+      cards += '<div class="fin-card"><div class="fin-card-label"><i class="fi fi-sr-receipt"></i> Operaciones</div><div class="fin-card-value">' + lista.length + '</div><div class="fin-card-sub">Registros en el período</div></div>';
+      document.getElementById('repCards').innerHTML = cards;
+
+      renderCategorias(lista);
+      renderEvolucion(lista, pf);
+      renderUltimos(lista);
+    }
+
+    function renderCategorias(lista) {
+      var tbody = document.getElementById('repCatBody');
+      if (!lista.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:30px;color:#999;">Sin movimientos en el período</td></tr>';
+        return;
+      }
+      var map = {};
+      lista.forEach(function(m) {
+        var k = m.tipo + '|' + (m.categoria || 'Sin categoría');
+        map[k] = map[k] || { tipo: m.tipo, categoria: m.categoria || 'Sin categoría', count: 0, monto: 0 };
+        map[k].count++;
+        map[k].monto += Number(m.monto) || 0;
+      });
+      var filas = Object.keys(map).map(function(k) { return map[k]; }).sort(function(a, b) { return b.monto - a.monto; });
+      var tot = 0;
+      tbody.innerHTML = filas.map(function(f) {
+        tot += f.monto;
+        return '<tr>'
+          + '<td>' + finEscape(f.categoria) + '</td>'
+          + '<td><span class="' + (f.tipo === 'Gasto' ? 'fin-tipo-gasto' : 'fin-tipo-ingreso') + '">' + finEscape(f.tipo) + '</span></td>'
+          + '<td style="text-align:center;">' + f.count + '</td>'
+          + '<td style="font-weight:700;">' + fmtBs(f.monto) + '</td>'
+          + '</tr>';
+      }).join('')
+        + '<tr style="border-top:2px solid var(--color-border);"><td colspan="3" style="text-align:right;font-weight:700;">Total</td><td style="font-weight:700;">' + fmtBs(tot) + '</td></tr>';
+    }
+
+    function renderEvolucion(lista, pf) {
+      var cont = document.getElementById('repEvo');
+      var title = document.getElementById('repEvoTitle');
+      if (pf.p === 'Mes') {
+        title.style.display = 'none';
+        cont.innerHTML = '';
+        return;
+      }
+      title.style.display = '';
+      var map = {};
+      lista.forEach(function(m) {
+        var k = (m.fecha || '').slice(0, 7);
+        map[k] = map[k] || { ing: 0, egr: 0 };
+        if (m.tipo === 'Ingreso') map[k].ing += Number(m.monto) || 0;
+        else map[k].egr += Number(m.monto) || 0;
+      });
+      var filas = [];
+      if (pf.p === 'Año') {
+        var anio = parseInt(document.getElementById('rep_anio').value, 10);
+        for (var i = 1; i <= 12; i++) {
+          var k = anio + '-' + (i < 10 ? '0' : '') + i;
+          filas.push({ key: k, mes: FIN_MESES[i - 1], ing: (map[k] || {}).ing || 0, egr: (map[k] || {}).egr || 0 });
+        }
+      } else {
+        Object.keys(map).sort().forEach(function(k) {
+          var m = parseInt(k.slice(5), 10);
+          filas.push({ key: k, mes: FIN_MESES[m - 1] + ' ' + k.slice(0, 4), ing: map[k].ing, egr: map[k].egr });
+        });
+      }
+      var max = 1;
+      filas.forEach(function(f) { max = Math.max(max, f.ing, f.egr); });
+      if (!filas.length) {
+        cont.innerHTML = '<div class="tabla-scroll"><table class="data-table"><tbody><tr><td style="text-align:center;padding:30px;color:#999;">Sin datos</td></tr></tbody></table></div>';
+        return;
+      }
+      var html = '<div class="tabla-scroll"><table class="data-table"><thead><tr><th>Mes</th><th style="width:34%;">Ingresos</th><th style="width:34%;">Egresos</th><th>Balance</th></tr></thead><tbody>';
+      html += filas.map(function(f) {
+        var bal = f.ing - f.egr;
+        return '<tr>'
+          + '<td>' + f.mes + '</td>'
+          + '<td><div class="fin-bar-row"><div class="fin-bar-track"><div class="fin-bar-ing" style="width:' + Math.round((f.ing / max) * 100) + '%;"></div></div><span style="white-space:nowrap;font-size:12px;">' + fmtBs(f.ing) + '</span></div></td>'
+          + '<td><div class="fin-bar-row"><div class="fin-bar-track"><div class="fin-bar-egr" style="width:' + Math.round((f.egr / max) * 100) + '%;"></div></div><span style="white-space:nowrap;font-size:12px;">' + fmtBs(f.egr) + '</span></div></td>'
+          + '<td style="font-weight:700;" class="' + (bal >= 0 ? 'fin-pos' : 'fin-neg') + '">' + fmtBs(bal) + '</td>'
+          + '</tr>';
+      }).join('');
+      html += '</tbody></table></div>';
+      cont.innerHTML = html;
+    }
+
+    function renderUltimos(lista) {
+      var tbody = document.getElementById('repUltBody');
+      if (!lista.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:#999;">Sin movimientos en el período</td></tr>';
+        return;
+      }
+      var recientes = lista.slice().sort(function(a, b) { return (b.fecha || '').localeCompare(a.fecha || ''); }).slice(0, 10);
+      tbody.innerHTML = recientes.map(function(m) {
+        return '<tr>'
+          + '<td>' + finEscape(m.fecha) + '</td>'
+          + '<td><span style="font-weight:600;">' + finEscape(m.concepto) + '</span><div style="font-size:12px;color:var(--color-text-secondary);">' + finEscape(m.categoria) + '</div></td>'
+          + '<td><span class="' + (m.tipo === 'Gasto' ? 'fin-tipo-gasto' : 'fin-tipo-ingreso') + '">' + finEscape(m.tipo) + '</span></td>'
+          + '<td style="font-weight:700;">' + fmtBs(m.monto) + '</td>'
+          + '<td><span class="badge ' + getBadgeClass(m.estado) + '">' + finEscape(m.estado) + '</span></td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function togglePeriodo() {
+      var p = document.getElementById('rep_periodo').value;
+      document.getElementById('rep_mesGroup').style.display = (p === 'Mes') ? '' : 'none';
+      document.getElementById('rep_anioGroup').style.display = (p === 'Mes' || p === 'Año') ? '' : 'none';
+      document.getElementById('rep_desdeGroup').style.display = (p === 'Rango') ? '' : 'none';
+      document.getElementById('rep_hastaGroup').style.display = (p === 'Rango') ? '' : 'none';
+    }
+
+    function llenarPeriodoSelects() {
+      var ahora = new Date();
+      var mesSel = document.getElementById('rep_mes');
+      mesSel.innerHTML = FIN_MESES.map(function(n, i) {
+        return '<option value="' + (i + 1) + '">' + n + '</option>';
+      }).join('');
+      mesSel.value = String(ahora.getMonth() + 1);
+      var anioSel = document.getElementById('rep_anio');
+      var html = '';
+      for (var a = ahora.getFullYear(); a >= 2020; a--) {
+        html += '<option value="' + a + '">' + a + '</option>';
+      }
+      anioSel.innerHTML = html;
+      anioSel.value = String(ahora.getFullYear());
+    }
+
+    /* ===== INICIALIZACIÓN ===== */
+    document.addEventListener('DOMContentLoaded', function() {
+      restoreTool();
+      llenarPeriodoSelects();
+      togglePeriodo();
+      loadMovimientos();
+      renderReportes();
+    });
+  </script>
+</body>
+</html>

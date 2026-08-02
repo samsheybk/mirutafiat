@@ -189,6 +189,7 @@ CREATE TABLE IF NOT EXISTS plantilla_trabajadores (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   candidato_id BIGINT REFERENCES ats_candidatos(id),
   cedula TEXT NOT NULL,
+  codigo_nomina TEXT,
   nombres TEXT NOT NULL,
   apellidos TEXT NOT NULL,
   correo TEXT,
@@ -391,7 +392,8 @@ ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS competencias_habilidades TEXT;
 ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS autoridad TEXT;
 ALTER TABLE est_cargos ADD COLUMN IF NOT EXISTS ambiente_riesgos TEXT;
 
-ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS foto_url TEXT;
+  ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS foto_url TEXT;
+  ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS codigo_nomina TEXT;
 ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS fecha_nacimiento DATE;
 ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS lugar_nacimiento TEXT;
 ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS sexo TEXT;
@@ -1283,6 +1285,231 @@ CREATE POLICY "Usuarios autenticados pueden ver respuestas"
 DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar respuestas" ON bienestar_encuesta_respuestas;
 CREATE POLICY "Usuarios autenticados pueden eliminar respuestas"
   ON bienestar_encuesta_respuestas FOR DELETE TO authenticated USING (true);
+
+-- ============================================
+-- 10) SEGURIDAD Y SALUD LABORAL: INSPECCIONES, SERVICIO MÉDICO E INVENTARIOS
+-- ============================================
+-- El módulo Seguridad y Salud Laboral usa además seguridad_incidentes (base)
+-- y plantilla_trabajadores / ats_candidatos (Servicio Médico). Estas tablas
+-- alimentan las herramientas Inspecciones (evaluación de campo), Servicio
+-- Médico e Inventario de equipos / insumos y medicamentos. También
+-- disponibles en seguridad-salud.sql.
+
+CREATE TABLE IF NOT EXISTS seguridad_inspecciones (
+  id BIGSERIAL PRIMARY KEY,
+  titulo TEXT NOT NULL,
+  tipo TEXT NOT NULL DEFAULT 'Planificada'
+    CHECK (tipo IN ('Planificada','No planificada','Rutinaria','Especial')),
+  area TEXT NOT NULL,
+  ubicacion TEXT,
+  inspector TEXT NOT NULL,
+  participantes TEXT,
+  fecha DATE NOT NULL DEFAULT CURRENT_DATE,
+  hora TIME,
+  estado TEXT NOT NULL DEFAULT 'Borrador'
+    CHECK (estado IN ('Borrador','En curso','Finalizada','Anulada')),
+  resultado TEXT CHECK (resultado IN ('Conforme','No conforme')),
+  recomendaciones TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID REFERENCES auth.users(id)
+);
+
+CREATE TABLE IF NOT EXISTS seguridad_inspeccion_items (
+  id BIGSERIAL PRIMARY KEY,
+  inspeccion_id BIGINT NOT NULL REFERENCES seguridad_inspecciones(id) ON DELETE CASCADE,
+  categoria TEXT NOT NULL,
+  item TEXT NOT NULL,
+  criterio TEXT,
+  resultado TEXT CHECK (resultado IN ('Conforme','No conforme','N/A')),
+  observacion TEXT,
+  orden INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_seg_inspeccion_items_inspeccion
+  ON seguridad_inspeccion_items (inspeccion_id);
+
+CREATE TABLE IF NOT EXISTS seguridad_servicio_medico (
+  id BIGSERIAL PRIMARY KEY,
+  fecha DATE NOT NULL DEFAULT CURRENT_DATE,
+  hora TIME,
+  tipo_paciente TEXT NOT NULL DEFAULT 'Trabajador'
+    CHECK (tipo_paciente IN ('Trabajador','Candidato')),
+  trabajador_id UUID REFERENCES plantilla_trabajadores(id) ON DELETE SET NULL,
+  candidato_id BIGINT REFERENCES ats_candidatos(id) ON DELETE SET NULL,
+  cedula TEXT,
+  nombre TEXT,
+  cargo TEXT,
+  unidad TEXT,
+  tipo_atencion TEXT NOT NULL DEFAULT 'Consulta'
+    CHECK (tipo_atencion IN ('Consulta','Emergencia','Curativo / Curas',
+      'Entrega de medicamento','Examen ocupacional','Evaluación de seguimiento',
+      'Vacunación','Otro')),
+  motivo TEXT,
+  diagnostico TEXT,
+  tratamiento TEXT,
+  apreciacion TEXT
+    CHECK (apreciacion IN ('Apto','Apto con restricciones','No apto','En observación')),
+  referido BOOLEAN NOT NULL DEFAULT FALSE,
+  referido_a TEXT,
+  atiende TEXT,
+  estado TEXT NOT NULL DEFAULT 'Atendido'
+    CHECK (estado IN ('Atendido','En observación','Referido','Cerrado')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID REFERENCES auth.users(id)
+);
+
+CREATE TABLE IF NOT EXISTS seguridad_inventario_equipos (
+  id BIGSERIAL PRIMARY KEY,
+  nombre TEXT NOT NULL,
+  tipo TEXT NOT NULL DEFAULT 'EPP'
+    CHECK (tipo IN ('EPP','Detección y extinción de incendios','Señalización',
+      'Rescate y emergencias','Ergonómicos','Otro')),
+  marca TEXT,
+  modelo TEXT,
+  serial TEXT,
+  codigo TEXT,
+  cantidad INTEGER NOT NULL DEFAULT 0,
+  cantidad_minima INTEGER NOT NULL DEFAULT 0,
+  ubicacion TEXT,
+  fecha_vencimiento DATE,
+  estado TEXT NOT NULL DEFAULT 'Disponible'
+    CHECK (estado IN ('Disponible','Bajo stock','Agotado','Vencido','En reparación')),
+  observaciones TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID REFERENCES auth.users(id)
+);
+
+CREATE TABLE IF NOT EXISTS seguridad_inventario_insumos (
+  id BIGSERIAL PRIMARY KEY,
+  nombre TEXT NOT NULL,
+  tipo TEXT NOT NULL DEFAULT 'Insumo médico'
+    CHECK (tipo IN ('Medicamento','Insumo médico','Botiquín','Otro')),
+  presentacion TEXT,
+  cantidad INTEGER NOT NULL DEFAULT 0,
+  cantidad_minima INTEGER NOT NULL DEFAULT 0,
+  lote TEXT,
+  fecha_vencimiento DATE,
+  ubicacion TEXT,
+  estado TEXT NOT NULL DEFAULT 'Disponible'
+    CHECK (estado IN ('Disponible','Bajo stock','Agotado','Vencido','Por vencer')),
+  observaciones TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID REFERENCES auth.users(id)
+);
+
+ALTER TABLE seguridad_inspecciones ENABLE ROW LEVEL SECURITY;
+ALTER TABLE seguridad_inspeccion_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE seguridad_servicio_medico ENABLE ROW LEVEL SECURITY;
+ALTER TABLE seguridad_inventario_equipos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE seguridad_inventario_insumos ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Autenticados ver inspecciones" ON seguridad_inspecciones;
+CREATE POLICY "Autenticados ver inspecciones"
+  ON seguridad_inspecciones FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados crear inspecciones" ON seguridad_inspecciones;
+CREATE POLICY "Autenticados crear inspecciones"
+  ON seguridad_inspecciones FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Autenticados actualizar inspecciones" ON seguridad_inspecciones;
+CREATE POLICY "Autenticados actualizar inspecciones"
+  ON seguridad_inspecciones FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados eliminar inspecciones" ON seguridad_inspecciones;
+CREATE POLICY "Autenticados eliminar inspecciones"
+  ON seguridad_inspecciones FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Autenticados ver items de inspeccion" ON seguridad_inspeccion_items;
+CREATE POLICY "Autenticados ver items de inspeccion"
+  ON seguridad_inspeccion_items FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados crear items de inspeccion" ON seguridad_inspeccion_items;
+CREATE POLICY "Autenticados crear items de inspeccion"
+  ON seguridad_inspeccion_items FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Autenticados actualizar items de inspeccion" ON seguridad_inspeccion_items;
+CREATE POLICY "Autenticados actualizar items de inspeccion"
+  ON seguridad_inspeccion_items FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados eliminar items de inspeccion" ON seguridad_inspeccion_items;
+CREATE POLICY "Autenticados eliminar items de inspeccion"
+  ON seguridad_inspeccion_items FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Autenticados ver servicio medico" ON seguridad_servicio_medico;
+CREATE POLICY "Autenticados ver servicio medico"
+  ON seguridad_servicio_medico FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados crear servicio medico" ON seguridad_servicio_medico;
+CREATE POLICY "Autenticados crear servicio medico"
+  ON seguridad_servicio_medico FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Autenticados actualizar servicio medico" ON seguridad_servicio_medico;
+CREATE POLICY "Autenticados actualizar servicio medico"
+  ON seguridad_servicio_medico FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados eliminar servicio medico" ON seguridad_servicio_medico;
+CREATE POLICY "Autenticados eliminar servicio medico"
+  ON seguridad_servicio_medico FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Autenticados ver inventario equipos" ON seguridad_inventario_equipos;
+CREATE POLICY "Autenticados ver inventario equipos"
+  ON seguridad_inventario_equipos FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados crear inventario equipos" ON seguridad_inventario_equipos;
+CREATE POLICY "Autenticados crear inventario equipos"
+  ON seguridad_inventario_equipos FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Autenticados actualizar inventario equipos" ON seguridad_inventario_equipos;
+CREATE POLICY "Autenticados actualizar inventario equipos"
+  ON seguridad_inventario_equipos FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados eliminar inventario equipos" ON seguridad_inventario_equipos;
+CREATE POLICY "Autenticados eliminar inventario equipos"
+  ON seguridad_inventario_equipos FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Autenticados ver inventario insumos" ON seguridad_inventario_insumos;
+CREATE POLICY "Autenticados ver inventario insumos"
+  ON seguridad_inventario_insumos FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados crear inventario insumos" ON seguridad_inventario_insumos;
+CREATE POLICY "Autenticados crear inventario insumos"
+  ON seguridad_inventario_insumos FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Autenticados actualizar inventario insumos" ON seguridad_inventario_insumos;
+CREATE POLICY "Autenticados actualizar inventario insumos"
+  ON seguridad_inventario_insumos FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados eliminar inventario insumos" ON seguridad_inventario_insumos;
+CREATE POLICY "Autenticados eliminar inventario insumos"
+  ON seguridad_inventario_insumos FOR DELETE TO authenticated USING (true);
+
+-- ============================================
+-- 11) FINANZAS: MOVIMIENTOS (GASTOS E INGRESOS)
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS finanzas_movimientos (
+  id BIGSERIAL PRIMARY KEY,
+  tipo TEXT NOT NULL CHECK (tipo IN ('Gasto', 'Ingreso')),
+  categoria TEXT NOT NULL,
+  concepto TEXT NOT NULL,
+  descripcion TEXT,
+  monto NUMERIC(12, 2) NOT NULL CHECK (monto > 0),
+  fecha DATE NOT NULL DEFAULT CURRENT_DATE,
+  metodo_pago TEXT CHECK (metodo_pago IN ('Efectivo', 'Transferencia', 'Tarjeta', 'Cheque', 'Otro')),
+  proveedor TEXT,
+  area TEXT,
+  responsable TEXT,
+  comprobante_url TEXT,
+  estado TEXT NOT NULL DEFAULT 'Registrado' CHECK (estado IN ('Registrado', 'Reembolsado', 'Anulado')),
+  observaciones TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID REFERENCES auth.users(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_finanzas_movimientos_fecha ON finanzas_movimientos (fecha);
+CREATE INDEX IF NOT EXISTS idx_finanzas_movimientos_tipo ON finanzas_movimientos (tipo);
+CREATE INDEX IF NOT EXISTS idx_finanzas_movimientos_categoria ON finanzas_movimientos (categoria);
+
+ALTER TABLE finanzas_movimientos ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Autenticados ver movimientos" ON finanzas_movimientos;
+CREATE POLICY "Autenticados ver movimientos"
+  ON finanzas_movimientos FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados crear movimientos" ON finanzas_movimientos;
+CREATE POLICY "Autenticados crear movimientos"
+  ON finanzas_movimientos FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Autenticados actualizar movimientos" ON finanzas_movimientos;
+CREATE POLICY "Autenticados actualizar movimientos"
+  ON finanzas_movimientos FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados eliminar movimientos" ON finanzas_movimientos;
+CREATE POLICY "Autenticados eliminar movimientos"
+  ON finanzas_movimientos FOR DELETE TO authenticated USING (true);
 
 -- ============================================
 -- FIN DEL ESQUEMA COMPLETO

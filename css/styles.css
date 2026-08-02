@@ -23,6 +23,7 @@
   --module-repositorio: #06b6d4;
   --module-chatfiat: #4f46e5;
   --module-desarrollo: #d97706;
+  --module-finanzas: #b45309;
 }
 
 html, body {
@@ -430,6 +431,7 @@ a {
 .panel-item.active .panel-item-indicator.bg-repositorio ~ i.fi { color: var(--module-repositorio); }
 .panel-item.active .panel-item-indicator.bg-chatfiat ~ i.fi { color: var(--module-chatfiat); }
 .panel-item.active .panel-item-indicator.bg-desarrollo ~ i.fi { color: var(--module-desarrollo); }
+.panel-item.active .panel-item-indicator.bg-finanzas ~ i.fi { color: var(--module-finanzas); }
 .panel-item-indicator {
   position: absolute;
   top: 0;
@@ -623,6 +625,7 @@ a {
 .btn-repositorio { background: var(--module-repositorio); }
 .btn-chatfiat { background: var(--module-chatfiat); }
 .btn-desarrollo { background: var(--module-desarrollo); }
+.btn-finanzas { background: var(--module-finanzas); }
 
 .border-captacion { border-color: var(--module-captacion); }
 .border-relaciones { border-color: var(--module-relaciones); }
@@ -634,6 +637,7 @@ a {
 .border-repositorio { border-color: var(--module-repositorio); }
 .border-chatfiat { border-color: var(--module-chatfiat); }
 .border-desarrollo { border-color: var(--module-desarrollo); }
+.border-finanzas { border-color: var(--module-finanzas); }
 
 .text-captacion { color: var(--module-captacion); }
 .text-relaciones { color: var(--module-relaciones); }
@@ -645,6 +649,7 @@ a {
 .text-repositorio { color: var(--module-repositorio); }
 .text-chatfiat { color: var(--module-chatfiat); }
 .text-desarrollo { color: var(--module-desarrollo); }
+.text-finanzas { color: var(--module-finanzas); }
 
 .bg-captacion { background: var(--module-captacion); }
 .bg-relaciones { background: var(--module-relaciones); }
@@ -656,6 +661,7 @@ a {
 .bg-repositorio { background: var(--module-repositorio); }
 .bg-chatfiat { background: var(--module-chatfiat); }
 .bg-desarrollo { background: var(--module-desarrollo); }
+.bg-finanzas { background: var(--module-finanzas); }
 
 /* ===== EMPTY STATE ===== */
 .empty-state {

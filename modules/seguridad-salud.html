@@ -9,7 +9,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
-  <style>:root { --module-color: var(--module-seguridad); }</style>
+  <style>
+    :root { --module-color: var(--module-seguridad); }
+    .ss-hint { font-size: 12px; color: var(--color-text-secondary); padding: 4px 0 14px; }
+    .ss-pac-info { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; background: var(--color-bg); border: 1px dashed var(--color-border); padding: 12px; margin: 4px 0 12px; }
+    .ss-pac-info .form-group { margin: 0; }
+    .ss-radio-row { display: flex; gap: 14px; align-items: center; }
+    .ss-check { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+    .ss-count { font-size: 12px; color: var(--color-text-secondary); }
+  </style>
 </head>
 <body>
   <div class="app-layout">
@@ -24,6 +32,7 @@
         <option value="bienestar-social.html">Bienestar Social</option>
         <option value="seguridad-salud.html" selected>Seguridad y Salud Laboral</option>
         <option value="compensacion.html">Compensación</option>
+        <option value="finanzas.html">Finanzas</option>
         <option value="repositorio.html">Repositorio</option>
         <option value="chatfiat.html">ChatFIAT</option>
         <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
@@ -39,95 +48,318 @@
         <div class="module-panel">
           <div class="panel-item active" data-tool="incidentes" onclick="switchTool('incidentes')" title="Incidentes"><span class="panel-item-indicator bg-seguridad"></span><i class="fi fi-sr-alarm-exclamation" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="riesgos" onclick="switchTool('riesgos')" title="Evaluación de riesgos"><span class="panel-item-indicator bg-seguridad"></span><i class="fi fi-sr-shield" style="font-size:24px;pointer-events:none;"></i>
+          <div class="panel-item" data-tool="inspecciones" onclick="switchTool('inspecciones')" title="Inspecciones (evaluación de campo)"><span class="panel-item-indicator bg-seguridad"></span><i class="fi fi-sr-search-alt" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="inspecciones" onclick="switchTool('inspecciones')" title="Inspecciones"><span class="panel-item-indicator bg-seguridad"></span><i class="fi fi-sr-search-alt" style="font-size:24px;pointer-events:none;"></i>
+          <div class="panel-item" data-tool="servicio-medico" onclick="switchTool('servicio-medico')" title="Servicio Médico"><span class="panel-item-indicator bg-seguridad"></span><i class="fi fi-sr-stethoscope" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="capacitaciones" onclick="switchTool('capacitaciones')" title="Capacitaciones SSL"><span class="panel-item-indicator bg-seguridad"></span><i class="fi fi-sr-graduation-cap" style="font-size:24px;pointer-events:none;"></i>
+          <div class="panel-item" data-tool="inv-equipos" onclick="switchTool('inv-equipos')" title="Inventario de equipos de seguridad"><span class="panel-item-indicator bg-seguridad"></span><i class="fi fi-sr-boxes" style="font-size:24px;pointer-events:none;"></i>
+          </div>
+          <div class="panel-item" data-tool="inv-insumos" onclick="switchTool('inv-insumos')" title="Inventario de insumos y medicamentos"><span class="panel-item-indicator bg-seguridad"></span><i class="fi fi-sr-pills" style="font-size:24px;pointer-events:none;"></i>
           </div>
         </div>
 
         <div class="module-body">
-          <header class="topbar">
-            <div><h1>Seguridad y Salud Laboral</h1><div class="topbar-breadcrumb">Inicio / Seguridad y Salud Laboral</div></div>
+          <header class="topbar" style="gap:16px;">
+            <div class="toolbar-content" data-toolbar="incidentes" style="display:flex;align-items:center;gap:16px;width:100%;">
+              <h2 style="font-size:18px;font-weight:700;color:var(--module-seguridad);">Incidentes</h2>
+              <button class="btn btn-seguridad btn-sm" onclick="openModalIncidente()" style="margin-left:auto;">+ Reportar incidente</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="inspecciones" style="display:none;align-items:center;gap:16px;width:100%;">
+              <h2 style="font-size:18px;font-weight:700;color:var(--module-seguridad);">Inspecciones</h2>
+              <button class="btn btn-seguridad btn-sm" onclick="openModalInspeccion()" style="margin-left:auto;">+ Nueva inspección</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="servicio-medico" style="display:none;align-items:center;gap:16px;width:100%;">
+              <h2 style="font-size:18px;font-weight:700;color:var(--module-seguridad);">Servicio Médico</h2>
+              <button class="btn btn-seguridad btn-sm" onclick="openModalServicioMedico()" style="margin-left:auto;">+ Registrar atención</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="inv-equipos" style="display:none;align-items:center;gap:16px;width:100%;">
+              <h2 style="font-size:18px;font-weight:700;color:var(--module-seguridad);">Inventario de equipos de seguridad</h2>
+              <button class="btn btn-seguridad btn-sm" onclick="openModalInvEquipo()" style="margin-left:auto;">+ Nuevo equipo</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="inv-insumos" style="display:none;align-items:center;gap:16px;width:100%;">
+              <h2 style="font-size:18px;font-weight:700;color:var(--module-seguridad);">Inventario de insumos y medicamentos</h2>
+              <button class="btn btn-seguridad btn-sm" onclick="openModalInvInsumo()" style="margin-left:auto;">+ Nuevo insumo</button>
+            </div>
           </header>
 
           <div class="module-content">
-          <div class="tool-section active" id="tool-incidentes">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-seguridad);">Incidentes</h2>
-              <button class="btn btn-seguridad" onclick="openModal()">+ Reportar incidente</button>
+            <div class="tool-section active" id="tool-incidentes">
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Tipo</th><th>Ubicación</th><th>Fecha</th><th>Gravedad</th><th>Estado</th><th style="width:110px;">Acciones</th></tr></thead>
+                  <tbody id="incidentesBody">
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <table class="data-table">
-              <thead><tr><th>Tipo</th><th>Ubicación</th><th>Fecha</th><th>Gravedad</th><th>Estado</th></tr></thead>
-              <tbody id="moduleTableBody">
-                <tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">No hay incidentes registrados</td></tr>
-              </tbody>
-            </table>
-          </div>
 
-          <div class="tool-section" id="tool-riesgos">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-seguridad);">Evaluación de riesgos</h2>
-              <button class="btn btn-seguridad">+ Nueva evaluación</button>
+            <div class="tool-section" id="tool-inspecciones">
+              <div class="ss-hint">Al crear una inspección se abre el <b>recorrido de campo</b>: un checklist por categorías para revisar las condiciones que representan riesgo laboral, alineado a la LOPCYMAT y normas COVENIN aplicables a la recepción y distribución de vehículos.</div>
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Título / Área</th><th>Tipo</th><th>Inspector</th><th>Fecha</th><th>Resultado</th><th>Estado</th><th style="width:190px;">Acciones</th></tr></thead>
+                  <tbody id="inspeccionesBody">
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <table class="data-table">
-              <thead><tr><th>Área</th><th>Tipo de riesgo</th><th>Nivel</th><th>Fecha</th><th>Estado</th></tr></thead>
-              <tbody><tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
-            </table>
-          </div>
 
-          <div class="tool-section" id="tool-inspecciones">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-seguridad);">Inspecciones</h2>
-              <button class="btn btn-seguridad">+ Nueva inspección</button>
+            <div class="tool-section" id="tool-servicio-medico">
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Fecha</th><th>Paciente</th><th>Cédula</th><th>Cargo / Unidad</th><th>Atención</th><th>Apreciación</th><th>Estado</th><th style="width:110px;">Acciones</th></tr></thead>
+                  <tbody id="servicioMedicoBody">
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <table class="data-table">
-              <thead><tr><th>Área inspeccionada</th><th>Inspector</th><th>Fecha</th><th>Resultado</th><th>Estado</th></tr></thead>
-              <tbody><tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
-            </table>
-          </div>
 
-          <div class="tool-section" id="tool-capacitaciones">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-seguridad);">Capacitaciones SSL</h2>
-              <button class="btn btn-seguridad">+ Nueva capacitación</button>
+            <div class="tool-section" id="tool-inv-equipos">
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Equipo</th><th>Tipo</th><th>Marca / Modelo</th><th>Cantidad</th><th>Mínimo</th><th>Ubicación</th><th>Vencimiento</th><th>Estado</th><th style="width:150px;">Acciones</th></tr></thead>
+                  <tbody id="invEquiposBody">
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <table class="data-table">
-              <thead><tr><th>Tema</th><th>Instructor</th><th>Fecha</th><th>Participantes</th><th>Estado</th></tr></thead>
-              <tbody><tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
-            </table>
+
+            <div class="tool-section" id="tool-inv-insumos">
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Insumo</th><th>Tipo</th><th>Presentación</th><th>Cantidad</th><th>Mínimo</th><th>Lote</th><th>Vencimiento</th><th>Ubicación</th><th>Estado</th><th style="width:150px;">Acciones</th></tr></thead>
+                  <tbody id="invInsumosBody">
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  </div>
 
-  <div class="modal-overlay" id="modal">
+  <!-- Modal Incidente -->
+  <div class="modal-overlay" id="modalIncidente">
     <div class="modal">
-      <div class="modal-header"><h3>Reportar incidente</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+      <div class="modal-header"><h3 id="modalIncidenteTitle">Reportar incidente</h3><button class="modal-close" onclick="ssHideModal('modalIncidente')">&times;</button></div>
       <div class="modal-body">
-        <form id="moduleForm">
+        <form id="formIncidente">
           <div class="form-group"><label>Tipo de incidente</label>
-            <select class="form-select" id="tipo"><option>Accidente</option><option>Incidente</option><option>Condición insegura</option><option>Inspección</option></select>
+            <select class="form-select" id="inc_tipo"><option>Accidente</option><option>Incidente</option><option>Condición insegura</option><option>Inspección</option></select>
           </div>
-          <div class="form-group"><label>Ubicación</label><input type="text" class="form-input" id="ubicacion" required></div>
+          <div class="form-group"><label>Ubicación</label><input type="text" class="form-input" id="inc_ubicacion" required></div>
           <div class="form-row">
-            <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="fecha" required></div>
+            <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="inc_fecha" required></div>
             <div class="form-group"><label>Gravedad</label>
-              <select class="form-select" id="gravedad"><option value="Baja">Baja</option><option value="Media">Media</option><option value="Alta">Alta</option><option value="Crítica">Crítica</option></select>
+              <select class="form-select" id="inc_gravedad"><option value="Baja">Baja</option><option value="Media">Media</option><option value="Alta">Alta</option><option value="Crítica">Crítica</option></select>
             </div>
           </div>
           <div class="form-group"><label>Estado</label>
-            <select class="form-select" id="estado"><option value="Reportado">Reportado</option><option value="En investigación">En investigación</option><option value="Resuelto">Resuelto</option></select>
+            <select class="form-select" id="inc_estado"><option value="Reportado">Reportado</option><option value="En investigación">En investigación</option><option value="Resuelto">Resuelto</option></select>
           </div>
-          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="descripcion" rows="3"></textarea></div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="inc_descripcion" rows="3"></textarea></div>
         </form>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
-        <button class="btn btn-seguridad" onclick="saveModule()">Guardar</button>
+        <button class="btn btn-outline" onclick="ssHideModal('modalIncidente')">Cancelar</button>
+        <button class="btn btn-seguridad" onclick="saveIncidente()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Inspección -->
+  <div class="modal-overlay" id="modalInspeccion">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalInspeccionTitle">Nueva inspección</h3><button class="modal-close" onclick="ssHideModal('modalInspeccion')">&times;</button></div>
+      <div class="modal-body">
+        <form id="formInspeccion">
+          <div class="form-group"><label>Título / nombre de la evaluación</label><input type="text" class="form-input" id="insp_titulo" placeholder="Ej: Recorrido de patio de recepción y distribución de vehículos" required></div>
+          <div class="form-row">
+            <div class="form-group"><label>Tipo</label>
+              <select class="form-select" id="insp_tipo"><option value="Planificada">Planificada</option><option value="No planificada">No planificada</option><option value="Rutinaria">Rutinaria</option><option value="Especial">Especial</option></select>
+            </div>
+            <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="insp_fecha" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Área a inspeccionar</label><input type="text" class="form-input" id="insp_area" placeholder="Ej: Patio de vehículos, Oficinas, Almacén" required></div>
+            <div class="form-group"><label>Ubicación</label><input type="text" class="form-input" id="insp_ubicacion" placeholder="Ej: Sede principal"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Inspector(a)</label><input type="text" class="form-input" id="insp_inspector" required></div>
+            <div class="form-group"><label>Hora</label><input type="time" class="form-input" id="insp_hora"></div>
+          </div>
+          <div class="form-group"><label>Participantes (delegados de prevención, CSSL, testigos)</label><input type="text" class="form-input" id="insp_participantes"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="ssHideModal('modalInspeccion')">Cancelar</button>
+        <button class="btn btn-seguridad" onclick="saveInspeccion()">Crear y abrir recorrido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Servicio Médico -->
+  <div class="modal-overlay" id="modalServicioMedico">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalServicioMedicoTitle">Registrar atención médica</h3><button class="modal-close" onclick="ssHideModal('modalServicioMedico')">&times;</button></div>
+      <div class="modal-body">
+        <form id="formServicioMedico">
+          <div class="form-row">
+            <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="sm_fecha" required></div>
+            <div class="form-group"><label>Hora</label><input type="time" class="form-input" id="sm_hora"></div>
+          </div>
+          <div class="form-group"><label>Tipo de paciente</label>
+            <select class="form-select" id="sm_tipo_paciente" onchange="onPacienteTypeChange()">
+              <option value="Trabajador">Trabajador activo</option>
+              <option value="Candidato">Candidato en proceso de captación</option>
+            </select>
+          </div>
+          <div class="form-group" id="sm_sel_trabajador">
+            <label>Trabajador</label>
+            <select class="form-select" id="sm_trabajador_id" onchange="onPacienteSelect()"></select>
+          </div>
+          <div class="form-group" id="sm_sel_candidato" style="display:none;">
+            <label>Candidato</label>
+            <select class="form-select" id="sm_candidato_id" onchange="onPacienteSelect()"></select>
+          </div>
+          <div class="ss-pac-info">
+            <div class="form-group"><label>Nombre</label><input type="text" class="form-input" id="sm_nombre" readonly style="background:var(--color-bg);"></div>
+            <div class="form-group"><label>Cédula</label><input type="text" class="form-input" id="sm_cedula" readonly style="background:var(--color-bg);"></div>
+            <div class="form-group"><label>Cargo</label><input type="text" class="form-input" id="sm_cargo" readonly style="background:var(--color-bg);"></div>
+          </div>
+          <div class="form-group"><label>Unidad / Proceso</label><input type="text" class="form-input" id="sm_unidad" readonly style="background:var(--color-bg);"></div>
+          <div class="form-group"><label>Tipo de atención</label>
+            <select class="form-select" id="sm_tipo_atencion">
+              <option value="Consulta">Consulta</option>
+              <option value="Emergencia">Emergencia</option>
+              <option value="Curativo / Curas">Curativo / Curas</option>
+              <option value="Entrega de medicamento">Entrega de medicamento</option>
+              <option value="Examen ocupacional">Examen ocupacional</option>
+              <option value="Evaluación de seguimiento">Evaluación de seguimiento</option>
+              <option value="Vacunación">Vacunación</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Motivo de la consulta</label><textarea class="form-textarea" id="sm_motivo" rows="2"></textarea></div>
+          <div class="form-group"><label>Diagnóstico</label><textarea class="form-textarea" id="sm_diagnostico" rows="2"></textarea></div>
+          <div class="form-group"><label>Tratamiento / indicaciones</label><textarea class="form-textarea" id="sm_tratamiento" rows="2"></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Apreciación de aptitud</label>
+              <select class="form-select" id="sm_apreciacion"><option value="">— Selecciona —</option><option value="Apto">Apto</option><option value="Apto con restricciones">Apto con restricciones</option><option value="No apto">No apto</option><option value="En observación">En observación</option></select>
+            </div>
+            <div class="form-group"><label>Atendido por</label><input type="text" class="form-input" id="sm_atiende" placeholder="Médico / Enfermero(a)"></div>
+          </div>
+          <div class="form-group"><label class="ss-check"><input type="checkbox" id="sm_referido" onchange="onReferidoChange()"> Referido a centro de salud / especialista</label></div>
+          <div class="form-group" id="sm_ref_a_group" style="display:none;"><label>Referido a</label><input type="text" class="form-input" id="sm_referido_a" placeholder="Ej: Ambulatorio, INPSASEL, Clínica"></div>
+          <div class="form-group"><label>Estado</label>
+            <select class="form-select" id="sm_estado"><option value="Atendido">Atendido</option><option value="En observación">En observación</option><option value="Referido">Referido</option><option value="Cerrado">Cerrado</option></select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="ssHideModal('modalServicioMedico')">Cancelar</button>
+        <button class="btn btn-seguridad" onclick="saveServicioMedico()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Inventario Equipos -->
+  <div class="modal-overlay" id="modalInvEquipo">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalInvEquipoTitle">Nuevo equipo de seguridad</h3><button class="modal-close" onclick="ssHideModal('modalInvEquipo')">&times;</button></div>
+      <div class="modal-body">
+        <form id="formInvEquipo">
+          <div class="form-row">
+            <div class="form-group"><label>Nombre</label><input type="text" class="form-input" id="eq_nombre" placeholder="Ej: Casco de seguridad" required></div>
+            <div class="form-group"><label>Tipo</label>
+              <select class="form-select" id="eq_tipo"><option value="EPP">EPP</option><option value="Detección y extinción de incendios">Detección y extinción de incendios</option><option value="Señalización">Señalización</option><option value="Rescate y emergencias">Rescate y emergencias</option><option value="Ergonómicos">Ergonómicos</option><option value="Otro">Otro</option></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Marca</label><input type="text" class="form-input" id="eq_marca"></div>
+            <div class="form-group"><label>Modelo</label><input type="text" class="form-input" id="eq_modelo"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Serial</label><input type="text" class="form-input" id="eq_serial"></div>
+            <div class="form-group"><label>Código</label><input type="text" class="form-input" id="eq_codigo"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Cantidad</label><input type="number" min="0" class="form-input" id="eq_cantidad" value="0" required></div>
+            <div class="form-group"><label>Cantidad mínima (alerta)</label><input type="number" min="0" class="form-input" id="eq_cantidad_minima" value="0"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Ubicación</label><input type="text" class="form-input" id="eq_ubicacion" placeholder="Ej: Almacén, Enfermería"></div>
+            <div class="form-group"><label>Fecha de vencimiento</label><input type="date" class="form-input" id="eq_fecha_vencimiento"></div>
+          </div>
+          <div class="form-group"><label>Estado</label>
+            <select class="form-select" id="eq_estado"><option value="Disponible">Disponible</option><option value="Bajo stock">Bajo stock</option><option value="Agotado">Agotado</option><option value="Vencido">Vencido</option><option value="En reparación">En reparación</option></select>
+          </div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="eq_observaciones" rows="2"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="ssHideModal('modalInvEquipo')">Cancelar</button>
+        <button class="btn btn-seguridad" onclick="saveInvEquipo()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Inventario Insumos -->
+  <div class="modal-overlay" id="modalInvInsumo">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalInvInsumoTitle">Nuevo insumo / medicamento</h3><button class="modal-close" onclick="ssHideModal('modalInvInsumo')">&times;</button></div>
+      <div class="modal-body">
+        <form id="formInvInsumo">
+          <div class="form-row">
+            <div class="form-group"><label>Nombre</label><input type="text" class="form-input" id="in_nombre" placeholder="Ej: Acetaminofén 500mg" required></div>
+            <div class="form-group"><label>Tipo</label>
+              <select class="form-select" id="in_tipo"><option value="Medicamento">Medicamento</option><option value="Insumo médico">Insumo médico</option><option value="Botiquín">Botiquín</option><option value="Otro">Otro</option></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Presentación</label><input type="text" class="form-input" id="in_presentacion" placeholder="Ej: Caja x 10 tabs, Frasco"></div>
+            <div class="form-group"><label>Lote</label><input type="text" class="form-input" id="in_lote"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Cantidad</label><input type="number" min="0" class="form-input" id="in_cantidad" value="0" required></div>
+            <div class="form-group"><label>Cantidad mínima (alerta)</label><input type="number" min="0" class="form-input" id="in_cantidad_minima" value="0"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Fecha de vencimiento</label><input type="date" class="form-input" id="in_fecha_vencimiento"></div>
+            <div class="form-group"><label>Ubicación</label><input type="text" class="form-input" id="in_ubicacion" placeholder="Ej: Botiquín principal, Enfermería"></div>
+          </div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="in_observaciones" rows="2"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="ssHideModal('modalInvInsumo')">Cancelar</button>
+        <button class="btn btn-seguridad" onclick="saveInvInsumo()">Guardar</button>
       </div>
     </div>
   </div>
@@ -137,6 +369,866 @@
   <script src="../js/ui.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/modules.js"></script>
-  <script>initModule('seguridad', 'seguridad_incidentes', ['tipo','ubicacion','fecha','gravedad','estado','descripcion']);</script>
+  <script>
+    function ssEscape(s) {
+      return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function ssShowModal(id) {
+      document.getElementById(id).classList.add('show');
+    }
+
+    function ssHideModal(id) {
+      document.getElementById(id).classList.remove('show');
+    }
+
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('show');
+    });
+
+    /* ===== Checklist LOPCYMAT para inspecciones (recepción y distribución de vehículos) ===== */
+    var INSPECCION_CHECKLIST = [
+      { categoria: 'Organización del Sistema de Seguridad y Salud en el Trabajo', items: [
+        ['Programa de Seguridad y Salud en el Trabajo (PSST) actualizado y aprobado', 'Art. 56 LOPCYMAT · NT-01-2008 INPSASEL'],
+        ['Comité de Seguridad y Salud Laboral (CSSL) constituido y sesionando', 'Art. 46-49 LOPCYMAT'],
+        ['Delegados de prevención electos, capacitados y con tiempo para sus funciones', 'Art. 42-45 LOPCYMAT'],
+        ['Certificación de la empresa ante el INPSASEL vigente', 'Art. 43, 56 LOPCYMAT · NT-01-2008'],
+        ['Estadísticas de accidentes, incidentes y morbilidad analizadas', 'Art. 53, 64 LOPCYMAT']
+      ] },
+      { categoria: 'Condiciones de los puestos de trabajo', items: [
+        ['Pasillos, corredores y vías de circulación despejados y en buen estado', 'Art. 59-60 LOPCYMAT · COVENIN 474'],
+        ['Pisos estables, antideslizantes y sin desniveles peligrosos', 'Art. 60 LOPCYMAT'],
+        ['Iluminación adecuada en puestos de trabajo y vías de circulación', 'COVENIN 3149 · Art. 60 LOPCYMAT'],
+        ['Ventilación y condiciones térmicas adecuadas en oficinas y almacenes', 'Art. 60 LOPCYMAT'],
+        ['Orden y limpieza general en todas las áreas', 'Art. 60 LOPCYMAT'],
+        ['Escaleras, rampas y barandas en buen estado con pasamanos', 'COVENIN 487 · Art. 60 LOPCYMAT'],
+        ['Señalización de seguridad conforme a colores y rótulos', 'COVENIN 187 · Art. 59 LOPCYMAT'],
+        ['Mobiliario ergonómico en puestos administrativos', 'COVENIN 2237 · NT-01-2008']
+      ] },
+      { categoria: 'Patio de recepción y distribución de vehículos', items: [
+        ['Delimitación y señalización de rutas peatonales vs. vehiculares', 'Art. 59-60 LOPCYMAT · señalización de tránsito'],
+        ['Límites de velocidad y sentido de circulación señalizados', 'COVENIN 187 · normativa de tránsito'],
+        ['Espejos convexos y/o controles en cruces ciegos y esquinas', 'Art. 59-60 LOPCYMAT'],
+        ['Barandas y topes en rampas, muelles y bordes de patio', 'Art. 60 LOPCYMAT'],
+        ['Superficie del patio sin baches, derrames de aceite o combustible', 'Art. 60 LOPCYMAT · manejo de sustancias peligrosas'],
+        ['Control de acceso vehicular y peatonal a las instalaciones', 'Art. 59-60 LOPCYMAT'],
+        ['Estacionamiento de vehículos nuevos demarcado, ordenado y estable', 'Buenas prácticas de operaciones controladas'],
+        ['Vehículos asegurados: freno de mano, posición neutra y llaves custodiadas', 'Buenas prácticas de patio de vehículos'],
+        ['Drenajes y manejo de aguas aceitosas y residuos de vehículos', 'Ley del Ambiente · desechos peligrosos']
+      ] },
+      { categoria: 'Prevención y protección contra incendios', items: [
+        ['Extintores visibles, accesibles y con fecha de recarga vigente', 'COVENIN 1040 · Art. 59 LOPCYMAT'],
+        ['Tipo y capacidad de extintores adecuados al riesgo del área', 'COVENIN 1040'],
+        ['Vías de escape y salidas de emergencia señalizadas y despejadas', 'COVENIN 810 · Art. 59-60 LOPCYMAT'],
+        ['Puertas de emergencia abren hacia el exterior sin obstáculos', 'COVENIN 810'],
+        ['Sistema de detección y alarma de incendios operativo', 'COVENIN 810 · NFPA 72'],
+        ['Almacenamiento de combustibles e inflamables en áreas seguras', 'COVENIN 1041 · Art. 60 LOPCYMAT'],
+        ['Separación adecuada entre vehículos para evitar propagación de incendios', 'Buenas prácticas de patio de vehículos']
+      ] },
+      { categoria: 'Equipos de protección personal', items: [
+        ['Dotación de EPP según riesgo: casco, calzado, guantes, uniforme', 'Art. 51, 60 LOPCYMAT · COVENIN 2237'],
+        ['Uso efectivo del EPP por parte de los trabajadores', 'Art. 54, 60 LOPCYMAT'],
+        ['Chalecos reflectantes en patio y zonas de circulación vehicular', 'COVENIN 2237'],
+        ['EPP en buen estado con reposición oportuna', 'Art. 51 LOPCYMAT'],
+        ['Almacenamiento e higiene adecuada del EPP', 'COVENIN 2237']
+      ] },
+      { categoria: 'Manejo manual de materiales y equipos', items: [
+        ['Uso de patines, transpaletas y gatos en buen estado', 'Art. 60 LOPCYMAT'],
+        ['Técnicas correctas de levantamiento manual de cargas (límite 25 kg)', 'COVENIN 3137 · NT-01-2008'],
+        ['Herramientas en buen estado y con mantenimiento preventivo', 'Art. 60 LOPCYMAT'],
+        ['Capacitación en manejo seguro de cargas y equipos de patio', 'Art. 60, 63 LOPCYMAT']
+      ] },
+      { categoria: 'Riesgos eléctricos y baterías', items: [
+        ['Tableros eléctricos cerrados, rotulados y con tapas', 'COVENIN 2004 · Art. 60 LOPCYMAT'],
+        ['Cables y extensiones en buen estado, sin empalmes improvisados', 'COVENIN 2004'],
+        ['Tomas de corriente con puesta a tierra en oficinas y taller', 'COVENIN 2004'],
+        ['Zona de carga y almacenamiento de baterías ventilada y señalizada', 'Riesgo específico: distribución de vehículos'],
+        ['Baterías sobre bandejas aislantes con material neutralizante disponible', 'Riesgo específico: distribución de vehículos']
+      ] },
+      { categoria: 'Servicios de salud en el trabajo', items: [
+        ['Servicio de medicina laboral o primeros auxilios disponible', 'Art. 39-45 LOPCYMAT · COVENIN 2237'],
+        ['Botiquín de primeros auxilios completo y con insumos vigentes', 'COVENIN 2237 · Art. 39 LOPCYMAT'],
+        ['Registro de aptitud médica de los trabajadores', 'COVENIN 2237 · Art. 41 LOPCYMAT'],
+        ['Plan de emergencia implementado con simulacros realizados', 'Art. 56, 60 LOPCYMAT']
+      ] },
+      { categoria: 'Emergencias y brigadas', items: [
+        ['Brigada de emergencia constituida y capacitada', 'Art. 56, 59 LOPCYMAT'],
+        ['Camilla, inmovilizadores y extintores cercanos a puntos de riesgo', 'COVENIN 2237 · COVENIN 1040'],
+        ['Números de emergencia visibles (INPSASEL, bomberos, ambulancias)', 'Art. 59 LOPCYMAT'],
+        ['Puntos de encuentro y zonas seguras señalizados', 'COVENIN 810']
+      ] }
+    ];
+
+    /* ===== INCIDENTES ===== */
+    var seguridadIncidentes = [];
+    var editingIncidenteId = null;
+
+    function gravedadColor(g) {
+      return { 'Baja': '#059669', 'Media': '#d97706', 'Alta': '#ea580c', 'Crítica': '#dc2626' }[g] || '#666';
+    }
+
+    async function loadIncidentes() {
+      try {
+        var { data, error } = await supabaseClient.from('seguridad_incidentes').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        seguridadIncidentes = data || [];
+        renderIncidentes();
+      } catch (err) {
+        document.getElementById('incidentesBody').innerHTML =
+          '<tr><td colspan="6" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar incidentes: ' + ssEscape(err.message) + '</td></tr>';
+      }
+    }
+
+    function renderIncidentes() {
+      var tbody = document.getElementById('incidentesBody');
+      if (!seguridadIncidentes.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">No hay incidentes registrados</td></tr>';
+        return;
+      }
+      tbody.innerHTML = seguridadIncidentes.map(function(i) {
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + ssEscape(i.tipo) + '</span></td>'
+          + '<td>' + ssEscape(i.ubicacion || '-') + '</td>'
+          + '<td>' + (i.fecha || '-') + '</td>'
+          + '<td><span style="font-weight:600;color:' + gravedadColor(i.gravedad) + ';">' + ssEscape(i.gravedad || '-') + '</span></td>'
+          + '<td><span class="badge ' + getBadgeClass(i.estado) + '">' + ssEscape(i.estado) + '</span></td>'
+          + '<td>'
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalIncidente(' + i.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteIncidente(' + i.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+      uiFadeIn(tbody);
+    }
+
+    function openModalIncidente(id) {
+      editingIncidenteId = id || null;
+      document.getElementById('formIncidente').reset();
+      document.getElementById('modalIncidenteTitle').textContent = id ? 'Editar incidente' : 'Reportar incidente';
+      document.getElementById('inc_fecha').value = new Date().toISOString().slice(0, 10);
+      if (id) {
+        var i = seguridadIncidentes.find(function(x) { return x.id === id; });
+        if (i) {
+          document.getElementById('inc_tipo').value = i.tipo;
+          document.getElementById('inc_ubicacion').value = i.ubicacion;
+          document.getElementById('inc_fecha').value = i.fecha;
+          document.getElementById('inc_gravedad').value = i.gravedad;
+          document.getElementById('inc_estado').value = i.estado;
+          document.getElementById('inc_descripcion').value = i.descripcion || '';
+        }
+      }
+      ssShowModal('modalIncidente');
+    }
+
+    async function saveIncidente() {
+      var ubicacion = document.getElementById('inc_ubicacion').value.trim();
+      var fecha = document.getElementById('inc_fecha').value;
+      if (!ubicacion || !fecha) {
+        showAlert('La ubicación y la fecha son obligatorias', 'warning');
+        return;
+      }
+      var payload = {
+        tipo: document.getElementById('inc_tipo').value,
+        ubicacion: ubicacion,
+        fecha: fecha,
+        gravedad: document.getElementById('inc_gravedad').value,
+        estado: document.getElementById('inc_estado').value,
+        descripcion: document.getElementById('inc_descripcion').value.trim() || null
+      };
+      try {
+        if (editingIncidenteId) {
+          var { error } = await supabaseClient.from('seguridad_incidentes').update(payload).eq('id', editingIncidenteId);
+          if (error) throw error;
+        } else {
+          var { error } = await supabaseClient.from('seguridad_incidentes').insert([payload]);
+          if (error) throw error;
+        }
+        ssHideModal('modalIncidente');
+        loadIncidentes();
+        showAlert(editingIncidenteId ? 'Incidente actualizado' : 'Incidente reportado', 'success');
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteIncidente(id) {
+      var ok = await showConfirm('¿Eliminar este incidente?', 'Eliminar');
+      if (!ok) return;
+      try {
+        var { error } = await supabaseClient.from('seguridad_incidentes').delete().eq('id', id);
+        if (error) throw error;
+        loadIncidentes();
+        showAlert('Incidente eliminado', 'success');
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== INSPECCIONES ===== */
+    var seguridadInspecciones = [];
+    var editingInspeccionId = null;
+
+    async function loadInspecciones() {
+      try {
+        var { data, error } = await supabaseClient.from('seguridad_inspecciones').select('*').order('fecha', { ascending: false });
+        if (error) throw error;
+        seguridadInspecciones = data || [];
+        renderInspecciones();
+      } catch (err) {
+        document.getElementById('inspeccionesBody').innerHTML =
+          '<tr><td colspan="7" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar inspecciones: ' + ssEscape(err.message) + '</td></tr>';
+      }
+    }
+
+    function renderInspecciones() {
+      var tbody = document.getElementById('inspeccionesBody');
+      if (!seguridadInspecciones.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay inspecciones registradas</td></tr>';
+        return;
+      }
+      tbody.innerHTML = seguridadInspecciones.map(function(x) {
+        var recorridoLabel = x.estado === 'Finalizada' ? 'Ver' : 'Recorrido';
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + ssEscape(x.titulo) + '</span><div style="font-size:11px;color:var(--color-text-secondary);">' + ssEscape(x.area) + (x.ubicacion ? ' · ' + ssEscape(x.ubicacion) : '') + '</div></td>'
+          + '<td>' + ssEscape(x.tipo) + '</td>'
+          + '<td>' + ssEscape(x.inspector) + '</td>'
+          + '<td>' + (x.fecha || '-') + (x.hora ? ' ' + x.hora : '') + '</td>'
+          + '<td>' + (x.resultado ? '<span class="badge ' + getBadgeClass(x.resultado) + '">' + ssEscape(x.resultado) + '</span>' : '<span style="color:#999;">—</span>') + '</td>'
+          + '<td><span class="badge ' + getBadgeClass(x.estado) + '">' + ssEscape(x.estado) + '</span></td>'
+          + '<td>'
+          + '<button class="btn btn-sm btn-seguridad" title="Abrir recorrido de campo" onclick="abrirRecorrido(' + x.id + ')">' + recorridoLabel + '</button> '
+          + '<button class="btn btn-sm btn-outline" title="Editar datos" onclick="openModalInspeccion(' + x.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteInspeccion(' + x.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+      uiFadeIn(tbody);
+    }
+
+    function abrirRecorrido(id) {
+      window.location.href = 'inspeccion.html?id=' + id;
+    }
+
+    function openModalInspeccion(id) {
+      editingInspeccionId = id || null;
+      document.getElementById('formInspeccion').reset();
+      document.getElementById('modalInspeccionTitle').textContent = id ? 'Editar inspección' : 'Nueva inspección';
+      document.getElementById('insp_fecha').value = new Date().toISOString().slice(0, 10);
+      if (id) {
+        var x = seguridadInspecciones.find(function(r) { return r.id === id; });
+        if (x) {
+          document.getElementById('insp_titulo').value = x.titulo;
+          document.getElementById('insp_tipo').value = x.tipo;
+          document.getElementById('insp_area').value = x.area;
+          document.getElementById('insp_ubicacion').value = x.ubicacion || '';
+          document.getElementById('insp_inspector').value = x.inspector;
+          document.getElementById('insp_participantes').value = x.participantes || '';
+          document.getElementById('insp_fecha').value = x.fecha || '';
+          document.getElementById('insp_hora').value = x.hora || '';
+        }
+      }
+      ssShowModal('modalInspeccion');
+    }
+
+    async function saveInspeccion() {
+      var titulo = document.getElementById('insp_titulo').value.trim();
+      var area = document.getElementById('insp_area').value.trim();
+      var inspector = document.getElementById('insp_inspector').value.trim();
+      var fecha = document.getElementById('insp_fecha').value;
+      if (!titulo || !area || !inspector || !fecha) {
+        showAlert('Completa título, área, inspector y fecha', 'warning');
+        return;
+      }
+      var payload = {
+        titulo: titulo,
+        tipo: document.getElementById('insp_tipo').value,
+        area: area,
+        ubicacion: document.getElementById('insp_ubicacion').value.trim() || null,
+        inspector: inspector,
+        participantes: document.getElementById('insp_participantes').value.trim() || null,
+        fecha: fecha,
+        hora: document.getElementById('insp_hora').value || null
+      };
+      try {
+        if (editingInspeccionId) {
+          var { error } = await supabaseClient.from('seguridad_inspecciones').update(payload).eq('id', editingInspeccionId);
+          if (error) throw error;
+          ssHideModal('modalInspeccion');
+          loadInspecciones();
+          showAlert('Inspección actualizada', 'success');
+        } else {
+          var { data: ins, error: errIns } = await supabaseClient.from('seguridad_inspecciones').insert([payload]).select();
+          if (errIns) throw errIns;
+          var inspeccionId = ins[0].id;
+          var itemsPayload = [];
+          var orden = 1;
+          INSPECCION_CHECKLIST.forEach(function(cat) {
+            cat.items.forEach(function(item) {
+              itemsPayload.push({
+                inspeccion_id: inspeccionId,
+                categoria: cat.categoria,
+                item: item[0],
+                criterio: item[1],
+                resultado: null,
+                observacion: null,
+                orden: orden++
+              });
+            });
+          });
+          var { error: errItems } = await supabaseClient.from('seguridad_inspeccion_items').insert(itemsPayload);
+          if (errItems) throw errItems;
+          ssHideModal('modalInspeccion');
+          loadInspecciones();
+          showAlert('Inspección creada. Inicia el recorrido de campo.', 'success');
+          window.location.href = 'inspeccion.html?id=' + inspeccionId;
+        }
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteInspeccion(id) {
+      var ok = await showConfirm('¿Eliminar esta inspección y todo su checklist?', 'Eliminar');
+      if (!ok) return;
+      try {
+        var { error } = await supabaseClient.from('seguridad_inspecciones').delete().eq('id', id);
+        if (error) throw error;
+        loadInspecciones();
+        showAlert('Inspección eliminada', 'success');
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== SERVICIO MÉDICO ===== */
+    var seguridadServicioMedico = [];
+    var editingServicioMedicoId = null;
+    var smTrabajadores = [];
+    var smCandidatos = [];
+    var smCargos = [];
+    var smUnidades = [];
+
+    function smGetCargo(id) {
+      var c = smCargos.find(function(x) { return x.id === id; });
+      return c ? c.titulo : '';
+    }
+
+    function smGetUnidad(id) {
+      var u = smUnidades.find(function(x) { return x.id === id; });
+      return u ? u.nombre : '';
+    }
+
+    function onPacienteTypeChange() {
+      var tipo = document.getElementById('sm_tipo_paciente').value;
+      document.getElementById('sm_sel_trabajador').style.display = tipo === 'Trabajador' ? 'block' : 'none';
+      document.getElementById('sm_sel_candidato').style.display = tipo === 'Candidato' ? 'block' : 'none';
+      document.getElementById('sm_nombre').value = '';
+      document.getElementById('sm_cedula').value = '';
+      document.getElementById('sm_cargo').value = '';
+      document.getElementById('sm_unidad').value = '';
+      onPacienteSelect();
+    }
+
+    function onPacienteSelect() {
+      var tipo = document.getElementById('sm_tipo_paciente').value;
+      var id = tipo === 'Trabajador' ? document.getElementById('sm_trabajador_id').value : document.getElementById('sm_candidato_id').value;
+      if (!id) {
+        document.getElementById('sm_nombre').value = '';
+        document.getElementById('sm_cedula').value = '';
+        document.getElementById('sm_cargo').value = '';
+        document.getElementById('sm_unidad').value = '';
+        return;
+      }
+      if (tipo === 'Trabajador') {
+        var t = smTrabajadores.find(function(x) { return x.id === id; });
+        if (t) {
+          document.getElementById('sm_nombre').value = t.nombres + ' ' + t.apellidos;
+          document.getElementById('sm_cedula').value = t.cedula;
+          document.getElementById('sm_cargo').value = smGetCargo(t.cargo_id);
+          document.getElementById('sm_unidad').value = smGetUnidad(t.unidad_id);
+        }
+      } else {
+        var c = smCandidatos.find(function(x) { return x.id === parseInt(id, 10); });
+        if (c) {
+          document.getElementById('sm_nombre').value = c.nombres + ' ' + c.apellidos;
+          document.getElementById('sm_cedula').value = c.cedula;
+          document.getElementById('sm_cargo').value = c.cargo_interes || '';
+          document.getElementById('sm_unidad').value = 'Candidato en captación';
+        }
+      }
+    }
+
+    function onReferidoChange() {
+      document.getElementById('sm_ref_a_group').style.display = document.getElementById('sm_referido').checked ? 'block' : 'none';
+    }
+
+    async function loadServicioMedico() {
+      try {
+        var [res, resTrab, resCand, resCargo, resUni] = await Promise.all([
+          supabaseClient.from('seguridad_servicio_medico').select('*').order('fecha', { ascending: false }),
+          supabaseClient.from('plantilla_trabajadores').select('*').eq('estado', 'Activo').order('apellidos'),
+          supabaseClient.from('ats_candidatos').select('*').order('apellidos'),
+          supabaseClient.from('est_cargos').select('id, titulo'),
+          supabaseClient.from('est_unidades').select('id, nombre')
+        ]);
+        if (res.error) throw res.error;
+        if (resTrab.error) throw resTrab.error;
+        if (resCand.error) throw resCand.error;
+        if (resCargo.error) throw resCargo.error;
+        if (resUni.error) throw resUni.error;
+        seguridadServicioMedico = res.data || [];
+        smTrabajadores = resTrab.data || [];
+        smCandidatos = resCand.data || [];
+        smCargos = resCargo.data || [];
+        smUnidades = resUni.data || [];
+        var selTrab = document.getElementById('sm_trabajador_id');
+        selTrab.innerHTML = '<option value="">— Selecciona —</option>';
+        smTrabajadores.forEach(function(t) {
+          selTrab.innerHTML += '<option value="' + t.id + '">' + ssEscape(t.nombres + ' ' + t.apellidos) + ' (' + ssEscape(t.cedula) + ')</option>';
+        });
+        var selCand = document.getElementById('sm_candidato_id');
+        selCand.innerHTML = '<option value="">— Selecciona —</option>';
+        smCandidatos.forEach(function(c) {
+          selCand.innerHTML += '<option value="' + c.id + '">' + ssEscape(c.nombres + ' ' + c.apellidos) + ' (' + ssEscape(c.cedula) + ') · ' + ssEscape(c.cargo_interes || '') + '</option>';
+        });
+        renderServicioMedico();
+      } catch (err) {
+        document.getElementById('servicioMedicoBody').innerHTML =
+          '<tr><td colspan="8" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar el servicio médico: ' + ssEscape(err.message) + '</td></tr>';
+      }
+    }
+
+    function renderServicioMedico() {
+      var tbody = document.getElementById('servicioMedicoBody');
+      if (!seguridadServicioMedico.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#999;">No hay atenciones registradas</td></tr>';
+        return;
+      }
+      tbody.innerHTML = seguridadServicioMedico.map(function(m) {
+        var apre = m.apreciacion ? '<span class="badge ' + getBadgeClass(m.apreciacion) + '">' + ssEscape(m.apreciacion) + '</span>' : '<span style="color:#999;">—</span>';
+        return '<tr>'
+          + '<td>' + (m.fecha || '-') + (m.hora ? ' ' + m.hora : '') + '</td>'
+          + '<td><span style="font-weight:600;">' + ssEscape(m.nombre || '-') + '</span><div style="font-size:11px;color:var(--color-text-secondary);">' + ssEscape(m.tipo_paciente) + '</div></td>'
+          + '<td>' + ssEscape(m.cedula || '-') + '</td>'
+          + '<td>' + ssEscape(m.cargo || '-') + (m.unidad ? '<div style="font-size:11px;color:var(--color-text-secondary);">' + ssEscape(m.unidad) + '</div>' : '') + '</td>'
+          + '<td>' + ssEscape(m.tipo_atencion) + '</td>'
+          + '<td>' + apre + '</td>'
+          + '<td><span class="badge ' + getBadgeClass(m.estado) + '">' + ssEscape(m.estado) + '</span></td>'
+          + '<td>'
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalServicioMedico(' + m.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteServicioMedico(' + m.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+      uiFadeIn(tbody);
+    }
+
+    function openModalServicioMedico(id) {
+      editingServicioMedicoId = id || null;
+      document.getElementById('formServicioMedico').reset();
+      document.getElementById('sm_referido').checked = false;
+      document.getElementById('sm_ref_a_group').style.display = 'none';
+      document.getElementById('modalServicioMedicoTitle').textContent = id ? 'Editar atención médica' : 'Registrar atención médica';
+      document.getElementById('sm_fecha').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('sm_tipo_paciente').value = 'Trabajador';
+      onPacienteTypeChange();
+      if (id) {
+        var m = seguridadServicioMedico.find(function(x) { return x.id === id; });
+        if (m) {
+          document.getElementById('sm_fecha').value = m.fecha || '';
+          document.getElementById('sm_hora').value = m.hora || '';
+          document.getElementById('sm_tipo_paciente').value = m.tipo_paciente || 'Trabajador';
+          onPacienteTypeChange();
+          if (m.tipo_paciente === 'Candidato') {
+            document.getElementById('sm_candidato_id').value = m.candidato_id || '';
+          } else {
+            document.getElementById('sm_trabajador_id').value = m.trabajador_id || '';
+          }
+          onPacienteSelect();
+          document.getElementById('sm_nombre').value = m.nombre || '';
+          document.getElementById('sm_cedula').value = m.cedula || '';
+          document.getElementById('sm_cargo').value = m.cargo || '';
+          document.getElementById('sm_unidad').value = m.unidad || '';
+          document.getElementById('sm_tipo_atencion').value = m.tipo_atencion;
+          document.getElementById('sm_motivo').value = m.motivo || '';
+          document.getElementById('sm_diagnostico').value = m.diagnostico || '';
+          document.getElementById('sm_tratamiento').value = m.tratamiento || '';
+          document.getElementById('sm_apreciacion').value = m.apreciacion || '';
+          document.getElementById('sm_atiende').value = m.atiende || '';
+          document.getElementById('sm_referido').checked = !!m.referido;
+          onReferidoChange();
+          document.getElementById('sm_referido_a').value = m.referido_a || '';
+          document.getElementById('sm_estado').value = m.estado;
+        }
+      }
+      ssShowModal('modalServicioMedico');
+    }
+
+    async function saveServicioMedico() {
+      var fecha = document.getElementById('sm_fecha').value;
+      var tipo = document.getElementById('sm_tipo_paciente').value;
+      var trabajadorId = tipo === 'Trabajador' ? document.getElementById('sm_trabajador_id').value : null;
+      var candidatoId = tipo === 'Candidato' ? parseInt(document.getElementById('sm_candidato_id').value, 10) || null : null;
+      var nombre = document.getElementById('sm_nombre').value.trim();
+      if (!fecha || (!trabajadorId && !candidatoId)) {
+        showAlert('Completa la fecha y selecciona el paciente', 'warning');
+        return;
+      }
+      var referido = document.getElementById('sm_referido').checked;
+      var payload = {
+        fecha: fecha,
+        hora: document.getElementById('sm_hora').value || null,
+        tipo_paciente: tipo,
+        trabajador_id: trabajadorId,
+        candidato_id: candidatoId,
+        cedula: document.getElementById('sm_cedula').value.trim() || null,
+        nombre: nombre || null,
+        cargo: document.getElementById('sm_cargo').value.trim() || null,
+        unidad: document.getElementById('sm_unidad').value.trim() || null,
+        tipo_atencion: document.getElementById('sm_tipo_atencion').value,
+        motivo: document.getElementById('sm_motivo').value.trim() || null,
+        diagnostico: document.getElementById('sm_diagnostico').value.trim() || null,
+        tratamiento: document.getElementById('sm_tratamiento').value.trim() || null,
+        apreciacion: document.getElementById('sm_apreciacion').value || null,
+        atiende: document.getElementById('sm_atiende').value.trim() || null,
+        referido: referido,
+        referido_a: referido ? document.getElementById('sm_referido_a').value.trim() || null : null,
+        estado: referido && document.getElementById('sm_estado').value === 'Atendido' ? 'Referido' : document.getElementById('sm_estado').value
+      };
+      try {
+        if (editingServicioMedicoId) {
+          var { error } = await supabaseClient.from('seguridad_servicio_medico').update(payload).eq('id', editingServicioMedicoId);
+          if (error) throw error;
+        } else {
+          var { error } = await supabaseClient.from('seguridad_servicio_medico').insert([payload]);
+          if (error) throw error;
+        }
+        ssHideModal('modalServicioMedico');
+        loadServicioMedico();
+        showAlert(editingServicioMedicoId ? 'Atención actualizada' : 'Atención registrada', 'success');
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteServicioMedico(id) {
+      var ok = await showConfirm('¿Eliminar esta atención médica?', 'Eliminar');
+      if (!ok) return;
+      try {
+        var { error } = await supabaseClient.from('seguridad_servicio_medico').delete().eq('id', id);
+        if (error) throw error;
+        loadServicioMedico();
+        showAlert('Atención eliminada', 'success');
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== INVENTARIO DE EQUIPOS ===== */
+    var seguridadInvEquipos = [];
+    var editingInvEquipoId = null;
+
+    function estadoAutoEquipo(row) {
+      var hoy = new Date();
+      if (row.fecha_vencimiento) {
+        var v = new Date(row.fecha_vencimiento + 'T00:00:00');
+        if (v < hoy) return 'Vencido';
+      }
+      if (row.cantidad <= 0) return 'Agotado';
+      if (row.cantidad_minima > 0 && row.cantidad <= row.cantidad_minima) return 'Bajo stock';
+      return 'Disponible';
+    }
+
+    function estadoFinalEquipo(row, manualEstado) {
+      if (manualEstado === 'En reparación') return 'En reparación';
+      return estadoAutoEquipo(row);
+    }
+
+    async function loadInvEquipos() {
+      try {
+        var { data, error } = await supabaseClient.from('seguridad_inventario_equipos').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        seguridadInvEquipos = data || [];
+        renderInvEquipos();
+      } catch (err) {
+        document.getElementById('invEquiposBody').innerHTML =
+          '<tr><td colspan="9" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar el inventario: ' + ssEscape(err.message) + '</td></tr>';
+      }
+    }
+
+    function renderInvEquipos() {
+      var tbody = document.getElementById('invEquiposBody');
+      if (!seguridadInvEquipos.length) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#999;">No hay equipos registrados</td></tr>';
+        return;
+      }
+      tbody.innerHTML = seguridadInvEquipos.map(function(e) {
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + ssEscape(e.nombre) + '</span></td>'
+          + '<td>' + ssEscape(e.tipo || '-') + '</td>'
+          + '<td>' + ssEscape([e.marca, e.modelo].filter(Boolean).join(' ') || '-') + '</td>'
+          + '<td style="text-align:center;font-weight:700;">' + e.cantidad + '</td>'
+          + '<td style="text-align:center;">' + e.cantidad_minima + '</td>'
+          + '<td>' + ssEscape(e.ubicacion || '-') + '</td>'
+          + '<td>' + (e.fecha_vencimiento || '-') + '</td>'
+          + '<td><span class="badge ' + getBadgeClass(e.estado) + '">' + ssEscape(e.estado) + '</span></td>'
+          + '<td>'
+          + '<button class="btn btn-sm btn-outline" title="Entrada (+1)" onclick="ajustarStockEquipo(' + e.id + ', 1)"><i class="fi fi-sr-plus" style="font-size:14px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Salida (-1)" onclick="ajustarStockEquipo(' + e.id + ', -1)"><i class="fi fi-sr-minus" style="font-size:14px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalInvEquipo(' + e.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteInvEquipo(' + e.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+      uiFadeIn(tbody);
+    }
+
+    async function ajustarStockEquipo(id, delta) {
+      var e = seguridadInvEquipos.find(function(x) { return x.id === id; });
+      if (!e) return;
+      var nuevaCantidad = Math.max(0, (e.cantidad || 0) + delta);
+      var estado = estadoAutoEquipo({ cantidad: nuevaCantidad, cantidad_minima: e.cantidad_minima, fecha_vencimiento: e.fecha_vencimiento });
+      try {
+        var { error } = await supabaseClient.from('seguridad_inventario_equipos')
+          .update({ cantidad: nuevaCantidad, estado: estado }).eq('id', id);
+        if (error) throw error;
+        loadInvEquipos();
+      } catch (err) {
+        showAlert('Error al actualizar stock: ' + err.message, 'error');
+      }
+    }
+
+    function openModalInvEquipo(id) {
+      editingInvEquipoId = id || null;
+      document.getElementById('formInvEquipo').reset();
+      document.getElementById('modalInvEquipoTitle').textContent = id ? 'Editar equipo' : 'Nuevo equipo de seguridad';
+      if (id) {
+        var e = seguridadInvEquipos.find(function(x) { return x.id === id; });
+        if (e) {
+          document.getElementById('eq_nombre').value = e.nombre;
+          document.getElementById('eq_tipo').value = e.tipo || 'EPP';
+          document.getElementById('eq_marca').value = e.marca || '';
+          document.getElementById('eq_modelo').value = e.modelo || '';
+          document.getElementById('eq_serial').value = e.serial || '';
+          document.getElementById('eq_codigo').value = e.codigo || '';
+          document.getElementById('eq_cantidad').value = e.cantidad;
+          document.getElementById('eq_cantidad_minima').value = e.cantidad_minima;
+          document.getElementById('eq_ubicacion').value = e.ubicacion || '';
+          document.getElementById('eq_fecha_vencimiento').value = e.fecha_vencimiento || '';
+          document.getElementById('eq_estado').value = e.estado;
+          document.getElementById('eq_observaciones').value = e.observaciones || '';
+        }
+      }
+      ssShowModal('modalInvEquipo');
+    }
+
+    async function saveInvEquipo() {
+      var nombre = document.getElementById('eq_nombre').value.trim();
+      if (!nombre) {
+        showAlert('El nombre del equipo es obligatorio', 'warning');
+        return;
+      }
+      var cantidad = parseInt(document.getElementById('eq_cantidad').value, 10) || 0;
+      var cantidadMinima = parseInt(document.getElementById('eq_cantidad_minima').value, 10) || 0;
+      var fechaVencimiento = document.getElementById('eq_fecha_vencimiento').value || null;
+      var estadoManual = document.getElementById('eq_estado').value;
+      var estado = estadoFinalEquipo({ cantidad: cantidad, cantidad_minima: cantidadMinima, fecha_vencimiento: fechaVencimiento }, estadoManual);
+      var payload = {
+        nombre: nombre,
+        tipo: document.getElementById('eq_tipo').value,
+        marca: document.getElementById('eq_marca').value.trim() || null,
+        modelo: document.getElementById('eq_modelo').value.trim() || null,
+        serial: document.getElementById('eq_serial').value.trim() || null,
+        codigo: document.getElementById('eq_codigo').value.trim() || null,
+        cantidad: cantidad,
+        cantidad_minima: cantidadMinima,
+        ubicacion: document.getElementById('eq_ubicacion').value.trim() || null,
+        fecha_vencimiento: fechaVencimiento,
+        estado: estado,
+        observaciones: document.getElementById('eq_observaciones').value.trim() || null
+      };
+      try {
+        if (editingInvEquipoId) {
+          var { error } = await supabaseClient.from('seguridad_inventario_equipos').update(payload).eq('id', editingInvEquipoId);
+          if (error) throw error;
+        } else {
+          var { error } = await supabaseClient.from('seguridad_inventario_equipos').insert([payload]);
+          if (error) throw error;
+        }
+        ssHideModal('modalInvEquipo');
+        loadInvEquipos();
+        showAlert(editingInvEquipoId ? 'Equipo actualizado' : 'Equipo registrado', 'success');
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteInvEquipo(id) {
+      var ok = await showConfirm('¿Eliminar este equipo del inventario?', 'Eliminar');
+      if (!ok) return;
+      try {
+        var { error } = await supabaseClient.from('seguridad_inventario_equipos').delete().eq('id', id);
+        if (error) throw error;
+        loadInvEquipos();
+        showAlert('Equipo eliminado', 'success');
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== INVENTARIO DE INSUMOS Y MEDICAMENTOS ===== */
+    var seguridadInvInsumos = [];
+    var editingInvInsumoId = null;
+
+    function estadoAutoInsumo(row) {
+      var hoy = new Date();
+      if (row.fecha_vencimiento) {
+        var v = new Date(row.fecha_vencimiento + 'T00:00:00');
+        var diff = Math.ceil((v - hoy) / (1000 * 60 * 60 * 24));
+        if (diff < 0) return 'Vencido';
+        if (diff <= 30) return 'Por vencer';
+      }
+      if (row.cantidad <= 0) return 'Agotado';
+      if (row.cantidad_minima > 0 && row.cantidad <= row.cantidad_minima) return 'Bajo stock';
+      return 'Disponible';
+    }
+
+    async function loadInvInsumos() {
+      try {
+        var { data, error } = await supabaseClient.from('seguridad_inventario_insumos').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        seguridadInvInsumos = data || [];
+        renderInvInsumos();
+      } catch (err) {
+        document.getElementById('invInsumosBody').innerHTML =
+          '<tr><td colspan="10" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar el inventario: ' + ssEscape(err.message) + '</td></tr>';
+      }
+    }
+
+    function renderInvInsumos() {
+      var tbody = document.getElementById('invInsumosBody');
+      if (!seguridadInvInsumos.length) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:#999;">No hay insumos registrados</td></tr>';
+        return;
+      }
+      tbody.innerHTML = seguridadInvInsumos.map(function(i) {
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + ssEscape(i.nombre) + '</span></td>'
+          + '<td>' + ssEscape(i.tipo || '-') + '</td>'
+          + '<td>' + ssEscape(i.presentacion || '-') + '</td>'
+          + '<td style="text-align:center;font-weight:700;">' + i.cantidad + '</td>'
+          + '<td style="text-align:center;">' + i.cantidad_minima + '</td>'
+          + '<td>' + ssEscape(i.lote || '-') + '</td>'
+          + '<td>' + (i.fecha_vencimiento || '-') + '</td>'
+          + '<td>' + ssEscape(i.ubicacion || '-') + '</td>'
+          + '<td><span class="badge ' + getBadgeClass(i.estado) + '">' + ssEscape(i.estado) + '</span></td>'
+          + '<td>'
+          + '<button class="btn btn-sm btn-outline" title="Entrada (+1)" onclick="ajustarStockInsumo(' + i.id + ', 1)"><i class="fi fi-sr-plus" style="font-size:14px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Salida (-1)" onclick="ajustarStockInsumo(' + i.id + ', -1)"><i class="fi fi-sr-minus" style="font-size:14px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalInvInsumo(' + i.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteInvInsumo(' + i.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+      uiFadeIn(tbody);
+    }
+
+    async function ajustarStockInsumo(id, delta) {
+      var i = seguridadInvInsumos.find(function(x) { return x.id === id; });
+      if (!i) return;
+      var nuevaCantidad = Math.max(0, (i.cantidad || 0) + delta);
+      var estado = estadoAutoInsumo({ cantidad: nuevaCantidad, cantidad_minima: i.cantidad_minima, fecha_vencimiento: i.fecha_vencimiento });
+      try {
+        var { error } = await supabaseClient.from('seguridad_inventario_insumos')
+          .update({ cantidad: nuevaCantidad, estado: estado }).eq('id', id);
+        if (error) throw error;
+        loadInvInsumos();
+      } catch (err) {
+        showAlert('Error al actualizar stock: ' + err.message, 'error');
+      }
+    }
+
+    function openModalInvInsumo(id) {
+      editingInvInsumoId = id || null;
+      document.getElementById('formInvInsumo').reset();
+      document.getElementById('modalInvInsumoTitle').textContent = id ? 'Editar insumo' : 'Nuevo insumo / medicamento';
+      if (id) {
+        var i = seguridadInvInsumos.find(function(x) { return x.id === id; });
+        if (i) {
+          document.getElementById('in_nombre').value = i.nombre;
+          document.getElementById('in_tipo').value = i.tipo || 'Insumo médico';
+          document.getElementById('in_presentacion').value = i.presentacion || '';
+          document.getElementById('in_lote').value = i.lote || '';
+          document.getElementById('in_cantidad').value = i.cantidad;
+          document.getElementById('in_cantidad_minima').value = i.cantidad_minima;
+          document.getElementById('in_fecha_vencimiento').value = i.fecha_vencimiento || '';
+          document.getElementById('in_ubicacion').value = i.ubicacion || '';
+          document.getElementById('in_observaciones').value = i.observaciones || '';
+        }
+      }
+      ssShowModal('modalInvInsumo');
+    }
+
+    async function saveInvInsumo() {
+      var nombre = document.getElementById('in_nombre').value.trim();
+      if (!nombre) {
+        showAlert('El nombre del insumo es obligatorio', 'warning');
+        return;
+      }
+      var cantidad = parseInt(document.getElementById('in_cantidad').value, 10) || 0;
+      var cantidadMinima = parseInt(document.getElementById('in_cantidad_minima').value, 10) || 0;
+      var fechaVencimiento = document.getElementById('in_fecha_vencimiento').value || null;
+      var estado = estadoAutoInsumo({ cantidad: cantidad, cantidad_minima: cantidadMinima, fecha_vencimiento: fechaVencimiento });
+      var payload = {
+        nombre: nombre,
+        tipo: document.getElementById('in_tipo').value,
+        presentacion: document.getElementById('in_presentacion').value.trim() || null,
+        cantidad: cantidad,
+        cantidad_minima: cantidadMinima,
+        lote: document.getElementById('in_lote').value.trim() || null,
+        fecha_vencimiento: fechaVencimiento,
+        ubicacion: document.getElementById('in_ubicacion').value.trim() || null,
+        estado: estado,
+        observaciones: document.getElementById('in_observaciones').value.trim() || null
+      };
+      try {
+        if (editingInvInsumoId) {
+          var { error } = await supabaseClient.from('seguridad_inventario_insumos').update(payload).eq('id', editingInvInsumoId);
+          if (error) throw error;
+        } else {
+          var { error } = await supabaseClient.from('seguridad_inventario_insumos').insert([payload]);
+          if (error) throw error;
+        }
+        ssHideModal('modalInvInsumo');
+        loadInvInsumos();
+        showAlert(editingInvInsumoId ? 'Insumo actualizado' : 'Insumo registrado', 'success');
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteInvInsumo(id) {
+      var ok = await showConfirm('¿Eliminar este insumo del inventario?', 'Eliminar');
+      if (!ok) return;
+      try {
+        var { error } = await supabaseClient.from('seguridad_inventario_insumos').delete().eq('id', id);
+        if (error) throw error;
+        loadInvInsumos();
+        showAlert('Insumo eliminado', 'success');
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== INICIALIZACIÓN ===== */
+    document.addEventListener('DOMContentLoaded', function() {
+      restoreTool();
+      loadIncidentes();
+      loadInspecciones();
+      loadServicioMedico();
+      loadInvEquipos();
+      loadInvInsumos();
+    });
+  </script>
 </body>
 </html>

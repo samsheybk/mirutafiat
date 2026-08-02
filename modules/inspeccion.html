@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inspección de campo - Seguridad y Salud Laboral - FIAT Intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
+  <style>
+    :root { --module-color: var(--module-seguridad); }
+    .insp-content { overflow-y: auto; }
+    .det-panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      padding: 20px 24px;
+    }
+    .insp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 14px; }
+    .insp-label { font-size: 11px; text-transform: uppercase; letter-spacing: .4px; color: var(--color-text-secondary); font-weight: 600; }
+    .insp-value { font-size: 13px; font-weight: 600; margin-top: 2px; }
+    .insp-badge-row { margin-top: 14px; display: flex; gap: 8px; align-items: center; }
+    .insp-progress { margin-top: 20px; }
+    .insp-bar { height: 8px; background: var(--color-border); border-radius: 4px; overflow: hidden; }
+    .insp-bar-fill { height: 100%; width: 0%; background: var(--module-seguridad); transition: width .2s ease; }
+    .insp-categoria { margin-top: 26px; }
+    .insp-cat-title {
+      font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+      color: var(--module-seguridad); padding: 10px 14px; background: var(--color-bg);
+      border: 1px solid var(--color-border); border-bottom: none;
+    }
+    .ss-radio { display: block; font-size: 12px; padding: 1px 0; cursor: pointer; }
+    .ss-radio input { cursor: pointer; }
+    .insp-obs-input { height: 34px; font-size: 12px; }
+    .insp-skeleton-line { height: 14px; background: var(--color-border); border-radius: 4px; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <nav class="topnav" style="background:var(--module-seguridad);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><img class="topnav-logo" src="../icons/logo FIAT.webp" alt="FIAT">VEN<span>-Intranet</span></div>
+      <div class="topnav-spacer"></div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Dashboard</option>
+        <option value="captacion.html">Captación y Selección</option>
+        <option value="relaciones-laborales.html">Relaciones Laborales</option>
+        <option value="capacitacion.html">Capacitación y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html" selected>Seguridad y Salud Laboral</option>
+        <option value="compensacion.html">Compensación</option>
+        <option value="finanzas.html">Finanzas</option>
+        <option value="repositorio.html">Repositorio</option>
+        <option value="chatfiat.html">ChatFIAT</option>
+        <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
+      </select>
+      <div class="nav-user">
+        <span id="navUserEmail"></span>
+        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-body">
+          <header class="topbar" style="gap:16px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:260px;">
+              <h1>Inspección de campo</h1>
+              <div class="topbar-breadcrumb">Inicio / Seguridad y Salud Laboral / Inspecciones</div>
+            </div>
+            <a class="btn btn-outline" href="seguridad-salud.html"><i class="fi fi-sr-arrow-left" style="font-size:14px;line-height:1;pointer-events:none;vertical-align:-1px;"></i> Volver</a>
+            <button class="btn btn-seguridad" id="btnGuardar" onclick="guardarAvance()">Guardar avance</button>
+            <button class="btn" id="btnFinalizar" style="background:#059669;color:#fff;" onclick="finalizarInspeccion()">Finalizar evaluación</button>
+          </header>
+
+          <div class="module-content insp-content">
+            <div class="det-panel" id="inspHeader">
+              <div class="insp-skeleton-line" style="width:45%;"></div>
+              <div class="insp-skeleton-line" style="width:80%;"></div>
+              <div class="insp-skeleton-line" style="width:60%;"></div>
+            </div>
+
+            <div class="det-panel insp-progress" style="margin-top:20px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <span style="font-weight:600;font-size:13px;">Progreso del recorrido</span>
+                <span id="inspProgresoLabel" style="font-size:12px;color:var(--color-text-secondary);">Cargando...</span>
+              </div>
+              <div class="insp-bar"><div class="insp-bar-fill" id="inspProgresoBar"></div></div>
+              <div id="inspResumen" style="font-size:12px;margin-top:8px;color:var(--color-text-secondary);"></div>
+            </div>
+
+            <div id="checklistContainer"></div>
+
+            <div class="det-panel" style="margin-top:26px;">
+              <div class="insp-label" style="font-size:12px;color:var(--module-seguridad);">Recomendaciones y acciones correctivas</div>
+              <textarea class="form-textarea" id="inspRecomendaciones" rows="4" placeholder="Describe las recomendaciones, acciones correctivas y responsables para eliminar o controlar los riesgos encontrados..."></textarea>
+              <div style="font-size:12px;color:var(--color-text-secondary);margin-top:8px;">Este campo se guarda con el avance y se incorpora al resultado final.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/modules.js"></script>
+  <script>
+    function ssEscape(s) {
+      return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    var inspeccionId = new URLSearchParams(location.search).get('id');
+    var inspeccion = null;
+    var inspeccionItems = [];
+
+    function renderHeader() {
+      var el = document.getElementById('inspHeader');
+      if (!inspeccion) return;
+      document.title = inspeccion.titulo + ' - Inspección - FIAT Intranet';
+      var badges = ''
+        + '<span class="badge ' + getBadgeClass(inspeccion.estado) + '">' + ssEscape(inspeccion.estado) + '</span>'
+        + (inspeccion.resultado ? ' <span class="badge ' + getBadgeClass(inspeccion.resultado) + '">Resultado: ' + ssEscape(inspeccion.resultado) + '</span>' : '');
+      el.innerHTML = ''
+        + '<h2 style="font-size:18px;font-weight:700;margin:0;">' + ssEscape(inspeccion.titulo) + '</h2>'
+        + '<div class="insp-grid">'
+        + '<div><div class="insp-label">Área</div><div class="insp-value">' + ssEscape(inspeccion.area || '-') + (inspeccion.ubicacion ? ' · ' + ssEscape(inspeccion.ubicacion) : '') + '</div></div>'
+        + '<div><div class="insp-label">Tipo</div><div class="insp-value">' + ssEscape(inspeccion.tipo || '-') + '</div></div>'
+        + '<div><div class="insp-label">Inspector(a)</div><div class="insp-value">' + ssEscape(inspeccion.inspector || '-') + '</div></div>'
+        + '<div><div class="insp-label">Fecha</div><div class="insp-value">' + ssEscape(inspeccion.fecha || '-') + (inspeccion.hora ? ' ' + inspeccion.hora : '') + '</div></div>'
+        + '<div><div class="insp-label">Participantes</div><div class="insp-value">' + ssEscape(inspeccion.participantes || '-') + '</div></div>'
+        + '<div><div class="insp-label">Puntos a evaluar</div><div class="insp-value">' + inspeccionItems.length + '</div></div>'
+        + '<div><div class="insp-label">Normativa aplicable</div><div class="insp-value" style="font-weight:400;font-size:12px;">LOPCYMAT · RLOPCYMAT · NT-01-2008 INPSASEL · Normas COVENIN</div></div>'
+        + '</div>'
+        + '<div class="insp-badge-row">' + badges + '</div>';
+      document.getElementById('inspRecomendaciones').value = inspeccion.recomendaciones || '';
+
+      if (inspeccion.estado === 'Finalizada' || inspeccion.estado === 'Anulada') {
+        var g = document.getElementById('btnGuardar');
+        var f = document.getElementById('btnFinalizar');
+        if (g) g.style.display = 'none';
+        if (f) f.style.display = 'none';
+        document.getElementById('inspRecomendaciones').readOnly = true;
+      }
+    }
+
+    function ssUpdateProgress() {
+      var total = inspeccionItems.length;
+      var done = 0, c = 0, nc = 0, na = 0;
+      inspeccionItems.forEach(function(it) {
+        var sel = document.querySelector('input[name="res_' + it.id + '"]:checked');
+        if (sel) {
+          done++;
+          if (sel.value === 'Conforme') c++;
+          else if (sel.value === 'No conforme') nc++;
+          else na++;
+        }
+      });
+      var pct = total ? Math.round(done / total * 100) : 0;
+      var bar = document.getElementById('inspProgresoBar');
+      if (bar) bar.style.width = pct + '%';
+      var label = document.getElementById('inspProgresoLabel');
+      if (label) label.textContent = done + ' de ' + total + ' puntos evaluados (' + pct + '%)';
+      var summary = document.getElementById('inspResumen');
+      if (summary) {
+        summary.innerHTML = 'Conforme: <b style="color:#059669;">' + c + '</b> &nbsp;·&nbsp; No conforme: <b style="color:#dc2626;">' + nc + '</b> &nbsp;·&nbsp; N/A: <b>' + na + '</b>';
+      }
+    }
+
+    function renderChecklist() {
+      var box = document.getElementById('checklistContainer');
+      if (!inspeccionItems.length) {
+        box.innerHTML = '<div class="det-panel" style="margin-top:26px;text-align:center;color:var(--color-text-secondary);padding:40px;">Esta inspección no tiene puntos por evaluar.</div>';
+        return;
+      }
+      var catMap = {};
+      inspeccionItems.forEach(function(it) {
+        if (!catMap[it.categoria]) catMap[it.categoria] = [];
+        catMap[it.categoria].push(it);
+      });
+      var disabled = inspeccion.estado === 'Finalizada' || inspeccion.estado === 'Anulada';
+      var dAttr = disabled ? ' disabled' : '';
+      var html = '';
+      Object.keys(catMap).forEach(function(cat) {
+        html += '<div class="insp-categoria">'
+          + '<div class="insp-cat-title">' + ssEscape(cat) + '</div>'
+          + '<table class="data-table">'
+          + '<thead><tr><th style="width:36px;">#</th><th>Punto a verificar</th><th style="width:24%;">Criterio / norma</th><th style="width:132px;">Resultado</th><th style="width:28%;">Observaciones</th></tr></thead><tbody>';
+        var n = 0;
+        catMap[cat].forEach(function(it) {
+          n++;
+          html += '<tr>'
+            + '<td style="text-align:center;color:var(--color-text-secondary);">' + n + '</td>'
+            + '<td><div style="font-weight:600;line-height:1.4;">' + ssEscape(it.item) + '</div></td>'
+            + '<td style="font-size:11px;color:var(--color-text-secondary);line-height:1.4;">' + ssEscape(it.criterio || '') + '</td>'
+            + '<td>'
+            + '<label class="ss-radio"><input type="radio" name="res_' + it.id + '" value="Conforme"' + (it.resultado === 'Conforme' ? ' checked' : '') + dAttr + ' onchange="ssUpdateProgress()"> Conforme</label>'
+            + '<label class="ss-radio"><input type="radio" name="res_' + it.id + '" value="No conforme"' + (it.resultado === 'No conforme' ? ' checked' : '') + dAttr + ' onchange="ssUpdateProgress()"> No conforme</label>'
+            + '<label class="ss-radio"><input type="radio" name="res_' + it.id + '" value="N/A"' + (it.resultado === 'N/A' ? ' checked' : '') + dAttr + ' onchange="ssUpdateProgress()"> N/A</label>'
+            + '</td>'
+            + '<td><input type="text" class="form-input insp-obs-input" id="obs_' + it.id + '" value="' + ssEscape(it.observacion || '') + '" placeholder="Observación..."' + dAttr + '></td>'
+            + '</tr>';
+        });
+        html += '</tbody></table></div>';
+      });
+      box.innerHTML = html;
+      ssUpdateProgress();
+    }
+
+    function ssRecolectarItems() {
+      return inspeccionItems.map(function(it) {
+        var sel = document.querySelector('input[name="res_' + it.id + '"]:checked');
+        var obs = document.getElementById('obs_' + it.id);
+        return {
+          id: it.id,
+          resultado: sel ? sel.value : it.resultado,
+          observacion: obs ? obs.value.trim() || null : it.observacion
+        };
+      });
+    }
+
+    async function guardarAvance() {
+      if (!inspeccion || inspeccion.estado === 'Finalizada' || inspeccion.estado === 'Anulada') return;
+      var updates = ssRecolectarItems();
+      var recomendaciones = document.getElementById('inspRecomendaciones').value.trim() || null;
+      try {
+        var proms = updates.map(function(u) {
+          return supabaseClient.from('seguridad_inspeccion_items')
+            .update({ resultado: u.resultado, observacion: u.observacion }).eq('id', u.id);
+        });
+        var estadoNuevo = inspeccion.estado === 'Borrador' ? 'En curso' : inspeccion.estado;
+        proms.push(supabaseClient.from('seguridad_inspecciones')
+          .update({ estado: estadoNuevo, recomendaciones: recomendaciones }).eq('id', inspeccionId));
+        var results = await Promise.all(proms);
+        var err = results.find(function(r) { return r.error; });
+        if (err) throw err;
+        inspeccion.estado = estadoNuevo;
+        inspeccion.recomendaciones = recomendaciones;
+        renderHeader();
+        showAlert('Avance guardado correctamente', 'success');
+      } catch (err2) {
+        showAlert('Error al guardar avance: ' + err2.message, 'error');
+      }
+    }
+
+    async function finalizarInspeccion() {
+      if (!inspeccion || inspeccion.estado === 'Finalizada' || inspeccion.estado === 'Anulada') return;
+      var updates = ssRecolectarItems();
+      var faltantes = updates.filter(function(u) {
+        return !document.querySelector('input[name="res_' + u.id + '"]:checked');
+      });
+      if (faltantes.length) {
+        showAlert('Faltan ' + faltantes.length + ' punto(s) por evaluar. Completa todo el recorrido antes de finalizar.', 'warning');
+        return;
+      }
+      var ok = await showConfirm('Al finalizar se calculará el resultado (Conforme / No conforme) y la inspección quedará cerrada. ¿Continuar?', 'Finalizar');
+      if (!ok) return;
+      var noConforme = updates.some(function(u) { return u.resultado === 'No conforme'; });
+      var resultado = noConforme ? 'No conforme' : 'Conforme';
+      var recomendaciones = document.getElementById('inspRecomendaciones').value.trim() || null;
+      try {
+        var proms = updates.map(function(u) {
+          return supabaseClient.from('seguridad_inspeccion_items')
+            .update({ resultado: u.resultado, observacion: u.observacion }).eq('id', u.id);
+        });
+        proms.push(supabaseClient.from('seguridad_inspecciones')
+          .update({ estado: 'Finalizada', resultado: resultado, recomendaciones: recomendaciones }).eq('id', inspeccionId));
+        var results = await Promise.all(proms);
+        var err = results.find(function(r) { return r.error; });
+        if (err) throw err;
+        showAlert('Inspección finalizada. Resultado: ' + resultado, 'success');
+        setTimeout(function() { window.location.href = 'seguridad-salud.html'; }, 1200);
+      } catch (err2) {
+        showAlert('Error al finalizar: ' + err2.message, 'error');
+      }
+    }
+
+    async function loadInspeccion() {
+      if (!inspeccionId) {
+        document.getElementById('checklistContainer').innerHTML =
+          '<div class="det-panel" style="margin-top:26px;text-align:center;color:#dc2626;padding:40px;">No se especificó la inspección.</div>';
+        return;
+      }
+      try {
+        var [resIns, resItems] = await Promise.all([
+          supabaseClient.from('seguridad_inspecciones').select('*').eq('id', inspeccionId).single(),
+          supabaseClient.from('seguridad_inspeccion_items').select('*').eq('inspeccion_id', inspeccionId).order('orden')
+        ]);
+        if (resIns.error) throw resIns.error;
+        if (resItems.error) throw resItems.error;
+        inspeccion = resIns.data;
+        inspeccionItems = resItems.data || [];
+        renderHeader();
+        renderChecklist();
+      } catch (err) {
+        document.getElementById('inspHeader').innerHTML =
+          '<div style="text-align:center;color:#dc2626;padding:20px;">Error al cargar la inspección: ' + ssEscape(err.message) + '</div>';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadInspeccion();
+    });
+  </script>
+</body>
+</html>

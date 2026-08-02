@@ -29,6 +29,7 @@
         <option value="bienestar-social.html">Bienestar Social</option>
         <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
         <option value="compensacion.html">Compensación</option>
+        <option value="finanzas.html">Finanzas</option>
         <option value="repositorio.html">Repositorio</option>
         <option value="chatfiat.html">ChatFIAT</option>
         <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
@@ -89,7 +90,10 @@
                 <option value="">Todas las unidades</option>
               </select>
               <span style="font-size:12px;color:var(--color-text-secondary);" id="plantCount">0 trabajadores</span>
-              <button class="btn btn-outline btn-sm" onclick="openModalImportar()" style="margin-left:auto;">Importar plantilla</button>
+              <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
+                <button class="btn btn-captacion btn-sm" onclick="location.href='trabajador-nuevo.html'">+ Nuevo trabajador</button>
+                <button class="btn btn-outline btn-sm" onclick="openModalImportar()">Importar plantilla</button>
+              </div>
             </div>
             <div class="toolbar-content" data-toolbar="requisiciones" style="display:none;align-items:center;gap:16px;width:100%;">
               <input type="text" class="form-input" id="reqSearch" placeholder="Buscar en requisiciones..." oninput="filterRequisiciones()" style="flex:1;max-width:400px;height:36px;">
@@ -1970,9 +1974,9 @@
         var c = await supabaseClient.from('est_cargos').select('*').order('titulo');
         var unidades = u.data || [];
         var cargos = c.data || [];
-        var headers = ['CÉDULA', 'NOMBRES', 'APELLIDOS', 'CORREO', 'TELÉFONO', 'DIRECCIÓN', 'UNIDAD', 'CARGO', 'FECHA DE INGRESO', 'ESTADO'];
+        var headers = ['CÉDULA', 'NOMBRES', 'APELLIDOS', 'CÓDIGO DE NÓMINA', 'CORREO', 'TELÉFONO', 'DIRECCIÓN', 'UNIDAD', 'CARGO', 'FECHA DE INGRESO', 'ESTADO'];
         var ws = XLSX.utils.aoa_to_sheet([headers]);
-        ws['!cols'] = headers.map(function(h, i) { return { wch: (i === 6 || i === 7) ? 34 : 18 }; });
+        ws['!cols'] = headers.map(function(h, i) { return { wch: (i === 7 || i === 8) ? 34 : 18 }; });
         var wsu = XLSX.utils.aoa_to_sheet([['UNIDAD']].concat(unidades.map(function(x) { return [x.nombre]; })));
         wsu['!cols'] = [{ wch: 40 }];
         var wsc = XLSX.utils.aoa_to_sheet([['CARGO']].concat(cargos.map(function(x) { return [x.titulo]; })));
@@ -1984,7 +1988,8 @@
           ['2. Las columnas UNIDAD y CARGO deben coincidir exactamente con los catálogos (hojas "Catálogo Unidades" y "Catálogo Cargos").'],
           ['3. FECHA DE INGRESO debe tener formato AAAA-MM-DD (ej: 2025-01-15).'],
           ['4. ESTADO solo puede ser: Activo, Suspendido o Retirado.'],
-          ['5. Guarda el archivo y súbelo en: Captación → Plantilla activa → Importar plantilla.'],
+          ['5. CÓDIGO DE NÓMINA es opcional: identificador interno de nómina (ej: FNT-0001).'],
+          ['6. Guarda el archivo y súbelo en: Captación → Plantilla activa → Importar plantilla.'],
           [''],
           ['Columnas obligatorias: CÉDULA, NOMBRES, APELLIDOS, UNIDAD, CARGO, FECHA DE INGRESO.'],
           ['Los trabajadores cuya cédula ya exista serán omitidos automáticamente.']
@@ -2016,6 +2021,7 @@
           cedula: headerRow.indexOf('cedula'),
           nombres: headerRow.indexOf('nombres'),
           apellidos: headerRow.indexOf('apellidos'),
+          codigoNomina: headerRow.indexOf('codigo de nomina'),
           correo: headerRow.indexOf('correo'),
           telefono: headerRow.indexOf('telefono'),
           direccion: headerRow.indexOf('direccion'),
@@ -2059,7 +2065,8 @@
           estado = estado.charAt(0).toUpperCase() + estado.slice(1).toLowerCase();
           if (['Activo', 'Suspendido', 'Retirado'].indexOf(estado) === -1) { errores.push('Fila ' + fila + ' (' + cedula + '): estado "' + estado + '" inválido (usa Activo, Suspendido o Retirado).'); continue; }
           aInsert.push({
-            cedula: cedula, nombres: nombres, apellidos: apellidos,
+            cedula: cedula, codigo_nomina: get(col.codigoNomina) || null,
+            nombres: nombres, apellidos: apellidos,
             correo: get(col.correo) || null, telefono: get(col.telefono) || null, direccion: get(col.direccion) || null,
             unidad_id: unidad.id, cargo_id: cargo.id, fecha_ingreso: fechaIngreso, estado: estado
           });

@@ -40,6 +40,13 @@ async function loadModuleCounts() {
       .select('*', { count: 'exact', head: true });
     document.getElementById('count-compensacion').textContent = (compensacionCount || 0) + ' registros';
   } catch (_) {}
+
+  try {
+    const { count: finanzasCount } = await supabaseClient
+      .from('finanzas_movimientos')
+      .select('*', { count: 'exact', head: true });
+    document.getElementById('count-finanzas').textContent = (finanzasCount || 0) + ' movimientos';
+  } catch (_) {}
 }
 
 document.addEventListener('DOMContentLoaded', () => {

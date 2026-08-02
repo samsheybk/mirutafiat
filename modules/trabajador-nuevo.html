@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuevo trabajador - FIAT Intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    :root { --module-color: var(--module-captacion); }
+    body[data-modulo="relaciones"] {
+      --module-captacion: var(--module-relaciones);
+      --module-color: var(--module-relaciones);
+    }
+    .det-photo {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: #eee;
+      border: 3px solid var(--module-captacion);
+    }
+    .det-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    .det-panel {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 10px;
+      padding: 20px 24px;
+    }
+    .det-section-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--module-captacion);
+      margin: 18px 0 10px;
+    }
+    .det-section-label:first-child { margin-top: 0; }
+    .estado-activo { background: #059669; }
+    .estado-suspendido { background: #D97706; }
+    .estado-retirado { background: #DC2626; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <nav class="topnav" style="background:var(--module-captacion);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><img class="topnav-logo" src="../icons/logo FIAT.webp" alt="FIAT">VEN<span>-Intranet</span></div>
+      <div class="topnav-spacer"></div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Dashboard</option>
+        <option value="captacion.html" selected>Captación y Selección</option>
+        <option value="relaciones-laborales.html">Relaciones Laborales</option>
+        <option value="capacitacion.html">Capacitación y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="compensacion.html">Compensación</option>
+        <option value="finanzas.html">Finanzas</option>
+        <option value="repositorio.html">Repositorio</option>
+        <option value="chatfiat.html">ChatFIAT</option>
+        <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
+      </select>
+      <div class="nav-user">
+        <span id="navUserEmail"></span>
+        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-body">
+          <header class="topbar">
+            <div style="display:flex;align-items:center;gap:16px;flex:1;min-width:0;">
+              <div style="flex:1;min-width:0;">
+                <div class="topbar-breadcrumb"><a href="captacion.html" style="color:var(--color-text-secondary);">Captación y Selección</a> / Plantilla activa</div>
+                <h1 id="detTitulo">Nuevo trabajador</h1>
+                <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px;">Agrega un trabajador a la plantilla activa</div>
+              </div>
+            </div>
+            <button class="btn btn-outline" onclick="history.length > 1 ? history.back() : location.href='captacion.html'" style="flex-shrink:0;margin-left:16px;">← Volver a plantilla</button>
+          </header>
+
+          <div class="module-content" style="overflow-y:auto;">
+            <div class="det-panel">
+              <form id="nuevoTrabForm">
+                <div class="det-section-label">Datos de identificación</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+                  <div class="form-group">
+                    <label>Cédula *</label>
+                    <input type="text" class="form-input" id="nt_cedula" placeholder="V-12345678">
+                  </div>
+                  <div class="form-group">
+                    <label>Código de nómina</label>
+                    <input type="text" class="form-input" id="nt_codigo_nomina" placeholder="Ej. 00125">
+                  </div>
+                  <div class="form-group">
+                    <label>Fecha de ingreso *</label>
+                    <input type="date" class="form-input" id="nt_fecha_ingreso">
+                  </div>
+                  <div class="form-group">
+                    <label>Nombres *</label>
+                    <input type="text" class="form-input" id="nt_nombres" placeholder="Nombres completos">
+                  </div>
+                  <div class="form-group">
+                    <label>Apellidos *</label>
+                    <input type="text" class="form-input" id="nt_apellidos" placeholder="Apellidos completos">
+                  </div>
+                  <div class="form-group">
+                    <label>Correo</label>
+                    <input type="email" class="form-input" id="nt_correo" placeholder="correo@empresa.com">
+                  </div>
+                  <div class="form-group">
+                    <label>Teléfono</label>
+                    <input type="text" class="form-input" id="nt_telefono" placeholder="0412-0000000">
+                  </div>
+                  <div class="form-group" style="grid-column:span 2;">
+                    <label>Dirección</label>
+                    <input type="text" class="form-input" id="nt_direccion" placeholder="Ciudad, Estado, municipio">
+                  </div>
+                </div>
+
+                <div class="det-section-label">Datos laborales</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;">
+                  <div class="form-group">
+                    <label>Unidad *</label>
+                    <select class="form-select" id="nt_unidad_id" required></select>
+                  </div>
+                  <div class="form-group">
+                    <label>Cargo *</label>
+                    <select class="form-select" id="nt_cargo_id" required></select>
+                  </div>
+                  <div class="form-group">
+                    <label>Estado</label>
+                    <select class="form-select" id="nt_estado">
+                      <option value="Activo" selected>Activo</option>
+                      <option value="Suspendido">Suspendido</option>
+                      <option value="Retirado">Retirado</option>
+                    </select>
+                  </div>
+                  <div class="form-group" id="ntFechaEgresoWrap" style="display:none;">
+                    <label>Fecha de egreso</label>
+                    <input type="date" class="form-input" id="nt_fecha_egreso">
+                  </div>
+                </div>
+
+                <div class="det-section-label">Datos personales</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+                  <div class="form-group">
+                    <label>Fecha de nacimiento</label>
+                    <input type="date" class="form-input" id="nt_fecha_nacimiento">
+                  </div>
+                  <div class="form-group">
+                    <label>Lugar de nacimiento</label>
+                    <input type="text" class="form-input" id="nt_lugar_nacimiento" placeholder="Estado, Ciudad">
+                  </div>
+                  <div class="form-group">
+                    <label>Sexo</label>
+                    <select class="form-select" id="nt_sexo">
+                      <option value="">— Selecciona —</option>
+                      <option value="Masculino">Masculino</option>
+                      <option value="Femenino">Femenino</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Estado civil</label>
+                    <select class="form-select" id="nt_estado_civil">
+                      <option value="">— Selecciona —</option>
+                      <option value="Soltero/a">Soltero/a</option>
+                      <option value="Casado/a">Casado/a</option>
+                      <option value="Divorciado/a">Divorciado/a</option>
+                      <option value="Viudo/a">Viudo/a</option>
+                      <option value="Concubinato">Concubinato</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Conducta civil</label>
+                    <select class="form-select" id="nt_conducta_civil">
+                      <option value="PENDIENTE" selected>PENDIENTE</option>
+                      <option value="APTO">APTO</option>
+                      <option value="NO APTO">NO APTO</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="det-section-label">Tallas de ropa y calzado</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;">
+                  <div class="form-group">
+                    <label>Talla de camisa</label>
+                    <select class="form-select" id="nt_talla_camisa">
+                      <option value="">— Selecciona —</option>
+                      <option value="XS">XS</option>
+                      <option value="S">S</option>
+                      <option value="M">M</option>
+                      <option value="L">L</option>
+                      <option value="XL">XL</option>
+                      <option value="XXL">XXL</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Talla de franela</label>
+                    <select class="form-select" id="nt_talla_franela">
+                      <option value="">— Selecciona —</option>
+                      <option value="XS">XS</option>
+                      <option value="S">S</option>
+                      <option value="M">M</option>
+                      <option value="L">L</option>
+                      <option value="XL">XL</option>
+                      <option value="XXL">XXL</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Talla de pantalón</label>
+                    <select class="form-select" id="nt_talla_pantalon">
+                      <option value="">— Selecciona —</option>
+                      <option value="28">28</option>
+                      <option value="30">30</option>
+                      <option value="32">32</option>
+                      <option value="34">34</option>
+                      <option value="36">36</option>
+                      <option value="38">38</option>
+                      <option value="40">40</option>
+                      <option value="42">42</option>
+                      <option value="44">44</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Talla de calzado</label>
+                    <select class="form-select" id="nt_talla_calzado">
+                      <option value="">— Selecciona —</option>
+                      <option value="34">34</option>
+                      <option value="35">35</option>
+                      <option value="36">36</option>
+                      <option value="37">37</option>
+                      <option value="38">38</option>
+                      <option value="39">39</option>
+                      <option value="40">40</option>
+                      <option value="41">41</option>
+                      <option value="42">42</option>
+                      <option value="43">43</option>
+                      <option value="44">44</option>
+                      <option value="45">45</option>
+                      <option value="46">46</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="det-section-label">Foto de perfil</div>
+                <div style="display:flex;gap:16px;align-items:center;">
+                  <div class="det-photo" style="width:72px;height:72px;">
+                    <img id="ntFoto" src="" alt="">
+                    <span id="ntFotoInicial" style="font-size:24px;font-weight:700;color:#999;">?</span>
+                  </div>
+                  <div style="display:flex;flex-direction:column;gap:8px;">
+                    <input type="file" id="ntFotoFile" accept="image/*" style="display:none;" onchange="onNtFotoChange()">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('ntFotoFile').click()">Seleccionar foto</button>
+                    <span style="font-size:12px;color:#666;">JPG/PNG (se guarda al registrar el trabajador)</span>
+                  </div>
+                </div>
+              </form>
+
+              <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:20px;">
+                <button class="btn btn-outline" onclick="history.length > 1 ? history.back() : location.href='captacion.html'">Cancelar</button>
+                <button class="btn btn-captacion" onclick="guardarTrabajador()">Guardar trabajador</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/modules.js"></script>
+  <script>
+    var allUnidades = [];
+    var allCargos = [];
+    var ntFotoArchivo = null;
+
+    function aplicarModuloContexto() {
+      var mod = new URLSearchParams(location.search).get('modulo');
+      if (mod === 'relaciones') {
+        document.body.setAttribute('data-modulo', 'relaciones');
+        var navSel = document.getElementById('navSelect');
+        if (navSel) navSel.value = 'relaciones-laborales.html';
+        var crumb = document.querySelector('.topbar-breadcrumb a');
+        if (crumb) {
+          crumb.href = 'relaciones-laborales.html';
+          crumb.textContent = 'Relaciones Laborales';
+        }
+        document.title = 'Nuevo trabajador - Relaciones Laborales';
+      }
+    }
+
+    function populateUnidadSelect() {
+      var sel = document.getElementById('nt_unidad_id');
+      if (!sel) return;
+      sel.innerHTML = '<option value="">— Selecciona —</option>';
+      allUnidades.forEach(function(u) { sel.innerHTML += '<option value="' + u.id + '">' + u.nombre + ' (' + u.tipo + ')</option>'; });
+    }
+
+    function populateCargoSelect() {
+      var unidadId = document.getElementById('nt_unidad_id').value;
+      var sel = document.getElementById('nt_cargo_id');
+      if (!sel) return;
+      sel.innerHTML = '<option value="">— Selecciona —</option>';
+      allCargos.filter(function(c) { return c.unidad_id === unidadId; }).forEach(function(c) {
+        sel.innerHTML += '<option value="' + c.id + '">' + c.titulo + '</option>';
+      });
+    }
+
+    function onNtFotoChange() {
+      var f = document.getElementById('ntFotoFile').files[0];
+      if (!f) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        ntFotoArchivo = f;
+        document.getElementById('ntFoto').src = e.target.result;
+        document.getElementById('ntFoto').style.display = 'block';
+        document.getElementById('ntFotoInicial').style.display = 'none';
+      };
+      reader.readAsDataURL(f);
+    }
+
+    async function loadDatos() {
+      try {
+        var u = await supabaseClient.from('est_unidades').select('*').order('nombre');
+        if (u.data) allUnidades = u.data;
+        var c = await supabaseClient.from('est_cargos').select('*').order('titulo');
+        if (c.data) allCargos = c.data;
+        populateUnidadSelect();
+      } catch (err) {
+        showAlert('Error cargando estructura: ' + err.message, 'error');
+      }
+    }
+
+    async function guardarTrabajador() {
+      var cedula = document.getElementById('nt_cedula').value.trim();
+      var codigoNomina = document.getElementById('nt_codigo_nomina').value.trim();
+      var nombres = document.getElementById('nt_nombres').value.trim();
+      var apellidos = document.getElementById('nt_apellidos').value.trim();
+      var correo = document.getElementById('nt_correo').value.trim();
+      var telefono = document.getElementById('nt_telefono').value.trim();
+      var direccion = document.getElementById('nt_direccion').value.trim();
+      var unidadId = document.getElementById('nt_unidad_id').value;
+      var cargoId = document.getElementById('nt_cargo_id').value;
+      var fechaIngreso = document.getElementById('nt_fecha_ingreso').value;
+      var estado = document.getElementById('nt_estado').value;
+      var fechaEgreso = document.getElementById('nt_fecha_egreso').value || null;
+
+      if (!cedula) { showAlert('Ingresa la cédula del trabajador', 'warning'); return; }
+      if (!nombres || !apellidos) { showAlert('Ingresa nombres y apellidos', 'warning'); return; }
+      if (!unidadId || !cargoId) { showAlert('Selecciona unidad y cargo', 'warning'); return; }
+      if (!fechaIngreso) { showAlert('Ingresa la fecha de ingreso', 'warning'); return; }
+
+      try {
+        var dup = await supabaseClient.from('plantilla_trabajadores')
+          .select('id,cedula').eq('cedula', cedula).maybeSingle();
+        if (dup.error) throw dup.error;
+        if (dup.data) { showAlert('Ya existe un trabajador con la cédula ' + cedula, 'warning'); return; }
+
+        var payload = {
+          cedula: cedula,
+          codigo_nomina: codigoNomina || null,
+          nombres: nombres,
+          apellidos: apellidos,
+          correo: correo || null,
+          telefono: telefono || null,
+          direccion: direccion || null,
+          unidad_id: unidadId,
+          cargo_id: cargoId,
+          fecha_ingreso: fechaIngreso,
+          estado: estado,
+          fecha_egreso: fechaEgreso,
+          fecha_nacimiento: document.getElementById('nt_fecha_nacimiento').value || null,
+          lugar_nacimiento: document.getElementById('nt_lugar_nacimiento').value.trim() || null,
+          sexo: document.getElementById('nt_sexo').value || null,
+          estado_civil: document.getElementById('nt_estado_civil').value || null,
+          conducta_civil: document.getElementById('nt_conducta_civil').value || null,
+          talla_camisa: document.getElementById('nt_talla_camisa').value || null,
+          talla_franela: document.getElementById('nt_talla_franela').value || null,
+          talla_pantalon: document.getElementById('nt_talla_pantalon').value || null,
+          talla_calzado: document.getElementById('nt_talla_calzado').value || null
+        };
+
+        var { data, error } = await supabaseClient.from('plantilla_trabajadores')
+          .insert([payload]).select('id');
+        if (error) throw error;
+        var nuevoId = data && data[0] ? data[0].id : null;
+        if (!nuevoId) throw new Error('No se pudo obtener el ID del trabajador creado.');
+
+        if (ntFotoArchivo) {
+          var ext = (ntFotoArchivo.name.split('.').pop() || 'jpg').toLowerCase();
+          var path = 'perfil/' + nuevoId + '.' + ext;
+          var { error: upErr } = await supabaseClient.storage
+            .from('fotos-perfil')
+            .upload(path, ntFotoArchivo, { upsert: true });
+          if (upErr) throw upErr;
+          var { data: pubData } = supabaseClient.storage.from('fotos-perfil').getPublicUrl(path);
+          await supabaseClient.from('plantilla_trabajadores')
+            .update({ foto_url: pubData.publicUrl }).eq('id', nuevoId);
+        }
+
+        showAlert('Trabajador registrado exitosamente en la plantilla activa.', 'success');
+        setTimeout(function() { location.href = 'trabajador.html?id=' + nuevoId; }, 1200);
+      } catch (err) {
+        showAlert('Error al registrar: ' + err.message, 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      aplicarModuloContexto();
+      var hoy = new Date();
+      document.getElementById('nt_fecha_ingreso').value = hoy.toISOString().split('T')[0];
+      document.getElementById('nt_unidad_id').onchange = populateCargoSelect;
+      document.getElementById('nt_estado').onchange = function() {
+        document.getElementById('ntFechaEgresoWrap').style.display = this.value === 'Retirado' ? '' : 'none';
+      };
+      loadDatos();
+    });
+  </script>
+</body>
+</html>

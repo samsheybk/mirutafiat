@@ -69,6 +69,13 @@
     .org-table td, .org-table th { white-space: nowrap; }
     .modal.modal-wide { max-width: 860px; }
     .modal.modal-sm { max-width: 420px; }
+    .org-rh-section { margin-top: 4px; }
+    .org-rh-sec-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .org-rh-card .org-card-value { font-size: 22px; }
+    .rh-badge { display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: 600; border-radius: 3px; white-space: nowrap; }
+    .rh-badge-abierta { background: #2563eb; color: #fff; }
+    .rh-badge-cubierta { background: #059669; color: #fff; }
+    .rh-badge-cancelada { background: #6b7280; color: #fff; }
   </style>
 </head>
 <body>
@@ -117,6 +124,9 @@
               <div class="form-group" style="margin:0;"><label>Unidad</label>
                 <select class="form-select" id="kpi_unidad" onchange="renderCumplimientoUnidades();renderMedicionesUnidad();"></select>
               </div>
+              <div class="form-group" style="margin:0;"><label>Período RH</label>
+                <input type="month" class="form-input" id="rh_periodo" onchange="renderRhIndicadores();renderRhRotacion();renderRhAusencias();renderRhVacantes();renderRhCapacitaciones();renderRhPendientes();">
+              </div>
               <button class="btn btn-desarrollo btn-sm" onclick="openModalKpi()">+ Nuevo KPI</button>
               <button class="btn btn-outline btn-sm" onclick="openModalMedicion('unidad')">+ Registrar medición</button>
             </div>
@@ -161,6 +171,40 @@
           <div class="module-content">
             <div class="tool-section active" id="tool-analisis-kpi">
               <div class="org-hint">KPIs definidos, cumplimiento por unidad y mediciones registradas. Define el KPI con su meta y la dirección en la que se cumple.</div>
+
+              <div class="org-rh-section">
+                <div class="org-rh-sec-head">
+                  <div class="org-sec-title" style="margin:0;"><i class="fi fi-sr-users"></i>Indicadores de RRHH</div>
+                  <div style="font-size:12px;color:var(--color-text-secondary);">Rotación temprana (≤90 días), absentismo, tiempo de cobertura de vacantes y cobertura de capacitación obligatoria.</div>
+                </div>
+                <div class="org-cards" id="rhIndicadores"></div>
+
+                <div class="org-rh-sec-head" style="margin-top:16px;">
+                  <div class="org-sec-title" style="margin:0;"><i class="fi fi-sr-exit"></i>Salidas tempranas del período</div>
+                </div>
+                <div class="tabla-scroll"><table class="table org-table" id="rhRotacionTable"></table></div>
+
+                <div class="org-rh-sec-head" style="margin-top:16px;">
+                  <div class="org-sec-title" style="margin:0;"><i class="fi fi-sr-user"></i>Registro de ausencias</div>
+                  <button class="btn btn-outline btn-sm" onclick="openModalAusencia()">+ Registrar ausencia</button>
+                </div>
+                <div class="tabla-scroll"><table class="table org-table" id="rhAusenciasTable"></table></div>
+
+                <div class="org-rh-sec-head" style="margin-top:16px;">
+                  <div class="org-sec-title" style="margin:0;"><i class="fi fi-sr-hourglass"></i>Vacantes y tiempo de cobertura</div>
+                  <button class="btn btn-outline btn-sm" onclick="openModalVacante()">+ Registrar vacante</button>
+                </div>
+                <div class="tabla-scroll"><table class="table org-table" id="rhVacantesTable"></table></div>
+
+                <div class="org-rh-sec-head" style="margin-top:16px;">
+                  <div class="org-sec-title" style="margin:0;"><i class="fi fi-sr-graduation-cap"></i>Capacitaciones completadas</div>
+                  <button class="btn btn-outline btn-sm" onclick="openModalCapacitacion()">+ Registrar completado</button>
+                </div>
+                <div class="tabla-scroll"><table class="table org-table" id="rhCapacitacionesTable"></table></div>
+                <div class="org-sec-title" style="font-size:13px;margin-top:12px;"><i class="fi fi-sr-clipboard-list-check"></i>Cursos obligatorios pendientes</div>
+                <div id="rhPendientes"></div>
+              </div>
+
               <div class="org-sec-title"><i class="fi fi-sr-chart-line-up"></i>KPIs definidos</div>
               <div class="org-kpi-grid" id="orgKpisGrid"></div>
               <div class="org-sec-title"><i class="fi fi-sr-chart-histogram"></i>Cumplimiento por unidad</div>
@@ -316,6 +360,88 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="modalAusencia">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalAusenciaTitle">Registrar ausencia</h3><button class="modal-close" onclick="orgHideModal('modalAusencia')">&times;</button></div>
+      <div class="modal-body">
+        <form id="formAusencia">
+          <div class="form-group"><label>Trabajador</label><select class="form-select" id="aus_trabajador" required></select></div>
+          <div class="form-row">
+            <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="aus_fecha" required></div>
+            <div class="form-group"><label>Tipo</label>
+              <select class="form-select" id="aus_tipo">
+                <option value="Injustificada">Injustificada</option>
+                <option value="Justificada">Justificada</option>
+                <option value="Permiso">Permiso</option>
+                <option value="Reposo médico">Reposo médico</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group"><label>Motivo</label><input type="text" class="form-input" id="aus_motivo" placeholder="Ej: Asunto personal"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="orgHideModal('modalAusencia')">Cancelar</button>
+        <button class="btn btn-desarrollo" onclick="saveAusencia()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalVacante">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalVacanteTitle">Registrar vacante</h3><button class="modal-close" onclick="orgHideModal('modalVacante')">&times;</button></div>
+      <div class="modal-body">
+        <form id="formVacante">
+          <div class="form-row">
+            <div class="form-group"><label>Cargo</label><input type="text" class="form-input" id="vac_cargo" placeholder="Ej: Auxiliar de contabilidad" required></div>
+            <div class="form-group"><label>Unidad</label><input type="text" class="form-input" id="vac_unidad" placeholder="Ej: Contabilidad"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>N° de vacantes</label><input type="number" min="1" class="form-input" id="vac_vacantes" value="1"></div>
+            <div class="form-group"><label>Fecha de apertura</label><input type="date" class="form-input" id="vac_fecha_apertura" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Fecha cubierta</label><input type="date" class="form-input" id="vac_fecha_cubierta"></div>
+            <div class="form-group"><label>Estado</label>
+              <select class="form-select" id="vac_estado">
+                <option value="Abierta">Abierta</option>
+                <option value="Cubierta">Cubierta</option>
+                <option value="Cancelada">Cancelada</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group"><label>Nota</label><input type="text" class="form-input" id="vac_nota" placeholder="Ej: Reemplazo por retiro"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="orgHideModal('modalVacante')">Cancelar</button>
+        <button class="btn btn-desarrollo" onclick="saveVacante()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalCapacitacion">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalCapacitacionTitle">Registrar capacitación completada</h3><button class="modal-close" onclick="orgHideModal('modalCapacitacion')">&times;</button></div>
+      <div class="modal-body">
+        <form id="formCapacitacion">
+          <div class="form-row">
+            <div class="form-group"><label>Trabajador</label><select class="form-select" id="cap_trabajador" required></select></div>
+            <div class="form-group"><label>Curso</label><select class="form-select" id="cap_curso" required></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Fecha de completado</label><input type="date" class="form-input" id="cap_fecha" required></div>
+            <div class="form-group"><label>Calificación</label><input type="number" step="0.01" min="0" max="100" class="form-input" id="cap_calificacion" placeholder="Opcional"></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="orgHideModal('modalCapacitacion')">Cancelar</button>
+        <button class="btn btn-desarrollo" onclick="saveCapacitacion()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="modalConfirm">
     <div class="modal modal-sm">
       <div class="modal-header"><h3>Confirmar</h3><button class="modal-close" onclick="orgHideModal('modalConfirm')">&times;</button></div>
@@ -348,6 +474,15 @@
     var currentOkrDetalleId = null;
     var orgUserEmail = '';
     var orgConfirmCb = null;
+    var rhPlantilla = [];
+    var rhAusencias = [];
+    var rhVacantes = [];
+    var rhCapacitaciones = [];
+    var rhCursos = [];
+    var rhObligatorios = [];
+    var editingAusenciaId = null;
+    var editingVacanteId = null;
+    var editingCapacitacionId = null;
 
     function orgEscape(s) {
       return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -1230,10 +1365,462 @@
       }
     }
 
+    /* ===== INDICADORES DE RRHH ===== */
+    function rhTrabNombre(t) { return (t.nombres + ' ' + (t.apellidos || '')).trim(); }
+    function rhTrabById(id) { return rhPlantilla.find(function(x) { return x.id === id; }); }
+    function rhCursoById(id) { return rhCursos.find(function(x) { return x.id === id; }); }
+    function rhDiasEntre(a, b) {
+      var d1 = new Date(a + 'T00:00:00');
+      var d2 = new Date(b + 'T00:00:00');
+      return Math.round((d2 - d1) / 86400000);
+    }
+    function rhDentroDeMes(fechaISO, mesISO) { return mesISO ? (fechaISO || '').slice(0, 7) === mesISO : true; }
+    function rhDiasHabiles(mesISO) {
+      var partes = String(mesISO).split('-').map(Number);
+      var y = partes[0], m = partes[1];
+      var d = new Date(y, m - 1, 1);
+      var dias = 0;
+      while (d.getMonth() === m - 1) {
+        var ds = d.getDay();
+        if (ds !== 0 && ds !== 6) dias++;
+        d.setDate(d.getDate() + 1);
+      }
+      return dias;
+    }
+    function fillTrabajadores(selId) {
+      llenarSelect(selId, rhPlantilla.filter(function(t) { return t.estado === 'Activo'; }).map(function(t) { return { v: t.id, t: rhTrabNombre(t) }; }));
+    }
+    function fillCursos(selId) {
+      llenarSelect(selId, rhCursos.map(function(c) { return { v: c.id, t: c.titulo }; }));
+    }
+    function rhMapObligatorios() {
+      var oblig = {};
+      rhObligatorios.forEach(function(o) {
+        if (!oblig[o.cargo_id]) oblig[o.cargo_id] = [];
+        oblig[o.cargo_id].push(o.curso_id);
+      });
+      return oblig;
+    }
+    function rhMapCompletados() {
+      var complet = {};
+      rhCapacitaciones.forEach(function(c) {
+        if (!complet[c.trabajador_id]) complet[c.trabajador_id] = [];
+        complet[c.trabajador_id].push(c.curso_id);
+      });
+      return complet;
+    }
+
+    async function loadRhDatos() {
+      try {
+        var [pRes, cRes, oRes, aRes, vRes, caRes] = await Promise.all([
+          supabaseClient.from('plantilla_trabajadores').select('id, nombres, apellidos, cargo_id, unidad_id, fecha_ingreso, fecha_egreso, estado'),
+          supabaseClient.from('cap_cursos').select('id, titulo, estado').order('titulo'),
+          supabaseClient.from('car_cursos_obligatorios').select('cargo_id, curso_id'),
+          supabaseClient.from('rh_ausencias').select('*').order('fecha', { ascending: false }),
+          supabaseClient.from('rh_vacantes').select('*').order('created_at', { ascending: false }),
+          supabaseClient.from('rh_capacitaciones').select('*').order('fecha_completado', { ascending: false })
+        ]);
+        if (pRes.error) throw pRes.error;
+        if (cRes.error) throw cRes.error;
+        if (oRes.error) throw oRes.error;
+        if (aRes.error) throw aRes.error;
+        if (vRes.error) throw vRes.error;
+        if (caRes.error) throw caRes.error;
+        rhPlantilla = pRes.data || [];
+        rhCursos = cRes.data || [];
+        rhObligatorios = oRes.data || [];
+        rhAusencias = aRes.data || [];
+        rhVacantes = vRes.data || [];
+        rhCapacitaciones = caRes.data || [];
+        fillTrabajadores('aus_trabajador');
+        fillTrabajadores('cap_trabajador');
+        fillCursos('cap_curso');
+        renderRhIndicadores();
+        renderRhRotacion();
+        renderRhAusencias();
+        renderRhVacantes();
+        renderRhCapacitaciones();
+        renderRhPendientes();
+      } catch (err) {
+        console.error('Error cargando indicadores RH:', err);
+      }
+    }
+
+    function renderRhIndicadores() {
+      var el = document.getElementById('rhIndicadores');
+      if (!el) return;
+      var mes = document.getElementById('rh_periodo').value;
+      var cards = [];
+
+      var retirosPeriodo = rhPlantilla.filter(function(t) {
+        return t.estado === 'Retirado' && t.fecha_egreso && rhDentroDeMes(t.fecha_egreso, mes);
+      });
+      var tempranos = retirosPeriodo.filter(function(t) {
+        return t.fecha_ingreso && rhDiasEntre(t.fecha_ingreso, t.fecha_egreso) <= 90;
+      });
+      var ingresosPeriodo = rhPlantilla.filter(function(t) { return t.fecha_ingreso && rhDentroDeMes(t.fecha_ingreso, mes); });
+      var rotPct = retirosPeriodo.length ? Math.round((tempranos.length / retirosPeriodo.length) * 1000) / 10 : 0;
+      cards.push({
+        l: 'Rotación temprana (≤90 días)',
+        v: (tempranos.length ? rotPct : 0) + '%',
+        cls: rotPct <= 5 ? 'org-pct-ok' : rotPct <= 15 ? 'org-pct-mid' : 'org-pct-bad',
+        s: tempranos.length + ' de ' + retirosPeriodo.length + ' salidas en el período · ' + ingresosPeriodo.length + ' ingresos'
+      });
+
+      var ausPeriodo = rhAusencias.filter(function(a) { return rhDentroDeMes(a.fecha, mes); });
+      var activos = rhPlantilla.filter(function(t) { return t.estado === 'Activo'; }).length;
+      var diasHabiles = mes ? rhDiasHabiles(mes) : 22;
+      var afectados = {};
+      ausPeriodo.forEach(function(a) { afectados[a.trabajador_id] = true; });
+      var ausPct = (activos > 0 && diasHabiles > 0) ? Math.round((ausPeriodo.length / (diasHabiles * activos)) * 10000) / 100 : 0;
+      cards.push({
+        l: 'Tasa de absentismo',
+        v: ausPct + '%',
+        cls: ausPct < 2 ? 'org-pct-ok' : ausPct <= 5 ? 'org-pct-mid' : 'org-pct-bad',
+        s: ausPeriodo.length + ' días perdidos · ' + Object.keys(afectados).length + ' trabajadores afectados'
+      });
+
+      var cubiertas = rhVacantes.filter(function(v) {
+        return v.estado === 'Cubierta' && v.fecha_cubierta && v.fecha_apertura && rhDentroDeMes(v.fecha_cubierta, mes);
+      });
+      var abiertas = rhVacantes.filter(function(v) { return v.estado === 'Abierta'; }).length;
+      var dias = cubiertas.map(function(v) { return rhDiasEntre(v.fecha_apertura, v.fecha_cubierta); });
+      var avgDias = dias.length ? Math.round(dias.reduce(function(a, b) { return a + b; }, 0) / dias.length) : null;
+      cards.push({
+        l: 'Tiempo medio de cobertura',
+        v: avgDias === null ? '—' : avgDias + ' días',
+        cls: avgDias === null ? 'org-pct-none' : avgDias <= 30 ? 'org-pct-ok' : avgDias <= 45 ? 'org-pct-mid' : 'org-pct-bad',
+        s: cubiertas.length + ' vacantes cubiertas en el período · ' + abiertas.length + ' abiertas ahora'
+      });
+
+      var oblig = rhMapObligatorios();
+      var complet = rhMapCompletados();
+      var conOblig = rhPlantilla.filter(function(t) { return t.estado === 'Activo' && t.cargo_id && oblig[t.cargo_id] && oblig[t.cargo_id].length; });
+      var alDia = conOblig.filter(function(t) {
+        var set = {};
+        (complet[t.id] || []).forEach(function(cid) { set[cid] = true; });
+        return oblig[t.cargo_id].every(function(cid) { return set[cid]; });
+      });
+      var capPct = conOblig.length ? Math.round((alDia.length / conOblig.length) * 1000) / 10 : null;
+      cards.push({
+        l: 'Cobertura capacitación obligatoria',
+        v: capPct === null ? '—' : capPct + '%',
+        cls: capPct === null ? 'org-pct-none' : capPct >= 100 ? 'org-pct-ok' : capPct >= 80 ? 'org-pct-mid' : 'org-pct-bad',
+        s: conOblig.length ? alDia.length + ' de ' + conOblig.length + ' trabajadores al día' : 'Sin cursos obligatorios definidos por cargo'
+      });
+
+      el.innerHTML = cards.map(function(c) {
+        return '<div class="org-card org-rh-card"><div class="org-card-label">' + c.l + '</div><div class="org-card-value ' + c.cls + '">' + c.v + '</div><div class="org-card-sub">' + c.s + '</div></div>';
+      }).join('');
+    }
+
+    function renderRhRotacion() {
+      var el = document.getElementById('rhRotacionTable');
+      var mes = document.getElementById('rh_periodo').value;
+      var lista = rhPlantilla.filter(function(t) {
+        return t.estado === 'Retirado' && t.fecha_ingreso && t.fecha_egreso && rhDentroDeMes(t.fecha_egreso, mes) && rhDiasEntre(t.fecha_ingreso, t.fecha_egreso) <= 90;
+      }).sort(function(a, b) { return a.fecha_egreso < b.fecha_egreso ? 1 : -1; });
+      if (!lista.length) {
+        el.innerHTML = '<tbody><tr><td><div class="org-empty">Sin salidas tempranas en el período. Se calcula de la plantilla: trabajadores retirados a los 90 días o menos de su ingreso.</div></td></tr></tbody>';
+        return;
+      }
+      var html = '<thead><tr><th>Trabajador</th><th>Ingreso</th><th>Egreso</th><th>Días trabajados</th></tr></thead><tbody>';
+      lista.forEach(function(t) {
+        html += '<tr><td>' + orgEscape(rhTrabNombre(t)) + '</td><td>' + orgEscape(t.fecha_ingreso) + '</td><td>' + orgEscape(t.fecha_egreso) + '</td><td><strong>' + rhDiasEntre(t.fecha_ingreso, t.fecha_egreso) + '</strong></td></tr>';
+      });
+      el.innerHTML = html + '</tbody>';
+    }
+
+    function renderRhAusencias() {
+      var el = document.getElementById('rhAusenciasTable');
+      var mes = document.getElementById('rh_periodo').value;
+      var lista = rhAusencias.filter(function(a) { return rhDentroDeMes(a.fecha, mes); }).slice(0, 50);
+      if (!lista.length) {
+        el.innerHTML = '<tbody><tr><td><div class="org-empty">Aún no hay ausencias registradas en el período. Cada fila equivale a un día de ausencia de un trabajador.</div></td></tr></tbody>';
+        return;
+      }
+      var html = '<thead><tr><th>Fecha</th><th>Trabajador</th><th>Tipo</th><th>Motivo</th><th></th></tr></thead><tbody>';
+      lista.forEach(function(a) {
+        var t = rhTrabById(a.trabajador_id);
+        html += '<tr><td>' + orgEscape(a.fecha) + '</td><td>' + orgEscape(t ? rhTrabNombre(t) : '—') + '</td><td>' + orgEscape(a.tipo) + '</td><td>' + orgEscape(a.motivo || '') + '</td>' +
+          '<td><button class="btn btn-outline btn-sm" onclick="openModalAusencia(' + a.id + ')">Editar</button> <button class="btn btn-sm" style="background:#dc2626;" onclick="deleteAusencia(' + a.id + ')">Eliminar</button></td></tr>';
+      });
+      el.innerHTML = html + '</tbody>';
+    }
+
+    function renderRhVacantes() {
+      var el = document.getElementById('rhVacantesTable');
+      var mes = document.getElementById('rh_periodo').value;
+      var lista = rhVacantes.filter(function(v) {
+        return !mes || rhDentroDeMes(v.fecha_cubierta, mes) || v.estado !== 'Cubierta';
+      }).slice(0, 50);
+      if (!lista.length) {
+        el.innerHTML = '<tbody><tr><td><div class="org-empty">Aún no hay vacantes registradas. Registra una vacante para medir el tiempo de cobertura.</div></td></tr></tbody>';
+        return;
+      }
+      var html = '<thead><tr><th>Cargo</th><th>Unidad</th><th>Apertura</th><th>Cubierta</th><th>Días</th><th>Estado</th><th>Nota</th><th></th></tr></thead><tbody>';
+      lista.forEach(function(v) {
+        var dias = null;
+        if (v.estado === 'Cubierta' && v.fecha_cubierta && v.fecha_apertura) dias = rhDiasEntre(v.fecha_apertura, v.fecha_cubierta);
+        if (v.estado === 'Abierta' && v.fecha_apertura) dias = rhDiasEntre(v.fecha_apertura, todayISO());
+        var badge = v.estado === 'Cubierta' ? 'rh-badge-cubierta' : v.estado === 'Cancelada' ? 'rh-badge-cancelada' : 'rh-badge-abierta';
+        html += '<tr><td>' + orgEscape(v.cargo) + '</td><td>' + orgEscape(v.unidad || '') + '</td><td>' + orgEscape(v.fecha_apertura) + '</td><td>' + orgEscape(v.fecha_cubierta || '—') + '</td>' +
+          '<td>' + (dias === null ? '—' : dias + ' días') + '</td>' +
+          '<td><span class="rh-badge ' + badge + '">' + orgEscape(v.estado) + '</span></td>' +
+          '<td>' + orgEscape(v.nota || '') + '</td>' +
+          '<td><button class="btn btn-outline btn-sm" onclick="openModalVacante(' + v.id + ')">Editar</button> <button class="btn btn-sm" style="background:#dc2626;" onclick="deleteVacante(' + v.id + ')">Eliminar</button></td></tr>';
+      });
+      el.innerHTML = html + '</tbody>';
+    }
+
+    function renderRhCapacitaciones() {
+      var el = document.getElementById('rhCapacitacionesTable');
+      var mes = document.getElementById('rh_periodo').value;
+      var lista = rhCapacitaciones.filter(function(c) { return rhDentroDeMes(c.fecha_completado, mes); }).slice(0, 50);
+      if (!lista.length) {
+        el.innerHTML = '<tbody><tr><td><div class="org-empty">Aún no hay capacitaciones completadas registradas en el período.</div></td></tr></tbody>';
+        return;
+      }
+      var html = '<thead><tr><th>Fecha</th><th>Trabajador</th><th>Curso</th><th>Calificación</th><th></th></tr></thead><tbody>';
+      lista.forEach(function(c) {
+        var t = rhTrabById(c.trabajador_id);
+        var cr = rhCursoById(c.curso_id);
+        html += '<tr><td>' + orgEscape(c.fecha_completado) + '</td><td>' + orgEscape(t ? rhTrabNombre(t) : '—') + '</td><td>' + orgEscape(cr ? cr.titulo : '—') + '</td>' +
+          '<td>' + (c.calificacion === null || c.calificacion === undefined ? '—' : fmtVal(c.calificacion)) + '</td>' +
+          '<td><button class="btn btn-outline btn-sm" onclick="openModalCapacitacion(' + c.id + ')">Editar</button> <button class="btn btn-sm" style="background:#dc2626;" onclick="deleteCapacitacion(' + c.id + ')">Eliminar</button></td></tr>';
+      });
+      el.innerHTML = html + '</tbody>';
+    }
+
+    function renderRhPendientes() {
+      var el = document.getElementById('rhPendientes');
+      var oblig = rhMapObligatorios();
+      var complet = rhMapCompletados();
+      var filas = [];
+      rhPlantilla.filter(function(t) { return t.estado === 'Activo' && t.cargo_id && oblig[t.cargo_id] && oblig[t.cargo_id].length; }).forEach(function(t) {
+        var set = {};
+        (complet[t.id] || []).forEach(function(cid) { set[cid] = true; });
+        var pend = oblig[t.cargo_id].filter(function(cid) { return !set[cid]; });
+        if (pend.length) {
+          var nombres = pend.map(function(cid) { var c = rhCursoById(cid); return c ? c.titulo : 'Curso #' + cid; });
+          filas.push({ nombre: rhTrabNombre(t), cursos: nombres.join(', ') });
+        }
+      });
+      if (!filas.length) {
+        el.innerHTML = '<div class="org-empty" style="padding:12px;">Todos los trabajadores activos con cursos obligatorios están al día.</div>';
+        return;
+      }
+      el.innerHTML = filas.map(function(f) {
+        return '<div style="padding:8px 0;border-bottom:1px solid var(--color-border);font-size:13px;"><strong>' + orgEscape(f.nombre) + '</strong><br><span style="color:var(--color-text-secondary);">' + orgEscape(f.cursos) + '</span></div>';
+      }).join('');
+    }
+
+    function openModalAusencia(id) {
+      editingAusenciaId = null;
+      document.getElementById('modalAusenciaTitle').textContent = 'Registrar ausencia';
+      document.getElementById('aus_fecha').value = todayISO();
+      document.getElementById('aus_tipo').value = 'Injustificada';
+      document.getElementById('aus_motivo').value = '';
+      fillTrabajadores('aus_trabajador');
+      if (id) {
+        var a = rhAusencias.find(function(x) { return x.id === id; });
+        if (!a) return;
+        editingAusenciaId = id;
+        document.getElementById('modalAusenciaTitle').textContent = 'Editar ausencia';
+        document.getElementById('aus_trabajador').value = a.trabajador_id;
+        document.getElementById('aus_fecha').value = a.fecha;
+        document.getElementById('aus_tipo').value = a.tipo;
+        document.getElementById('aus_motivo').value = a.motivo || '';
+      }
+      orgShowModal('modalAusencia');
+    }
+
+    async function saveAusencia() {
+      var trabajadorId = document.getElementById('aus_trabajador').value;
+      var fecha = document.getElementById('aus_fecha').value;
+      if (!trabajadorId) { alert('Selecciona el trabajador.'); return; }
+      if (!fecha) { alert('Indica la fecha de la ausencia.'); return; }
+      var payload = {
+        trabajador_id: trabajadorId,
+        fecha: fecha,
+        tipo: document.getElementById('aus_tipo').value,
+        motivo: document.getElementById('aus_motivo').value.trim()
+      };
+      try {
+        var res;
+        if (editingAusenciaId) {
+          res = await supabaseClient.from('rh_ausencias').update(payload).eq('id', editingAusenciaId);
+        } else {
+          res = await supabaseClient.from('rh_ausencias').insert([payload]);
+        }
+        if (res.error) throw res.error;
+        orgHideModal('modalAusencia');
+        await loadRhDatos();
+      } catch (err) {
+        console.error(err);
+        alert('No se pudo guardar la ausencia: ' + (err.message || 'error desconocido'));
+      }
+    }
+
+    function deleteAusencia(id) {
+      orgConfirm('¿Eliminar esta ausencia?', async function() {
+        try {
+          var { error } = await supabaseClient.from('rh_ausencias').delete().eq('id', id);
+          if (error) throw error;
+          await loadRhDatos();
+        } catch (err) {
+          console.error(err);
+          alert('No se pudo eliminar la ausencia: ' + (err.message || 'error desconocido'));
+        }
+      });
+    }
+
+    function openModalVacante(id) {
+      editingVacanteId = null;
+      document.getElementById('modalVacanteTitle').textContent = 'Registrar vacante';
+      document.getElementById('vac_cargo').value = '';
+      document.getElementById('vac_unidad').value = '';
+      document.getElementById('vac_vacantes').value = 1;
+      document.getElementById('vac_fecha_apertura').value = todayISO();
+      document.getElementById('vac_fecha_cubierta').value = '';
+      document.getElementById('vac_estado').value = 'Abierta';
+      document.getElementById('vac_nota').value = '';
+      if (id) {
+        var v = rhVacantes.find(function(x) { return x.id === id; });
+        if (!v) return;
+        editingVacanteId = id;
+        document.getElementById('modalVacanteTitle').textContent = 'Editar vacante';
+        document.getElementById('vac_cargo').value = v.cargo;
+        document.getElementById('vac_unidad').value = v.unidad || '';
+        document.getElementById('vac_vacantes').value = v.vacantes;
+        document.getElementById('vac_fecha_apertura').value = v.fecha_apertura;
+        document.getElementById('vac_fecha_cubierta').value = v.fecha_cubierta || '';
+        document.getElementById('vac_estado').value = v.estado;
+        document.getElementById('vac_nota').value = v.nota || '';
+      }
+      orgShowModal('modalVacante');
+    }
+
+    async function saveVacante() {
+      var cargo = document.getElementById('vac_cargo').value.trim();
+      var apertura = document.getElementById('vac_fecha_apertura').value;
+      if (!cargo) { alert('Indica el cargo de la vacante.'); return; }
+      if (!apertura) { alert('Indica la fecha de apertura.'); return; }
+      var cubierta = document.getElementById('vac_fecha_cubierta').value || null;
+      var estado = document.getElementById('vac_estado').value;
+      if (cubierta && rhDiasEntre(apertura, cubierta) < 0) { alert('La fecha cubierta no puede ser anterior a la apertura.'); return; }
+      if (estado === 'Cubierta' && !cubierta) { alert('Indica la fecha en que se cubrió la vacante.'); return; }
+      var payload = {
+        cargo: cargo,
+        unidad: document.getElementById('vac_unidad').value.trim(),
+        vacantes: parseInt(document.getElementById('vac_vacantes').value, 10) || 1,
+        fecha_apertura: apertura,
+        fecha_cubierta: cubierta,
+        estado: estado,
+        nota: document.getElementById('vac_nota').value.trim()
+      };
+      try {
+        var res;
+        if (editingVacanteId) {
+          res = await supabaseClient.from('rh_vacantes').update(payload).eq('id', editingVacanteId);
+        } else {
+          res = await supabaseClient.from('rh_vacantes').insert([payload]);
+        }
+        if (res.error) throw res.error;
+        orgHideModal('modalVacante');
+        await loadRhDatos();
+      } catch (err) {
+        console.error(err);
+        alert('No se pudo guardar la vacante: ' + (err.message || 'error desconocido'));
+      }
+    }
+
+    function deleteVacante(id) {
+      orgConfirm('¿Eliminar esta vacante?', async function() {
+        try {
+          var { error } = await supabaseClient.from('rh_vacantes').delete().eq('id', id);
+          if (error) throw error;
+          await loadRhDatos();
+        } catch (err) {
+          console.error(err);
+          alert('No se pudo eliminar la vacante: ' + (err.message || 'error desconocido'));
+        }
+      });
+    }
+
+    function openModalCapacitacion(id) {
+      editingCapacitacionId = null;
+      document.getElementById('modalCapacitacionTitle').textContent = 'Registrar capacitación completada';
+      document.getElementById('cap_fecha').value = todayISO();
+      document.getElementById('cap_calificacion').value = '';
+      fillTrabajadores('cap_trabajador');
+      fillCursos('cap_curso');
+      if (id) {
+        var c = rhCapacitaciones.find(function(x) { return x.id === id; });
+        if (!c) return;
+        editingCapacitacionId = id;
+        document.getElementById('modalCapacitacionTitle').textContent = 'Editar capacitación completada';
+        document.getElementById('cap_trabajador').value = c.trabajador_id;
+        document.getElementById('cap_curso').value = c.curso_id;
+        document.getElementById('cap_fecha').value = c.fecha_completado;
+        document.getElementById('cap_calificacion').value = c.calificacion === null || c.calificacion === undefined ? '' : c.calificacion;
+      }
+      orgShowModal('modalCapacitacion');
+    }
+
+    async function saveCapacitacion() {
+      var trabajadorId = document.getElementById('cap_trabajador').value;
+      var cursoId = document.getElementById('cap_curso').value;
+      var fecha = document.getElementById('cap_fecha').value;
+      var calRaw = document.getElementById('cap_calificacion').value;
+      if (!trabajadorId) { alert('Selecciona el trabajador.'); return; }
+      if (!cursoId) { alert('Selecciona el curso.'); return; }
+      if (!fecha) { alert('Indica la fecha de completado.'); return; }
+      var cal = calRaw === '' ? null : parseFloat(calRaw);
+      if (cal !== null && (isNaN(cal) || cal < 0 || cal > 100)) { alert('La calificación debe estar entre 0 y 100.'); return; }
+      var payload = {
+        trabajador_id: trabajadorId,
+        curso_id: cursoId,
+        fecha_completado: fecha,
+        calificacion: cal
+      };
+      try {
+        var res;
+        if (editingCapacitacionId) {
+          res = await supabaseClient.from('rh_capacitaciones').update(payload).eq('id', editingCapacitacionId);
+        } else {
+          res = await supabaseClient.from('rh_capacitaciones').insert([payload]);
+        }
+        if (res.error) {
+          if (res.error.code === '23505') { alert('Ese trabajador ya tiene registrado ese curso como completado.'); return; }
+          throw res.error;
+        }
+        orgHideModal('modalCapacitacion');
+        await loadRhDatos();
+      } catch (err) {
+        console.error(err);
+        alert('No se pudo guardar la capacitación: ' + (err.message || 'error desconocido'));
+      }
+    }
+
+    function deleteCapacitacion(id) {
+      orgConfirm('¿Eliminar este registro de capacitación completada?', async function() {
+        try {
+          var { error } = await supabaseClient.from('rh_capacitaciones').delete().eq('id', id);
+          if (error) throw error;
+          await loadRhDatos();
+        } catch (err) {
+          console.error(err);
+          alert('No se pudo eliminar el registro: ' + (err.message || 'error desconocido'));
+        }
+      });
+    }
+
     /* ===== INICIALIZACIÓN ===== */
     document.addEventListener('DOMContentLoaded', function() {
       restoreTool();
       document.getElementById('med_periodo').value = currentMonthISO();
+      document.getElementById('rh_periodo').value = currentMonthISO();
       supabaseClient.auth.getUser().then(function(res) {
         if (res.data && res.data.user) orgUserEmail = res.data.user.email || '';
       }).catch(function() {});
@@ -1241,6 +1828,7 @@
       loadKpis();
       loadResultados();
       loadOkrs();
+      loadRhDatos();
     });
   </script>
 

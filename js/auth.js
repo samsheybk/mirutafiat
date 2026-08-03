@@ -47,6 +47,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       errorDiv.textContent = 'No se pudo verificar tu acceso (problema de base de datos). Revisa el esquema de Supabase o inténtalo de nuevo.';
       errorDiv.classList.add('show');
     }
+    if (params.get('msg') === 'passok') {
+      errorDiv.textContent = 'Contraseña actualizada correctamente. Inicia sesión con tu nueva contraseña.';
+      errorDiv.classList.add('show');
+      errorDiv.classList.add('login-success');
+    }
 
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -94,7 +99,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const user = await getCurrentUser();
     const emailEl = document.getElementById('navUserEmail');
-    if (emailEl) emailEl.textContent = user.email || '';
+    if (emailEl) {
+      emailEl.textContent = user.email || '';
+      emailEl.className = 'nav-user-email';
+      emailEl.title = 'Ver mi perfil';
+      emailEl.addEventListener('click', function () {
+        var path = window.location.pathname || '';
+        window.location.href = (path.indexOf('/modules/') !== -1 ? '../' : '') + 'perfil.html';
+      });
+    }
 
     logoutBtn.addEventListener('click', async () => {
       if (!(await showConfirm('¿Estás seguro de cerrar tu sesión?'))) return;

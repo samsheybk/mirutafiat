@@ -101,7 +101,7 @@
   function inModules() { return location.pathname.indexOf('/modules/') !== -1; }
   function baseModule(page) { return PARENT[page] || page; }
 
-  var state = { allow: true, role: 'Empleado', modulos: null, hasRow: false, worker: null, isAdmin: false, manage: false };
+  var state = { allow: true, role: 'Empleado', modulos: null, hasRow: false, worker: null, isAdmin: false, manage: false, ready: false };
 
   function canViewModule(page) {
     if (!state.allow) return false;
@@ -122,13 +122,14 @@
   }
 
   async function buildState(email) {
-    state = { allow: true, role: 'Empleado', modulos: null, hasRow: false, worker: null, isAdmin: false, manage: false, error: null };
+    state = { allow: true, role: 'Empleado', modulos: null, hasRow: false, worker: null, isAdmin: false, manage: false, error: null, ready: false };
     try {
       var emailNorm = (email || '').trim().toLowerCase();
       if (SUPERADMIN_EMAILS.indexOf(emailNorm) !== -1) {
         state.role = 'Administrador';
         state.isAdmin = true;
         state.manage = true;
+        state.ready = true;
         return;
       }
       var wRes = await supabaseClient
@@ -157,6 +158,7 @@
       state.modulos = acc && acc.modulos ? acc.modulos : null;
       state.isAdmin = state.role === 'Administrador';
       state.manage = state.isAdmin;
+      state.ready = true;
     } catch (err) {
       console.error('[access.buildState]', err && err.message ? err.message : err);
       state = { allow: false, role: 'Empleado', modulos: null, hasRow: false, worker: null, isAdmin: false, manage: false, error: err && err.message ? err.message : 'Error desconocido' };
@@ -172,6 +174,14 @@
       if (base === 'gestion-usuarios.html') { opt.style.display = state.manage ? '' : 'none'; return; }
       if (!canViewModule(base)) opt.style.display = 'none';
     });
+    var perfilExists = Array.prototype.some.call(sel.options, function (o) { return pageOf(o.value) === 'perfil.html'; });
+    if (!perfilExists) {
+      var pOpt = document.createElement('option');
+      pOpt.value = (inModules() ? '../' : '') + 'perfil.html';
+      pOpt.textContent = 'Mi perfil';
+      sel.appendChild(pOpt);
+      if (currentPage() === 'perfil.html') pOpt.selected = true;
+    }
     if (state.manage) {
       var exists = Array.prototype.some.call(sel.options, function (o) { return pageOf(o.value) === 'gestion-usuarios.html'; });
       if (!exists) {
@@ -196,7 +206,7 @@
 
   function guardCurrentPage() {
     var cur = currentPage();
-    if (!cur || cur === 'dashboard.html' || cur === 'index.html') return;
+    if (!cur || cur === 'dashboard.html' || cur === 'index.html' || cur === 'perfil.html') return;
     var dash = inModules() ? '../dashboard.html' : 'dashboard.html';
     if (cur === 'gestion-usuarios.html') { if (!state.manage) location.href = dash; return; }
     if (!canViewModule(cur)) location.href = dash;
@@ -254,7 +264,7 @@
   window.navigateModule = function (url) {
     if (!url) return;
     var base = pageOf(url);
-    if (base && base !== 'dashboard.html' && base !== 'index.html') {
+    if (base && base !== 'dashboard.html' && base !== 'index.html' && base !== 'perfil.html') {
       var dash = inModules() ? '../dashboard.html' : 'dashboard.html';
       if (base === 'gestion-usuarios.html') {
         if (!state.manage) { location.href = dash; return; }

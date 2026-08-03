@@ -13,6 +13,15 @@
         { icon: 'fi-sr-house-building', name: 'Panel general', desc: 'Resumen de la intranet con acceso directo a cada módulo: procesos de captación, plantilla activa, cursos, incidentes, movimientos financieros y más.' }
       ]
     },
+    'perfil.html': {
+      title: 'Mi perfil',
+      subtitle: 'Tu ficha personal en la intranet: datos del trabajador, unidad y cargo, y configuración de tu acceso a los módulos.',
+      accent: '#0d9488',
+      tools: [
+        { icon: 'fi-sr-id-badge', name: 'Información personal', desc: 'Datos de tu ficha de trabajador: cédula, correo, teléfono, fecha de ingreso y ubicación en la estructura organizacional.' },
+        { icon: 'fi-sr-laptop', name: 'Acceso a la intranet', desc: 'Tu rol y los módulos a los que tienes acceso según tu configuración de usuario.' }
+      ]
+    },
     'captacion.html': {
       title: 'Captación y Selección',
       subtitle: 'Gestión integral del proceso de reclutamiento y selección de personal de FIAT.',
@@ -117,7 +126,7 @@
       subtitle: 'Indicadores de gestión, objetivos y salud organizacional por unidad y cargo.',
       accent: '#d97706',
       tools: [
-        { icon: 'fi-sr-chart-line-up', name: 'Análisis de KPI por unidades', desc: 'Indicadores clave por unidad para medir la salud y el desempeño organizacional.' },
+        { icon: 'fi-sr-chart-line-up', name: 'Análisis de KPI por unidades', desc: 'Indicadores clave por unidad para medir la salud y el desempeño organizacional, e indicadores de RRHH: rotación temprana, absentismo, tiempo de cobertura de vacantes y cobertura de capacitación obligatoria.' },
         { icon: 'fi-sr-chart-user', name: 'Rendimiento según KPI', desc: 'Rendimiento de los cargos de acuerdo con los indicadores definidos para cada puesto.' },
         { icon: 'fi-sr-bullseye', name: 'OKR', desc: 'Objetivos y Resultados Clave con seguimiento del avance por trimestre.' },
         { icon: 'fi-sr-chart-pie', name: 'Estadísticas de salud', desc: 'Estadísticas y tendencias de la salud de las áreas de la empresa.' }

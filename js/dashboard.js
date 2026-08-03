@@ -47,6 +47,13 @@ async function loadModuleCounts() {
       .select('*', { count: 'exact', head: true });
     document.getElementById('count-finanzas').textContent = (finanzasCount || 0) + ' movimientos';
   } catch (_) {}
+
+  try {
+    const { count: usuariosCount } = await supabaseClient
+      .from('usuario_accesos')
+      .select('*', { count: 'exact', head: true });
+    document.getElementById('count-usuarios').textContent = (usuariosCount || 0) + ' usuarios configurados';
+  } catch (_) {}
 }
 
 document.addEventListener('DOMContentLoaded', () => {

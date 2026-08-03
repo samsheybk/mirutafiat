@@ -1668,5 +1668,46 @@ CREATE POLICY "Autenticados eliminar seguimiento okr"
   ON org_okr_seguimiento FOR DELETE TO authenticated USING (true);
 
 -- ============================================
+-- 13) GESTIÓN DE USUARIOS Y ACCESOS
+-- Solo trabajadores ACTIVOS pueden ingresar. Por usuario se
+-- configura qué módulos ve y qué herramientas por módulo usa.
+-- (Ver gestion-usuarios.sql para detalles.)
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS usuario_accesos (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  trabajador_id UUID NOT NULL REFERENCES plantilla_trabajadores(id) ON DELETE CASCADE,
+  rol TEXT NOT NULL DEFAULT 'Empleado' CHECK (rol IN ('Administrador', 'Empleado')),
+  modulos JSONB NOT NULL DEFAULT '{}'::jsonb,
+  activo BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT uq_usuario_accesos_trabajador UNIQUE (trabajador_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_usuario_accesos_trabajador ON usuario_accesos (trabajador_id);
+CREATE INDEX IF NOT EXISTS idx_usuario_accesos_rol ON usuario_accesos (rol);
+CREATE INDEX IF NOT EXISTS idx_usuario_accesos_activo ON usuario_accesos (activo);
+
+ALTER TABLE usuario_accesos ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Autenticados ver accesos" ON usuario_accesos;
+CREATE POLICY "Autenticados ver accesos"
+  ON usuario_accesos FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados crear accesos" ON usuario_accesos;
+CREATE POLICY "Autenticados crear accesos"
+  ON usuario_accesos FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Autenticados actualizar accesos" ON usuario_accesos;
+CREATE POLICY "Autenticados actualizar accesos"
+  ON usuario_accesos FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados eliminar accesos" ON usuario_accesos;
+CREATE POLICY "Autenticados eliminar accesos"
+  ON usuario_accesos FOR DELETE TO authenticated USING (true);
+
+DROP TRIGGER IF EXISTS update_usuario_accesos_updated_at ON usuario_accesos;
+CREATE TRIGGER update_usuario_accesos_updated_at
+  BEFORE UPDATE ON usuario_accesos
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ============================================
 -- FIN DEL ESQUEMA COMPLETO
 -- ============================================

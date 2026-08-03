@@ -123,6 +123,15 @@
         { icon: 'fi-sr-chart-pie', name: 'Estadísticas de salud', desc: 'Estadísticas y tendencias de la salud de las áreas de la empresa.' }
       ]
     },
+    'gestion-usuarios.html': {
+      title: 'Gestión de usuarios',
+      subtitle: 'Administración de los accesos a la intranet: qué módulos ve cada trabajador activo y qué herramientas puede usar por módulo.',
+      accent: '#0ea5e9',
+      tools: [
+        { icon: 'fi-sr-users-gear', name: 'Usuarios y accesos', desc: 'Listado de trabajadores activos con su configuración de acceso, rol, estado y opciones para crear, activar o desactivar usuarios.' },
+        { icon: 'fi-sr-shield-check', name: 'Permisos por módulo', desc: 'Asignación de módulos visibles y herramientas permitidas por usuario, con control por módulo y por herramienta individual.' }
+      ]
+    },
     'oportunidades.html': {
       title: 'Oportunidades de acción',
       subtitle: 'Propuestas de crecimiento de la intranet para cubrir nuevas áreas y necesidades de FIAT.',

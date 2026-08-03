@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de usuarios - FIAT Intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
+  <style>
+    :root { --module-color: var(--module-usuarios); }
+    .tool-section.active { height: 100%; overflow-y: auto; padding-right: 4px; }
+    .gu-hint { font-size: 12px; color: var(--color-text-secondary); padding: 2px 0 14px; }
+    .gu-hint i.fi { color: var(--module-usuarios); margin-right: 6px; }
+    .gu-filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; margin-bottom: 14px; }
+    .gu-filters .form-group { margin: 0; flex: 1; min-width: 220px; }
+    .acc-mod { border: 1px solid var(--color-border); border-radius: var(--radius-md); margin-bottom: 10px; overflow: hidden; background: var(--color-surface); }
+    .acc-mod-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; flex-wrap: wrap; }
+    .acc-mod-check { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; cursor: pointer; }
+    .acc-mod-check input { width: 16px; height: 16px; accent-color: var(--module-usuarios); }
+    .acc-all { margin-left: auto; }
+    .acc-tools { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 16px 14px 44px; }
+    .acc-tool-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; border: 1px solid var(--color-border); border-radius: 999px; padding: 5px 12px; cursor: pointer; background: var(--color-surface); transition: border-color 0.15s, background 0.15s; }
+    .acc-tool-chip:hover { border-color: var(--module-usuarios); }
+    .acc-tool-chip input { accent-color: var(--module-usuarios); }
+    .acc-tool-chip input:checked + span { color: var(--module-usuarios); font-weight: 600; }
+    .acc-tool-chip input:disabled + span { opacity: 0.55; }
+    .acc-panel-head { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 14px; }
+    .acc-panel-head .form-group { margin: 0; min-width: 200px; flex: 1; }
+    .gu-resumen { font-size: 12px; color: var(--color-text-secondary); margin: 0 0 10px; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+
+    <nav class="topnav" style="background:var(--module-usuarios);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><img class="topnav-logo" src="../icons/logo FIAT.webp" alt="FIAT">VEN<span>-Intranet</span></div>
+      <div class="topnav-spacer"></div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Dashboard</option>
+        <option value="captacion.html">Captación y Selección</option>
+        <option value="relaciones-laborales.html">Relaciones Laborales</option>
+        <option value="capacitacion.html">Capacitación y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="compensacion.html">Compensación</option>
+        <option value="finanzas.html">Finanzas</option>
+        <option value="repositorio.html">Repositorio</option>
+        <option value="chatfiat.html">ChatFIAT</option>
+        <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
+      </select>
+      <div class="nav-user">
+        <span id="navUserEmail"></span>
+        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-panel">
+          <div class="panel-item active" data-tool="usuarios" onclick="switchTool('usuarios')" title="Usuarios y accesos"><span class="panel-item-indicator bg-usuarios"></span><i class="fi fi-sr-users-gear" style="font-size:24px;pointer-events:none;"></i></div>
+          <div class="panel-item" data-tool="accesos" onclick="switchTool('accesos')" title="Permisos por módulo"><span class="panel-item-indicator bg-usuarios"></span><i class="fi fi-sr-shield-check" style="font-size:24px;pointer-events:none;"></i></div>
+        </div>
+
+        <div class="module-body">
+          <div class="module-content">
+
+            <div class="tool-section active" id="tool-usuarios">
+              <div class="gu-hint"><i class="fi fi-sr-lock"></i> Para ingresar a la intranet el trabajador debe estar <b>Activo</b> en la plantilla y su correo debe coincidir con su cuenta. Aquí se configura qué módulos ve y qué herramientas usa cada usuario.</div>
+              <div class="gu-filters">
+                <div class="form-group"><label>Buscar trabajador</label>
+                  <input type="text" class="form-input" id="filUsuarios" placeholder="Nombre, apellido o correo..." oninput="renderUsuarios()">
+                </div>
+                <button class="btn btn-usuarios" onclick="openModalCrear()"><i class="fi fi-sr-user-pen" style="font-size:15px;pointer-events:none;"></i> Crear usuario</button>
+              </div>
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Trabajador</th><th>Correo</th><th>Cargo</th><th>Acceso</th><th>Rol</th><th>Estado</th><th style="width:250px;">Acciones</th></tr></thead>
+                  <tbody id="usuariosBody">
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="tool-section" id="tool-accesos">
+              <div class="acc-panel-head">
+                <div class="form-group"><label>Usuario</label>
+                  <select class="form-select" id="accUsuario" onchange="onUsuarioCambio(this.value)"></select>
+                </div>
+                <div class="form-group" style="min-width:160px;"><label>Rol</label>
+                  <select class="form-select" id="accRol">
+                    <option value="Empleado">Empleado</option>
+                    <option value="Administrador">Administrador</option>
+                  </select>
+                </div>
+                <button class="btn btn-usuarios" onclick="guardarAccesos()"><i class="fi fi-sr-check" style="font-size:15px;pointer-events:none;"></i> Guardar accesos</button>
+                <button class="btn btn-outline" onclick="restaurarAccesos()"><i class="fi fi-sr-shuffle" style="font-size:15px;pointer-events:none;"></i> Restaurar</button>
+              </div>
+              <div class="gu-hint"><i class="fi fi-sr-list-check"></i> Marca los módulos que el usuario puede <b>ver</b>. Con el módulo visible, marca las <b>herramientas</b> que puede usar; "Todas las herramientas" permite todo el módulo. El rol <b>Administrador</b> siempre ve todo.</div>
+              <div id="accesosMatrix" class="gu-resumen">Selecciona un usuario para configurar sus accesos.</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modalCrear">
+      <div class="modal">
+        <div class="modal-header"><h3>Crear usuario</h3><button class="modal-close" onclick="closeModalCrear()">&times;</button></div>
+        <div class="modal-body">
+          <div class="form-group"><label>Trabajador activo</label>
+            <select class="form-select" id="nuTrabajador"></select>
+          </div>
+          <div class="form-group"><label>Rol</label>
+            <select class="form-select" id="nuRol">
+              <option value="Empleado">Empleado</option>
+              <option value="Administrador">Administrador</option>
+            </select>
+          </div>
+          <div class="gu-hint" style="margin-top:6px;">Solo aparecen trabajadores activos con correo registrado. El nuevo usuario tendrá acceso completo a todos los módulos; usa la herramienta "Permisos por módulo" para restringirlo.</div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline" onclick="closeModalCrear()">Cancelar</button>
+          <button class="btn btn-usuarios" onclick="guardarCrear()">Crear usuario</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-config.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/modules.js"></script>
+    <script src="../js/module-help.js"></script>
+    <script src="../js/access.js"></script>
+    <script>
+      let plantillaAll = [];
+      let accesosByWorker = {};
+      let cargosById = {};
+      let selectedAccWorker = null;
+      let selModulos = {};
+
+      function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+      async function loadDatos() {
+        const [pRes, cRes, aRes] = await Promise.all([
+          supabaseClient.from('plantilla_trabajadores').select('*').eq('estado', 'Activo').order('nombres'),
+          supabaseClient.from('est_cargos').select('id,titulo').order('titulo'),
+          supabaseClient.from('usuario_accesos').select('*')
+        ]);
+        cargosById = {};
+        (cRes.data || []).forEach(function (c) { cargosById[c.id] = c.titulo; });
+        plantillaAll = (pRes.data || []).filter(function (w) { return w.estado === 'Activo'; });
+        accesosByWorker = {};
+        (aRes.data || []).forEach(function (a) { accesosByWorker[a.trabajador_id] = a; });
+        llenarSelectUsuarios();
+        renderUsuarios();
+      }
+
+      function llenarSelectUsuarios() {
+        const sel = document.getElementById('accUsuario');
+        sel.innerHTML = plantillaAll.map(function (w) {
+          return '<option value="' + w.id + '">' + esc(w.nombres) + ' ' + esc(w.apellidos) + ' — ' + esc(w.correo || 'sin correo') + '</option>';
+        }).join('');
+        if (selectedAccWorker) {
+          const still = plantillaAll.some(function (w) { return w.id === selectedAccWorker; });
+          if (still) sel.value = selectedAccWorker;
+          else { selectedAccWorker = null; buildSelModulos(null); renderMatrix(); }
+        }
+      }
+
+      function renderUsuarios() {
+        const tbody = document.getElementById('usuariosBody');
+        const q = (document.getElementById('filUsuarios').value || '').toLowerCase();
+        const rows = plantillaAll.filter(function (w) {
+          return (w.nombres + ' ' + w.apellidos + ' ' + (w.correo || '')).toLowerCase().indexOf(q) !== -1;
+        });
+        if (!rows.length) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay trabajadores activos</td></tr>';
+          return;
+        }
+        tbody.innerHTML = rows.map(function (w) {
+          const acc = accesosByWorker[w.id];
+          const configurado = !!acc;
+          const rol = acc ? acc.rol : null;
+          const activo = acc ? (acc.activo !== false) : true;
+          const cargo = w.cargo_id ? (cargosById[w.cargo_id] || '—') : '—';
+          const nMod = acc ? Object.keys(acc.modulos || {}).length : 'Todos';
+          const rolBadge = rol === 'Administrador' ? '<span class="badge badge-active">Admin</span>' : (rol ? '<span class="badge badge-pending">Empleado</span>' : '<span class="text-secondary">—</span>');
+          const estBadge = activo ? '<span class="badge badge-active">Activo</span>' : '<span class="badge badge-inactive">Desactivado</span>';
+          const accBadge = configurado ? '<span class="badge badge-active">Configurado (' + nMod + ')</span>' : '<span class="badge badge-pending">Sin configurar</span>';
+          return '<tr>' +
+            '<td><div style="font-weight:600;">' + esc(w.nombres) + ' ' + esc(w.apellidos) + '</div><div style="font-size:11px;color:var(--color-text-secondary);">C.I. ' + esc(w.cedula) + '</div></td>' +
+            '<td>' + esc(w.correo || '—') + '</td>' +
+            '<td>' + esc(cargo) + '</td>' +
+            '<td>' + accBadge + '</td>' +
+            '<td>' + rolBadge + '</td>' +
+            '<td>' + estBadge + '</td>' +
+            '<td style="white-space:nowrap;">' +
+              '<button class="btn btn-sm btn-usuarios" onclick="abrirAccesos(\'' + w.id + '\')"><i class="fi fi-sr-shield-check" style="font-size:14px;pointer-events:none;"></i> Accesos</button>' +
+              (configurado ? ' <button class="btn btn-sm btn-outline" onclick="toggleActivo(\'' + w.id + '\')">' + (activo ? 'Desactivar' : 'Activar') + '</button>' +
+              ' <button class="btn btn-sm btn-outline" onclick="eliminarUsuario(\'' + w.id + '\')" style="color:#dc2626;"><i class="fi fi-sr-trash" style="font-size:14px;pointer-events:none;"></i></button>' : '') +
+            '</td>' +
+          '</tr>';
+        }).join('');
+      }
+
+      function openModalCrear() {
+        const candidatos = plantillaAll.filter(function (w) { return (w.correo || '').trim() && !accesosByWorker[w.id]; });
+        const sel = document.getElementById('nuTrabajador');
+        sel.innerHTML = candidatos.length
+          ? candidatos.map(function (w) { return '<option value="' + w.id + '">' + esc(w.nombres) + ' ' + esc(w.apellidos) + ' — ' + esc(w.correo) + '</option>'; }).join('')
+          : '<option value="">No hay trabajadores activos sin configurar</option>';
+        document.getElementById('modalCrear').classList.add('show');
+      }
+
+      function closeModalCrear() { document.getElementById('modalCrear').classList.remove('show'); }
+
+      async function guardarCrear() {
+        const id = document.getElementById('nuTrabajador').value;
+        if (!id) { showAlert('Selecciona un trabajador', 'warning'); return; }
+        const rol = document.getElementById('nuRol').value;
+        const modulos = {};
+        window.FIAT_MODULES.forEach(function (m) { if (m.key !== 'gestion-usuarios.html') modulos[m.key] = ['*']; });
+        const { error } = await supabaseClient.from('usuario_accesos').upsert(
+          { trabajador_id: id, rol: rol, modulos: modulos, activo: true },
+          { onConflict: 'trabajador_id' }
+        );
+        if (error) { showAlert('Error al crear: ' + error.message, 'error'); return; }
+        closeModalCrear();
+        showAlert('Usuario creado. Configura sus permisos por módulo.', 'success');
+        await loadDatos();
+      }
+
+      async function toggleActivo(id) {
+        const acc = accesosByWorker[id];
+        if (!acc) return;
+        const nuevo = acc.activo === false;
+        const { error } = await supabaseClient.from('usuario_accesos').update({ activo: nuevo }).eq('id', acc.id);
+        if (error) { showAlert('Error: ' + error.message, 'error'); return; }
+        showAlert(nuevo ? 'Acceso activado' : 'Acceso desactivado', 'success');
+        await loadDatos();
+      }
+
+      async function eliminarUsuario(id) {
+        const acc = accesosByWorker[id];
+        if (!acc) return;
+        if (!(await showConfirm('¿Eliminar la configuración de acceso de este usuario? Podrá seguir ingresando con acceso completo (configuración inicial).'))) return;
+        const { error } = await supabaseClient.from('usuario_accesos').delete().eq('id', acc.id);
+        if (error) { showAlert('Error: ' + error.message, 'error'); return; }
+        showAlert('Configuración eliminada', 'success');
+        await loadDatos();
+      }
+
+      function onUsuarioCambio(id) { if (id) abrirAccesos(id); }
+
+      function abrirAccesos(id) {
+        selectedAccWorker = id;
+        const acc = accesosByWorker[id];
+        document.getElementById('accRol').value = acc ? acc.rol : 'Empleado';
+        buildSelModulos(acc ? acc.modulos : null);
+        renderMatrix();
+        switchTool('accesos');
+      }
+
+      function buildSelModulos(mod) {
+        selModulos = {};
+        if (mod && typeof mod === 'object') {
+          Object.keys(mod).forEach(function (k) { selModulos[k] = mod[k]; });
+        } else {
+          window.FIAT_MODULES.forEach(function (m) { if (m.key !== 'gestion-usuarios.html') selModulos[m.key] = ['*']; });
+        }
+      }
+
+      function renderMatrix() {
+        const c = document.getElementById('accesosMatrix');
+        if (!selectedAccWorker) { c.innerHTML = '<div class="gu-resumen">Selecciona un usuario para configurar sus accesos.</div>'; return; }
+        const mods = window.FIAT_MODULES.filter(function (m) { return m.key !== 'gestion-usuarios.html'; });
+        c.innerHTML = mods.map(function (m) {
+          const toolsArr = selModulos[m.key] || [];
+          const visible = selModulos[m.key] !== undefined;
+          const all = toolsArr.indexOf('*') !== -1;
+          const chips = m.tools.map(function (t) {
+            const on = all || toolsArr.indexOf(t.key) !== -1;
+            return '<label class="acc-tool-chip"><input type="checkbox" class="acc-tool-check" value="' + t.key + '" data-mod="' + m.key + '" ' + (on ? 'checked' : '') + (all ? ' disabled' : '') + '> <span>' + esc(t.name) + '</span></label>';
+          }).join('');
+          return '<div class="acc-mod" data-mod="' + m.key + '">' +
+            '<div class="acc-mod-head">' +
+              '<label class="acc-mod-check"><input type="checkbox" class="acc-mod-checkbox" data-mod="' + m.key + '" ' + (visible ? 'checked' : '') + '> <span>' + esc(m.name) + '</span></label>' +
+              '<label class="acc-tool-chip acc-all"><input type="checkbox" class="acc-tool-all" data-mod="' + m.key + '" ' + (all ? 'checked' : '') + '> <span>Todas las herramientas</span></label>' +
+            '</div>' +
+            '<div class="acc-tools" style="' + (visible ? '' : 'display:none;') + '">' + chips + '</div>' +
+          '</div>';
+        }).join('');
+      }
+
+      document.getElementById('accesosMatrix').addEventListener('change', function (e) {
+        const t = e.target;
+        if (!t.classList.contains('acc-mod-checkbox') && !t.classList.contains('acc-tool-all') && !t.classList.contains('acc-tool-check')) return;
+        const mod = t.dataset.mod;
+        const row = document.querySelector('.acc-mod[data-mod="' + mod + '"]');
+        if (!row) return;
+        const toolsEl = row.querySelector('.acc-tools');
+        const tools = row.querySelectorAll('.acc-tool-check');
+        const all = row.querySelector('.acc-tool-all');
+        const modCheck = row.querySelector('.acc-mod-checkbox');
+
+        if (t.classList.contains('acc-mod-checkbox')) {
+          if (t.checked) {
+            selModulos[mod] = ['*'];
+            toolsEl.style.display = '';
+            all.checked = true;
+            tools.forEach(function (x) { x.checked = true; x.disabled = true; });
+          } else {
+            delete selModulos[mod];
+            toolsEl.style.display = 'none';
+          }
+        } else if (t.classList.contains('acc-tool-all')) {
+          if (t.checked) {
+            selModulos[mod] = ['*'];
+            tools.forEach(function (x) { x.checked = true; x.disabled = true; });
+          } else {
+            selModulos[mod] = [];
+            tools.forEach(function (x) { x.checked = false; x.disabled = false; });
+          }
+        } else {
+          if (t.checked) {
+            all.checked = false;
+            tools.forEach(function (x) { x.disabled = false; });
+          }
+          selModulos[mod] = Array.prototype.filter.call(tools, function (x) { return x.checked; }).map(function (x) { return x.value; });
+        }
+      });
+
+      async function guardarAccesos() {
+        if (!selectedAccWorker) { showAlert('Selecciona un usuario', 'warning'); return; }
+        const rol = document.getElementById('accRol').value;
+        const modulos = {};
+        Object.keys(selModulos).forEach(function (k) { modulos[k] = selModulos[k]; });
+        const { error } = await supabaseClient.from('usuario_accesos').upsert(
+          { trabajador_id: selectedAccWorker, rol: rol, modulos: modulos, activo: true },
+          { onConflict: 'trabajador_id' }
+        );
+        if (error) { showAlert('Error al guardar: ' + error.message, 'error'); return; }
+        showAlert('Accesos guardados correctamente', 'success');
+        await loadDatos();
+        if (selectedAccWorker) {
+          const acc = accesosByWorker[selectedAccWorker];
+          if (acc) { document.getElementById('accRol').value = acc.rol; buildSelModulos(acc.modulos); renderMatrix(); }
+        }
+      }
+
+      function restaurarAccesos() {
+        if (!selectedAccWorker) return;
+        const acc = accesosByWorker[selectedAccWorker];
+        document.getElementById('accRol').value = acc ? acc.rol : 'Empleado';
+        buildSelModulos(acc ? acc.modulos : null);
+        renderMatrix();
+        showAlert('Cambios descartados', 'info');
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        restoreTool();
+        loadDatos();
+      });
+    </script>
+  </div>
+</body>
+</html>

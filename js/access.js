@@ -99,7 +99,13 @@
   function pageOf(url) { return (url || '').split('/').pop(); }
   function currentPage() { return pageOf(location.pathname); }
   function inModules() { return location.pathname.indexOf('/modules/') !== -1; }
-  function baseModule(page) { return PARENT[page] || page; }
+  function baseModule(page) {
+    if ((page === 'trabajador.html' || page === 'trabajador-nuevo.html') && location.search) {
+      var mod = new URLSearchParams(location.search).get('modulo');
+      if (mod) return mod;
+    }
+    return PARENT[page] || page;
+  }
 
   var state = { allow: true, role: 'Empleado', modulos: null, hasRow: false, worker: null, isAdmin: false, manage: false, ready: false };
 

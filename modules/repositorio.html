@@ -65,12 +65,10 @@
       background: var(--module-repositorio);
       color: #fff;
     }
-    .repo-toolbar {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
+    .toolbar-content[data-toolbar="documentos"] .form-input,
+    .toolbar-content[data-toolbar="documentos"] .form-select,
+    .toolbar-content[data-toolbar="categorias"] .form-input,
+    .toolbar-content[data-toolbar="categorias"] .form-select { height: 36px; }
     .repo-view-toggle {
       display: flex;
       gap: 4px;
@@ -90,27 +88,6 @@
     .repo-view-btn.active {
       background: var(--module-repositorio);
       color: white;
-    }
-    .repo-filters {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-    .repo-filter-select {
-      padding: 6px 12px;
-      border: 1px solid var(--color-border);
-      border-radius: 6px;
-      background: white;
-      font-size: 13px;
-      cursor: pointer;
-    }
-    .repo-search {
-      flex: 1;
-      min-width: 200px;
-      padding: 8px 12px;
-      border: 1px solid var(--color-border);
-      border-radius: 6px;
-      font-size: 13px;
     }
     .repo-list-view {
       background: white;
@@ -266,57 +243,6 @@
       border-color: #10b981;
       background: #f0fdf4;
     }
-    .repo-notification-badge {
-      position: relative;
-      display: inline-block;
-    }
-    .repo-notification-count {
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      background: #ef4444;
-      color: white;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .repo-notification-dropdown {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      width: 320px;
-      max-height: 400px;
-      overflow-y: auto;
-      background: white;
-      border: 1px solid var(--color-border);
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      z-index: 1000;
-      display: none;
-    }
-    .repo-notification-dropdown.show {
-      display: block;
-    }
-    .repo-notification-item {
-      padding: 12px;
-      border-bottom: 1px solid var(--color-border);
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-    .repo-notification-item:hover {
-      background: var(--color-bg);
-    }
-    .repo-notification-item.unread {
-      background: #f0f9ff;
-    }
-    .repo-notification-item:last-child {
-      border-bottom: none;
-    }
     .repo-preview-modal {
       max-width: 90vw;
       max-height: 90vh;
@@ -450,11 +376,6 @@
       </select>
       <div class="nav-user">
         <span id="navUserEmail"></span>
-        <div class="repo-notification-badge">
-          <button class="btn-nav-logout" id="notificationBtn" style="background:transparent;"><i class="fi fi-sr-bell"></i></button>
-          <span class="repo-notification-count" id="notificationCount" style="display:none;">0</span>
-          <div class="repo-notification-dropdown" id="notificationDropdown"></div>
-        </div>
         <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
       </div>
     </nav>
@@ -469,41 +390,41 @@
         </div>
 
         <div class="module-body">
-          <header class="topbar">
-            <div><h1>Repositorio</h1><div class="topbar-breadcrumb">Inicio / Repositorio</div></div>
+          <header class="topbar" style="gap:16px;">
+            <div class="toolbar-content" data-toolbar="documentos" style="display:flex;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
+              <div class="form-group" style="margin:0;flex:1;min-width:200px;"><label>Buscar</label>
+                <input type="text" class="form-input" id="searchInput" name="buscarDocumentos" placeholder="Buscar documentos..." autocomplete="off" spellcheck="false" oninput="filterDocuments()">
+              </div>
+              <div class="form-group" style="margin:0;"><label>Categoría</label>
+                <select class="form-select" id="filterCategoria" onchange="filterDocuments()">
+                  <option value="">Todas las categorías</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0;"><label>Subcategoría</label>
+                <select class="form-select" id="filterSubcategoria" onchange="filterDocuments()">
+                  <option value="">Todas las subcategorías</option>
+                </select>
+              </div>
+              <div class="repo-view-toggle" style="margin-bottom:6px;">
+                <button class="repo-view-btn active" onclick="switchView('list', this)"><i class="fi fi-sr-list"></i> Lista</button>
+                <button class="repo-view-btn" onclick="switchView('tree', this)"><i class="fi fi-sr-folder"></i> Carpetas</button>
+              </div>
+              <button class="btn btn-repositorio btn-sm" onclick="openUploadModal()">+ Subir documento</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="categorias" style="display:none;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
+              <span style="font-size:13px;color:var(--color-text-secondary);margin-bottom:8px;">Administra las categorías y subcategorías del repositorio.</span>
+              <button class="btn btn-repositorio btn-sm" style="margin-left:auto;" onclick="openCategoryModal()">+ Nueva categoría</button>
+            </div>
           </header>
 
           <div class="module-content">
             <!-- Vista Documentos -->
             <div class="tool-section active" id="tool-documentos">
-              <div class="tool-section-header">
-                <h2 style="color:var(--module-repositorio);">Documentos</h2>
-                <button class="btn btn-repositorio" onclick="openUploadModal()">+ Subir documento</button>
-              </div>
-              <div class="repo-toolbar">
-                <input type="text" class="repo-search" id="searchInput" placeholder="Buscar documentos..." oninput="filterDocuments()">
-                <div class="repo-filters">
-                  <select class="repo-filter-select" id="filterCategoria" onchange="filterDocuments()">
-                    <option value="">Todas las categorías</option>
-                  </select>
-                  <select class="repo-filter-select" id="filterSubcategoria" onchange="filterDocuments()">
-                    <option value="">Todas las subcategorías</option>
-                  </select>
-                </div>
-                <div class="repo-view-toggle">
-<button class="repo-view-btn active" onclick="switchView('list', this)"><i class="fi fi-sr-list"></i> Lista</button>
-                <button class="repo-view-btn" onclick="switchView('tree', this)"><i class="fi fi-sr-folder"></i> Carpetas</button>
-                </div>
-              </div>
               <div id="documentsContainer"></div>
             </div>
 
             <!-- Vista Categorías -->
             <div class="tool-section" id="tool-categorias">
-              <div class="tool-section-header">
-                <h2 style="color:var(--module-repositorio);">Categorías</h2>
-                <button class="btn btn-repositorio" onclick="openCategoryModal()">+ Nueva categoría</button>
-              </div>
               <div id="categoriesContainer"></div>
             </div>
           </div>
@@ -546,13 +467,13 @@
           <div id="passwordFields" style="display:none;">
             <div class="form-group"><label>Contraseña *</label>
               <div class="password-wrap">
-                <input type="password" class="form-input" id="docPassword" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+                <input type="password" class="form-input" id="docPassword" autocomplete="new-password" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
                 <button type="button" class="password-toggle" onclick="togglePassword('docPassword', this)" tabindex="-1"><i class="fi-sr-eye"></i></button>
               </div>
             </div>
             <div class="form-group"><label>Confirmar contraseña *</label>
               <div class="password-wrap">
-                <input type="password" class="form-input" id="docPasswordConfirm" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+                <input type="password" class="form-input" id="docPasswordConfirm" autocomplete="new-password" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
                 <button type="button" class="password-toggle" onclick="togglePassword('docPasswordConfirm', this)" tabindex="-1"><i class="fi-sr-eye"></i></button>
               </div>
             </div>
@@ -574,7 +495,7 @@
         <p style="margin-bottom:16px;" id="passwordModalMsg">Este documento está protegido con contraseña. Ingresa la contraseña para descargar.</p>
         <div class="form-group"><label>Contraseña</label>
           <div class="password-wrap">
-            <input type="password" class="form-input" id="downloadPassword" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+            <input type="password" class="form-input" id="downloadPassword" autocomplete="new-password" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
             <button type="button" class="password-toggle" onclick="togglePassword('downloadPassword', this)" tabindex="-1"><i class="fi-sr-eye"></i></button>
           </div>
         </div>
@@ -667,7 +588,6 @@
       await loadCategorias();
       await loadSubcategorias();
       await loadDocumentos();
-      await loadNotifications();
     });
 
     // ============================================
@@ -725,39 +645,6 @@
       documentos = data || [];
       renderDocumentos();
       renderCategorias();
-    }
-
-    async function loadNotifications() {
-      const { data, error } = await supabaseClient
-        .from('repo_notificaciones')
-        .select('*')
-        .eq('leido', false)
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        console.error('Error cargando notificaciones:', error);
-        return;
-      }
-      
-      const count = data ? data.length : 0;
-      const countEl = document.getElementById('notificationCount');
-      const dropdown = document.getElementById('notificationDropdown');
-      
-      if (count > 0) {
-        countEl.textContent = count;
-        countEl.style.display = 'flex';
-        
-        dropdown.innerHTML = data.map(n => `
-          <div class="repo-notification-item unread" onclick="markAsRead(${n.id}, ${n.documento_id})">
-            <div style="font-weight:600;font-size:13px;margin-bottom:4px;">${n.tipo === 'nuevo_documento' ? '<i class="fi fi-sr-file"></i> Nuevo documento' : '<i class="fi fi-sr-refresh"></i> Nueva versión'}</div>
-            <div style="font-size:12px;color:var(--color-text-secondary);">${n.mensaje}</div>
-            <div style="font-size:11px;color:var(--color-text-secondary);margin-top:4px;">${new Date(n.created_at).toLocaleString('es-VE')}</div>
-          </div>
-        `).join('');
-      } else {
-        countEl.style.display = 'none';
-        dropdown.innerHTML = '<div style="padding:20px;text-align:center;color:var(--color-text-secondary);">No hay notificaciones</div>';
-      }
     }
 
     // ============================================
@@ -1172,8 +1059,6 @@
             .eq('id', editingDocId);
           
           if (error) throw error;
-          
-          await createNotification(editingDocId, 'nueva_version', `Se actualizó: ${titulo}`);
         } else {
           const { data, error } = await supabaseClient
             .from('repo_documentos')
@@ -1196,13 +1081,10 @@
             .single();
           
           if (error) throw error;
-          
-          await createNotification(data.id, 'nuevo_documento', `Nuevo documento: ${titulo}`);
         }
         
         closeModal('modalUpload');
         await loadDocumentos();
-        await loadNotifications();
       } catch (error) {
         console.error('Error guardando documento:', error);
         showAlert('Error: ' + error.message, 'error');
@@ -1530,39 +1412,6 @@
     }
 
     // ============================================
-    // NOTIFICACIONES
-    // ============================================
-
-    async function createNotification(documentoId, tipo, mensaje) {
-      try {
-        await supabaseClient
-          .from('repo_notificaciones')
-          .insert([{
-            documento_id: documentoId,
-            usuario_id: null,
-            tipo: tipo,
-            mensaje: mensaje
-          }]);
-      } catch (error) {
-        console.error('Error creando notificación:', error);
-      }
-    }
-
-    async function markAsRead(notificationId, documentoId) {
-      try {
-        await supabaseClient
-          .from('repo_notificaciones')
-          .update({ leido: true })
-          .eq('id', notificationId);
-        
-        await loadNotifications();
-        previewDocument(documentoId);
-      } catch (error) {
-        console.error('Error marcando notificación:', error);
-      }
-    }
-
-    // ============================================
     // UTILIDADES
     // ============================================
 
@@ -1595,15 +1444,8 @@
     function closeModal(id) {
       document.getElementById(id).classList.remove('show');
     }
-
-    document.getElementById('notificationBtn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      document.getElementById('notificationDropdown').classList.toggle('show');
-    });
-
-    document.addEventListener('click', () => {
-      document.getElementById('notificationDropdown').classList.remove('show');
-    });
   </script>
+
+<script src="../js/module-help.js"></script>
 </body>
 </html>

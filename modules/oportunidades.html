@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oportunidades de acción - FIAT Intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
+  <style>
+    :root { --module-color: var(--module-oportunidades); }
+    .tool-section.active { height: 100%; overflow-y: auto; padding-right: 4px; }
+    .op-intro { margin-bottom: 20px; }
+    .op-intro h2 { font-size: 18px; font-weight: 700; margin: 0 0 6px; }
+    .op-intro p { margin: 0; color: var(--color-text-secondary); font-size: 13px; }
+    .op-hero { display: flex; gap: 16px; align-items: flex-start; background: linear-gradient(135deg, rgba(101,163,13,0.12), rgba(101,163,13,0.04)); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 22px 24px; margin-bottom: 18px; }
+    .op-hero-icon { width: 52px; height: 52px; flex-shrink: 0; border-radius: var(--radius-lg); background: var(--module-oportunidades); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: var(--shadow-md); }
+    .op-hero h2 { font-size: 20px; font-weight: 800; margin: 0 0 6px; }
+    .op-hero p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--color-text-secondary); }
+    .op-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 22px; }
+    .op-stat { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 16px 18px; box-shadow: var(--shadow-sm); }
+    .op-stat-value { font-size: 26px; font-weight: 800; color: var(--module-oportunidades); }
+    .op-stat-label { font-size: 12px; color: var(--color-text-secondary); margin-top: 4px; }
+    .op-sec-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; margin: 20px 0 10px; }
+    .op-sec-title i.fi { color: var(--module-oportunidades); font-size: 16px; }
+    .op-list { margin: 0; padding-left: 18px; color: var(--color-text-secondary); font-size: 13px; line-height: 1.9; }
+    .op-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+    .op-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 18px; box-shadow: var(--shadow-sm); transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s; }
+    .op-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: rgba(101,163,13,0.45); }
+    .op-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .op-card-icon { width: 42px; height: 42px; border-radius: var(--radius-md); background: rgba(101,163,13,0.12); color: var(--module-oportunidades); display: flex; align-items: center; justify-content: center; font-size: 19px; }
+    .op-chip { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-secondary); border: 1px solid var(--color-border); border-radius: 999px; padding: 3px 10px; }
+    .op-card h4 { margin: 0 0 8px; font-size: 15px; font-weight: 700; }
+    .op-card > p { margin: 0 0 10px; font-size: 12.5px; line-height: 1.55; color: var(--color-text-secondary); }
+    .op-card ul { margin: 0; padding-left: 16px; font-size: 12.5px; line-height: 1.8; color: var(--color-text); }
+    .op-note { display: flex; gap: 12px; align-items: flex-start; background: var(--color-bg); border: 1px dashed var(--color-border); border-radius: var(--radius-md); padding: 14px 16px; margin-top: 18px; font-size: 12.5px; color: var(--color-text-secondary); }
+    .op-note i.fi { color: var(--module-oportunidades); font-size: 18px; margin-top: 1px; }
+    .op-note b { color: var(--color-text); }
+    .op-phases { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+    .op-phase { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 18px; box-shadow: var(--shadow-sm); }
+    .op-phase-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .op-phase-head h4 { margin: 0; font-size: 15px; font-weight: 700; }
+    .op-phase-badge { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; color: #fff; border-radius: 999px; padding: 4px 12px; }
+    .op-phase-badge.p1 { background: #0d9488; }
+    .op-phase-badge.p2 { background: #d97706; }
+    .op-phase-badge.p3 { background: #7c3aed; }
+    .op-phase > p { margin: 0 0 12px; font-size: 12.5px; line-height: 1.55; color: var(--color-text-secondary); }
+    .op-phase-list { list-style: none; margin: 0; padding: 0; }
+    .op-phase-list li { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px dashed var(--color-border); font-size: 13px; }
+    .op-phase-list li i.fi { color: var(--color-text-secondary); font-size: 15px; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+
+    <nav class="topnav" style="background:var(--module-oportunidades);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><img class="topnav-logo" src="../icons/logo FIAT.webp" alt="FIAT">VEN<span>-Intranet</span></div>
+      <div class="topnav-spacer"></div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Dashboard</option>
+        <option value="captacion.html">Captación y Selección</option>
+        <option value="relaciones-laborales.html">Relaciones Laborales</option>
+        <option value="capacitacion.html">Capacitación y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="compensacion.html">Compensación</option>
+        <option value="finanzas.html">Finanzas</option>
+        <option value="repositorio.html">Repositorio</option>
+        <option value="chatfiat.html">ChatFIAT</option>
+        <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
+      </select>
+      <div class="nav-user">
+        <span id="navUserEmail"></span>
+        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-panel">
+          <div class="panel-item active" data-tool="vision" onclick="switchTool('vision')" title="Visión general"><span class="panel-item-indicator bg-oportunidades"></span><i class="fi fi-sr-bullseye" style="font-size:24px;pointer-events:none;"></i></div>
+          <div class="panel-item" data-tool="oportunidades" onclick="switchTool('oportunidades')" title="Oportunidades de crecimiento"><span class="panel-item-indicator bg-oportunidades"></span><i class="fi fi-sr-rocket" style="font-size:24px;pointer-events:none;"></i></div>
+          <div class="panel-item" data-tool="roadmap" onclick="switchTool('roadmap')" title="Hoja de ruta"><span class="panel-item-indicator bg-oportunidades"></span><i class="fi fi-sr-route" style="font-size:24px;pointer-events:none;"></i></div>
+        </div>
+
+        <div class="module-body">
+          <div class="module-content">
+
+            <div class="tool-section active" id="tool-vision">
+              <div class="op-hero">
+                <div class="op-hero-icon"><i class="fi fi-sr-rocket"></i></div>
+                <div>
+                  <h2>La intranet FIAT puede crecer</h2>
+                  <p>Este módulo reúne las oportunidades de evolución de la intranet para apoyar nuevas áreas y procesos de la empresa: desde seguridad física y gestión de la zona gourmet, hasta CRM de ventas, comunicaciones unificadas, evaluaciones de desempeño por puesto e inteligencia de negocio.</p>
+                </div>
+              </div>
+
+              <div class="op-stats">
+                <div class="op-stat"><div class="op-stat-value">11</div><div class="op-stat-label">Oportunidades propuestas</div></div>
+                <div class="op-stat"><div class="op-stat-value">6</div><div class="op-stat-label">Áreas de la empresa cubiertas</div></div>
+                <div class="op-stat"><div class="op-stat-value">3</div><div class="op-stat-label">Fases de implementación</div></div>
+                <div class="op-stat"><div class="op-stat-value">100%</div><div class="op-stat-label">Integrado a la plataforma actual</div></div>
+              </div>
+
+              <div class="op-sec-title"><i class="fi fi-sr-lightbulb-exclamation"></i> ¿Qué encontrarás en este módulo?</div>
+              <ul class="op-list">
+                <li><b>Oportunidades de crecimiento:</b> catálogo de nuevas capacidades, cada una con su descripción y beneficios esperados.</li>
+                <li><b>Hoja de ruta:</b> fases sugeridas para priorizar e implementar las oportunidades según su impacto y esfuerzo.</li>
+                <li>Todas las propuestas se integran con la infraestructura actual (Supabase, login, navegación) sin duplicar esfuerzos.</li>
+              </ul>
+            </div>
+
+            <div class="tool-section" id="tool-oportunidades">
+              <div class="op-intro">
+                <h2>Oportunidades de crecimiento</h2>
+                <p>Capacidades propuestas para ampliar el alcance de la intranet en toda la organización.</p>
+              </div>
+
+              <div class="op-grid">
+                <div class="op-card">
+                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-camera-security"></i></div><span class="op-chip">Seguridad</span></div>
+                  <h4>Seguridad Física</h4>
+                  <p>Vigilancia electrónica, control de accesos y reporte de novedades de seguridad física en las instalaciones.</p>
+                  <ul>
+                    <li>Registro de rondas de vigilancia</li>
+                    <li>Control de visitantes y accesos</li>
+                    <li>Alertas y novedades de seguridad</li>
+                  </ul>
+                </div>
+
+                <div class="op-card">
+                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-utensils"></i></div><span class="op-chip">Operaciones</span></div>
+                  <h4>Gestión de zona gourmet</h4>
+                  <p>Administración del servicio de la zona gourmet: menús, pedidos, inventario y control de consumo.</p>
+                  <ul>
+                    <li>Menús y programación semanal</li>
+                    <li>Control de inventario y mermas</li>
+                    <li>Reservas y pedidos en línea</li>
+                  </ul>
+                </div>
+
+                <div class="op-card">
+                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-sack-dollar"></i></div><span class="op-chip">Comercial</span></div>
+                  <h4>CRM para el área de ventas</h4>
+                  <p>Seguimiento de clientes, oportunidades de negocio y cierre de ventas para el equipo comercial.</p>
+                  <ul>
+                    <li>Ficha de clientes y contactos</li>
+                    <li>Pipeline de oportunidades</li>
+                    <li>Reportes de ventas por asesor</li>
+                  </ul>
+                </div>
+
+                <div class="op-card">
+                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-video-camera"></i></div><span class="op-chip">Comunicación</span></div>
+                  <h4>Videoconferencias</h4>
+                  <p>Reuniones virtuales integradas a la intranet para equipos remotos y sedes múltiples.</p>
+                  <ul>
+                    <li>Salas de reunión virtuales</li>
+                    <li>Agenda y grabaciones</li>
+                    <li>Integración con el calendario</li>
+                  </ul>
+                </div>
+
+                <div class="op-card">
+                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-calendar"></i></div><span class="op-chip">Comunicación</span></div>
+                  <h4>Calendarios compartidos</h4>
+                  <p>Calendarios por unidad y corporativos para coordinar reuniones, eventos y disponibilidad de recursos.</p>
+                  <ul>
+                    <li>Disponibilidad de salas y equipos</li>
+                    <li>Coordinación de reuniones</li>
+                    <li>Eventos de la empresa</li>
+                  </ul>
+                </div>
+
+                <div class="op-card">
+                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-envelope"></i></div><span class="op-chip">Comunicación</span></div>
+                  <h4>Correos y canales de comunicación</h4>
+                  <p>Uso eficiente del correo corporativo y de los canales de comunicación internos por área y proyecto.</p>
+                  <ul>
+                    <li>Correo corporativo integrado</li>
+                    <li>Directorio de canales y grupos</li>
+                    <li>Políticas y buenas prácticas</li>
+                  </ul>
+                </div>
+
+                <div class="op-card">
+                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-chart-user"></i></div><span class="op-chip">RRHH</span></div>
+                  <h4>Evaluaciones de desempeño por puesto</h4>
+                  <p>Métricas de las evaluaciones del desempeño de cada puesto para decisiones de desarrollo y talento.</p>
+                  <ul>
+                    <li>Matriz de competencias por cargo</li>
+                    <li>Evaluaciones de 360°</li>
+                    <li>Reportes de desempeño por unidad</li>
+                  </ul>
+                </div>
+
+                <div class="op-card">
+                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-user-crown"></i></div><span class="op-chip">RRHH</span></div>
+                  <h4>Portal del empleado</h4>
+                  <p>Autoservicio para el trabajador: recibo de pago, solicitudes, vacaciones y datos personales.</p>
+                  <ul>
+                    <li>Consulta de recibos y nómina</li>
+                    <li>Solicitudes y permisos en línea</li>
+                    <li>Actualización de datos personales</li>
+                  </ul>
+                </div>
+
+                <div class="op-card">
+                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-chart-scatter"></i></div><span class="op-chip">Tecnología</span></div>
+                  <h4>Business Intelligence</h4>
+                  <p>Tableros y análisis de datos consolidados de toda la organización para la toma de decisiones.</p>
+                  <ul>
+                    <li>Tableros por área</li>
+                    <li>Análisis de tendencias</li>
+                    <li>Exportación de reportes</li>
+                  </ul>
+                </div>
+
+                <div class="op-card">
+                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-check-double"></i></div><span class="op-chip">Tecnología</span></div>
+                  <h4>Flujos de aprobación</h4>
+                  <p>Aprobaciones automatizadas de solicitudes, documentos y procesos con trazabilidad completa.</p>
+                  <ul>
+                    <li>Solicitudes con flujo definido</li>
+                    <li>Notificaciones de aprobación</li>
+                    <li>Historial de trámites</li>
+                  </ul>
+                </div>
+
+                <div class="op-card">
+                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-mobile-button"></i></div><span class="op-chip">Tecnología</span></div>
+                  <h4>Conectividad móvil</h4>
+                  <p>Acceso a la intranet desde dispositivos móviles para trabajo de campo y fuera de la oficina.</p>
+                  <ul>
+                    <li>Versión móvil optimizada</li>
+                    <li>Notificaciones push</li>
+                    <li>Acceso seguro desde cualquier lugar</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="op-note">
+                <i class="fi fi-sr-lightbulb-exclamation"></i>
+                <div><b>¿Tienes otra idea?</b> Estas propuestas son la base para el crecimiento de la intranet; cualquier área de la empresa puede proponer nuevas capacidades para incorporar a la hoja de ruta.</div>
+              </div>
+            </div>
+
+            <div class="tool-section" id="tool-roadmap">
+              <div class="op-intro">
+                <h2>Hoja de ruta</h2>
+                <p>Fases sugeridas para priorizar e implementar las oportunidades, ordenadas por impacto y esfuerzo.</p>
+              </div>
+
+              <div class="op-phases">
+                <div class="op-phase">
+                  <div class="op-phase-head"><span class="op-phase-badge p1">Fase 1</span><h4>Fundamentos</h4><span class="op-chip">Corto plazo</span></div>
+                  <p>Capacidades de base que mejoran la operación diaria y la comunicación de toda la empresa.</p>
+                  <ul class="op-phase-list">
+                    <li><i class="fi fi-sr-envelope"></i> Correos y canales de comunicación</li>
+                    <li><i class="fi fi-sr-calendar"></i> Calendarios compartidos</li>
+                    <li><i class="fi fi-sr-user-crown"></i> Portal del empleado</li>
+                    <li><i class="fi fi-sr-check-double"></i> Flujos de aprobación</li>
+                  </ul>
+                </div>
+
+                <div class="op-phase">
+                  <div class="op-phase-head"><span class="op-phase-badge p2">Fase 2</span><h4>Crecimiento</h4><span class="op-chip">Mediano plazo</span></div>
+                  <p>Nuevos módulos que apoyan procesos clave de ventas, operaciones y desarrollo del talento.</p>
+                  <ul class="op-phase-list">
+                    <li><i class="fi fi-sr-sack-dollar"></i> CRM para el área de ventas</li>
+                    <li><i class="fi fi-sr-video-camera"></i> Videoconferencias</li>
+                    <li><i class="fi fi-sr-utensils"></i> Gestión de zona gourmet</li>
+                    <li><i class="fi fi-sr-chart-user"></i> Evaluaciones de desempeño por puesto</li>
+                  </ul>
+                </div>
+
+                <div class="op-phase">
+                  <div class="op-phase-head"><span class="op-phase-badge p3">Fase 3</span><h4>Transformación</h4><span class="op-chip">Largo plazo</span></div>
+                  <p>Capacidades estratégicas que integran datos, seguridad y acceso móvil de toda la organización.</p>
+                  <ul class="op-phase-list">
+                    <li><i class="fi fi-sr-camera-security"></i> Seguridad Física</li>
+                    <li><i class="fi fi-sr-chart-scatter"></i> Business Intelligence</li>
+                    <li><i class="fi fi-sr-mobile-button"></i> Conectividad móvil</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-config.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/modules.js"></script>
+    <script src="../js/module-help.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        restoreTool();
+      });
+    </script>
+  </div>
+</body>
+</html>

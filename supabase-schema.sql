@@ -1668,6 +1668,98 @@ CREATE POLICY "Autenticados eliminar seguimiento okr"
   ON org_okr_seguimiento FOR DELETE TO authenticated USING (true);
 
 -- ============================================
+-- 12.1) INDICADORES DE RRHH
+-- Fuentes de datos de la herramienta Análisis de KPI por unidades:
+-- ausencias, vacantes cubiertas y capacitaciones completadas.
+-- La rotación temprana se calcula directamente de plantilla_trabajadores.
+-- (Ver desarrollo-organizacional.sql para detalles.)
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS rh_ausencias (
+  id BIGSERIAL PRIMARY KEY,
+  trabajador_id UUID NOT NULL REFERENCES plantilla_trabajadores(id) ON DELETE CASCADE,
+  fecha DATE NOT NULL DEFAULT CURRENT_DATE,
+  tipo TEXT NOT NULL DEFAULT 'Injustificada' CHECK (tipo IN ('Justificada', 'Injustificada', 'Permiso', 'Reposo médico')),
+  motivo TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID REFERENCES auth.users(id)
+);
+CREATE INDEX IF NOT EXISTS idx_rh_ausencias_trabajador ON rh_ausencias (trabajador_id);
+CREATE INDEX IF NOT EXISTS idx_rh_ausencias_fecha ON rh_ausencias (fecha);
+
+CREATE TABLE IF NOT EXISTS rh_vacantes (
+  id BIGSERIAL PRIMARY KEY,
+  cargo TEXT NOT NULL,
+  unidad TEXT,
+  vacantes INTEGER NOT NULL DEFAULT 1,
+  fecha_apertura DATE NOT NULL,
+  fecha_cubierta DATE,
+  estado TEXT NOT NULL DEFAULT 'Abierta' CHECK (estado IN ('Abierta', 'Cubierta', 'Cancelada')),
+  nota TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID REFERENCES auth.users(id)
+);
+CREATE INDEX IF NOT EXISTS idx_rh_vacantes_estado ON rh_vacantes (estado);
+CREATE INDEX IF NOT EXISTS idx_rh_vacantes_fecha_apertura ON rh_vacantes (fecha_apertura);
+
+CREATE TABLE IF NOT EXISTS rh_capacitaciones (
+  id BIGSERIAL PRIMARY KEY,
+  trabajador_id UUID NOT NULL REFERENCES plantilla_trabajadores(id) ON DELETE CASCADE,
+  curso_id BIGINT NOT NULL REFERENCES cap_cursos(id) ON DELETE CASCADE,
+  fecha_completado DATE NOT NULL DEFAULT CURRENT_DATE,
+  calificacion NUMERIC(5, 2),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID REFERENCES auth.users(id),
+  CONSTRAINT uq_rh_capacitaciones UNIQUE (trabajador_id, curso_id)
+);
+CREATE INDEX IF NOT EXISTS idx_rh_capacitaciones_trabajador ON rh_capacitaciones (trabajador_id);
+CREATE INDEX IF NOT EXISTS idx_rh_capacitaciones_curso ON rh_capacitaciones (curso_id);
+
+ALTER TABLE rh_ausencias ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Autenticados ver ausencias" ON rh_ausencias;
+CREATE POLICY "Autenticados ver ausencias"
+  ON rh_ausencias FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados crear ausencias" ON rh_ausencias;
+CREATE POLICY "Autenticados crear ausencias"
+  ON rh_ausencias FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Autenticados actualizar ausencias" ON rh_ausencias;
+CREATE POLICY "Autenticados actualizar ausencias"
+  ON rh_ausencias FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados eliminar ausencias" ON rh_ausencias;
+CREATE POLICY "Autenticados eliminar ausencias"
+  ON rh_ausencias FOR DELETE TO authenticated USING (true);
+
+ALTER TABLE rh_vacantes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Autenticados ver vacantes" ON rh_vacantes;
+CREATE POLICY "Autenticados ver vacantes"
+  ON rh_vacantes FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados crear vacantes" ON rh_vacantes;
+CREATE POLICY "Autenticados crear vacantes"
+  ON rh_vacantes FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Autenticados actualizar vacantes" ON rh_vacantes;
+CREATE POLICY "Autenticados actualizar vacantes"
+  ON rh_vacantes FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados eliminar vacantes" ON rh_vacantes;
+CREATE POLICY "Autenticados eliminar vacantes"
+  ON rh_vacantes FOR DELETE TO authenticated USING (true);
+
+ALTER TABLE rh_capacitaciones ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Autenticados ver capacitaciones rh" ON rh_capacitaciones;
+CREATE POLICY "Autenticados ver capacitaciones rh"
+  ON rh_capacitaciones FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados crear capacitaciones rh" ON rh_capacitaciones;
+CREATE POLICY "Autenticados crear capacitaciones rh"
+  ON rh_capacitaciones FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Autenticados actualizar capacitaciones rh" ON rh_capacitaciones;
+CREATE POLICY "Autenticados actualizar capacitaciones rh"
+  ON rh_capacitaciones FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados eliminar capacitaciones rh" ON rh_capacitaciones;
+CREATE POLICY "Autenticados eliminar capacitaciones rh"
+  ON rh_capacitaciones FOR DELETE TO authenticated USING (true);
+
+-- ============================================
 -- 13) GESTIÓN DE USUARIOS Y ACCESOS
 -- Solo trabajadores ACTIVOS pueden ingresar. Por usuario se
 -- configura qué módulos ve y qué herramientas por módulo usa.

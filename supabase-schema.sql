@@ -1085,8 +1085,7 @@ CREATE POLICY "Usuarios autenticados pueden eliminar cursos obligatorios"
 -- ============================================
 -- El módulo Bienestar Social usa además plantilla_trabajadores (herramienta
 -- Plantilla). Estas tablas alimentan las herramientas Préstamos, Pólizas,
--- Historias de gente FIAT, Encuestas y Calendario. También disponibles en
--- bienestar-social.sql.
+-- Historias de gente FIAT, Encuestas y Calendario.
 
 CREATE TABLE IF NOT EXISTS bienestar_prestamos (
   id BIGSERIAL PRIMARY KEY,
@@ -1292,8 +1291,7 @@ CREATE POLICY "Usuarios autenticados pueden eliminar respuestas"
 -- El módulo Seguridad y Salud Laboral usa además seguridad_incidentes (base)
 -- y plantilla_trabajadores / ats_candidatos (Servicio Médico). Estas tablas
 -- alimentan las herramientas Inspecciones (evaluación de campo), Servicio
--- Médico e Inventario de equipos / insumos y medicamentos. También
--- disponibles en seguridad-salud.sql.
+-- Médico e Inventario de equipos / insumos y medicamentos.
 
 CREATE TABLE IF NOT EXISTS seguridad_inspecciones (
   id BIGSERIAL PRIMARY KEY,
@@ -1672,7 +1670,6 @@ CREATE POLICY "Autenticados eliminar seguimiento okr"
 -- Fuentes de datos de la herramienta Análisis de KPI por unidades:
 -- ausencias, vacantes cubiertas y capacitaciones completadas.
 -- La rotación temprana se calcula directamente de plantilla_trabajadores.
--- (Ver desarrollo-organizacional.sql para detalles.)
 -- ============================================
 
 CREATE TABLE IF NOT EXISTS rh_ausencias (
@@ -1763,7 +1760,6 @@ CREATE POLICY "Autenticados eliminar capacitaciones rh"
 -- 13) GESTIÓN DE USUARIOS Y ACCESOS
 -- Solo trabajadores ACTIVOS pueden ingresar. Por usuario se
 -- configura qué módulos ve y qué herramientas por módulo usa.
--- (Ver gestion-usuarios.sql para detalles.)
 -- ============================================
 
 CREATE TABLE IF NOT EXISTS usuario_accesos (

@@ -33,6 +33,7 @@
   --module-desarrollo: #d97706;
   --module-finanzas: #b45309;
   --module-oportunidades: #65a30d;
+  --module-usuarios: #0ea5e9;
 }
 
 html, body {
@@ -533,6 +534,7 @@ a {
   .panel-item.active .panel-item-indicator.bg-desarrollo ~ i.fi { color: var(--module-desarrollo); }
   .panel-item.active .panel-item-indicator.bg-finanzas ~ i.fi { color: var(--module-finanzas); }
   .panel-item.active .panel-item-indicator.bg-oportunidades ~ i.fi { color: var(--module-oportunidades); }
+  .panel-item.active .panel-item-indicator.bg-usuarios ~ i.fi { color: var(--module-usuarios); }
 .panel-item-indicator {
   position: absolute;
   top: 0;
@@ -782,6 +784,7 @@ a {
 .btn-desarrollo { background: var(--module-desarrollo); }
 .btn-finanzas { background: var(--module-finanzas); }
 .btn-oportunidades { background: var(--module-oportunidades); }
+.btn-usuarios { background: var(--module-usuarios); }
 
 .border-captacion { border-color: var(--module-captacion); }
 .border-relaciones { border-color: var(--module-relaciones); }
@@ -795,6 +798,7 @@ a {
 .border-desarrollo { border-color: var(--module-desarrollo); }
 .border-finanzas { border-color: var(--module-finanzas); }
 .border-oportunidades { border-color: var(--module-oportunidades); }
+.border-usuarios { border-color: var(--module-usuarios); }
 
 .text-captacion { color: var(--module-captacion); }
 .text-relaciones { color: var(--module-relaciones); }
@@ -808,6 +812,7 @@ a {
 .text-desarrollo { color: var(--module-desarrollo); }
 .text-finanzas { color: var(--module-finanzas); }
 .text-oportunidades { color: var(--module-oportunidades); }
+.text-usuarios { color: var(--module-usuarios); }
 
 .bg-captacion { background: var(--module-captacion); }
 .bg-relaciones { background: var(--module-relaciones); }
@@ -821,6 +826,7 @@ a {
 .bg-desarrollo { background: var(--module-desarrollo); }
 .bg-finanzas { background: var(--module-finanzas); }
 .bg-oportunidades { background: var(--module-oportunidades); }
+.bg-usuarios { background: var(--module-usuarios); }
 
 /* ===== EMPTY STATE ===== */
 .empty-state {
@@ -1472,5 +1478,185 @@ a {
   font-size: 13px;
   line-height: 1.55;
   color: var(--color-text-secondary);
+}
+
+/* ===== RESPONSIVE ===== */
+.tabla-scroll {
+  overflow-x: auto;
+}
+
+@media (max-width: 900px) {
+  .topnav {
+    padding: 0 16px;
+    gap: 12px;
+  }
+  .content-area {
+    padding: 20px;
+  }
+  .module-content {
+    padding: 18px 16px;
+  }
+  .module-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  html {
+    font-size: 13px;
+  }
+
+  /* Top nav: logo y usuario arriba, selector de módulos abajo */
+  .topnav {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  .topnav-brand {
+    font-size: 14px;
+  }
+  .topnav-brand span {
+    display: none;
+  }
+  .topnav-logo {
+    height: 28px;
+    margin-right: 6px;
+  }
+  .nav-select {
+    order: 3;
+    flex: 1 1 100%;
+    min-width: 0;
+    width: 100%;
+  }
+  .nav-help-btn {
+    order: 3;
+    margin-left: 0;
+  }
+  #navUserEmail {
+    display: none;
+  }
+  .nav-user {
+    margin-left: auto;
+    gap: 8px;
+  }
+
+  /* Contenido y barras */
+  .content-area {
+    padding: 14px 12px;
+  }
+  .topbar {
+    padding: 12px 16px;
+  }
+  .topbar h1 {
+    font-size: 16px;
+  }
+
+  /* Dashboard: una columna */
+  .module-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .module-card {
+    padding: 20px;
+  }
+
+  /* Layout del módulo: panel horizontal arriba */
+  .module-layout {
+    flex-direction: column;
+  }
+  .module-panel {
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+    padding: 6px 10px;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+    overflow-x: auto;
+    flex-shrink: 0;
+  }
+  .panel-item {
+    flex-shrink: 0;
+  }
+  .module-content {
+    padding: 14px 12px;
+    overflow-y: auto;
+  }
+  .tool-section.active {
+    overflow-x: auto;
+  }
+
+  /* Vistas con altura fija: scroll interno del section */
+  #atsTableView,
+  #atsKanbanView,
+  #estUnidadesView {
+    height: auto;
+    max-height: calc(100vh - 220px);
+  }
+
+  /* Tablas: scroll horizontal */
+  .tabla-scroll {
+    overflow-x: auto;
+  }
+  .data-table,
+  .table {
+    min-width: 560px;
+  }
+
+  /* Toolbars que envuelven */
+  .toolbar-content {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  .tool-section-header,
+  .module-page-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Formularios y modales */
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .form-card {
+    padding: 20px;
+  }
+  .modal {
+    margin: 12px;
+    max-height: 92vh;
+  }
+  .modal-body {
+    padding: 16px;
+  }
+  .modal-header {
+    padding: 14px 16px;
+  }
+  .modal-footer {
+    padding: 12px 16px;
+  }
+
+  /* Kanban: scroll horizontal */
+  .kanban-board {
+    grid-template-columns: repeat(6, minmax(230px, 1fr));
+    overflow-x: auto;
+    height: auto;
+    min-height: 320px;
+  }
+
+  /* Login */
+  .login-page {
+    padding: 16px;
+  }
+  .login-form {
+    padding: 24px;
+  }
+  .login-logo {
+    margin-bottom: 24px;
+  }
+  .login-logo img {
+    max-width: 150px !important;
+  }
 }
 

@@ -37,11 +37,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
+    const errorDiv = document.getElementById('loginError');
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('msg') === 'noacceso') {
+      errorDiv.textContent = 'Acceso restringido: solo trabajadores activos de FIAT pueden ingresar.';
+      errorDiv.classList.add('show');
+    }
+    if (params.get('msg') === 'noverif') {
+      errorDiv.textContent = 'No se pudo verificar tu acceso (problema de base de datos). Revisa el esquema de Supabase o inténtalo de nuevo.';
+      errorDiv.classList.add('show');
+    }
+
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      const errorDiv = document.getElementById('loginError');
       const loginBtn = document.getElementById('loginBtn');
 
       errorDiv.classList.remove('show');
@@ -50,6 +60,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       try {
         await handleLogin(email, password);
+        if (window.fiatAccess) {
+          const ok = await window.fiatAccess.checkActiveWorker();
+          if (!ok) {
+            const st = window.fiatAccess.state;
+            errorDiv.textContent = (st && st.error && st.error !== 'NO_MATCH')
+              ? 'No se pudo verificar tu acceso (problema de base de datos). Revisa la consola o el esquema de Supabase.'
+              : 'Acceso restringido: solo trabajadores activos de FIAT pueden ingresar.';
+            errorDiv.classList.add('show');
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Iniciar sesión';
+            return;
+          }
+        }
         window.location.href = '/dashboard.html';
       } catch (err) {
         errorDiv.textContent = 'Credenciales inválidas. Verifica tu correo y contraseña.';

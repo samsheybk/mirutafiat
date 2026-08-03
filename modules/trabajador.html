@@ -14,6 +14,10 @@
       --module-captacion: var(--module-relaciones);
       --module-color: var(--module-relaciones);
     }
+    body[data-modulo="bienestar"] {
+      --module-captacion: var(--module-bienestar);
+      --module-color: var(--module-bienestar);
+    }
     .det-photo {
       width: 88px;
       height: 88px;
@@ -521,6 +525,29 @@
         if (tabContrato) tabContrato.style.display = '';
         var tallas = document.getElementById('detTallasWrap');
         if (tallas) tallas.style.display = 'none';
+      } else if (mod === 'bienestar') {
+        document.body.setAttribute('data-modulo', 'bienestar');
+        var navSel = document.getElementById('navSelect');
+        if (navSel) navSel.value = 'bienestar-social.html';
+        var crumb = document.querySelector('.topbar-breadcrumb a');
+        if (crumb) {
+          crumb.href = 'bienestar-social.html';
+          crumb.textContent = 'Bienestar Social';
+        }
+        var back = document.querySelector('.topbar .btn-outline');
+        if (back) {
+          back.setAttribute('onclick', "location.href='bienestar-social.html'");
+          back.textContent = '← Volver a plantilla';
+        }
+        document.title = 'Detalle del trabajador - Bienestar Social';
+        var crumbBox = document.querySelector('.topbar-breadcrumb');
+        if (crumbBox) {
+          crumbBox.innerHTML = '<a href="bienestar-social.html" style="color:var(--color-text-secondary);">Bienestar Social</a> / Plantilla de trabajadores';
+        }
+        var tabFam = document.querySelector('.det-tab[data-dtab="familia"]');
+        if (tabFam) tabFam.style.display = '';
+        var tabContrato = document.querySelector('.det-tab[data-dtab="contrato"]');
+        if (tabContrato) tabContrato.style.display = 'none';
       }
     }
 

@@ -200,87 +200,6 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="modalTallas">
-    <div class="modal">
-      <div class="modal-header"><h3 id="modalTallasTitle">Detalle del trabajador</h3><button class="modal-close" onclick="bsHideModal('modalTallas')">&times;</button></div>
-      <div class="modal-body">
-        <div class="form-row">
-          <div class="form-group"><label>Nombre</label><input type="text" class="form-input" id="tallas_nombre" readonly style="background:var(--color-bg);"></div>
-          <div class="form-group"><label>Cédula</label><input type="text" class="form-input" id="tallas_cedula" readonly style="background:var(--color-bg);"></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>Unidad</label><input type="text" class="form-input" id="tallas_unidad" readonly style="background:var(--color-bg);"></div>
-          <div class="form-group"><label>Cargo</label><input type="text" class="form-input" id="tallas_cargo" readonly style="background:var(--color-bg);"></div>
-        </div>
-        <div style="font-size:12px;font-weight:600;color:var(--module-bienestar);margin:14px 0 8px;">Tallas de ropa y calzado</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-          <div class="form-group">
-            <label>Talla de camisa</label>
-            <select class="form-select" id="tallas_camisa">
-              <option value="">— Selecciona —</option>
-              <option value="XS">XS</option>
-              <option value="S">S</option>
-              <option value="M">M</option>
-              <option value="L">L</option>
-              <option value="XL">XL</option>
-              <option value="XXL">XXL</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Talla de franela</label>
-            <select class="form-select" id="tallas_franela">
-              <option value="">— Selecciona —</option>
-              <option value="XS">XS</option>
-              <option value="S">S</option>
-              <option value="M">M</option>
-              <option value="L">L</option>
-              <option value="XL">XL</option>
-              <option value="XXL">XXL</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Talla de pantalón</label>
-            <select class="form-select" id="tallas_pantalon">
-              <option value="">— Selecciona —</option>
-              <option value="28">28</option>
-              <option value="30">30</option>
-              <option value="32">32</option>
-              <option value="34">34</option>
-              <option value="36">36</option>
-              <option value="38">38</option>
-              <option value="40">40</option>
-              <option value="42">42</option>
-              <option value="44">44</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Talla de calzado</label>
-            <select class="form-select" id="tallas_calzado">
-              <option value="">— Selecciona —</option>
-              <option value="34">34</option>
-              <option value="35">35</option>
-              <option value="36">36</option>
-              <option value="37">37</option>
-              <option value="38">38</option>
-              <option value="39">39</option>
-              <option value="40">40</option>
-              <option value="41">41</option>
-              <option value="42">42</option>
-              <option value="43">43</option>
-              <option value="44">44</option>
-              <option value="45">45</option>
-              <option value="46">46</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" onclick="bsHideModal('modalTallas')">Cancelar</button>
-        <button class="btn btn-bienestar" onclick="saveTallas()">Guardar tallas</button>
-      </div>
-    </div>
-  </div>
-
   <div class="modal-overlay" id="modalPrestamo">
     <div class="modal">
       <div class="modal-header"><h3 id="modalPrestamoTitle">Nuevo préstamo</h3><button class="modal-close" onclick="bsHideModal('modalPrestamo')">&times;</button></div>
@@ -464,7 +383,6 @@
     var bienestarTrabajadores = [];
     var bienestarUnidades = [];
     var bienestarCargos = [];
-    var detalleTrabajadorId = null;
 
     function getUnidadNombre(id) {
       var u = bienestarUnidades.find(function(x) { return x.id === id; });
@@ -535,7 +453,9 @@
           + '<td>' + escBienestar(getUnidadNombre(t.unidad_id)) + '</td>'
           + '<td>' + escBienestar(getCargoNombre(t.cargo_id)) + '</td>'
           + '<td class="estado-' + (t.estado || '').toLowerCase() + '">' + escBienestar(t.estado || '-') + '</td>'
-          + '<td><button class="btn btn-sm btn-bienestar" title="Ver detalle y tallas" onclick="openModalTallas(\'' + t.id + '\')"><i class="fi fi-sr-eye" style="font-size:15px;line-height:1;pointer-events:none;"></i> Ver</button></td>'
+          + '<td>'
+          + '<button class="btn btn-sm btn-outline" title="Ver detalle" onclick="location.href=\'trabajador.html?id=' + t.id + '&modulo=bienestar\'"><i class="fi fi-sr-eye" style="font-size:15px;line-height:1;pointer-events:none;"></i></button>'
+          + '</td>'
           + '</tr>';
       }).join('');
     }

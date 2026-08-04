@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Acta de reunión - FIAT Intranet</title>
+  <title>Acta de reunión - Intranet</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -151,7 +151,7 @@
 <body>
   <div class="app-layout">
     <nav class="topnav" style="background:var(--module-relaciones);">
-      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><img class="topnav-logo" src="../icons/logo FIAT.webp" alt="FIAT">VEN<span>-Intranet</span></div>
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><span class="topnav-logo"></span>VEN<span>-Intranet</span></div>
       <div class="topnav-spacer"></div>
       <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
         <option value="../dashboard.html">Dashboard</option>
@@ -163,7 +163,7 @@
         <option value="compensacion.html">Compensación</option>
         <option value="finanzas.html">Finanzas</option>
         <option value="repositorio.html">Repositorio</option>
-        <option value="chatfiat.html">ChatFIAT</option>
+        <option value="chatfiat.html">Mensajería</option>
         <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
       </select>
       <div class="nav-user">
@@ -349,7 +349,7 @@
       var participantes = participantesLista();
 
       var fechaLarga = fecha ? new Date(fecha + 'T00:00:00').toLocaleDateString('es-VE', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
-      var html = '<h2>FIAT VENEZUELA</h2>'
+      var html = '<h2>INTRANET</h2>'
         + '<div class="subtitle">Relaciones Laborales</div>'
         + '<div class="tema">' + escapeHtml(tema || 'ACTA DE REUNIÓN') + '</div>'
         + '<div class="line"><strong>Fecha:</strong>' + escapeHtml(fechaLarga || '-') + '</div>'
@@ -568,7 +568,7 @@
 
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(14);
-      doc.text('FIAT VENEZUELA', ancho / 2, y, { align: 'center' });
+      doc.text('INTRANET', ancho / 2, y, { align: 'center' });
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
       doc.text('Relaciones Laborales', ancho / 2, y + 7, { align: 'center' });

@@ -24,7 +24,7 @@
     },
     'captacion.html': {
       title: 'Captación y Selección',
-      subtitle: 'Gestión integral del proceso de reclutamiento y selección de personal de FIAT.',
+      subtitle: 'Gestión integral del proceso de reclutamiento y selección de personal.',
       accent: '#2563eb',
       tools: [
         { icon: 'fi-sr-users', name: 'ATS', desc: 'Seguimiento de candidatos por etapa del proceso (reclutamiento, entrevista, selección) con vista de tabla y tablero Kanban, filtros por estatus y gestión de requisiciones.' },
@@ -48,7 +48,7 @@
     },
     'capacitacion.html': {
       title: 'Capacitación y Desarrollo',
-      subtitle: 'Formación continua, evaluación de competencias y desarrollo del talento de FIAT.',
+      subtitle: 'Formación continua, evaluación de competencias y desarrollo del talento.',
       accent: '#ea580c',
       tools: [
         { icon: 'fi-sr-graduation-cap', name: 'Cursos', desc: 'Catálogo de cursos internos con contenidos, horarios, instructores y registro de participantes.' },
@@ -66,7 +66,7 @@
         { icon: 'fi-sr-users', name: 'Plantilla de trabajadores', desc: 'Listado de trabajadores para la gestión de beneficios, tallas y programas sociales.' },
         { icon: 'fi-sr-hand-holding-usd', name: 'Préstamos', desc: 'Solicitud y seguimiento de préstamos a trabajadores con control de saldo y cuotas.' },
         { icon: 'fi-sr-shield', name: 'Pólizas', desc: 'Registro de pólizas de seguros de los trabajadores con vigencias y coberturas.' },
-        { icon: 'fi-sr-circle-book-open', name: 'Historias de gente FIAT', desc: 'Muro de historias, logros y reconocimientos de los trabajadores de la empresa.' },
+        { icon: 'fi-sr-circle-book-open', name: 'Historias de gente', desc: 'Muro de historias, logros y reconocimientos de los trabajadores de la empresa.' },
         { icon: 'fi-sr-square-poll-horizontal', name: 'Encuestas', desc: 'Creación y publicación de encuestas con enlace compartible, respuestas y resultados.' },
         { icon: 'fi-sr-calendar', name: 'Calendario', desc: 'Calendario de eventos y actividades sociales de la empresa.' }
       ]
@@ -113,11 +113,11 @@
       ]
     },
     'chatfiat.html': {
-      title: 'ChatFIAT',
-      subtitle: 'La red social interna de FIAT Venezuela para comunicar y conectar a los trabajadores.',
+      title: 'Mensajería',
+      subtitle: 'La red social interna para comunicar y conectar a los trabajadores.',
       accent: '#4f46e5',
       tools: [
-        { icon: 'fi-sr-house-building', name: 'Inicio', desc: 'Página principal de la red social interna: noticias y publicaciones de la comunidad FIAT.' },
+        { icon: 'fi-sr-house-building', name: 'Inicio', desc: 'Página principal de la red social interna: noticias y publicaciones de la comunidad.' },
         { icon: 'fi-sr-envelope', name: 'Mensajes', desc: 'Mensajería interna entre los trabajadores de la empresa.' }
       ]
     },
@@ -143,7 +143,7 @@
     },
     'oportunidades.html': {
       title: 'Oportunidades de acción',
-      subtitle: 'Propuestas de crecimiento de la intranet para cubrir nuevas áreas y necesidades de FIAT.',
+      subtitle: 'Propuestas de crecimiento de la intranet para cubrir nuevas áreas y necesidades de la empresa.',
       accent: '#65a30d',
       tools: [
         { icon: 'fi-sr-bullseye', name: 'Visión general', desc: 'Presentación de cómo la intranet puede crecer para apoyar nuevas áreas de la empresa.' },

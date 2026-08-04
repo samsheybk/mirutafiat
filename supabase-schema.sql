@@ -1149,11 +1149,23 @@ CREATE TABLE IF NOT EXISTS bienestar_calendario (
   user_id UUID REFERENCES auth.users(id)
 );
 
+CREATE TABLE IF NOT EXISTS bienestar_splash (
+  id BIGSERIAL PRIMARY KEY,
+  titulo TEXT NOT NULL,
+  imagen_url TEXT NOT NULL,
+  fecha_inicio DATE,
+  fecha_fin DATE,
+  activo BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID REFERENCES auth.users(id)
+);
+
 ALTER TABLE bienestar_prestamos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bienestar_polizas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bienestar_historias ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bienestar_encuestas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bienestar_calendario ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bienestar_splash ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Usuarios autenticados pueden ver prestamos" ON bienestar_prestamos;
 CREATE POLICY "Usuarios autenticados pueden ver prestamos"
@@ -1219,6 +1231,19 @@ CREATE POLICY "Usuarios autenticados pueden actualizar calendario"
 DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar calendario" ON bienestar_calendario;
 CREATE POLICY "Usuarios autenticados pueden eliminar calendario"
   ON bienestar_calendario FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver splash" ON bienestar_splash;
+CREATE POLICY "Usuarios autenticados pueden ver splash"
+  ON bienestar_splash FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear splash" ON bienestar_splash;
+CREATE POLICY "Usuarios autenticados pueden crear splash"
+  ON bienestar_splash FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar splash" ON bienestar_splash;
+CREATE POLICY "Usuarios autenticados pueden actualizar splash"
+  ON bienestar_splash FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar splash" ON bienestar_splash;
+CREATE POLICY "Usuarios autenticados pueden eliminar splash"
+  ON bienestar_splash FOR DELETE TO authenticated USING (true);
 
 -- ============================================
 -- ENCUESTAS: preguntas y respuestas de trabajadores

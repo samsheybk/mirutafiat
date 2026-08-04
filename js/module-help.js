@@ -68,7 +68,8 @@
         { icon: 'fi-sr-shield', name: 'Pólizas', desc: 'Registro de pólizas de seguros de los trabajadores con vigencias y coberturas.' },
         { icon: 'fi-sr-circle-book-open', name: 'Historias de gente', desc: 'Muro de historias, logros y reconocimientos de los trabajadores de la empresa.' },
         { icon: 'fi-sr-square-poll-horizontal', name: 'Encuestas', desc: 'Creación y publicación de encuestas con enlace compartible, respuestas y resultados.' },
-        { icon: 'fi-sr-calendar', name: 'Calendario', desc: 'Calendario de eventos y actividades sociales de la empresa.' }
+        { icon: 'fi-sr-calendar', name: 'Calendario', desc: 'Calendario mensual de eventos y actividades: selecciona un día para ver lo pautado o agregar eventos, con lista de próximos eventos ordenados por fecha.' },
+        { icon: 'fi-sr-images', name: 'Splash y banners', desc: 'Configura imágenes promocionales (splash/banner) que se muestran a todos los usuarios, por ejemplo para el día del trabajador.' }
       ]
     },
     'seguridad-salud.html': {
@@ -182,6 +183,18 @@
       openHelp();
     });
     sel.parentNode.insertBefore(btn, sel.nextSibling);
+
+    var costsBtn = document.createElement('button');
+    costsBtn.id = 'navCostsBtn';
+    costsBtn.className = 'nav-costs-btn';
+    costsBtn.type = 'button';
+    costsBtn.title = 'Ver propuesta de costos del sistema';
+    costsBtn.innerHTML = '<span>$</span> Costos';
+    costsBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      location.href = (inModules ? '../' : '') + 'costos-sistema.html';
+    });
+    btn.parentNode.insertBefore(costsBtn, btn.nextSibling);
 
     var opt = document.createElement('option');
     opt.value = (inModules ? '' : 'modules/') + 'oportunidades.html';

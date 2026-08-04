@@ -34,6 +34,65 @@
     .enc-opcion .form-input { flex: 1; }
     .enc-opcion .modal-close { width: 24px; height: 24px; flex-shrink: 0; }
     .enc-preguntas-hint { font-size: 12px; color: var(--color-text-secondary); padding: 8px 0; }
+    /* Calendario */
+    .cal-wrap { display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start; }
+    .cal-main { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); padding: 16px; }
+    .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 8px; }
+    .cal-nav h3 { margin: 0; font-size: 16px; font-weight: 700; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .cal-dow { text-align: center; font-size: 11px; font-weight: 600; color: var(--color-text-secondary); padding: 4px 0; }
+    .cal-dia-celda { min-height: 44px; border: 1px solid var(--color-border); border-radius: 6px; padding: 4px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 3px; background: var(--color-bg); transition: border-color .15s ease, background .15s ease; }
+    .cal-dia-celda:hover { border-color: var(--module-bienestar); }
+    .cal-dia-celda.otro-mes { opacity: .35; }
+    .cal-dia-celda.hoy { border-color: var(--module-bienestar); }
+    .cal-dia-celda.sel { background: var(--module-bienestar); border-color: var(--module-bienestar); }
+    .cal-dia-celda.sel .cal-num { color: #fff; }
+    .cal-num { font-size: 12px; font-weight: 600; line-height: 1; color: var(--color-text); }
+    .cal-puntos { display: flex; gap: 2px; min-height: 4px; flex-wrap: wrap; justify-content: center; }
+    .cal-punto { width: 4px; height: 4px; border-radius: 50%; background: var(--module-bienestar); }
+    .cal-dia-celda.sel .cal-punto { background: #fff; }
+    .cal-dia { margin-top: 16px; border-top: 1px solid var(--color-border); padding-top: 14px; }
+    .cal-dia-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+    .cal-dia-head h3 { margin: 0; font-size: 14px; font-weight: 700; }
+    .cal-dia-list { display: flex; flex-direction: column; gap: 8px; min-height: 56px; }
+    .cal-evento { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg); }
+    .cal-evento-hora { flex-shrink: 0; width: 62px; font-size: 12px; font-weight: 600; color: var(--module-bienestar); }
+    .cal-evento-info { flex: 1; min-width: 0; }
+    .cal-evento-info .t { font-size: 13px; font-weight: 600; line-height: 1.3; }
+    .cal-evento-info .m { font-size: 11px; color: var(--color-text-secondary); }
+    .cal-evento-acciones { display: flex; gap: 6px; flex-shrink: 0; }
+    .cal-vacio { font-size: 12px; color: var(--color-text-secondary); padding: 8px 0; }
+    .cal-side { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); padding: 16px; max-height: calc(100vh - 260px); overflow-y: auto; }
+    .cal-side h3 { margin: 0 0 12px; font-size: 14px; font-weight: 700; }
+    .cal-lista { display: flex; flex-direction: column; gap: 8px; }
+    .cal-lista-item { display: flex; gap: 10px; align-items: flex-start; padding: 9px 10px; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-bg); }
+    .cal-lista-fecha { flex-shrink: 0; width: 40px; text-align: center; border-right: 1px solid var(--color-border); padding-right: 10px; }
+    .cal-lista-fecha .d { font-size: 17px; font-weight: 700; color: var(--module-bienestar); line-height: 1; }
+    .cal-lista-fecha .m { font-size: 10px; text-transform: uppercase; color: var(--color-text-secondary); }
+    .cal-lista-info { flex: 1; min-width: 0; }
+    .cal-lista-info .t { font-size: 13px; font-weight: 600; line-height: 1.3; }
+    .cal-lista-info .m { font-size: 11px; color: var(--color-text-secondary); }
+    /* Splash */
+    .splash-banner { position: relative; margin-bottom: 16px; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--color-border); box-shadow: var(--shadow-sm); }
+    .splash-banner img { width: 100%; max-height: 180px; object-fit: cover; display: block; }
+    .splash-banner-caption { position: absolute; left: 0; bottom: 0; right: 0; padding: 28px 16px 10px; background: linear-gradient(to top, rgba(0,0,0,.65), transparent); color: #fff; font-size: 15px; font-weight: 700; }
+    .splash-vista { margin-bottom: 16px; }
+    .splash-vista-card { display: flex; gap: 14px; align-items: center; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 12px; box-shadow: var(--shadow-sm); }
+    .splash-vista-card img { width: 240px; height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid var(--color-border); }
+    .splash-vista-info { font-size: 13px; line-height: 1.5; }
+    .splash-vista-info .t { font-weight: 700; }
+    .splash-thumb { width: 150px; height: 70px; object-fit: cover; border-radius: 6px; border: 1px solid var(--color-border); }
+    .splash-overlay { position: relative; width: 92%; max-width: 860px; margin: auto; }
+    .splash-overlay img { width: 100%; max-height: 80vh; object-fit: contain; border-radius: 12px; display: block; }
+    .splash-show-caption { text-align: center; color: #fff; font-size: 16px; font-weight: 700; margin-top: 10px; }
+    .splash-close { position: absolute; top: 10px; right: 10px; z-index: 5; background: rgba(0,0,0,.55); border-color: transparent; color: #fff; border-radius: 50%; }
+    .splash-close:hover { background: rgba(0,0,0,.8); color: #fff; }
+    @media (max-width: 900px) {
+      .cal-wrap { grid-template-columns: 1fr; }
+      .cal-side { max-height: none; }
+      .splash-vista-card { flex-direction: column; align-items: flex-start; }
+      .splash-vista-card img { width: 100%; height: 160px; }
+    }
   </style>
 </head>
 <body>
@@ -75,6 +134,8 @@
           </div>
           <div class="panel-item" data-tool="calendario" onclick="switchTool('calendario')" title="Calendario"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-calendar" style="font-size:24px;pointer-events:none;"></i>
           </div>
+          <div class="panel-item" data-tool="splash" onclick="switchTool('splash')" title="Splash y banners"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-images" style="font-size:24px;pointer-events:none;"></i>
+          </div>
         </div>
 
         <div class="module-body">
@@ -104,11 +165,16 @@
             </div>
             <div class="toolbar-content" data-toolbar="calendario" style="display:none;align-items:center;gap:16px;width:100%;">
               <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Calendario</h2>
-              <button class="btn btn-bienestar btn-sm" onclick="openModalCalendario()" style="margin-left:auto;">+ Nuevo evento</button>
+              <button class="btn btn-bienestar btn-sm" onclick="openModalCalendario(null, calFechaSel())" style="margin-left:auto;">+ Nuevo evento</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="splash" style="display:none;align-items:center;gap:16px;width:100%;">
+              <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Splash y banners</h2>
+              <button class="btn btn-bienestar btn-sm" onclick="openModalSplash()" style="margin-left:auto;">+ Nueva imagen</button>
             </div>
           </header>
 
           <div class="module-content">
+            <div class="splash-banner" id="splashBanner" style="display:none;"></div>
             <div class="tool-section active" id="tool-plantilla">
               <div class="tabla-scroll">
                 <table class="data-table">
@@ -181,15 +247,37 @@
             </div>
 
             <div class="tool-section" id="tool-calendario">
+              <div class="cal-wrap">
+                <div class="cal-main">
+                  <div class="cal-nav">
+                    <button class="btn btn-sm btn-outline" onclick="calMes(-1)" title="Mes anterior">‹</button>
+                    <h3 id="calTitle"></h3>
+                    <button class="btn btn-sm btn-outline" onclick="calMes(1)" title="Mes siguiente">›</button>
+                  </div>
+                  <div class="cal-grid" id="calGrid"></div>
+                  <div class="cal-dia">
+                    <div class="cal-dia-head">
+                      <h3>Eventos del <span id="calFechaSel"></span></h3>
+                      <button class="btn btn-bienestar btn-sm" onclick="openModalCalendario(null, calFechaSel())">+ Agregar evento</button>
+                    </div>
+                    <div id="calEventosDia" class="cal-dia-list"></div>
+                  </div>
+                </div>
+                <div class="cal-side">
+                  <h3>Todos los eventos</h3>
+                  <div id="calLista" class="cal-lista"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="tool-section" id="tool-splash">
+              <div class="splash-vista" id="splashVista"></div>
               <div class="tabla-scroll">
                 <table class="data-table">
-                  <thead><tr><th>Evento</th><th>Fecha</th><th>Hora</th><th>Lugar</th><th>Tipo</th><th style="width:120px;">Acciones</th></tr></thead>
-                  <tbody id="calendarioBody">
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  <thead><tr><th style="width:200px;">Imagen</th><th>Título</th><th>Vigencia</th><th>Estado</th><th style="width:140px;">Acciones</th></tr></thead>
+                  <tbody id="splashBody">
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
                   </tbody>
                 </table>
               </div>
@@ -350,6 +438,42 @@
         <button class="btn btn-outline" onclick="bsHideModal('modalCalendario')">Cancelar</button>
         <button class="btn btn-bienestar" onclick="saveCalendario()">Guardar</button>
       </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalSplash">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalSplashTitle">Nueva imagen splash</h3><button class="modal-close" onclick="bsHideModal('modalSplash')">&times;</button></div>
+      <div class="modal-body">
+        <form id="formSplash">
+          <div class="form-group"><label>Título</label><input type="text" class="form-input" id="spl_titulo" required placeholder="Ej: Día del trabajador"></div>
+          <div class="form-group">
+            <label>Imagen</label>
+            <input type="file" id="spl_imagen" accept="image/*" onchange="onSplashImagenChange()">
+            <div id="splImagenPreview" style="margin-top:8px;"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Fecha de inicio</label><input type="date" class="form-input" id="spl_fecha_inicio"></div>
+            <div class="form-group"><label>Fecha de fin</label><input type="date" class="form-input" id="spl_fecha_fin"></div>
+          </div>
+          <div class="form-group" style="display:flex;align-items:center;gap:8px;margin-bottom:0;">
+            <input type="checkbox" id="spl_activo" checked style="width:16px;height:16px;">
+            <label for="spl_activo" style="margin:0;">Activo (se muestra a los usuarios)</label>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="bsHideModal('modalSplash')">Cancelar</button>
+        <button class="btn btn-bienestar" onclick="saveSplash()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalSplashShow" style="background:rgba(0,0,0,.88);z-index:3000;">
+    <div class="splash-overlay" id="splashOverlayContent" style="display:none;">
+      <button class="modal-close splash-close" onclick="cerrarSplashShow()">&times;</button>
+      <img id="splashShowImg" src="" alt="Splash">
+      <div class="splash-show-caption" id="splashShowCaption"></div>
     </div>
   </div>
 
@@ -1012,6 +1136,133 @@
     /* ===== CALENDARIO ===== */
     var bienestarCalendario = [];
     var editingCalendarioId = null;
+    var calAnio = new Date().getFullYear();
+    var calMesActual = new Date().getMonth();
+    var calDiaSel = new Date();
+    var MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    var DOW_CORTO = ['Lu','Ma','Mi','Ju','Vi','Sa','Do'];
+
+    function fechaISO(d) {
+      var m = String(d.getMonth() + 1).padStart(2, '0');
+      var dia = String(d.getDate()).padStart(2, '0');
+      return d.getFullYear() + '-' + m + '-' + dia;
+    }
+
+    function fechaCorta(iso) {
+      if (!iso) return '';
+      var p = String(iso).split('-');
+      return p[2] + '/' + p[1] + '/' + p[0];
+    }
+
+    function calFechaSel() {
+      return fechaISO(calDiaSel);
+    }
+
+    function calMes(offset) {
+      var d = new Date(calAnio, calMesActual + offset, 1);
+      calAnio = d.getFullYear();
+      calMesActual = d.getMonth();
+      renderCalendario();
+    }
+
+    function seleccionarDia(d) {
+      calDiaSel = d;
+      renderCalendario();
+    }
+
+    function renderCalendario() {
+      var grid = document.getElementById('calGrid');
+      if (!grid) return;
+      document.getElementById('calTitle').textContent = MESES[calMesActual] + ' ' + calAnio;
+      var hoy = new Date();
+      var hoyISO = fechaISO(hoy);
+      var primero = new Date(calAnio, calMesActual, 1);
+      var offset = (primero.getDay() + 6) % 7;
+      var diasEnMes = new Date(calAnio, calMesActual + 1, 0).getDate();
+      var evPorDia = {};
+      bienestarCalendario.forEach(function(c) {
+        if (!evPorDia[c.fecha]) evPorDia[c.fecha] = [];
+        evPorDia[c.fecha].push(c);
+      });
+      var fechaSel = fechaISO(calDiaSel);
+      var html = DOW_CORTO.map(function(w) { return '<div class="cal-dow">' + w + '</div>'; }).join('');
+      for (var i = 0; i < 42; i++) {
+        var dia = i - offset + 1;
+        if (dia < 1 || dia > diasEnMes) {
+          html += '<div class="cal-dia-celda otro-mes">&nbsp;</div>';
+          continue;
+        }
+        var iso = fechaISO(new Date(calAnio, calMesActual, dia));
+        var cls = 'cal-dia-celda';
+        if (iso === hoyISO) cls += ' hoy';
+        if (iso === fechaSel) cls += ' sel';
+        var evs = evPorDia[iso] || [];
+        var puntos = evs.length
+          ? '<div class="cal-puntos">' + evs.slice(0, 6).map(function() { return '<span class="cal-punto"></span>'; }).join('') + '</div>'
+          : '<div class="cal-puntos"></div>';
+        html += '<div class="' + cls + '" onclick="seleccionarDia(new Date(' + calAnio + ', ' + calMesActual + ', ' + dia + '))">'
+          + '<span class="cal-num">' + dia + '</span>' + puntos + '</div>';
+      }
+      grid.innerHTML = html;
+      document.getElementById('calFechaSel').textContent = fechaCorta(fechaSel);
+      renderEventosDia();
+      renderCalendarioLista();
+    }
+
+    function renderEventosDia() {
+      var cont = document.getElementById('calEventosDia');
+      if (!cont) return;
+      var iso = fechaISO(calDiaSel);
+      var evs = bienestarCalendario.filter(function(c) { return c.fecha === iso; })
+        .sort(function(a, b) { return String(a.hora || '').localeCompare(String(b.hora || '')); });
+      if (!evs.length) {
+        cont.innerHTML = '<div class="cal-vacio">No hay eventos para este día.</div>';
+        return;
+      }
+      cont.innerHTML = evs.map(function(c) {
+        return '<div class="cal-evento">'
+          + '<div class="cal-evento-hora">' + escBienestar(c.hora || 'Todo el día') + '</div>'
+          + '<div class="cal-evento-info">'
+          + '<div class="t">' + escBienestar(c.titulo) + '</div>'
+          + '<div class="m">' + escBienestar([c.tipo, c.lugar].filter(Boolean).join(' · ')) + '</div>'
+          + (c.descripcion ? '<div class="m">' + escBienestar(c.descripcion) + '</div>' : '')
+          + '</div>'
+          + '<div class="cal-evento-acciones">'
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalCalendario(' + c.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteCalendario(' + c.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '</div>'
+          + '</div>';
+      }).join('');
+    }
+
+    function renderCalendarioLista() {
+      var cont = document.getElementById('calLista');
+      if (!cont) return;
+      var ordenados = bienestarCalendario.slice().sort(function(a, b) {
+        if (a.fecha === b.fecha) return String(a.hora || '').localeCompare(String(b.hora || ''));
+        return a.fecha < b.fecha ? -1 : 1;
+      });
+      if (!ordenados.length) {
+        cont.innerHTML = '<div class="cal-vacio">No hay eventos registrados.</div>';
+        return;
+      }
+      cont.innerHTML = ordenados.map(function(c) {
+        var p = String(c.fecha || '').split('-');
+        var dia = p[2] || '?';
+        var mes = MESES[(parseInt(p[1], 10) || 1) - 1].slice(0, 3);
+        return '<div class="cal-lista-item">'
+          + '<div class="cal-lista-fecha"><div class="d">' + dia + '</div><div class="m">' + mes + '</div></div>'
+          + '<div class="cal-lista-info">'
+          + '<div class="t">' + escBienestar(c.titulo) + '</div>'
+          + '<div class="m">' + escBienestar([c.hora, c.tipo, c.lugar].filter(Boolean).join(' · ')) + '</div>'
+          + '</div>'
+          + '<div class="cal-evento-acciones">'
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalCalendario(' + c.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteCalendario(' + c.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '</div>'
+          + '</div>';
+      }).join('');
+    }
 
     async function loadCalendario() {
       try {
@@ -1020,35 +1271,14 @@
         bienestarCalendario = data || [];
         renderCalendario();
       } catch (err) {
-        document.getElementById('calendarioBody').innerHTML =
-          '<tr><td colspan="6" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar el calendario: ' + escBienestar(err.message) + '</td></tr>';
+        var cont = document.getElementById('calEventosDia');
+        if (cont) cont.innerHTML = '<div class="cal-vacio" style="color:#dc2626;">Error al cargar el calendario: ' + escBienestar(err.message) + '</div>';
+        var lista = document.getElementById('calLista');
+        if (lista) lista.innerHTML = '<div class="cal-vacio" style="color:#dc2626;">Error al cargar los eventos.</div>';
       }
     }
 
-    function renderCalendario() {
-      var tbody = document.getElementById('calendarioBody');
-      if (!bienestarCalendario.length) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">No hay eventos registrados</td></tr>';
-        return;
-      }
-      var hoy = new Date().toISOString().slice(0, 10);
-      tbody.innerHTML = bienestarCalendario.map(function(c) {
-        var proximo = c.fecha >= hoy;
-        return '<tr>'
-          + '<td><span style="font-weight:600;">' + escBienestar(c.titulo) + '</span></td>'
-          + '<td>' + (c.fecha || '-') + '</td>'
-          + '<td>' + escBienestar(c.hora || '-') + '</td>'
-          + '<td>' + escBienestar(c.lugar || '-') + '</td>'
-          + '<td>' + escBienestar(c.tipo || '-') + '</td>'
-          + '<td>'
-          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalCalendario(' + c.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
-          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteCalendario(' + c.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
-          + '</td>'
-          + '</tr>';
-      }).join('');
-    }
-
-    function openModalCalendario(id) {
+    function openModalCalendario(id, fechaPreseleccionada) {
       editingCalendarioId = id || null;
       document.getElementById('formCalendario').reset();
       document.getElementById('modalCalendarioTitle').textContent = id ? 'Editar evento' : 'Nuevo evento';
@@ -1062,6 +1292,8 @@
           document.getElementById('cal_tipo').value = c.tipo || '';
           document.getElementById('cal_descripcion').value = c.descripcion || '';
         }
+      } else if (fechaPreseleccionada) {
+        document.getElementById('cal_fecha').value = fechaPreseleccionada;
       }
       bsShowModal('modalCalendario');
     }
@@ -1110,9 +1342,195 @@
       }
     }
 
+    /* ===== SPLASH ===== */
+    var bienestarSplash = [];
+    var editingSplashId = null;
+    var splashImagenArchivo = null;
+
+    function splashEnVigencia(s) {
+      if (s.activo === false) return false;
+      var hoyISO = fechaISO(new Date());
+      if (s.fecha_inicio && s.fecha_inicio > hoyISO) return false;
+      if (s.fecha_fin && s.fecha_fin < hoyISO) return false;
+      return true;
+    }
+
+    function splashActual() {
+      return bienestarSplash.filter(splashEnVigencia).sort(function(a, b) {
+        return String(b.created_at || '').localeCompare(String(a.created_at || ''));
+      })[0] || null;
+    }
+
+    function onSplashImagenChange() {
+      var f = document.getElementById('spl_imagen').files[0];
+      var prev = document.getElementById('splImagenPreview');
+      if (!f) {
+        splashImagenArchivo = null;
+        prev.innerHTML = '';
+        return;
+      }
+      if (f.size > 2 * 1024 * 1024) {
+        showAlert('La imagen supera los 2 MB', 'warning');
+        document.getElementById('spl_imagen').value = '';
+        prev.innerHTML = '';
+        return;
+      }
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        splashImagenArchivo = e.target.result;
+        prev.innerHTML = '<img src="' + splashImagenArchivo + '" alt="Vista previa" style="max-width:320px;border-radius:8px;border:1px solid var(--color-border);display:block;">';
+      };
+      reader.readAsDataURL(f);
+    }
+
+    async function loadSplash() {
+      try {
+        var { data, error } = await supabaseClient.from('bienestar_splash').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        bienestarSplash = data || [];
+        renderSplashBanner();
+        renderSplash();
+        mostrarSplashOverlay();
+      } catch (err) {
+        document.getElementById('splashBody').innerHTML =
+          '<tr><td colspan="5" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar los splash: ' + escBienestar(err.message) + '</td></tr>';
+      }
+    }
+
+    function renderSplashBanner() {
+      var banner = document.getElementById('splashBanner');
+      if (!banner) return;
+      var s = splashActual();
+      if (!s) {
+        banner.style.display = 'none';
+        banner.innerHTML = '';
+        return;
+      }
+      banner.style.display = 'block';
+      banner.innerHTML = '<img src="' + s.imagen_url + '" alt="' + escBienestar(s.titulo) + '" onerror="this.closest(\'.splash-banner\').style.display=\'none\';">'
+        + '<div class="splash-banner-caption">' + escBienestar(s.titulo) + '</div>';
+    }
+
+    function renderSplash() {
+      var cont = document.getElementById('splashBody');
+      var vista = document.getElementById('splashVista');
+      if (!cont) return;
+      var s = splashActual();
+      vista.innerHTML = s
+        ? '<div class="splash-vista-card">'
+          + '<img src="' + s.imagen_url + '" alt="' + escBienestar(s.titulo) + '" onerror="this.style.display=\'none\';">'
+          + '<div class="splash-vista-info"><div class="t">' + escBienestar(s.titulo) + '</div>'
+          + '<div>Activa ahora: ' + (s.fecha_inicio || s.fecha_fin
+            ? 'del ' + (s.fecha_inicio ? fechaCorta(s.fecha_inicio) : '?') + ' al ' + (s.fecha_fin ? fechaCorta(s.fecha_fin) : 'indefinido')
+            : 'sin vigencia fijada') + '</div>'
+          + '</div></div>'
+        : '';
+      if (!bienestarSplash.length) {
+        cont.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">No hay imágenes splash configuradas</td></tr>';
+        return;
+      }
+      cont.innerHTML = bienestarSplash.map(function(s) {
+        var vigencia = (s.fecha_inicio ? fechaCorta(s.fecha_inicio) : '—') + ' al ' + (s.fecha_fin ? fechaCorta(s.fecha_fin) : '—');
+        var vigente = splashEnVigencia(s);
+        return '<tr>'
+          + '<td><img class="splash-thumb" src="' + s.imagen_url + '" alt="' + escBienestar(s.titulo) + '" onerror="this.style.visibility=\'hidden\';">'
+          + '<td><span style="font-weight:600;">' + escBienestar(s.titulo) + '</span></td>'
+          + '<td>' + vigencia + '</td>'
+          + '<td><span class="badge-' + (vigente ? 'active' : 'inactive') + '" style="padding:2px 8px;border-radius:4px;font-size:11px;">' + (vigente ? 'Activo' : 'Inactivo') + '</span></td>'
+          + '<td>'
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalSplash(' + s.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteSplash(' + s.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function openModalSplash(id) {
+      editingSplashId = id || null;
+      document.getElementById('formSplash').reset();
+      document.getElementById('splImagenPreview').innerHTML = '';
+      splashImagenArchivo = null;
+      document.getElementById('modalSplashTitle').textContent = id ? 'Editar imagen splash' : 'Nueva imagen splash';
+      if (id) {
+        var s = bienestarSplash.find(function(x) { return x.id === id; });
+        if (s) {
+          document.getElementById('spl_titulo').value = s.titulo;
+          document.getElementById('spl_fecha_inicio').value = s.fecha_inicio || '';
+          document.getElementById('spl_fecha_fin').value = s.fecha_fin || '';
+          document.getElementById('spl_activo').checked = s.activo !== false;
+          document.getElementById('splImagenPreview').innerHTML = '<img src="' + s.imagen_url + '" alt="Imagen actual" style="max-width:320px;border-radius:8px;border:1px solid var(--color-border);display:block;">';
+        }
+      }
+      bsShowModal('modalSplash');
+    }
+
+    async function saveSplash() {
+      var titulo = document.getElementById('spl_titulo').value.trim();
+      if (!titulo) {
+        showAlert('El título es obligatorio', 'warning');
+        return;
+      }
+      if (!splashImagenArchivo) {
+        showAlert('Selecciona una imagen', 'warning');
+        return;
+      }
+      var payload = {
+        titulo: titulo,
+        imagen_url: splashImagenArchivo,
+        fecha_inicio: document.getElementById('spl_fecha_inicio').value || null,
+        fecha_fin: document.getElementById('spl_fecha_fin').value || null,
+        activo: document.getElementById('spl_activo').checked
+      };
+      try {
+        if (editingSplashId) {
+          var { error } = await supabaseClient.from('bienestar_splash').update(payload).eq('id', editingSplashId);
+          if (error) throw error;
+        } else {
+          var { error } = await supabaseClient.from('bienestar_splash').insert([payload]);
+          if (error) throw error;
+        }
+        bsHideModal('modalSplash');
+        loadSplash();
+        showAlert(editingSplashId ? 'Splash actualizado' : 'Splash creado', 'success');
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteSplash(id) {
+      var ok = await showConfirm('¿Eliminar esta imagen splash?', 'Eliminar');
+      if (!ok) return;
+      try {
+        var { error } = await supabaseClient.from('bienestar_splash').delete().eq('id', id);
+        if (error) throw error;
+        loadSplash();
+        showAlert('Splash eliminado', 'success');
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    function mostrarSplashOverlay() {
+      var s = splashActual();
+      if (!s) return;
+      try {
+        if (localStorage.getItem('splash_visto_' + s.id)) return;
+        localStorage.setItem('splash_visto_' + s.id, '1');
+      } catch (e) {}
+      document.getElementById('splashShowImg').src = s.imagen_url;
+      document.getElementById('splashShowCaption').textContent = s.titulo;
+      document.getElementById('splashOverlayContent').style.display = 'block';
+      bsShowModal('modalSplashShow');
+    }
+
+    function cerrarSplashShow() {
+      bsHideModal('modalSplashShow');
+    }
+
     /* ===== INICIALIZACIÓN ===== */
     document.addEventListener('DOMContentLoaded', function() {
       restoreTool();
+      renderCalendario();
       loadPlantilla().then(function() {
         loadPrestamos();
       });
@@ -1120,6 +1538,7 @@
       loadHistorias();
       loadEncuestas();
       loadCalendario();
+      loadSplash();
     });
   </script>
 

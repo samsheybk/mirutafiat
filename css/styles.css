@@ -1481,6 +1481,136 @@ a {
   transform: translateY(0);
 }
 
+/* ===== BOTÓN SPLASH (ver splash activo) ===== */
+.nav-splash-btn {
+  height: 34px;
+  margin-left: 10px;
+  padding: 0 14px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s, transform 0.15s;
+}
+.nav-splash-btn:hover {
+  background: rgba(255, 255, 255, 0.32);
+  transform: translateY(-1px);
+}
+.nav-splash-btn:active {
+  transform: translateY(0);
+}
+
+/* ===== CARRUSEL DE SPLASH (overlay global) ===== */
+.splash-show-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(0, 0, 0, 0.9);
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.splash-show-overlay.show {
+  display: flex;
+}
+.splash-show-content {
+  position: relative;
+  width: 92%;
+  max-width: 860px;
+  text-align: center;
+}
+.splash-show-img {
+  width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 12px;
+  display: block;
+  background: #000;
+}
+.splash-show-caption {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 10px;
+}
+.splash-show-count {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  margin-top: 4px;
+}
+.splash-show-close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  z-index: 6;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.splash-show-close:hover {
+  background: rgba(0, 0, 0, 0.85);
+}
+.splash-show-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 6;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.splash-show-arrow:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+.splash-show-arrow.left {
+  left: -16px;
+}
+.splash-show-arrow.right {
+  right: -16px;
+}
+.splash-show-dots {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 12px;
+}
+.splash-show-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.splash-show-dot.active {
+  background: #fff;
+}
+
 .help-module-sub {
   margin: 0 0 18px;
   color: var(--color-text-secondary);
@@ -1599,6 +1729,20 @@ a {
   .nav-costs-btn {
     order: 3;
     margin-left: 0;
+  }
+  .nav-splash-btn {
+    order: 3;
+    margin-left: 0;
+  }
+  .splash-show-arrow.left {
+    left: 4px;
+  }
+  .splash-show-arrow.right {
+    right: 4px;
+  }
+  .splash-show-close {
+    top: -6px;
+    right: -6px;
   }
   #navUserEmail {
     display: none;

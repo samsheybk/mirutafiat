@@ -13,7 +13,7 @@
 (function () {
   'use strict';
 
-  var SUPERADMIN_EMAILS = ['admin@fiat.com.ve'];
+  var SUPERADMIN_EMAILS = ['developer@prueba.dev'];
 
   window.FIAT_MODULES = [
     { key: 'captacion.html', name: 'Captación y Selección', tools: [

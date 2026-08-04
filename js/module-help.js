@@ -196,6 +196,18 @@
     });
     btn.parentNode.insertBefore(costsBtn, btn.nextSibling);
 
+    var splashBtn = document.createElement('button');
+    splashBtn.id = 'navSplashBtn';
+    splashBtn.className = 'nav-splash-btn';
+    splashBtn.type = 'button';
+    splashBtn.title = 'Ver el splash activo';
+    splashBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> Splash';
+    splashBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      openSplashFromNav();
+    });
+    costsBtn.parentNode.insertBefore(splashBtn, costsBtn.nextSibling);
+
     var opt = document.createElement('option');
     opt.value = (inModules ? '' : 'modules/') + 'oportunidades.html';
     opt.textContent = 'Oportunidades de acción';
@@ -275,6 +287,139 @@
     }
     document.removeEventListener('keydown', onHelpKey);
   }
+
+  /* ===== CARRUSEL DE SPLASH (global, todas las páginas) ===== */
+  var splashItems = [];
+  var splashIndex = 0;
+  var splashTimer = null;
+
+  function splashVigenteGlobal(s) {
+    if (s.activo === false) return false;
+    var hoy = new Date();
+    var hoyISO = hoy.getFullYear() + '-' + String(hoy.getMonth() + 1).padStart(2, '0') + '-' + String(hoy.getDate()).padStart(2, '0');
+    if (s.fecha_inicio && s.fecha_inicio > hoyISO) return false;
+    if (s.fecha_fin && s.fecha_fin < hoyISO) return false;
+    return true;
+  }
+
+  function showSplashCarousel(items, startIndex) {
+    if (!items || !items.length) return;
+    splashItems = items;
+    splashIndex = typeof startIndex === 'number' ? startIndex : 0;
+    var overlay = document.getElementById('globalSplashOverlay');
+    if (!overlay) overlay = buildSplashOverlay();
+    renderSplashSlide();
+    overlay.classList.add('show');
+    startSplashTimer();
+  }
+
+  function buildSplashOverlay() {
+    var overlay = document.createElement('div');
+    overlay.className = 'splash-show-overlay';
+    overlay.id = 'globalSplashOverlay';
+    overlay.innerHTML =
+      '<div class="splash-show-content">' +
+        '<button class="splash-show-close" aria-label="Cerrar">&times;</button>' +
+        '<button class="splash-show-arrow left" aria-label="Anterior">&#8249;</button>' +
+        '<img class="splash-show-img" id="globalSplashImg" src="" alt="Splash">' +
+        '<button class="splash-show-arrow right" aria-label="Siguiente">&#8250;</button>' +
+        '<div class="splash-show-caption" id="globalSplashCaption"></div>' +
+        '<div class="splash-show-count" id="globalSplashCount"></div>' +
+        '<div class="splash-show-dots" id="globalSplashDots"></div>' +
+      '</div>';
+    overlay.querySelector('.splash-show-close').addEventListener('click', closeSplashCarousel);
+    overlay.querySelector('.splash-show-arrow.left').addEventListener('click', function () { splashStep(-1); });
+    overlay.querySelector('.splash-show-arrow.right').addEventListener('click', function () { splashStep(1); });
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) closeSplashCarousel();
+    });
+    overlay.addEventListener('mouseenter', stopSplashTimer);
+    overlay.addEventListener('mouseleave', startSplashTimer);
+    document.addEventListener('keydown', function (e) {
+      if (!overlay.classList.contains('show')) return;
+      if (e.key === 'Escape') closeSplashCarousel();
+      if (e.key === 'ArrowLeft') splashStep(-1);
+      if (e.key === 'ArrowRight') splashStep(1);
+    });
+    document.body.appendChild(overlay);
+    return overlay;
+  }
+
+  function renderSplashSlide() {
+    var overlay = document.getElementById('globalSplashOverlay');
+    if (!overlay || !splashItems.length) return;
+    var item = splashItems[splashIndex];
+    var img = document.getElementById('globalSplashImg');
+    var caption = document.getElementById('globalSplashCaption');
+    var count = document.getElementById('globalSplashCount');
+    var dots = document.getElementById('globalSplashDots');
+    img.src = item.imagen_url || '';
+    caption.textContent = item.titulo || '';
+    count.textContent = splashItems.length > 1 ? (splashIndex + 1) + ' / ' + splashItems.length : '';
+    dots.innerHTML = splashItems.map(function (_, i) {
+      return '<button class="splash-show-dot' + (i === splashIndex ? ' active' : '') + '" data-i="' + i + '" aria-label="Imagen ' + (i + 1) + '"></button>';
+    }).join('');
+    var dotBtns = dots.querySelectorAll('.splash-show-dot');
+    for (var i = 0; i < dotBtns.length; i++) {
+      (function (d) {
+        d.addEventListener('click', function () {
+          splashIndex = parseInt(d.getAttribute('data-i'), 10);
+          renderSplashSlide();
+          startSplashTimer();
+        });
+      })(dotBtns[i]);
+    }
+  }
+
+  function splashStep(dir) {
+    if (!splashItems.length) return;
+    splashIndex = (splashIndex + dir + splashItems.length) % splashItems.length;
+    renderSplashSlide();
+  }
+
+  function startSplashTimer() {
+    stopSplashTimer();
+    if (splashItems.length < 2) return;
+    splashTimer = setInterval(function () { splashStep(1); }, 5000);
+  }
+
+  function stopSplashTimer() {
+    if (splashTimer) {
+      clearInterval(splashTimer);
+      splashTimer = null;
+    }
+  }
+
+  function closeSplashCarousel() {
+    stopSplashTimer();
+    var overlay = document.getElementById('globalSplashOverlay');
+    if (overlay) overlay.classList.remove('show');
+  }
+
+  function openSplashFromNav() {
+    if (typeof supabaseClient === 'undefined') {
+      if (typeof showAlert === 'function') showAlert('Sesión no disponible', 'warning');
+      return;
+    }
+    supabaseClient.from('bienestar_splash').select('*').order('created_at', { ascending: false }).then(function (res) {
+      if (res.error) {
+        if (typeof showAlert === 'function') showAlert('Error al cargar el splash: ' + res.error.message, 'error');
+        return;
+      }
+      var items = (res.data || []).filter(splashVigenteGlobal);
+      if (!items.length) {
+        if (typeof showAlert === 'function') showAlert('No hay imágenes splash activas', 'warning');
+        return;
+      }
+      showSplashCarousel(items.map(function (s) {
+        return { imagen_url: s.imagen_url, titulo: s.titulo };
+      }));
+    });
+  }
+
+  window.showSplashCarousel = showSplashCarousel;
+  window.closeSplashCarousel = closeSplashCarousel;
+  window.splashStep = splashStep;
 
   document.addEventListener('DOMContentLoaded', injectNavHelp);
 })();

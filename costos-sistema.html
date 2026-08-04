@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estructura de Costos - Intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f1f5f9;
+      --surface: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --indigo: #4f46e5;
+      --indigo-dark: #4338ca;
+      --green: #059669;
+      --green-bg: #ecfdf5;
+      --amber: #d97706;
+      --amber-bg: #fffbeb;
+      --red: #dc2626;
+      --red-bg: #fef2f2;
+      --slate-100: #f8fafc;
+      --radius: 14px;
+      --shadow: 0 1px 3px rgba(15, 23, 42, .06), 0 8px 24px rgba(15, 23, 42, .06);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    .page { max-width: 1080px; margin: 0 auto; padding: 32px 20px 64px; }
+
+    /* Header */
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #312e81 55%, #4f46e5 100%);
+      border-radius: 20px;
+      padding: 40px 44px;
+      color: #fff;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      right: -80px; top: -80px;
+      width: 260px; height: 260px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.06);
+    }
+    .hero-brand { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 700; letter-spacing: .5px; margin-bottom: 22px; opacity: .9; }
+    .hero-logo {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: #fff; box-shadow: 0 0 0 4px rgba(255,255,255,.25);
+      flex-shrink: 0;
+    }
+    .hero h1 { font-size: 30px; font-weight: 800; letter-spacing: -.5px; margin-bottom: 8px; }
+    .hero p { font-size: 15px; color: #c7d2fe; max-width: 640px; }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 18px; padding: 7px 14px; border-radius: 999px;
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      font-size: 12.5px; font-weight: 600; color: #e0e7ff;
+    }
+
+    /* KPI row */
+    .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+    .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow); }
+    .kpi-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); margin-bottom: 6px; }
+    .kpi-value { font-size: 26px; font-weight: 800; letter-spacing: -.5px; }
+    .kpi-sub { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+    .kpi.hoy .kpi-value { color: var(--green); }
+    .kpi.prod .kpi-value { color: var(--indigo); }
+    .kpi.anual .kpi-value { color: var(--indigo-dark); }
+
+    /* Section */
+    .section { margin-bottom: 36px; }
+    .section-title { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 800; letter-spacing: -.3px; margin-bottom: 16px; }
+    .section-title .num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; border-radius: 8px; background: var(--indigo); color: #fff;
+      font-size: 13px; font-weight: 700; flex-shrink: 0;
+    }
+
+    /* Tables */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
+      color: var(--muted); background: var(--slate-100);
+      padding: 13px 18px; border-bottom: 1px solid var(--border);
+    }
+    td { padding: 15px 18px; font-size: 13.5px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--slate-100); }
+    .col-price { text-align: right; white-space: nowrap; font-weight: 700; }
+    .col-price.mono { font-variant-numeric: tabular-nums; }
+    .free { color: var(--green); }
+    .paid { color: var(--indigo); }
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 999px;
+      font-size: 11px; font-weight: 700; letter-spacing: .2px;
+    }
+    .badge.free { background: var(--green-bg); color: var(--green); }
+    .badge.paid { background: #eef2ff; color: var(--indigo); }
+
+    /* Service cards */
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .svc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 14px; }
+    .svc-head { display: flex; align-items: center; justify-content: space-between; }
+    .svc-name { font-size: 16px; font-weight: 800; }
+    .svc-logo { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 13px; color: #fff; flex-shrink: 0; }
+    .svc-logo.supabase { background: linear-gradient(135deg, #3ecf8e, #1f9d6b); }
+    .svc-logo.vercel { background: linear-gradient(135deg, #111, #000); }
+    .svc-logo.github { background: linear-gradient(135deg, #24292f, #0d1117); }
+    .svc-cost { font-size: 22px; font-weight: 800; letter-spacing: -.5px; }
+    .svc-cost .plan { font-size: 12px; font-weight: 600; color: var(--muted); margin-left: 4px; }
+    .svc ul { list-style: none; }
+    .svc li { position: relative; padding-left: 18px; font-size: 13px; color: var(--text); margin-bottom: 8px; }
+    .svc li::before { content: '✓'; position: absolute; left: 0; top: 0; color: var(--green); font-weight: 700; font-size: 12px; }
+    .svc .warn::before { content: '⚠'; color: var(--amber); }
+    .svc .x::before { content: '✕'; color: var(--red); }
+    .svc small { font-size: 11.5px; color: var(--muted); line-height: 1.5; }
+
+    /* Alert boxes */
+    .alert { display: flex; gap: 12px; border-radius: 12px; padding: 16px 18px; font-size: 13.5px; margin-bottom: 12px; }
+    .alert .ic { font-size: 16px; line-height: 1.4; flex-shrink: 0; }
+    .alert.warn { background: var(--amber-bg); border: 1px solid #fde68a; color: #92400e; }
+    .alert.warn strong { color: #78350f; }
+    .alert.good { background: var(--green-bg); border: 1px solid #a7f3d0; color: #065f46; }
+    .alert.good strong { color: #064e3b; }
+
+    /* Recomendación */
+    .reco { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px; }
+    .reco-total { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    .reco-total .lbl { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+    .reco-total .val { font-size: 34px; font-weight: 800; letter-spacing: -1px; color: var(--indigo); }
+    .reco-total .val small { font-size: 15px; color: var(--muted); font-weight: 600; letter-spacing: 0; }
+    .reco-list { margin-top: 18px; display: grid; gap: 10px; }
+    .reco-item { display: flex; gap: 12px; font-size: 13.5px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--slate-100); }
+    .reco-item .n { flex-shrink: 0; width: 22px; height: 22px; border-radius: 7px; background: var(--indigo); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .reco-item b { color: var(--text); }
+
+    /* Footer */
+    .foot { margin-top: 36px; padding-top: 18px; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+    @media (max-width: 760px) {
+      .hero { padding: 28px 24px; }
+      .hero h1 { font-size: 24px; }
+      .kpis, .grid-3 { grid-template-columns: 1fr; }
+      .page { padding: 16px 12px 48px; }
+    }
+    @media print {
+      body { background: #fff; }
+      .hero { box-shadow: none; }
+      .card, .svc, .reco, .kpi { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- Header -->
+    <header class="hero">
+      <div class="hero-brand"><span class="hero-logo"></span> VEN-Intranet &nbsp;·&nbsp; Propuesta de costos</div>
+      <h1>Estructura de costos para el mantenimiento del sistema</h1>
+      <p>Estimación de gastos de infraestructura para operar la intranet en producción: base de datos (Supabase), despliegue (Vercel) y repositorio (GitHub).</p>
+      <div class="hero-tag">📅 Agosto 2026 &nbsp;·&nbsp; Precios verificados según planes vigentes</div>
+    </header>
+
+    <!-- KPIs -->
+    <div class="kpis">
+      <div class="kpi hoy">
+        <div class="kpi-label">Costo actual (todo Free)</div>
+        <div class="kpi-value">$0/mes</div>
+        <div class="kpi-sub">Funciona, pero con riesgos de disponibilidad y restricciones de uso comercial</div>
+      </div>
+      <div class="kpi prod">
+        <div class="kpi-label">Plan de producción recomendado</div>
+        <div class="kpi-value">$45–49/mes</div>
+        <div class="kpi-sub">Supabase Pro + Vercel Pro + GitHub (Free/Pro)</div>
+      </div>
+      <div class="kpi anual">
+        <div class="kpi-label">Costo anual estimado</div>
+        <div class="kpi-value">≈ $540–588/año</div>
+        <div class="kpi-sub">Equivale a < $50 al mes para operar en producción</div>
+      </div>
+    </div>
+
+    <!-- Estado actual -->
+    <section class="section">
+      <div class="section-title"><span class="num">1</span> Situación actual (planes gratuitos)</div>
+      <div class="card">
+        <table>
+          <thead>
+            <tr><th>Servicio</th><th>Plan</th><th>Costo</th><th>Límites clave</th><th>Riesgo</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>Supabase</b> <span class="badge free">Gratis</span></td>
+              <td>Free</td>
+              <td class="col-price free mono">$0</td>
+              <td>500 MB BD · 5 GB egress · ~1 GB storage · 50.000 usuarios</td>
+              <td>El proyecto <b>se pausa tras 7 días sin actividad</b>; sin backups</td>
+            </tr>
+            <tr>
+              <td><b>Vercel</b> <span class="badge free">Gratis</span></td>
+              <td>Hobby</td>
+              <td class="col-price free mono">$0</td>
+              <td>100 GB transferencia · 1M invocaciones</td>
+              <td><b>Prohíbe uso comercial</b>; si se superan límites, la app se pausa</td>
+            </tr>
+            <tr>
+              <td><b>GitHub</b> <span class="badge free">Gratis</span></td>
+              <td>Free</td>
+              <td class="col-price free mono">$0</td>
+              <td>Repos privados ilimitados · 2.000 min Actions</td>
+              <td>Sin riesgo para un solo desarrollador</td>
+            </tr>
+            <tr>
+              <td colspan="2"><b>Total actual</b></td>
+              <td class="col-price free mono"><b>$0/mes</b></td>
+              <td colspan="2"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="height:14px;"></div>
+      <div class="alert warn">
+        <span class="ic">⚠️</span>
+        <div><strong>Por qué gratis no es viable en producción:</strong> en Supabase el proyecto se <b>pausa automáticamente tras 7 días de inactividad</b> (la intranet quedaría inaccesible), no hay backups automáticos, y en Vercel el plan gratuito <b>no permite uso comercial</b>. Además, las imágenes guardadas en base64 llenan los 500 MB disponibles rápidamente.</div>
+      </div>
+    </section>
+
+    <!-- Desglose -->
+    <section class="section">
+      <div class="section-title"><span class="num">2</span> Desglose por servicio (plan de pago)</div>
+      <div class="grid-3">
+        <div class="svc">
+          <div class="svc-head"><span class="svc-name">Supabase</span><span class="svc-logo supabase">S</span></div>
+          <div class="svc-cost">$25<span class="plan">/mes · Pro</span></div>
+          <ul>
+            <li>8 GB base de datos</li>
+            <li>250 GB transferencia (egress)</li>
+            <li>100 GB de archivos (storage)</li>
+            <li>100.000 usuarios activos/mes</li>
+            <li>Backups diarios (7 días)</li>
+            <li>Sin pausas por inactividad</li>
+            <li>Soporte por email</li>
+          </ul>
+          <small>Proyecto adicional: +$10/mes · Sobrecostos: BD $0.125/GB, egress $0.09/GB, storage $0.021/GB, cómputo Small +$5</small>
+        </div>
+        <div class="svc">
+          <div class="svc-head"><span class="svc-name">Vercel</span><span class="svc-logo vercel">▲</span></div>
+          <div class="svc-cost">$20<span class="plan">/mes · Pro</span></div>
+          <ul>
+            <li>1 TB transferencia por mes</li>
+            <li>Uso comercial permitido</li>
+            <li>$20 de crédito mensual de uso</li>
+            <li>Despliegues automáticos desde GitHub</li>
+            <li>CDN global + HTTPS</li>
+            <li>Soporte por email</li>
+          </ul>
+          <small>Precio por asiento de desarrollador. El sitio es estático y las imágenes se sirven desde Supabase, por lo que el consumo real de transferencia es mínimo.</small>
+        </div>
+        <div class="svc">
+          <div class="svc-head"><span class="svc-name">GitHub</span><span class="svc-logo github">G</span></div>
+          <div class="svc-cost">$0–4<span class="plan">/mes</span></div>
+          <ul>
+            <li>Repositorios privados ilimitados</li>
+            <li>Historial de versiones y colaboración</li>
+            <li>2.000–3.000 min de Actions</li>
+            <li>GitHub Pages (gratis)</li>
+            <li>Soporte por email (Pro)</li>
+          </ul>
+          <small>El plan Free ($0) es suficiente para un desarrollador. GitHub Pro ($4/mes) solo agrega más minutos de Actions, Codespaces y soporte.</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- Escenarios -->
+    <section class="section">
+      <div class="section-title"><span class="num">3</span> Escenarios de costos totales</div>
+      <div class="card">
+        <table>
+          <thead>
+            <tr><th>Escenario</th><th>Supabase</th><th>Vercel</th><th>GitHub</th><th style="text-align:right;">Total / mes</th><th style="text-align:right;">Total / año</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>Actual</b> (solo desarrollo)</td>
+              <td>Free $0</td><td>Hobby $0</td><td>Free $0</td>
+              <td class="col-price free mono">$0</td>
+              <td class="col-price free mono">$0</td>
+            </tr>
+            <tr>
+              <td><b>Mínimo producción</b></td>
+              <td>Pro $25</td><td>Pro $20</td><td>Free $0</td>
+              <td class="col-price paid mono"><b>$45</b></td>
+              <td class="col-price paid mono"><b>≈ $540</b></td>
+            </tr>
+            <tr>
+              <td><b>Mínimo + GitHub Pro</b></td>
+              <td>Pro $25</td><td>Pro $20</td><td>Pro $4</td>
+              <td class="col-price paid mono"><b>$49</b></td>
+              <td class="col-price paid mono"><b>≈ $588</b></td>
+            </tr>
+            <tr>
+              <td><b>Con margen de cómputo</b></td>
+              <td>Pro + Small $30</td><td>Pro $20</td><td>Pro $4</td>
+              <td class="col-price paid mono"><b>$54</b></td>
+              <td class="col-price paid mono"><b>≈ $648</b></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Recomendación -->
+    <section class="section">
+      <div class="section-title"><span class="num">4</span> Recomendación</div>
+      <div class="reco">
+        <div class="reco-total">
+          <div>
+            <div class="lbl">Inversión recomendada</div>
+            <div class="val">$45 – $49 <small>/mes</small></div>
+          </div>
+          <div style="text-align:right;font-size:13px;color:var(--muted);">
+            ≈ $540 – $588 al año<br><b style="color:var(--text);">menos de $50/mes</b> para operar en producción
+          </div>
+        </div>
+        <div class="reco-list">
+          <div class="reco-item"><span class="n">1</span><div><b>Supabase Pro ($25/mes)</b> es el mínimo razonable: elimina las pausas por inactividad, añade backups diarios de 7 días y sube la base de datos a 8 GB.</div></div>
+          <div class="reco-item"><span class="n">2</span><div><b>Vercel Pro ($20/mes)</b> es necesario por la cláusula de uso comercial; tu consumo real de ancho de banda será mínimo porque las imágenes se sirven desde Supabase.</div></div>
+          <div class="reco-item"><span class="n">3</span><div><b>GitHub Free ($0)</b> es suficiente. Si se usa con intensidad de Actions/Codespaces, GitHub Pro ($4/mes) es un costo menor.</div></div>
+          <div class="reco-item"><span class="n">4</span><div><b>El principal driver de costo</b> es el tamaño de la base de datos (las imágenes en base64 pesan ~33% más) y el storage de archivos; ambos quedan cubiertos con holgura por el plan Pro.</div></div>
+        </div>
+      </div>
+      <div style="height:14px;"></div>
+      <div class="alert good">
+        <span class="ic">✅</span>
+        <div><strong>Resumen ejecutivo:</strong> migrar de $0 a producción cuesta aproximadamente <strong>$45–49 mensuales</strong>. No hay costos ocultos significativos al nivel de uso de una intranet corporativa; los sobrecargos (banda ancha, storage, cómputo) solo aparecerían con tráfico o volumen muy superiores a los actuales.</div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span>VEN-Intranet · Propuesta de estructura de costos</span>
+      <span>Precios vigentes verificados · Agosto 2026 (planes: Supabase Pro $25, Vercel Pro $20, GitHub Pro $4)</span>
+    </footer>
+
+  </div>
+</body>
+</html>

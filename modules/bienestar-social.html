@@ -82,11 +82,13 @@
     .splash-vista-info { font-size: 13px; line-height: 1.5; }
     .splash-vista-info .t { font-weight: 700; }
     .splash-thumb { width: 150px; height: 70px; object-fit: cover; border-radius: 6px; border: 1px solid var(--color-border); }
-    .splash-overlay { position: relative; width: 92%; max-width: 860px; margin: auto; }
-    .splash-overlay img { width: 100%; max-height: 80vh; object-fit: contain; border-radius: 12px; display: block; }
-    .splash-show-caption { text-align: center; color: #fff; font-size: 16px; font-weight: 700; margin-top: 10px; }
-    .splash-close { position: absolute; top: 10px; right: 10px; z-index: 5; background: rgba(0,0,0,.55); border-color: transparent; color: #fff; border-radius: 50%; }
-    .splash-close:hover { background: rgba(0,0,0,.8); color: #fff; }
+    /* Scroll vertical de las herramientas (calendario, splash, etc.) */
+    .module-content { overflow-y: auto; }
+    /* Splash por día dentro del calendario */
+    .cal-splash-dia-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+    .cal-splash-mini { width: 180px; border: 1px solid var(--color-border); border-radius: 8px; padding: 8px; background: var(--color-bg); }
+    .cal-splash-mini img { width: 100%; height: 78px; cursor: pointer; }
+    .cal-splash-mini-info { font-size: 12px; font-weight: 600; margin: 6px 0 8px; line-height: 1.3; word-break: break-word; }
     @media (max-width: 900px) {
       .cal-wrap { grid-template-columns: 1fr; }
       .cal-side { max-height: none; }
@@ -261,6 +263,13 @@
                       <button class="btn btn-bienestar btn-sm" onclick="openModalCalendario(null, calFechaSel())">+ Agregar evento</button>
                     </div>
                     <div id="calEventosDia" class="cal-dia-list"></div>
+                  </div>
+                  <div class="cal-dia">
+                    <div class="cal-dia-head">
+                      <h3>Splash del <span id="calFechaSelSplash"></span></h3>
+                      <button class="btn btn-bienestar btn-sm" onclick="openModalSplash(null, calFechaSel())">+ Agregar splash</button>
+                    </div>
+                    <div id="calSplashDia" class="cal-splash-dia-grid"></div>
                   </div>
                 </div>
                 <div class="cal-side">
@@ -466,14 +475,6 @@
         <button class="btn btn-outline" onclick="bsHideModal('modalSplash')">Cancelar</button>
         <button class="btn btn-bienestar" onclick="saveSplash()">Guardar</button>
       </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="modalSplashShow" style="background:rgba(0,0,0,.88);z-index:3000;">
-    <div class="splash-overlay" id="splashOverlayContent" style="display:none;">
-      <button class="modal-close splash-close" onclick="cerrarSplashShow()">&times;</button>
-      <img id="splashShowImg" src="" alt="Splash">
-      <div class="splash-show-caption" id="splashShowCaption"></div>
     </div>
   </div>
 
@@ -1205,8 +1206,11 @@
       }
       grid.innerHTML = html;
       document.getElementById('calFechaSel').textContent = fechaCorta(fechaSel);
+      var splashFecha = document.getElementById('calFechaSelSplash');
+      if (splashFecha) splashFecha.textContent = fechaCorta(fechaSel);
       renderEventosDia();
       renderCalendarioLista();
+      renderSplashDia();
     }
 
     function renderEventosDia() {
@@ -1262,6 +1266,50 @@
           + '</div>'
           + '</div>';
       }).join('');
+    }
+
+    function splashDeDia(iso) {
+      return bienestarSplash.filter(function(s) {
+        if (s.activo === false) return false;
+        if (!s.fecha_inicio) return false;
+        if (s.fecha_inicio > iso) return false;
+        if (s.fecha_fin && s.fecha_fin < iso) return false;
+        return true;
+      }).sort(function(a, b) {
+        return String(b.created_at || '').localeCompare(String(a.created_at || ''));
+      });
+    }
+
+    function renderSplashDia() {
+      var cont = document.getElementById('calSplashDia');
+      if (!cont) return;
+      var iso = fechaISO(calDiaSel);
+      var lista = splashDeDia(iso);
+      if (!lista.length) {
+        cont.innerHTML = '<div class="cal-vacio">No hay imágenes splash para este día.</div>';
+        return;
+      }
+      cont.innerHTML = lista.map(function(s) {
+        return '<div class="cal-splash-mini">'
+          + '<img class="splash-thumb" src="' + s.imagen_url + '" alt="' + escBienestar(s.titulo) + '" onclick="verSplashDia(\'' + iso + '\')" onerror="this.style.visibility=\'hidden\';">'
+          + '<div class="cal-splash-mini-info">' + escBienestar(s.titulo) + '</div>'
+          + '<div class="cal-evento-acciones">'
+          + '<button class="btn btn-sm btn-outline" title="Ver carrusel" onclick="verSplashDia(\'' + iso + '\')"><i class="fi fi-sr-eye" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalSplash(' + s.id + ', \'' + iso + '\')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteSplash(' + s.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '</div>'
+          + '</div>';
+      }).join('');
+    }
+
+    function verSplashDia(iso) {
+      var lista = splashDeDia(iso);
+      if (!lista.length) return;
+      if (window.showSplashCarousel) {
+        window.showSplashCarousel(lista.map(function(s) {
+          return { imagen_url: s.imagen_url, titulo: s.titulo };
+        }));
+      }
     }
 
     async function loadCalendario() {
@@ -1355,10 +1403,14 @@
       return true;
     }
 
-    function splashActual() {
+    function splashActuales() {
       return bienestarSplash.filter(splashEnVigencia).sort(function(a, b) {
         return String(b.created_at || '').localeCompare(String(a.created_at || ''));
-      })[0] || null;
+      });
+    }
+
+    function splashActual() {
+      return splashActuales()[0] || null;
     }
 
     function onSplashImagenChange() {
@@ -1445,7 +1497,7 @@
       }).join('');
     }
 
-    function openModalSplash(id) {
+    function openModalSplash(id, fechaPreseleccionada) {
       editingSplashId = id || null;
       document.getElementById('formSplash').reset();
       document.getElementById('splImagenPreview').innerHTML = '';
@@ -1460,6 +1512,9 @@
           document.getElementById('spl_activo').checked = s.activo !== false;
           document.getElementById('splImagenPreview').innerHTML = '<img src="' + s.imagen_url + '" alt="Imagen actual" style="max-width:320px;border-radius:8px;border:1px solid var(--color-border);display:block;">';
         }
+      } else if (fechaPreseleccionada) {
+        document.getElementById('spl_fecha_inicio').value = fechaPreseleccionada;
+        document.getElementById('spl_fecha_fin').value = fechaPreseleccionada;
       }
       bsShowModal('modalSplash');
     }
@@ -1511,20 +1566,17 @@
     }
 
     function mostrarSplashOverlay() {
-      var s = splashActual();
-      if (!s) return;
+      var lista = splashActuales();
+      if (!lista.length) return;
       try {
-        if (localStorage.getItem('splash_visto_' + s.id)) return;
-        localStorage.setItem('splash_visto_' + s.id, '1');
+        if (sessionStorage.getItem('splash_auto_mostrado')) return;
+        sessionStorage.setItem('splash_auto_mostrado', '1');
       } catch (e) {}
-      document.getElementById('splashShowImg').src = s.imagen_url;
-      document.getElementById('splashShowCaption').textContent = s.titulo;
-      document.getElementById('splashOverlayContent').style.display = 'block';
-      bsShowModal('modalSplashShow');
-    }
-
-    function cerrarSplashShow() {
-      bsHideModal('modalSplashShow');
+      if (window.showSplashCarousel) {
+        window.showSplashCarousel(lista.map(function(s) {
+          return { imagen_url: s.imagen_url, titulo: s.titulo };
+        }));
+      }
     }
 
     /* ===== INICIALIZACIÓN ===== */

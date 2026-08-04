@@ -402,7 +402,10 @@ ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS talla_camisa TEXT;
 ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS talla_pantalon TEXT;
 ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS talla_calzado TEXT;
 ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS talla_franela TEXT;
-ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS conducta_civil TEXT;
+  ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS conducta_civil TEXT;
+
+ALTER TABLE bienestar_calendario ADD COLUMN IF NOT EXISTS fecha_fin DATE;
+ALTER TABLE bienestar_splash ADD COLUMN IF NOT EXISTS evento_id BIGINT REFERENCES bienestar_calendario(id) ON DELETE CASCADE;
 
 -- ============================================
 -- ROW LEVEL SECURITY (RLS)
@@ -1141,6 +1144,7 @@ CREATE TABLE IF NOT EXISTS bienestar_calendario (
   id BIGSERIAL PRIMARY KEY,
   titulo TEXT NOT NULL,
   fecha DATE NOT NULL,
+  fecha_fin DATE,
   hora TIME,
   lugar TEXT,
   tipo TEXT NOT NULL DEFAULT 'Actividad',
@@ -1156,6 +1160,7 @@ CREATE TABLE IF NOT EXISTS bienestar_splash (
   fecha_inicio DATE,
   fecha_fin DATE,
   activo BOOLEAN DEFAULT TRUE,
+  evento_id BIGINT REFERENCES bienestar_calendario(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   user_id UUID REFERENCES auth.users(id)
 );

@@ -68,8 +68,7 @@
         { icon: 'fi-sr-shield', name: 'Pólizas', desc: 'Registro de pólizas de seguros de los trabajadores con vigencias y coberturas.' },
         { icon: 'fi-sr-circle-book-open', name: 'Historias de gente', desc: 'Muro de historias, logros y reconocimientos de los trabajadores de la empresa.' },
         { icon: 'fi-sr-square-poll-horizontal', name: 'Encuestas', desc: 'Creación y publicación de encuestas con enlace compartible, respuestas y resultados.' },
-        { icon: 'fi-sr-calendar', name: 'Calendario', desc: 'Calendario mensual de eventos y actividades: selecciona un día para ver lo pautado o agregar eventos, con lista de próximos eventos ordenados por fecha.' },
-        { icon: 'fi-sr-images', name: 'Splash y banners', desc: 'Configura imágenes promocionales (splash/banner) que se muestran a todos los usuarios, por ejemplo para el día del trabajador.' }
+        { icon: 'fi-sr-calendar', name: 'Calendario', desc: 'Calendario mensual de eventos y actividades: selecciona un día para ver lo pautado o agregar eventos, con lista de próximos eventos ordenados por fecha. Desde el día seleccionado también se configuran los anuncios (splash) con imágenes que se muestran a todos los usuarios.' }
       ]
     },
     'seguridad-salud.html': {
@@ -200,13 +199,15 @@
     splashBtn.id = 'navSplashBtn';
     splashBtn.className = 'nav-splash-btn';
     splashBtn.type = 'button';
-    splashBtn.title = 'Ver el splash activo';
-    splashBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> Splash';
+    splashBtn.title = 'Ver el anuncio activo';
+    splashBtn.style.display = 'none';
+    splashBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-7v16L3 13v-2z"></path><path d="M7 13v6"></path></svg> Anuncio';
     splashBtn.addEventListener('click', function (e) {
       e.stopPropagation();
       openSplashFromNav();
     });
     costsBtn.parentNode.insertBefore(splashBtn, costsBtn.nextSibling);
+    refreshSplashNav();
 
     var opt = document.createElement('option');
     opt.value = (inModules ? '' : 'modules/') + 'oportunidades.html';
@@ -403,12 +404,12 @@
     }
     supabaseClient.from('bienestar_splash').select('*').order('created_at', { ascending: false }).then(function (res) {
       if (res.error) {
-        if (typeof showAlert === 'function') showAlert('Error al cargar el splash: ' + res.error.message, 'error');
+        if (typeof showAlert === 'function') showAlert('Error al cargar el anuncio: ' + res.error.message, 'error');
         return;
       }
       var items = (res.data || []).filter(splashVigenteGlobal);
       if (!items.length) {
-        if (typeof showAlert === 'function') showAlert('No hay imágenes splash activas', 'warning');
+        if (typeof showAlert === 'function') showAlert('No hay anuncios activos', 'warning');
         return;
       }
       showSplashCarousel(items.map(function (s) {
@@ -417,9 +418,26 @@
     });
   }
 
+  function setSplashNavVisible(items) {
+    var btn = document.getElementById('navSplashBtn');
+    if (!btn) return;
+    var hay = items ? items.some(splashVigenteGlobal) : false;
+    btn.style.display = hay ? '' : 'none';
+  }
+
+  function refreshSplashNav() {
+    if (typeof supabaseClient === 'undefined') return;
+    supabaseClient.from('bienestar_splash').select('*').order('created_at', { ascending: false }).then(function (res) {
+      if (res.error) return;
+      setSplashNavVisible(res.data || []);
+    });
+  }
+
   window.showSplashCarousel = showSplashCarousel;
   window.closeSplashCarousel = closeSplashCarousel;
   window.splashStep = splashStep;
+  window.setSplashNavVisible = setSplashNavVisible;
+  window.refreshSplashNav = refreshSplashNav;
 
   document.addEventListener('DOMContentLoaded', injectNavHelp);
 })();

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Encuesta - FIAT Venezuela</title>
+  <title>Encuesta - Intranet</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -24,11 +24,15 @@
       text-align: center;
       margin-bottom: 24px;
     }
-    .header img {
-      max-width: 92px;
-      height: auto;
-      margin-bottom: 12px;
-      filter: brightness(0);
+    .header .logo-circle {
+      width: 92px;
+      height: 92px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid #ddd;
+      display: block;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
     }
     .header h1 {
       font-size: 22px;
@@ -192,7 +196,7 @@
 <body>
   <div class="page">
     <div class="header">
-      <img src="icons/logo FIAT.webp" alt="FIAT Venezuela">
+      <span class="logo-circle"></span>
       <h1>Encuesta de Bienestar</h1>
       <p>Tu opinión es importante para mejorar el clima laboral</p>
     </div>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bienestar Social - FIAT Intranet</title>
+  <title>Bienestar Social - Intranet</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -39,7 +39,7 @@
 <body>
   <div class="app-layout">
     <nav class="topnav" style="background:var(--module-bienestar);">
-      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><img class="topnav-logo" src="../icons/logo FIAT.webp" alt="FIAT">VEN<span>-Intranet</span></div>
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><span class="topnav-logo"></span>VEN<span>-Intranet</span></div>
       <div class="topnav-spacer"></div>
       <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
         <option value="../dashboard.html">Dashboard</option>
@@ -51,7 +51,7 @@
         <option value="compensacion.html">Compensación</option>
         <option value="finanzas.html">Finanzas</option>
         <option value="repositorio.html">Repositorio</option>
-        <option value="chatfiat.html">ChatFIAT</option>
+        <option value="chatfiat.html">Mensajería</option>
         <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
       </select>
       <div class="nav-user">
@@ -69,7 +69,7 @@
           </div>
           <div class="panel-item" data-tool="polizas" onclick="switchTool('polizas')" title="Pólizas"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-shield" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="historias" onclick="switchTool('historias')" title="Historias de gente FIAT"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-circle-book-open" style="font-size:24px;pointer-events:none;"></i>
+          <div class="panel-item" data-tool="historias" onclick="switchTool('historias')" title="Historias de gente"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-circle-book-open" style="font-size:24px;pointer-events:none;"></i>
           </div>
           <div class="panel-item" data-tool="encuestas" onclick="switchTool('encuestas')" title="Encuestas"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-square-poll-horizontal" style="font-size:24px;pointer-events:none;"></i>
           </div>
@@ -95,7 +95,7 @@
               <button class="btn btn-bienestar btn-sm" onclick="openModalPoliza()" style="margin-left:auto;">+ Nueva póliza</button>
             </div>
             <div class="toolbar-content" data-toolbar="historias" style="display:none;align-items:center;gap:16px;width:100%;">
-              <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Historias de gente FIAT</h2>
+              <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Historias de gente</h2>
               <button class="btn btn-bienestar btn-sm" onclick="openModalHistoria()" style="margin-left:auto;">+ Nueva historia</button>
             </div>
             <div class="toolbar-content" data-toolbar="encuestas" style="display:none;align-items:center;gap:16px;width:100%;">
@@ -458,46 +458,6 @@
           + '</td>'
           + '</tr>';
       }).join('');
-    }
-
-    function openModalTallas(id) {
-      detalleTrabajadorId = id;
-      var t = bienestarTrabajadores.find(function(x) { return x.id === id; });
-      if (!t) return;
-      document.getElementById('modalTallasTitle').textContent = 'Detalle del trabajador';
-      document.getElementById('tallas_nombre').value = t.nombres + ' ' + t.apellidos;
-      document.getElementById('tallas_cedula').value = t.cedula;
-      document.getElementById('tallas_unidad').value = getUnidadNombre(t.unidad_id);
-      document.getElementById('tallas_cargo').value = getCargoNombre(t.cargo_id);
-      document.getElementById('tallas_camisa').value = t.talla_camisa || '';
-      document.getElementById('tallas_franela').value = t.talla_franela || '';
-      document.getElementById('tallas_pantalon').value = t.talla_pantalon || '';
-      document.getElementById('tallas_calzado').value = t.talla_calzado || '';
-      bsShowModal('modalTallas');
-    }
-
-    async function saveTallas() {
-      if (!detalleTrabajadorId) return;
-      var payload = {
-        talla_camisa: document.getElementById('tallas_camisa').value || null,
-        talla_franela: document.getElementById('tallas_franela').value || null,
-        talla_pantalon: document.getElementById('tallas_pantalon').value || null,
-        talla_calzado: document.getElementById('tallas_calzado').value || null
-      };
-      try {
-        var { error, count } = await supabaseClient
-          .from('plantilla_trabajadores')
-          .update(payload, { count: 'exact' })
-          .eq('id', detalleTrabajadorId);
-        if (error) throw error;
-        if (count === 0) throw new Error('0 filas actualizadas. Revisa la política de UPDATE en plantilla_trabajadores (RLS).');
-        var t = bienestarTrabajadores.find(function(x) { return x.id === detalleTrabajadorId; });
-        if (t) Object.assign(t, payload);
-        bsHideModal('modalTallas');
-        showAlert('Tallas guardadas correctamente', 'success');
-      } catch (err) {
-        showAlert('Error al guardar: ' + err.message, 'error');
-      }
     }
 
     /* ===== PRÉSTAMOS ===== */

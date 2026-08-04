@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const errorDiv = document.getElementById('loginError');
     const params = new URLSearchParams(window.location.search);
     if (params.get('msg') === 'noacceso') {
-      errorDiv.textContent = 'Acceso restringido: solo trabajadores activos de FIAT pueden ingresar.';
+      errorDiv.textContent = 'Acceso restringido: solo trabajadores activos pueden ingresar.';
       errorDiv.classList.add('show');
     }
     if (params.get('msg') === 'noverif') {
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const st = window.fiatAccess.state;
             errorDiv.textContent = (st && st.error && st.error !== 'NO_MATCH')
               ? 'No se pudo verificar tu acceso (problema de base de datos). Revisa la consola o el esquema de Supabase.'
-              : 'Acceso restringido: solo trabajadores activos de FIAT pueden ingresar.';
+              : 'Acceso restringido: solo trabajadores activos pueden ingresar.';
             errorDiv.classList.add('show');
             loginBtn.disabled = false;
             loginBtn.textContent = 'Iniciar sesión';

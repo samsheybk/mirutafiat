@@ -41,7 +41,7 @@
       { key: 'plantilla', name: 'Plantilla de trabajadores' },
       { key: 'prestamos', name: 'Préstamos' },
       { key: 'polizas', name: 'Pólizas' },
-      { key: 'historias', name: 'Historias de gente FIAT' },
+      { key: 'historias', name: 'Historias de gente' },
       { key: 'encuestas', name: 'Encuestas' },
       { key: 'calendario', name: 'Calendario' }
     ]},
@@ -66,7 +66,7 @@
       { key: 'documentos', name: 'Documentos' },
       { key: 'categorias', name: 'Categorías' }
     ]},
-    { key: 'chatfiat.html', name: 'ChatFIAT', tools: [
+    { key: 'chatfiat.html', name: 'Mensajería', tools: [
       { key: 'inicio', name: 'Inicio' },
       { key: 'mensajes', name: 'Mensajes' }
     ]},

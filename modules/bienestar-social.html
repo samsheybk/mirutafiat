@@ -11,17 +11,6 @@
   <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
   <style>
     :root { --module-color: var(--module-bienestar); }
-    .historias-grid { display: grid; grid-template-columns: repeat(auto-fill, 300px); gap: 16px; justify-content: start; max-height: calc(100vh - 200px); overflow-y: auto; padding: 2px; }
-    .historia-card { background: var(--color-surface); border: 1px solid var(--color-border); width: 300px; transition: box-shadow .15s ease; }
-    .historia-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,.15); }
-    .historia-thumb { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; }
-    .historia-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-    .historia-thumb-ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 28px; font-weight: 700; }
-    .historia-badge { position: absolute; top: 8px; left: 8px; z-index: 2; padding: 2px 8px; font-size: 11px; font-weight: 600; color: #fff; }
-    .historia-card-body { padding: 10px; }
-    .historia-card-title { font-size: 13px; font-weight: 600; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .historia-card-meta { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; }
-    .historia-card-excerpt { font-size: 12px; color: var(--color-text-secondary); margin-top: 6px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     /* Constructor de preguntas de encuestas */
     .enc-pregunta { border: 1px solid var(--color-border); padding: 12px; margin-bottom: 12px; background: var(--color-bg); }
     .enc-pregunta-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
@@ -75,6 +64,22 @@
     .cal-splash-mini { width: 180px; border: 1px solid var(--color-border); border-radius: 8px; padding: 8px; background: var(--color-bg); }
     .cal-splash-mini img { width: 100%; height: 78px; cursor: pointer; }
     .cal-splash-mini-info { font-size: 12px; font-weight: 600; margin: 6px 0 8px; line-height: 1.3; word-break: break-word; }
+    .ue-item { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .ue-item .modal-close { width: 28px; height: 28px; flex-shrink: 0; }
+    /* Catálogo de stock */
+    .uni-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; padding: 2px; }
+    .uni-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 10px; overflow: hidden; transition: box-shadow .15s ease, transform .15s ease; display: flex; flex-direction: column; }
+    .uni-card:hover { box-shadow: 0 8px 20px rgba(0,0,0,.15); transform: translateY(-2px); }
+    .uni-thumb { width: 100%; aspect-ratio: 16 / 10; overflow: hidden; display: flex; align-items: center; justify-content: center; background: var(--color-bg); }
+    .uni-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .uni-thumb-ph { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: #e5e7eb; color: #9ca3af; }
+    .uni-thumb-ph i { font-size: 44px; line-height: 1; }
+    .uni-card-body { padding: 10px 12px 4px; flex: 1; }
+    .uni-card-title { font-size: 13.5px; font-weight: 700; }
+    .uni-card-meta { font-size: 11.5px; color: var(--color-text-secondary); margin-top: 1px; }
+    .uni-card-stock { margin-top: 8px; }
+    .uni-card-obs { font-size: 11.5px; color: var(--color-text-secondary); margin-top: 6px; line-height: 1.35; word-break: break-word; }
+    .uni-card-foot { padding: 10px 12px 12px; display: flex; gap: 8px; }
     @media (max-width: 900px) {
       .cal-wrap { grid-template-columns: 1fr; }
       .cal-main { order: 1; }
@@ -85,7 +90,7 @@
 <body>
   <div class="app-layout">
     <nav class="topnav" style="background:var(--module-bienestar);">
-      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><span class="topnav-logo"></span>VEN<span>-Intranet</span></div>
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><span class="topnav-logo"></span>Intranet</div>
       <div class="topnav-spacer"></div>
       <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
         <option value="../dashboard.html">Dashboard</option>
@@ -115,7 +120,7 @@
           </div>
           <div class="panel-item" data-tool="polizas" onclick="switchTool('polizas')" title="Pólizas"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-shield" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="historias" onclick="switchTool('historias')" title="Historias de gente"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-circle-book-open" style="font-size:24px;pointer-events:none;"></i>
+          <div class="panel-item" data-tool="uniformes" onclick="switchTool('uniformes')" title="Inventario de uniformes"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-vest" style="font-size:24px;pointer-events:none;"></i>
           </div>
           <div class="panel-item" data-tool="encuestas" onclick="switchTool('encuestas')" title="Encuestas"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-square-poll-horizontal" style="font-size:24px;pointer-events:none;"></i>
           </div>
@@ -140,9 +145,12 @@
               <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Pólizas</h2>
               <button class="btn btn-bienestar btn-sm" onclick="openModalPoliza()" style="margin-left:auto;">+ Nueva póliza</button>
             </div>
-            <div class="toolbar-content" data-toolbar="historias" style="display:none;align-items:center;gap:16px;width:100%;">
-              <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Historias de gente</h2>
-              <button class="btn btn-bienestar btn-sm" onclick="openModalHistoria()" style="margin-left:auto;">+ Nueva historia</button>
+            <div class="toolbar-content" data-toolbar="uniformes" style="display:none;align-items:center;gap:10px;width:100%;flex-wrap:wrap;">
+              <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Inventario de uniformes</h2>
+              <input type="text" class="form-input" id="uniBuscar" placeholder="Buscar..." oninput="uniBuscar()" style="flex:1;max-width:280px;height:34px;" title="Filtrar por prenda, talla o trabajador">
+              <button class="btn btn-sm uni-tab" data-utab="stock" onclick="uniSwitchView('stock',this)" style="background:var(--module-bienestar);color:#fff;border:0;border-radius:4px;padding:6px 16px;">Stock</button>
+              <button class="btn btn-sm uni-tab" data-utab="entregas" onclick="uniSwitchView('entregas',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Entregas</button>
+              <button class="btn btn-bienestar btn-sm" id="uniNuevoBtn" onclick="openModalUniformeStock()" style="margin-left:auto;">+ Nueva prenda</button>
             </div>
             <div class="toolbar-content" data-toolbar="encuestas" style="display:none;align-items:center;gap:16px;width:100%;">
               <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Encuestas</h2>
@@ -206,14 +214,21 @@
               </div>
             </div>
 
-            <div class="tool-section" id="tool-historias">
-              <div id="historiasGrid" class="historias-grid">
-                <div class="skeleton-card"><div class="skeleton skeleton-thumb"></div><div class="skeleton-card-body"><div class="skeleton" style="width:85%"></div><div class="skeleton" style="width:60%"></div><div class="skeleton" style="width:42%"></div></div></div>
-                <div class="skeleton-card"><div class="skeleton skeleton-thumb"></div><div class="skeleton-card-body"><div class="skeleton" style="width:85%"></div><div class="skeleton" style="width:60%"></div><div class="skeleton" style="width:42%"></div></div></div>
-                <div class="skeleton-card"><div class="skeleton skeleton-thumb"></div><div class="skeleton-card-body"><div class="skeleton" style="width:85%"></div><div class="skeleton" style="width:60%"></div><div class="skeleton" style="width:42%"></div></div></div>
-                <div class="skeleton-card"><div class="skeleton skeleton-thumb"></div><div class="skeleton-card-body"><div class="skeleton" style="width:85%"></div><div class="skeleton" style="width:60%"></div><div class="skeleton" style="width:42%"></div></div></div>
-                <div class="skeleton-card"><div class="skeleton skeleton-thumb"></div><div class="skeleton-card-body"><div class="skeleton" style="width:85%"></div><div class="skeleton" style="width:60%"></div><div class="skeleton" style="width:42%"></div></div></div>
-                <div class="skeleton-card"><div class="skeleton skeleton-thumb"></div><div class="skeleton-card-body"><div class="skeleton" style="width:85%"></div><div class="skeleton" style="width:60%"></div><div class="skeleton" style="width:42%"></div></div></div>
+            <div class="tool-section" id="tool-uniformes">
+              <div id="uniStockView">
+                <div id="uniStockGrid" class="uni-grid"></div>
+              </div>
+              <div id="uniEntregasView" style="display:none;">
+                <div class="tabla-scroll">
+                  <table class="data-table">
+                    <thead><tr><th>Trabajador</th><th>Artículos</th><th>Total</th><th>Fecha</th><th>Estado</th><th style="width:120px;">Acciones</th></tr></thead>
+                    <tbody id="uniEntregasBody">
+                      <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                      <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                      <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
 
@@ -322,28 +337,56 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="modalHistoria">
+  <div class="modal-overlay" id="modalUniformeStock">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalHistoriaTitle">Nueva historia</h3><button class="modal-close" onclick="bsHideModal('modalHistoria')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalUniformeStockTitle">Nueva prenda</h3><button class="modal-close" onclick="bsHideModal('modalUniformeStock')">&times;</button></div>
       <div class="modal-body">
-        <form id="formHistoria">
+        <form id="formUniformeStock">
           <div class="form-row">
-            <div class="form-group"><label>Título</label><input type="text" class="form-input" id="hist_titulo" required></div>
-            <div class="form-group"><label>Autor</label><input type="text" class="form-input" id="hist_autor"></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="hist_fecha" required></div>
-            <div class="form-group"><label>Estado</label>
-              <select class="form-select" id="hist_estado"><option value="Publicada">Publicada</option><option value="Borrador">Borrador</option><option value="Archivada">Archivada</option></select>
+            <div class="form-group"><label>Prenda</label><input type="text" class="form-input" id="us_prenda" list="usPrendas" required placeholder="Ej: Camisa"><datalist id="usPrendas"><option value="Camisa"></option><option value="Pantalón"></option><option value="Franela"></option><option value="Chaqueta"></option><option value="Overol"></option><option value="Bermuda"></option><option value="Gorra"></option></datalist></div>
+            <div class="form-group"><label>Talla</label>
+              <select class="form-select" id="us_talla" required><option value="">—</option><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select>
             </div>
           </div>
-          <div class="form-group"><label>URL de foto</label><input type="text" class="form-input" id="hist_foto_url" placeholder="https://..."></div>
-          <div class="form-group"><label>Contenido</label><textarea class="form-textarea" id="hist_contenido" rows="4"></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Cantidad en stock</label><input type="number" min="0" class="form-input" id="us_cantidad" value="0" required></div>
+          </div>
+          <div class="form-group"><label>URL de imagen</label><input type="url" class="form-input" id="us_imagen_url" placeholder="https://ejemplo.com/foto.jpg"></div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="us_observaciones" rows="2"></textarea></div>
         </form>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-outline" onclick="bsHideModal('modalHistoria')">Cancelar</button>
-        <button class="btn btn-bienestar" onclick="saveHistoria()">Guardar</button>
+        <button class="btn btn-outline" onclick="bsHideModal('modalUniformeStock')">Cancelar</button>
+        <button class="btn btn-bienestar" onclick="saveUniformeStock()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalUniformeEntrega">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalUniformeEntregaTitle">Nueva entrega</h3><button class="modal-close" onclick="bsHideModal('modalUniformeEntrega')">&times;</button></div>
+      <div class="modal-body">
+        <form id="formUniformeEntrega">
+          <div class="form-group"><label>Trabajador</label>
+            <select class="form-select" id="ue_trabajador_id" required></select>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="ue_fecha" required></div>
+            <div class="form-group"><label>Estado</label>
+              <select class="form-select" id="ue_estado"><option value="Entregado">Entregado</option><option value="Devuelto">Devuelto</option><option value="Dañado">Dañado</option></select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Artículos (solo stock disponible)</label>
+            <div id="ueItemsList"></div>
+            <button type="button" class="btn btn-bienestar btn-sm" onclick="ueAddItem()">+ Agregar artículo</button>
+          </div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="ue_observaciones" rows="2"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="bsHideModal('modalUniformeEntrega')">Cancelar</button>
+        <button class="btn btn-bienestar" onclick="saveUniformeEntrega()">Guardar</button>
       </div>
     </div>
   </div>
@@ -423,34 +466,6 @@
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="bsHideModal('modalCalendario')">Cancelar</button>
         <button class="btn btn-bienestar" onclick="saveCalendario()">Guardar</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="modalSplash">
-    <div class="modal">
-      <div class="modal-header"><h3 id="modalSplashTitle">Nueva imagen splash</h3><button class="modal-close" onclick="bsHideModal('modalSplash')">&times;</button></div>
-      <div class="modal-body">
-        <form id="formSplash">
-          <div class="form-group"><label>Título</label><input type="text" class="form-input" id="spl_titulo" required placeholder="Ej: Día del trabajador"></div>
-          <div class="form-group">
-            <label>Imagen</label>
-            <input type="file" id="spl_imagen" accept="image/*" onchange="onSplashImagenChange()">
-            <div id="splImagenPreview" style="margin-top:8px;"></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>Fecha de inicio</label><input type="date" class="form-input" id="spl_fecha_inicio"></div>
-            <div class="form-group"><label>Fecha de fin</label><input type="date" class="form-input" id="spl_fecha_fin"></div>
-          </div>
-          <div class="form-group" style="display:flex;align-items:center;gap:8px;margin-bottom:0;">
-            <input type="checkbox" id="spl_activo" checked style="width:16px;height:16px;">
-            <label for="spl_activo" style="margin:0;">Activo (se muestra a los usuarios)</label>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" onclick="bsHideModal('modalSplash')">Cancelar</button>
-        <button class="btn btn-bienestar" onclick="saveSplash()">Guardar</button>
       </div>
     </div>
   </div>
@@ -773,118 +788,337 @@
       }
     }
 
-    /* ===== HISTORIAS DE GENTE FIAT ===== */
-    var bienestarHistorias = [];
-    var editingHistoriaId = null;
-    var historiaGradients = ['#db2777', '#7c3aed', '#0d9488', '#ea580c', '#2563eb', '#059669', '#d97706'];
+    /* ===== INVENTARIO DE UNIFORMES ===== */
+    var uniView = 'stock';
+    var uniQuery = '';
+    var uniStock = [];
+    var uniEntregas = [];
+    var uniEntregaItems = [];
+    var editingUniformeStockId = null;
+    var editingUniformeEntregaId = null;
 
-    function historiaGradiente(id) {
-      var s = String(id);
-      var n = 0;
-      for (var i = 0; i < s.length; i++) n += s.charCodeAt(i);
-      return historiaGradients[n % historiaGradients.length];
-    }
-
-    async function loadHistorias() {
-      try {
-        var { data, error } = await supabaseClient.from('bienestar_historias').select('*').order('fecha', { ascending: false });
-        if (error) throw error;
-        bienestarHistorias = data || [];
-        renderHistorias();
-      } catch (err) {
-        document.getElementById('historiasGrid').innerHTML =
-          '<div class="empty-state"><div class="empty-state-text" style="color:#dc2626;">Error al cargar historias: ' + escBienestar(err.message) + '</div></div>';
+    function uniSwitchView(view, btn) {
+      uniView = view;
+      document.getElementById('uniStockView').style.display = view === 'stock' ? '' : 'none';
+      document.getElementById('uniEntregasView').style.display = view === 'entregas' ? '' : 'none';
+      document.querySelectorAll('.uni-tab').forEach(function(t) {
+        var on = t.getAttribute('data-utab') === view;
+        t.style.background = on ? 'var(--module-bienestar)' : 'transparent';
+        t.style.color = on ? '#fff' : 'var(--color-text)';
+        t.style.border = on ? '0' : '1px solid var(--border-color)';
+      });
+      var btnEl = document.getElementById('uniNuevoBtn');
+      if (view === 'entregas') {
+        btnEl.textContent = '+ Nueva entrega';
+        btnEl.setAttribute('onclick', 'openModalUniformeEntrega()');
+      } else {
+        btnEl.textContent = '+ Nueva prenda';
+        btnEl.setAttribute('onclick', 'openModalUniformeStock()');
       }
     }
 
-    function renderHistorias() {
-      var grid = document.getElementById('historiasGrid');
-      if (!bienestarHistorias.length) {
-        grid.innerHTML = '<div class="empty-state"><div class="empty-state-text">No hay historias publicadas</div></div>';
+    function llenarSelectTrabajadores(selId) {
+      var sel = document.getElementById(selId);
+      sel.innerHTML = '<option value="">— Selecciona —</option>';
+      bienestarTrabajadores.forEach(function(t) {
+        sel.innerHTML += '<option value="' + t.id + '">' + escBienestar(t.nombres + ' ' + t.apellidos) + ' (' + escBienestar(t.cedula) + ')</option>';
+      });
+    }
+
+    async function loadUniformeStock() {
+      try {
+        var { data, error } = await supabaseClient.from('bienestar_uniforme_stock').select('*').order('prenda');
+        if (error) throw error;
+        uniStock = data || [];
+        renderUniformeStock();
+      } catch (err) {
+        document.getElementById('uniStockGrid').innerHTML =
+          '<div style="text-align:center;padding:40px;color:#dc2626;">Error al cargar stock: ' + escBienestar(err.message) + '</div>';
+      }
+    }
+
+    function uniThumb(s) {
+      if (s.imagen_url) {
+        return '<img src="' + escBienestar(s.imagen_url) + '" alt="' + escBienestar(s.prenda) + '" loading="lazy" onerror="this.parentElement.innerHTML=\'<span class=\\\'uni-thumb-ph\\\'><i class=\\\'fi fi-sr-vest\\\'></i></span>\'">';
+      }
+      return '<span class="uni-thumb-ph"><i class="fi fi-sr-vest"></i></span>';
+    }
+
+    function uniBuscar() {
+      uniQuery = (document.getElementById('uniBuscar').value || '').toLowerCase().trim();
+      if (uniView === 'entregas') { renderUniformeEntregas(); } else { renderUniformeStock(); }
+    }
+
+    function renderUniformeStock() {
+      var grid = document.getElementById('uniStockGrid');
+      var lista = uniQuery
+        ? uniStock.filter(function(s) {
+            return (s.prenda || '').toLowerCase().includes(uniQuery)
+              || (s.talla || '').toLowerCase().includes(uniQuery)
+              || (s.observaciones || '').toLowerCase().includes(uniQuery);
+          })
+        : uniStock;
+      if (!lista.length) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999;">' + (uniStock.length ? 'Sin resultados para la búsqueda' : 'No hay prendas en stock. Agrega la primera con el botón “Nueva prenda”.') + '</div>';
         return;
       }
-      grid.innerHTML = bienestarHistorias.map(function(h) {
-        var letra = (h.titulo || '?').charAt(0).toUpperCase();
-        var thumb = h.foto_url
-          ? '<img src="' + escBienestar(h.foto_url) + '" alt="" onerror="this.style.display=\'none\';">'
-          : '';
-        return '<div class="historia-card">'
-          + '<div class="historia-thumb">'
-          + thumb
-          + '<div class="historia-thumb-ph" style="background:' + historiaGradiente(h.id) + ';">' + escBienestar(letra) + '</div>'
-          + '<span class="historia-badge badge-' + (h.estado === 'Publicada' ? 'active" style="background:#059669;' : 'pending" style="background:#d97706;') + '">' + escBienestar(h.estado || '-') + '</span>'
+      grid.innerHTML = lista.map(function(s) {
+        var badge = s.cantidad > 0 ? 'badge-active' : 'badge-inactive';
+        var stockTxt = Number(s.cantidad || 0) === 1 ? 'unidad' : 'unidades';
+        return '<div class="uni-card">'
+          + '<div class="uni-thumb">' + uniThumb(s) + '</div>'
+          + '<div class="uni-card-body">'
+          + '<div class="uni-card-title">' + escBienestar(s.prenda) + '</div>'
+          + '<div class="uni-card-meta">Talla ' + escBienestar(s.talla || '-') + '</div>'
+          + '<div class="uni-card-stock"><span class="badge ' + badge + '">' + Number(s.cantidad || 0) + ' ' + stockTxt + '</span></div>'
+          + (s.observaciones ? '<div class="uni-card-obs">' + escBienestar(s.observaciones) + '</div>' : '')
           + '</div>'
-          + '<div class="historia-card-body">'
-          + '<div class="historia-card-title">' + escBienestar(h.titulo) + '</div>'
-          + '<div class="historia-card-meta">' + escBienestar(h.autor || 'Autor no indicado') + ' · ' + (h.fecha || '-') + '</div>'
-          + '<div class="historia-card-excerpt">' + escBienestar(h.contenido || '') + '</div>'
-          + '</div>'
-          + '<div style="padding:0 10px 10px;display:flex;gap:8px;">'
-          + '<button class="btn btn-bienestar btn-sm" onclick="openModalHistoria(' + h.id + ')">Editar</button>'
-          + '<button class="btn btn-outline btn-sm" onclick="deleteHistoria(' + h.id + ')">Eliminar</button>'
+          + '<div class="uni-card-foot">'
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalUniformeStock(' + s.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteUniformeStock(' + s.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
           + '</div>'
           + '</div>';
       }).join('');
-      uiFadeIn(grid);
     }
 
-    function openModalHistoria(id) {
-      editingHistoriaId = id || null;
-      document.getElementById('formHistoria').reset();
-      document.getElementById('modalHistoriaTitle').textContent = id ? 'Editar historia' : 'Nueva historia';
+    function openModalUniformeStock(id) {
+      editingUniformeStockId = id || null;
+      document.getElementById('formUniformeStock').reset();
+      document.getElementById('modalUniformeStockTitle').textContent = id ? 'Editar prenda' : 'Nueva prenda';
       if (id) {
-        var h = bienestarHistorias.find(function(x) { return x.id === id; });
-        if (h) {
-          document.getElementById('hist_titulo').value = h.titulo;
-          document.getElementById('hist_autor').value = h.autor || '';
-          document.getElementById('hist_foto_url').value = h.foto_url || '';
-          document.getElementById('hist_contenido').value = h.contenido || '';
-          document.getElementById('hist_fecha').value = h.fecha || '';
-          document.getElementById('hist_estado').value = h.estado;
+        var s = uniStock.find(function(x) { return x.id === id; });
+        if (s) {
+          document.getElementById('us_prenda').value = s.prenda;
+          document.getElementById('us_talla').value = s.talla || '';
+          document.getElementById('us_cantidad').value = s.cantidad;
+          document.getElementById('us_imagen_url').value = s.imagen_url || '';
+          document.getElementById('us_observaciones').value = s.observaciones || '';
         }
       }
-      bsShowModal('modalHistoria');
+      bsShowModal('modalUniformeStock');
     }
 
-    async function saveHistoria() {
-      var titulo = document.getElementById('hist_titulo').value.trim();
-      var fecha = document.getElementById('hist_fecha').value;
-      if (!titulo || !fecha) {
-        showAlert('El título y la fecha son obligatorios', 'warning');
+    async function saveUniformeStock() {
+      var prenda = document.getElementById('us_prenda').value.trim();
+      var talla = document.getElementById('us_talla').value;
+      var cantidad = parseInt(document.getElementById('us_cantidad').value);
+      if (!prenda || !talla || isNaN(cantidad) || cantidad < 0) {
+        showAlert('Completa la prenda, la talla y una cantidad válida', 'warning');
         return;
       }
       var payload = {
-        titulo: titulo,
-        autor: document.getElementById('hist_autor').value.trim() || null,
-        foto_url: document.getElementById('hist_foto_url').value.trim() || null,
-        contenido: document.getElementById('hist_contenido').value.trim() || null,
-        fecha: fecha,
-        estado: document.getElementById('hist_estado').value
+        prenda: prenda,
+        talla: talla,
+        cantidad: cantidad,
+        imagen_url: document.getElementById('us_imagen_url').value.trim() || null,
+        observaciones: document.getElementById('us_observaciones').value.trim() || null
       };
       try {
-        if (editingHistoriaId) {
-          var { error } = await supabaseClient.from('bienestar_historias').update(payload).eq('id', editingHistoriaId);
+        if (editingUniformeStockId) {
+          var { error } = await supabaseClient.from('bienestar_uniforme_stock').update(payload).eq('id', editingUniformeStockId);
           if (error) throw error;
         } else {
-          var { error } = await supabaseClient.from('bienestar_historias').insert([payload]);
+          var { error } = await supabaseClient.from('bienestar_uniforme_stock').insert([payload]);
           if (error) throw error;
         }
-        bsHideModal('modalHistoria');
-        loadHistorias();
-        showAlert(editingHistoriaId ? 'Historia actualizada' : 'Historia creada', 'success');
+        bsHideModal('modalUniformeStock');
+        loadUniformeStock();
+        showAlert(editingUniformeStockId ? 'Prenda actualizada' : 'Prenda agregada', 'success');
       } catch (err) {
         showAlert('Error al guardar: ' + err.message, 'error');
       }
     }
 
-    async function deleteHistoria(id) {
-      var ok = await showConfirm('¿Eliminar esta historia?', 'Eliminar');
+    async function deleteUniformeStock(id) {
+      var ok = await showConfirm('¿Eliminar esta prenda del stock?', 'Eliminar');
       if (!ok) return;
       try {
-        var { error } = await supabaseClient.from('bienestar_historias').delete().eq('id', id);
+        var { error } = await supabaseClient.from('bienestar_uniforme_stock').delete().eq('id', id);
         if (error) throw error;
-        loadHistorias();
-        showAlert('Historia eliminada', 'success');
+        loadUniformeStock();
+        showAlert('Prenda eliminada', 'success');
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    function itemsDeEntrega(entregaId) {
+      return uniEntregaItems.filter(function(it) { return it.entrega_id === entregaId; });
+    }
+
+    async function loadUniformeEntregas() {
+      try {
+        var [entRes, itRes] = await Promise.all([
+          supabaseClient.from('bienestar_uniforme_entregas').select('*').order('fecha', { ascending: false }),
+          supabaseClient.from('bienestar_uniforme_entrega_items').select('*')
+        ]);
+        if (entRes.error) throw entRes.error;
+        if (itRes.error) throw itRes.error;
+        uniEntregas = entRes.data || [];
+        uniEntregaItems = itRes.data || [];
+        renderUniformeEntregas();
+      } catch (err) {
+        document.getElementById('uniEntregasBody').innerHTML =
+          '<tr><td colspan="7" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar entregas: ' + escBienestar(err.message) + '</td></tr>';
+      }
+    }
+
+    function renderUniformeEntregas() {
+      var tbody = document.getElementById('uniEntregasBody');
+      var lista = uniEntregas.map(function(e) {
+        var items = itemsDeEntrega(e.id);
+        var resumen = items.length
+          ? items.map(function(it) { return escBienestar(it.prenda) + ' (' + escBienestar(it.talla) + ') × ' + it.cantidad; }).join(', ')
+          : '<span style="color:#999;">Sin artículos</span>';
+        return { e: e, items: items, resumen: resumen, texto: (getTrabajadorNombre(e.trabajador_id) + ' ' + items.map(function(it) { return it.prenda + ' ' + it.talla; }).join(' ')).toLowerCase() };
+      });
+      if (uniQuery) lista = lista.filter(function(r) { return r.texto.includes(uniQuery); });
+      if (!uniEntregas.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay entregas registradas</td></tr>';
+        return;
+      }
+      if (!lista.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Sin resultados para la búsqueda</td></tr>';
+        return;
+      }
+      tbody.innerHTML = lista.map(function(r) {
+        var e = r.e, items = r.items, resumen = r.resumen;
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + escBienestar(getTrabajadorNombre(e.trabajador_id)) + '</span></td>'
+          + '<td>' + resumen + '</td>'
+          + '<td style="text-align:center;">' + (items.length ? items.reduce(function(a, b) { return a + b.cantidad; }, 0) : 0) + '</td>'
+          + '<td>' + (e.fecha || '-') + '</td>'
+          + '<td><span class="badge ' + getBadgeClass(e.estado) + '">' + escBienestar(e.estado) + '</span></td>'
+          + '<td>'
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalUniformeEntrega(' + e.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteUniformeEntrega(' + e.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function ueStockOptions(selectedId) {
+      var html = '<option value="">— Selecciona —</option>';
+      uniStock.forEach(function(s) {
+        if (Number(s.cantidad) <= 0) return;
+        var sel = selectedId && String(s.id) === String(selectedId) ? ' selected' : '';
+        html += '<option value="' + s.id + '"' + sel + '>' + escBienestar(s.prenda) + ' · ' + escBienestar(s.talla || '-') + ' (' + s.cantidad + ' disp.)</option>';
+      });
+      return html;
+    }
+
+    function ueAddItem(prefill) {
+      var list = document.getElementById('ueItemsList');
+      var row = document.createElement('div');
+      row.className = 'ue-item';
+      row.innerHTML = '<select class="form-select ue-item-stock" style="flex:1;">' + ueStockOptions(prefill ? prefill.stock_id : null) + '</select>'
+        + '<input type="number" class="form-input ue-item-cantidad" min="1" value="' + (prefill ? prefill.cantidad : 1) + '" style="width:84px;" oninput="ueValidateCantidad(this)">'
+        + '<button type="button" class="modal-close" title="Quitar artículo" onclick="ueRemoveItem(this)">&times;</button>';
+      list.appendChild(row);
+    }
+
+    function ueRemoveItem(btn) {
+      var list = document.getElementById('ueItemsList');
+      if (list.children.length <= 1) {
+        showAlert('Debe haber al menos un artículo', 'warning');
+        return;
+      }
+      btn.parentElement.remove();
+    }
+
+    function ueValidateCantidad(input) {
+      var sel = input.parentElement.querySelector('.ue-item-stock');
+      var stock = uniStock.find(function(s) { return String(s.id) === String(sel.value); });
+      if (stock && Number(input.value) > Number(stock.cantidad)) {
+        input.value = stock.cantidad;
+      }
+      if (Number(input.value) < 1) input.value = 1;
+    }
+
+    function ueCollectItems() {
+      var rows = document.querySelectorAll('#ueItemsList .ue-item');
+      var items = [];
+      for (var i = 0; i < rows.length; i++) {
+        var sel = rows[i].querySelector('.ue-item-stock');
+        var cant = parseInt(rows[i].querySelector('.ue-item-cantidad').value);
+        if (!sel.value || isNaN(cant) || cant < 1) return null;
+        items.push({ stock_id: sel.value, cantidad: cant });
+      }
+      return items;
+    }
+
+    function openModalUniformeEntrega(id) {
+      editingUniformeEntregaId = id || null;
+      llenarSelectTrabajadores('ue_trabajador_id');
+      document.getElementById('formUniformeEntrega').reset();
+      document.getElementById('ueItemsList').innerHTML = '';
+      document.getElementById('modalUniformeEntregaTitle').textContent = id ? 'Editar entrega' : 'Nueva entrega';
+      document.getElementById('ue_fecha').value = fechaISO(new Date());
+      if (id) {
+        var e = uniEntregas.find(function(x) { return x.id === id; });
+        if (e) {
+          document.getElementById('ue_trabajador_id').value = e.trabajador_id || '';
+          document.getElementById('ue_fecha').value = e.fecha || '';
+          document.getElementById('ue_estado').value = e.estado;
+          document.getElementById('ue_observaciones').value = e.observaciones || '';
+          var items = itemsDeEntrega(e.id);
+          items.forEach(function(it) { ueAddItem({ stock_id: it.stock_id, cantidad: it.cantidad }); });
+        }
+      }
+      if (!document.getElementById('ueItemsList').children.length) ueAddItem();
+      if (!uniStock.some(function(s) { return Number(s.cantidad) > 0; })) {
+        showAlert('No hay artículos con stock disponible. Agrega stock primero.', 'warning');
+      }
+      bsShowModal('modalUniformeEntrega');
+    }
+
+    async function saveUniformeEntrega() {
+      var trabajador_id = document.getElementById('ue_trabajador_id').value;
+      var fecha = document.getElementById('ue_fecha').value;
+      var estado = document.getElementById('ue_estado').value;
+      var observaciones = document.getElementById('ue_observaciones').value.trim() || null;
+      if (!trabajador_id || !fecha) {
+        showAlert('Selecciona el trabajador y la fecha', 'warning');
+        return;
+      }
+      var items = ueCollectItems();
+      if (!items) {
+        showAlert('Completa todos los artículos con stock seleccionado y cantidad válida', 'warning');
+        return;
+      }
+      var payload = {
+        p_trabajador_id: trabajador_id,
+        p_fecha: fecha,
+        p_estado: estado,
+        p_observaciones: observaciones,
+        p_items: items
+      };
+      try {
+        var res;
+        if (editingUniformeEntregaId) {
+          res = await supabaseClient.rpc('actualizar_entrega_uniforme', Object.assign({ p_entrega_id: editingUniformeEntregaId }, payload));
+        } else {
+          res = await supabaseClient.rpc('crear_entrega_uniforme', payload);
+        }
+        if (res.error) throw res.error;
+        bsHideModal('modalUniformeEntrega');
+        loadUniformeEntregas();
+        loadUniformeStock();
+        showAlert(editingUniformeEntregaId ? 'Entrega actualizada (stock ajustado)' : 'Entrega registrada (stock rebajado)', 'success');
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteUniformeEntrega(id) {
+      var ok = await showConfirm('¿Eliminar esta entrega? El stock será devuelto al inventario.', 'Eliminar');
+      if (!ok) return;
+      try {
+        var { error } = await supabaseClient.rpc('eliminar_entrega_uniforme', { p_entrega_id: id });
+        if (error) throw error;
+        loadUniformeEntregas();
+        loadUniformeStock();
+        showAlert('Entrega eliminada (stock devuelto)', 'success');
       } catch (err) {
         showAlert('Error al eliminar: ' + err.message, 'error');
       }
@@ -1302,16 +1536,33 @@
         return;
       }
       cont.innerHTML = lista.map(function(s) {
+        var btnEditar = s.evento_id
+          ? '<button class="btn btn-sm btn-outline" title="Editar evento vinculado" onclick="openModalCalendario(' + s.evento_id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          : '';
         return '<div class="cal-splash-mini">'
-          + '<img class="splash-thumb" src="' + s.imagen_url + '" alt="' + escBienestar(s.titulo) + '" onclick="verSplashDia(\'' + iso + '\')" onerror="this.style.visibility=\'hidden\';">'
+          + '<img class="splash-thumb" src="' + s.imagen_url + '" alt="' + escBienestar(s.titulo) + '" onclick="verSplashDetalleId(' + s.id + ')" onerror="this.style.visibility=\'hidden\';">'
           + '<div class="cal-splash-mini-info">' + escBienestar(s.titulo) + '</div>'
           + '<div class="cal-evento-acciones">'
           + '<button class="btn btn-sm btn-outline" title="Ver carrusel" onclick="verSplashDia(\'' + iso + '\')"><i class="fi fi-sr-eye" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
-          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalSplash(' + s.id + ', \'' + iso + '\')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + btnEditar
           + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteSplash(' + s.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
           + '</div>'
           + '</div>';
       }).join('');
+    }
+
+    function verSplashDetalleId(id) {
+      var s = bienestarSplash.find(function(x) { return x.id === id; });
+      if (!s) return;
+      if (window.showSplashDetalle) {
+        window.showSplashDetalle({
+          imagen_url: s.imagen_url,
+          titulo: s.titulo,
+          descripcion: s.descripcion,
+          fecha_inicio: s.fecha_inicio,
+          fecha_fin: s.fecha_fin
+        });
+      }
     }
 
     function verSplashDia(iso) {
@@ -1319,7 +1570,7 @@
       if (!lista.length) return;
       if (window.showSplashCarousel) {
         window.showSplashCarousel(lista.map(function(s) {
-          return { imagen_url: s.imagen_url, titulo: s.titulo };
+          return { imagen_url: s.imagen_url, titulo: s.titulo, descripcion: s.descripcion, fecha_inicio: s.fecha_inicio, fecha_fin: s.fecha_fin };
         }));
       }
     }
@@ -1432,7 +1683,7 @@
           if (error) throw error;
           eventoId = insertado && insertado[0] ? insertado[0].id : null;
         }
-        await guardarSplashEvento(eventoId, incluirSplash, titulo, fecha, fechaFin);
+        await guardarSplashEvento(eventoId, incluirSplash, titulo, fecha, fechaFin, payload.descripcion);
         bsHideModal('modalCalendario');
         loadCalendario();
         loadSplash();
@@ -1442,12 +1693,13 @@
       }
     }
 
-    async function guardarSplashEvento(eventoId, incluirSplash, titulo, fecha, fechaFin) {
+    async function guardarSplashEvento(eventoId, incluirSplash, titulo, fecha, fechaFin, descripcion) {
       if (!eventoId) return;
       var existente = splashDeEvento(eventoId);
       if (incluirSplash) {
         var splashPayload = {
           titulo: titulo,
+          descripcion: descripcion || null,
           fecha_inicio: fecha,
           fecha_fin: fechaFin || fecha,
           activo: true,
@@ -1489,8 +1741,6 @@
 
     /* ===== SPLASH ===== */
     var bienestarSplash = [];
-    var editingSplashId = null;
-    var splashImagenArchivo = null;
 
     function splashEnVigencia(s) {
       if (s.activo === false) return false;
@@ -1506,28 +1756,6 @@
       });
     }
 
-    function onSplashImagenChange() {
-      var f = document.getElementById('spl_imagen').files[0];
-      var prev = document.getElementById('splImagenPreview');
-      if (!f) {
-        splashImagenArchivo = null;
-        prev.innerHTML = '';
-        return;
-      }
-      if (f.size > 2 * 1024 * 1024) {
-        showAlert('La imagen supera los 2 MB', 'warning');
-        document.getElementById('spl_imagen').value = '';
-        prev.innerHTML = '';
-        return;
-      }
-      var reader = new FileReader();
-      reader.onload = function(e) {
-        splashImagenArchivo = e.target.result;
-        prev.innerHTML = '<img src="' + splashImagenArchivo + '" alt="Vista previa" style="max-width:320px;border-radius:8px;border:1px solid var(--color-border);display:block;">';
-      };
-      reader.readAsDataURL(f);
-    }
-
     async function loadSplash() {
       try {
         var { data, error } = await supabaseClient.from('bienestar_splash').select('*').order('created_at', { ascending: false });
@@ -1537,61 +1765,6 @@
         if (window.setSplashNavVisible) window.setSplashNavVisible(bienestarSplash);
       } catch (err) {
         if (window.console && console.error) console.error('Error al cargar los splash:', err.message);
-      }
-    }
-
-    function openModalSplash(id, fechaPreseleccionada) {
-      editingSplashId = id || null;
-      document.getElementById('formSplash').reset();
-      document.getElementById('splImagenPreview').innerHTML = '';
-      splashImagenArchivo = null;
-      document.getElementById('modalSplashTitle').textContent = id ? 'Editar imagen splash' : 'Nueva imagen splash';
-      if (id) {
-        var s = bienestarSplash.find(function(x) { return x.id === id; });
-        if (s) {
-          document.getElementById('spl_titulo').value = s.titulo;
-          document.getElementById('spl_fecha_inicio').value = s.fecha_inicio || '';
-          document.getElementById('spl_fecha_fin').value = s.fecha_fin || '';
-          document.getElementById('spl_activo').checked = s.activo !== false;
-          document.getElementById('splImagenPreview').innerHTML = '<img src="' + s.imagen_url + '" alt="Imagen actual" style="max-width:320px;border-radius:8px;border:1px solid var(--color-border);display:block;">';
-        }
-      } else if (fechaPreseleccionada) {
-        document.getElementById('spl_fecha_inicio').value = fechaPreseleccionada;
-        document.getElementById('spl_fecha_fin').value = fechaPreseleccionada;
-      }
-      bsShowModal('modalSplash');
-    }
-
-    async function saveSplash() {
-      var titulo = document.getElementById('spl_titulo').value.trim();
-      if (!titulo) {
-        showAlert('El título es obligatorio', 'warning');
-        return;
-      }
-      if (!splashImagenArchivo) {
-        showAlert('Selecciona una imagen', 'warning');
-        return;
-      }
-      var payload = {
-        titulo: titulo,
-        imagen_url: splashImagenArchivo,
-        fecha_inicio: document.getElementById('spl_fecha_inicio').value || null,
-        fecha_fin: document.getElementById('spl_fecha_fin').value || null,
-        activo: document.getElementById('spl_activo').checked
-      };
-      try {
-        if (editingSplashId) {
-          var { error } = await supabaseClient.from('bienestar_splash').update(payload).eq('id', editingSplashId);
-          if (error) throw error;
-        } else {
-          var { error } = await supabaseClient.from('bienestar_splash').insert([payload]);
-          if (error) throw error;
-        }
-        bsHideModal('modalSplash');
-        loadSplash();
-        showAlert(editingSplashId ? 'Splash actualizado' : 'Splash creado', 'success');
-      } catch (err) {
-        showAlert('Error al guardar: ' + err.message, 'error');
       }
     }
 
@@ -1617,7 +1790,7 @@
       } catch (e) {}
       if (window.showSplashCarousel) {
         window.showSplashCarousel(lista.map(function(s) {
-          return { imagen_url: s.imagen_url, titulo: s.titulo };
+          return { imagen_url: s.imagen_url, titulo: s.titulo, descripcion: s.descripcion, fecha_inicio: s.fecha_inicio, fecha_fin: s.fecha_fin };
         }));
       }
     }
@@ -1630,7 +1803,8 @@
         loadPrestamos();
       });
       loadPolizas();
-      loadHistorias();
+      loadUniformeStock();
+      loadUniformeEntregas();
       loadEncuestas();
       loadCalendario();
       loadSplash();

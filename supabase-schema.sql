@@ -406,6 +406,7 @@ ALTER TABLE plantilla_trabajadores ADD COLUMN IF NOT EXISTS talla_franela TEXT;
 
 ALTER TABLE bienestar_calendario ADD COLUMN IF NOT EXISTS fecha_fin DATE;
 ALTER TABLE bienestar_splash ADD COLUMN IF NOT EXISTS evento_id BIGINT REFERENCES bienestar_calendario(id) ON DELETE CASCADE;
+ALTER TABLE bienestar_splash ADD COLUMN IF NOT EXISTS descripcion TEXT;
 
 -- ============================================
 -- ROW LEVEL SECURITY (RLS)
@@ -1157,6 +1158,7 @@ CREATE TABLE IF NOT EXISTS bienestar_splash (
   id BIGSERIAL PRIMARY KEY,
   titulo TEXT NOT NULL,
   imagen_url TEXT NOT NULL,
+  descripcion TEXT,
   fecha_inicio DATE,
   fecha_fin DATE,
   activo BOOLEAN DEFAULT TRUE,
@@ -1165,12 +1167,52 @@ CREATE TABLE IF NOT EXISTS bienestar_splash (
   user_id UUID REFERENCES auth.users(id)
 );
 
+CREATE TABLE IF NOT EXISTS bienestar_uniforme_stock (
+  id BIGSERIAL PRIMARY KEY,
+  prenda TEXT NOT NULL,
+  talla TEXT NOT NULL,
+  cantidad INTEGER NOT NULL DEFAULT 0,
+  imagen_url TEXT,
+  observaciones TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID REFERENCES auth.users(id)
+);
+
+CREATE TABLE IF NOT EXISTS bienestar_uniforme_entregas (
+  id BIGSERIAL PRIMARY KEY,
+  trabajador_id UUID REFERENCES plantilla_trabajadores(id) ON DELETE SET NULL,
+  fecha DATE NOT NULL DEFAULT CURRENT_DATE,
+  estado TEXT NOT NULL DEFAULT 'Entregado' CHECK (estado IN ('Entregado','Devuelto','Dañado')),
+  observaciones TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID REFERENCES auth.users(id)
+);
+
+CREATE TABLE IF NOT EXISTS bienestar_uniforme_entrega_items (
+  id BIGSERIAL PRIMARY KEY,
+  entrega_id BIGINT NOT NULL REFERENCES bienestar_uniforme_entregas(id) ON DELETE CASCADE,
+  stock_id BIGINT REFERENCES bienestar_uniforme_stock(id) ON DELETE SET NULL,
+  prenda TEXT NOT NULL,
+  talla TEXT NOT NULL,
+  cantidad INTEGER NOT NULL DEFAULT 1,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Migración: la entrega pasa a ser un encabezado; los artículos viven en bienestar_uniforme_entrega_items
+ALTER TABLE bienestar_uniforme_entregas DROP COLUMN IF EXISTS prenda;
+ALTER TABLE bienestar_uniforme_entregas DROP COLUMN IF EXISTS talla;
+ALTER TABLE bienestar_uniforme_entregas DROP COLUMN IF EXISTS cantidad;
+ALTER TABLE bienestar_uniforme_stock ADD COLUMN IF NOT EXISTS imagen_url TEXT;
+
 ALTER TABLE bienestar_prestamos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bienestar_polizas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bienestar_historias ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bienestar_encuestas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bienestar_calendario ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bienestar_splash ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bienestar_uniforme_stock ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bienestar_uniforme_entregas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bienestar_uniforme_entrega_items ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Usuarios autenticados pueden ver prestamos" ON bienestar_prestamos;
 CREATE POLICY "Usuarios autenticados pueden ver prestamos"
@@ -1249,6 +1291,184 @@ CREATE POLICY "Usuarios autenticados pueden actualizar splash"
 DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar splash" ON bienestar_splash;
 CREATE POLICY "Usuarios autenticados pueden eliminar splash"
   ON bienestar_splash FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver stock uniformes" ON bienestar_uniforme_stock;
+CREATE POLICY "Usuarios autenticados pueden ver stock uniformes"
+  ON bienestar_uniforme_stock FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear stock uniformes" ON bienestar_uniforme_stock;
+CREATE POLICY "Usuarios autenticados pueden crear stock uniformes"
+  ON bienestar_uniforme_stock FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar stock uniformes" ON bienestar_uniforme_stock;
+CREATE POLICY "Usuarios autenticados pueden actualizar stock uniformes"
+  ON bienestar_uniforme_stock FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar stock uniformes" ON bienestar_uniforme_stock;
+CREATE POLICY "Usuarios autenticados pueden eliminar stock uniformes"
+  ON bienestar_uniforme_stock FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver entregas uniformes" ON bienestar_uniforme_entregas;
+CREATE POLICY "Usuarios autenticados pueden ver entregas uniformes"
+  ON bienestar_uniforme_entregas FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear entregas uniformes" ON bienestar_uniforme_entregas;
+CREATE POLICY "Usuarios autenticados pueden crear entregas uniformes"
+  ON bienestar_uniforme_entregas FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar entregas uniformes" ON bienestar_uniforme_entregas;
+CREATE POLICY "Usuarios autenticados pueden actualizar entregas uniformes"
+  ON bienestar_uniforme_entregas FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar entregas uniformes" ON bienestar_uniforme_entregas;
+CREATE POLICY "Usuarios autenticados pueden eliminar entregas uniformes"
+  ON bienestar_uniforme_entregas FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver items entregas uniformes" ON bienestar_uniforme_entrega_items;
+CREATE POLICY "Usuarios autenticados pueden ver items entregas uniformes"
+  ON bienestar_uniforme_entrega_items FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear items entregas uniformes" ON bienestar_uniforme_entrega_items;
+CREATE POLICY "Usuarios autenticados pueden crear items entregas uniformes"
+  ON bienestar_uniforme_entrega_items FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar items entregas uniformes" ON bienestar_uniforme_entrega_items;
+CREATE POLICY "Usuarios autenticados pueden actualizar items entregas uniformes"
+  ON bienestar_uniforme_entrega_items FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar items entregas uniformes" ON bienestar_uniforme_entrega_items;
+CREATE POLICY "Usuarios autenticados pueden eliminar items entregas uniformes"
+  ON bienestar_uniforme_entrega_items FOR DELETE TO authenticated USING (true);
+
+-- ============================================
+-- UNIFORMES: funciones de entrega (header + items, rebaja de stock atómica)
+-- ============================================
+
+CREATE OR REPLACE FUNCTION crear_entrega_uniforme(
+  p_trabajador_id UUID,
+  p_fecha DATE,
+  p_estado TEXT,
+  p_observaciones TEXT,
+  p_items JSONB
+) RETURNS BIGINT
+LANGUAGE plpgsql SECURITY DEFINER
+AS $$
+DECLARE
+  v_entrega_id BIGINT;
+  v_item JSONB;
+  v_stock RECORD;
+  v_cantidad INTEGER;
+BEGIN
+  IF p_items IS NULL OR jsonb_array_length(p_items) = 0 THEN
+    RAISE EXCEPTION 'Debe agregar al menos un artículo';
+  END IF;
+
+  INSERT INTO bienestar_uniforme_entregas (trabajador_id, fecha, estado, observaciones)
+  VALUES (p_trabajador_id, p_fecha, p_estado, p_observaciones)
+  RETURNING id INTO v_entrega_id;
+
+  FOR v_item IN SELECT value FROM jsonb_array_elements(p_items)
+  LOOP
+    v_cantidad := COALESCE((v_item->>'cantidad')::INTEGER, 0);
+    IF v_cantidad < 1 THEN
+      RAISE EXCEPTION 'Cantidad inválida en un artículo';
+    END IF;
+
+    SELECT * INTO v_stock FROM bienestar_uniforme_stock
+    WHERE id = (v_item->>'stock_id')::BIGINT
+    FOR UPDATE;
+
+    IF v_stock.id IS NULL THEN
+      RAISE EXCEPTION 'Artículo no encontrado en stock';
+    END IF;
+    IF v_stock.cantidad < v_cantidad THEN
+      RAISE EXCEPTION 'Stock insuficiente para % (talla %): solo hay % disponible',
+        v_stock.prenda, v_stock.talla, v_stock.cantidad;
+    END IF;
+
+    UPDATE bienestar_uniforme_stock
+    SET cantidad = cantidad - v_cantidad
+    WHERE id = v_stock.id;
+
+    INSERT INTO bienestar_uniforme_entrega_items (entrega_id, stock_id, prenda, talla, cantidad)
+    VALUES (v_entrega_id, v_stock.id, v_stock.prenda, v_stock.talla, v_cantidad);
+  END LOOP;
+
+  RETURN v_entrega_id;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION actualizar_entrega_uniforme(
+  p_entrega_id BIGINT,
+  p_trabajador_id UUID,
+  p_fecha DATE,
+  p_estado TEXT,
+  p_observaciones TEXT,
+  p_items JSONB
+) RETURNS BIGINT
+LANGUAGE plpgsql SECURITY DEFINER
+AS $$
+DECLARE
+  v_item JSONB;
+  v_stock RECORD;
+  v_old RECORD;
+  v_cantidad INTEGER;
+BEGIN
+  FOR v_old IN SELECT stock_id, cantidad FROM bienestar_uniforme_entrega_items WHERE entrega_id = p_entrega_id
+  LOOP
+    IF v_old.stock_id IS NOT NULL THEN
+      UPDATE bienestar_uniforme_stock SET cantidad = cantidad + v_old.cantidad WHERE id = v_old.stock_id;
+    END IF;
+  END LOOP;
+  DELETE FROM bienestar_uniforme_entrega_items WHERE entrega_id = p_entrega_id;
+
+  UPDATE bienestar_uniforme_entregas
+  SET trabajador_id = p_trabajador_id, fecha = p_fecha, estado = p_estado, observaciones = p_observaciones
+  WHERE id = p_entrega_id;
+
+  IF p_items IS NULL OR jsonb_array_length(p_items) = 0 THEN
+    RAISE EXCEPTION 'Debe agregar al menos un artículo';
+  END IF;
+
+  FOR v_item IN SELECT value FROM jsonb_array_elements(p_items)
+  LOOP
+    v_cantidad := COALESCE((v_item->>'cantidad')::INTEGER, 0);
+    IF v_cantidad < 1 THEN
+      RAISE EXCEPTION 'Cantidad inválida en un artículo';
+    END IF;
+
+    SELECT * INTO v_stock FROM bienestar_uniforme_stock
+    WHERE id = (v_item->>'stock_id')::BIGINT
+    FOR UPDATE;
+
+    IF v_stock.id IS NULL THEN
+      RAISE EXCEPTION 'Artículo no encontrado en stock';
+    END IF;
+    IF v_stock.cantidad < v_cantidad THEN
+      RAISE EXCEPTION 'Stock insuficiente para % (talla %): solo hay % disponible',
+        v_stock.prenda, v_stock.talla, v_stock.cantidad;
+    END IF;
+
+    UPDATE bienestar_uniforme_stock
+    SET cantidad = cantidad - v_cantidad
+    WHERE id = v_stock.id;
+
+    INSERT INTO bienestar_uniforme_entrega_items (entrega_id, stock_id, prenda, talla, cantidad)
+    VALUES (p_entrega_id, v_stock.id, v_stock.prenda, v_stock.talla, v_cantidad);
+  END LOOP;
+
+  RETURN p_entrega_id;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION eliminar_entrega_uniforme(p_entrega_id BIGINT)
+RETURNS VOID
+LANGUAGE plpgsql SECURITY DEFINER
+AS $$
+DECLARE
+  v_old RECORD;
+BEGIN
+  FOR v_old IN SELECT stock_id, cantidad FROM bienestar_uniforme_entrega_items WHERE entrega_id = p_entrega_id
+  LOOP
+    IF v_old.stock_id IS NOT NULL THEN
+      UPDATE bienestar_uniforme_stock SET cantidad = cantidad + v_old.cantidad WHERE id = v_old.stock_id;
+    END IF;
+  END LOOP;
+  DELETE FROM bienestar_uniforme_entrega_items WHERE entrega_id = p_entrega_id;
+  DELETE FROM bienestar_uniforme_entregas WHERE id = p_entrega_id;
+END;
+$$;
 
 -- ============================================
 -- ENCUESTAS: preguntas y respuestas de trabajadores

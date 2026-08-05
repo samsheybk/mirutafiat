@@ -41,7 +41,7 @@
       { key: 'plantilla', name: 'Plantilla de trabajadores' },
       { key: 'prestamos', name: 'Préstamos' },
       { key: 'polizas', name: 'Pólizas' },
-      { key: 'historias', name: 'Historias de gente' },
+      { key: 'uniformes', name: 'Inventario de uniformes' },
       { key: 'encuestas', name: 'Encuestas' },
       { key: 'calendario', name: 'Calendario' }
     ]},
@@ -79,7 +79,8 @@
     { key: 'oportunidades.html', name: 'Oportunidades de acción', tools: [
       { key: 'vision', name: 'Visión general' },
       { key: 'oportunidades', name: 'Oportunidades de crecimiento' },
-      { key: 'roadmap', name: 'Hoja de ruta' }
+      { key: 'roadmap', name: 'Hoja de ruta' },
+      { key: 'costos', name: 'Propuesta de costos' }
     ]},
     { key: 'gestion-usuarios.html', name: 'Gestión de usuarios', tools: [
       { key: 'usuarios', name: 'Usuarios y accesos' },

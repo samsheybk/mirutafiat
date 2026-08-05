@@ -66,7 +66,7 @@
         { icon: 'fi-sr-users', name: 'Plantilla de trabajadores', desc: 'Listado de trabajadores para la gestión de beneficios, tallas y programas sociales.' },
         { icon: 'fi-sr-hand-holding-usd', name: 'Préstamos', desc: 'Solicitud y seguimiento de préstamos a trabajadores con control de saldo y cuotas.' },
         { icon: 'fi-sr-shield', name: 'Pólizas', desc: 'Registro de pólizas de seguros de los trabajadores con vigencias y coberturas.' },
-        { icon: 'fi-sr-circle-book-open', name: 'Historias de gente', desc: 'Muro de historias, logros y reconocimientos de los trabajadores de la empresa.' },
+        { icon: 'fi-sr-vest', name: 'Inventario de uniformes', desc: 'Control del stock de prendas y tallas, y registro de las entregas de uniformes a los trabajadores con fecha, cantidad y estado.' },
         { icon: 'fi-sr-square-poll-horizontal', name: 'Encuestas', desc: 'Creación y publicación de encuestas con enlace compartible, respuestas y resultados.' },
         { icon: 'fi-sr-calendar', name: 'Calendario', desc: 'Calendario mensual de eventos y actividades: selecciona un día para ver lo pautado o agregar eventos, con lista de próximos eventos ordenados por fecha. Desde el día seleccionado también se configuran los anuncios (splash) con imágenes que se muestran a todos los usuarios.' }
       ]
@@ -148,7 +148,8 @@
       tools: [
         { icon: 'fi-sr-bullseye', name: 'Visión general', desc: 'Presentación de cómo la intranet puede crecer para apoyar nuevas áreas de la empresa.' },
         { icon: 'fi-sr-rocket', name: 'Oportunidades de crecimiento', desc: 'Catálogo de nuevas capacidades propuestas, cada una con su descripción y beneficios esperados.' },
-        { icon: 'fi-sr-route', name: 'Hoja de ruta', desc: 'Fases sugeridas para implementar las oportunidades priorizadas.' }
+        { icon: 'fi-sr-route', name: 'Hoja de ruta', desc: 'Fases sugeridas para implementar las oportunidades priorizadas.' },
+        { icon: 'fi-sr-coins', name: 'Propuesta de costos', desc: 'Estimación de los costos de infraestructura para operar la intranet en producción.' }
       ]
     }
   };
@@ -183,18 +184,6 @@
     });
     sel.parentNode.insertBefore(btn, sel.nextSibling);
 
-    var costsBtn = document.createElement('button');
-    costsBtn.id = 'navCostsBtn';
-    costsBtn.className = 'nav-costs-btn';
-    costsBtn.type = 'button';
-    costsBtn.title = 'Ver propuesta de costos del sistema';
-    costsBtn.innerHTML = '<span>$</span> Costos';
-    costsBtn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      location.href = (inModules ? '../' : '') + 'costos-sistema.html';
-    });
-    btn.parentNode.insertBefore(costsBtn, btn.nextSibling);
-
     var splashBtn = document.createElement('button');
     splashBtn.id = 'navSplashBtn';
     splashBtn.className = 'nav-splash-btn';
@@ -206,7 +195,7 @@
       e.stopPropagation();
       openSplashFromNav();
     });
-    costsBtn.parentNode.insertBefore(splashBtn, costsBtn.nextSibling);
+    btn.parentNode.insertBefore(splashBtn, btn.nextSibling);
     refreshSplashNav();
 
     var opt = document.createElement('option');
@@ -355,7 +344,8 @@
     var count = document.getElementById('globalSplashCount');
     var dots = document.getElementById('globalSplashDots');
     img.src = item.imagen_url || '';
-    caption.textContent = item.titulo || '';
+    img.onclick = function () { showSplashDetalle(splashItems[splashIndex]); };
+    caption.innerHTML = '<strong>' + mhEscape(item.titulo || '') + '</strong>' + (item.descripcion ? '<br>' + mhEscape(item.descripcion) : '');
     count.textContent = splashItems.length > 1 ? (splashIndex + 1) + ' / ' + splashItems.length : '';
     dots.innerHTML = splashItems.map(function (_, i) {
       return '<button class="splash-show-dot' + (i === splashIndex ? ' active' : '') + '" data-i="' + i + '" aria-label="Imagen ' + (i + 1) + '"></button>';
@@ -397,6 +387,60 @@
     if (overlay) overlay.classList.remove('show');
   }
 
+  function mhEscape(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function showSplashDetalle(item) {
+    if (!item) return;
+    var overlay = document.getElementById('splashDetalleOverlay');
+    if (!overlay) {
+      overlay = document.createElement('div');
+      overlay.className = 'splash-show-overlay';
+      overlay.id = 'splashDetalleOverlay';
+      overlay.innerHTML =
+        '<div class="splash-detail-card">' +
+          '<button class="splash-show-close" aria-label="Cerrar">&times;</button>' +
+          '<div class="splash-detail-img-wrap"><img id="splashDetalleImg" src="" alt=""></div>' +
+          '<div class="splash-detail-texto">' +
+            '<h3 id="splashDetalleTitulo"></h3>' +
+            '<p id="splashDetalleDesc"></p>' +
+            '<span class="splash-detail-fecha" id="splashDetalleFecha"></span>' +
+          '</div>' +
+        '</div>';
+      overlay.querySelector('.splash-show-close').addEventListener('click', closeSplashDetalle);
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) closeSplashDetalle();
+      });
+      document.addEventListener('keydown', function (e) {
+        var o = document.getElementById('splashDetalleOverlay');
+        if (!o || !o.classList.contains('show')) return;
+        if (e.key === 'Escape') closeSplashDetalle();
+      });
+      document.body.appendChild(overlay);
+    }
+    document.getElementById('splashDetalleImg').src = item.imagen_url || '';
+    document.getElementById('splashDetalleImg').alt = item.titulo || '';
+    document.getElementById('splashDetalleTitulo').textContent = item.titulo || '';
+    document.getElementById('splashDetalleDesc').textContent = item.descripcion || 'Sin descripción';
+    var fIni = item.fecha_inicio || '';
+    var fFin = item.fecha_fin || '';
+    var fechaEl = document.getElementById('splashDetalleFecha');
+    fechaEl.textContent = (fIni || fFin)
+      ? 'Vigente del ' + fIni + (fFin && fFin !== fIni ? ' al ' + fFin : '')
+      : '';
+    overlay.classList.add('show');
+  }
+
+  function closeSplashDetalle() {
+    var overlay = document.getElementById('splashDetalleOverlay');
+    if (overlay) overlay.classList.remove('show');
+  }
+
   function openSplashFromNav() {
     if (typeof supabaseClient === 'undefined') {
       if (typeof showAlert === 'function') showAlert('Sesión no disponible', 'warning');
@@ -413,7 +457,7 @@
         return;
       }
       showSplashCarousel(items.map(function (s) {
-        return { imagen_url: s.imagen_url, titulo: s.titulo };
+        return { imagen_url: s.imagen_url, titulo: s.titulo, descripcion: s.descripcion, fecha_inicio: s.fecha_inicio, fecha_fin: s.fecha_fin };
       }));
     });
   }
@@ -436,6 +480,8 @@
   window.showSplashCarousel = showSplashCarousel;
   window.closeSplashCarousel = closeSplashCarousel;
   window.splashStep = splashStep;
+  window.showSplashDetalle = showSplashDetalle;
+  window.closeSplashDetalle = closeSplashDetalle;
   window.setSplashNavVisible = setSplashNavVisible;
   window.refreshSplashNav = refreshSplashNav;
 

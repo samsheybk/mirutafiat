@@ -311,11 +311,12 @@
       '<div class="splash-show-content">' +
         '<button class="splash-show-close" aria-label="Cerrar">&times;</button>' +
         '<button class="splash-show-arrow left" aria-label="Anterior">&#8249;</button>' +
-        '<img class="splash-show-img" id="globalSplashImg" src="" alt="Splash">' +
+        '<div class="splash-show-media"><img class="splash-show-img" id="globalSplashImg" src="" alt="Splash"><div class="splash-show-dots" id="globalSplashDots"></div></div>' +
+        '<div class="splash-show-panel">' +
+          '<div class="splash-show-caption" id="globalSplashCaption"></div>' +
+          '<div class="splash-show-count" id="globalSplashCount"></div>' +
+        '</div>' +
         '<button class="splash-show-arrow right" aria-label="Siguiente">&#8250;</button>' +
-        '<div class="splash-show-caption" id="globalSplashCaption"></div>' +
-        '<div class="splash-show-count" id="globalSplashCount"></div>' +
-        '<div class="splash-show-dots" id="globalSplashDots"></div>' +
       '</div>';
     overlay.querySelector('.splash-show-close').addEventListener('click', closeSplashCarousel);
     overlay.querySelector('.splash-show-arrow.left').addEventListener('click', function () { splashStep(-1); });

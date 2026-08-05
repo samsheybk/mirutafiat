@@ -1505,44 +1505,78 @@ a {
 }
 .splash-show-content {
   position: relative;
+  display: flex;
+  align-items: stretch;
   width: 92%;
-  max-width: 860px;
-  text-align: center;
+  max-width: 980px;
+  max-height: 88vh;
+  overflow: hidden;
+  border-radius: 14px;
+}
+.splash-show-media {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border-radius: 14px 0 0 14px;
 }
 .splash-show-img {
   width: 100%;
-  max-height: 80vh;
+  height: 100%;
+  max-height: 88vh;
   object-fit: contain;
-  border-radius: 12px;
   display: block;
-  background: #000;
   cursor: pointer;
 }
-.splash-show-caption {
+.splash-show-panel {
+  flex: 0 0 300px;
+  min-height: 0;
+  background: #111;
+  padding: 26px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 14px;
   color: #fff;
-  font-size: 15px;
-  margin-top: 10px;
-  line-height: 1.45;
+  text-align: left;
+  overflow-y: auto;
+  border-radius: 0 14px 14px 0;
+}
+.splash-show-caption {
+  margin-top: auto;
+  color: #d1d5db;
+  font-size: 14.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
 }
 .splash-show-caption strong {
+  display: block;
   font-weight: 700;
-  font-size: 16px;
+  font-size: 19px;
+  color: #fff;
+  margin-bottom: 8px;
 }
 .splash-show-count {
-  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: auto;
+  color: rgba(255, 255, 255, 0.6);
   font-size: 12px;
-  margin-top: 4px;
 }
 .splash-show-close {
   position: absolute;
-  top: -14px;
-  right: -14px;
+  top: 12px;
+  right: 12px;
   z-index: 6;
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.35);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   color: #fff;
   font-size: 20px;
   line-height: 1;
@@ -1550,9 +1584,12 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0.85;
+  transition: opacity 0.18s ease, background 0.18s ease;
 }
 .splash-show-close:hover {
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.65);
+  opacity: 1;
 }
 .splash-show-arrow {
   position: absolute;
@@ -1562,38 +1599,52 @@ a {
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.18);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.45);
   color: #fff;
   font-size: 22px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0.85;
+  transition: opacity 0.18s ease, background 0.18s ease;
 }
 .splash-show-arrow:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.4);
+  opacity: 1;
 }
 .splash-show-arrow.left {
-  left: -16px;
+  left: 12px;
 }
 .splash-show-arrow.right {
-  right: -16px;
+  right: 12px;
 }
 .splash-show-dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  z-index: 5;
   display: flex;
-  gap: 6px;
   justify-content: center;
-  margin-top: 12px;
+  gap: 8px;
 }
 .splash-show-dot {
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.45);
   border: none;
   cursor: pointer;
   padding: 0;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25), 0 1px 4px rgba(0, 0, 0, 0.4);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.splash-show-dot:hover {
+  transform: scale(1.2);
 }
 .splash-show-dot.active {
   background: #fff;
@@ -1669,6 +1720,20 @@ a {
   }
   .splash-detail-texto {
     max-height: none;
+  }
+  .splash-show-content {
+    flex-direction: column;
+    max-height: 90vh;
+  }
+  .splash-show-media {
+    flex: none;
+  }
+  .splash-show-img {
+    max-height: 45vh;
+  }
+  .splash-show-panel {
+    flex: 1;
+    max-height: 45vh;
   }
 }
 
@@ -1792,14 +1857,14 @@ a {
     margin-left: 0;
   }
   .splash-show-arrow.left {
-    left: 4px;
+    left: 6px;
   }
   .splash-show-arrow.right {
-    right: 4px;
+    right: 6px;
   }
   .splash-show-close {
-    top: -6px;
-    right: -6px;
+    top: 8px;
+    right: 8px;
   }
   #navUserEmail {
     display: none;

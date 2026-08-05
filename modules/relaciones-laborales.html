@@ -76,13 +76,15 @@
               <button class="btn btn-relaciones btn-sm" onclick="rlOpenConceptoModal()">+ Nuevo concepto</button>
             </div>
             <div class="toolbar-content" data-toolbar="equipos" style="display:none;align-items:center;gap:16px;width:100%;">
-              <div style="display:flex;gap:8px;align-items:center;">
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                 <button class="btn btn-sm eq-tab active" data-etab="asignaciones" onclick="switchEquiposView('asignaciones',this)" style="background:var(--module-relaciones);color:#fff;border:0;border-radius:4px;padding:6px 16px;">Asignaciones</button>
+                <button class="btn btn-sm eq-tab" data-etab="sensible" onclick="switchEquiposView('sensible',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Información sensible</button>
                 <button class="btn btn-sm eq-tab" data-etab="catalogo" onclick="switchEquiposView('catalogo',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Catálogo de equipos</button>
               </div>
               <div style="flex:1;"></div>
-              <input type="text" class="form-input" id="eqSearch" placeholder="Buscar equipo o trabajador..." oninput="filterEquipos()" style="max-width:300px;height:36px;">
+              <input type="text" class="form-input" id="eqSearch" placeholder="Buscar equipo, trabajador o acceso..." oninput="filterEquipos()" style="max-width:300px;height:36px;">
               <button class="btn btn-relaciones btn-sm" id="btnNuevaAsignacion" onclick="rlOpenAsignacionModal()">+ Nueva asignación</button>
+              <button class="btn btn-relaciones btn-sm" id="btnNuevaSensible" style="display:none;" onclick="rlOpenSensibleModal()">+ Nueva información sensible</button>
               <button class="btn btn-relaciones btn-sm" id="btnNuevoEquipo" style="display:none;" onclick="rlOpenEquipoModal()">+ Nuevo equipo</button>
             </div>
             <div class="toolbar-content" data-toolbar="plantilla" style="display:none;align-items:center;gap:16px;width:100%;">
@@ -159,6 +161,22 @@
                   </tbody>
                 </table>
               </div>
+              <div id="eqSensibleView" style="display:none;">
+                <div class="tool-section-header">
+                  <h2 style="color:var(--module-relaciones);">Información sensible</h2>
+                  <span style="font-size:12px;color:var(--color-text-secondary);" id="sensCount">0 registros</span>
+                </div>
+                <div style="height:calc(100vh - 240px);overflow-y:auto;">
+                  <table class="data-table">
+                    <thead>
+                      <tr><th>Trabajador</th><th>Tipo</th><th>Descripción</th><th>Usuario</th><th>Estado</th><th style="width:150px;">Acción</th></tr>
+                    </thead>
+                    <tbody id="sensTableBody">
+                      <tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">Sin información sensible registrada</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
 
             <div class="tool-section" id="tool-plantilla">
@@ -168,7 +186,6 @@
                   <button class="btn btn-sm plantilla-tab" data-tab="historico" onclick="switchPlantillaView('historico',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Histórico</button>
                 </div>
                 <span style="font-size:12px;color:var(--color-text-secondary);" id="plantCount">0 trabajadores</span>
-                <button class="btn btn-relaciones btn-sm" onclick="location.href='trabajador-nuevo.html?modulo=relaciones'" style="margin-left:auto;">+ Nuevo trabajador</button>
               </div>
               <div id="plantillaActivoView" style="height:calc(100vh - 240px);overflow-y:auto;">
                 <table class="data-table">
@@ -332,6 +349,41 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="modalInfoSensible">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalSensibleTitle">Nueva información sensible</h3><button class="modal-close" onclick="rlCloseModal('modalInfoSensible')">&times;</button></div>
+      <div class="modal-body">
+        <form id="sensibleForm">
+          <div class="form-group"><label>Trabajador</label>
+            <select class="form-select" id="sens_trabajador_id"><option value="">— Selecciona —</option></select>
+          </div>
+          <div class="form-group"><label>Tipo de acceso</label>
+            <select class="form-select" id="sens_tipo">
+              <option value="Aplicación">Aplicación</option>
+              <option value="Ente gubernamental">Ente gubernamental</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Descripción (aplicación o ente)</label><input type="text" class="form-input" id="sens_descripcion" placeholder="Ej: SENIAT, sistema de nómina, correo institucional..."></div>
+          <div class="form-group"><label>Usuario / cuenta</label><input type="text" class="form-input" id="sens_usuario" placeholder="Usuario de la cuenta (opcional)"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group"><label>Estado</label>
+              <select class="form-select" id="sens_estado">
+                <option value="Pendiente">Pendiente</option>
+                <option value="Entregado">Entregado</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group"><label>Notas</label><textarea class="form-textarea" id="sens_notas" rows="2" placeholder="Ej: solicitar usuario y contraseña al retirar"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="rlCloseModal('modalInfoSensible')">Cancelar</button>
+        <button class="btn btn-relaciones" onclick="rlSaveSensible()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="modalEditarTrabajador">
     <div class="modal">
       <div class="modal-header"><h3>Editar trabajador</h3><button class="modal-close" onclick="rlCloseModal('modalEditarTrabajador')">&times;</button></div>
@@ -370,6 +422,7 @@
     var rlConceptos = [];
     var rlEquipos = [];
     var rlAsignaciones = [];
+    var rlInfoSensible = [];
     var rlRegistros = [];
     var rlActas = [];
     var currentPlantillaView = 'activo';
@@ -378,6 +431,7 @@
     var editConceptoId = null;
     var editEquipoId = null;
     var editAsignacionId = null;
+    var editSensibleId = null;
     var editTrabajadorId = null;
 
     function switchTool(name) {
@@ -426,8 +480,10 @@
         b.style.border = b === btn ? '0' : '1px solid var(--border-color)';
       });
       document.getElementById('eqAsignacionesView').style.display = tab === 'asignaciones' ? '' : 'none';
+      document.getElementById('eqSensibleView').style.display = tab === 'sensible' ? '' : 'none';
       document.getElementById('eqCatalogoView').style.display = tab === 'catalogo' ? '' : 'none';
       document.getElementById('btnNuevaAsignacion').style.display = tab === 'asignaciones' ? '' : 'none';
+      document.getElementById('btnNuevaSensible').style.display = tab === 'sensible' ? '' : 'none';
       document.getElementById('btnNuevoEquipo').style.display = tab === 'catalogo' ? '' : 'none';
       filterEquipos();
     }
@@ -486,22 +542,24 @@
 
     async function loadRelacionesData() {
       try {
-        var [u, c, t, co, eq, as, rg, ac] = await Promise.all([
+        var [u, c, t, co, eq, as, se, rg, ac] = await Promise.all([
           rlFetch('est_unidades', 'nombre'),
           rlFetch('est_cargos', 'titulo'),
           rlFetch('plantilla_trabajadores', 'apellidos'),
           rlFetch('rl_conceptos', 'nombre'),
           rlFetch('rl_equipos', 'descripcion'),
           rlFetch('rl_asignaciones', 'fecha_asignacion'),
+          rlFetch('rl_info_sensible', 'created_at'),
           rlFetch('relaciones_registros', 'fecha'),
           rlFetch('rl_actas', 'fecha')
         ]);
-        rlUnidades = u; rlCargos = c; rlTrabajadores = t; rlConceptos = co; rlEquipos = eq; rlAsignaciones = as; rlRegistros = rg; rlActas = ac;
+        rlUnidades = u; rlCargos = c; rlTrabajadores = t; rlConceptos = co; rlEquipos = eq; rlAsignaciones = as; rlInfoSensible = se; rlRegistros = rg; rlActas = ac;
         populateUnidadSelect();
         populateTrabajadorModalSelects();
         renderRegistros();
         renderConceptos();
         renderAsignaciones();
+        renderInfoSensible();
         renderEquipos();
         renderActas();
         filterPlantilla();
@@ -821,8 +879,8 @@
 
     /* ===== ASIGNACIONES DE EQUIPOS ===== */
 
-    function populateTrabajadorSelect() {
-      var sel = document.getElementById('asig_trabajador_id');
+    function populateTrabajadorSelect(selectId) {
+      var sel = document.getElementById(selectId || 'asig_trabajador_id');
       if (!sel) return;
       sel.innerHTML = '<option value="">— Selecciona —</option>';
       rlTrabajadores.forEach(function(t) {
@@ -980,7 +1038,119 @@
 
     function filterEquipos() {
       if (currentEquiposView === 'asignaciones') renderAsignaciones();
+      else if (currentEquiposView === 'sensible') renderInfoSensible();
       else renderEquipos();
+    }
+
+    /* ===== INFORMACIÓN SENSIBLE ===== */
+
+    function renderInfoSensible() {
+      var q = (document.getElementById('eqSearch').value || '').trim().toLowerCase();
+      var data = rlInfoSensible.filter(function(s) {
+        if (!q) return true;
+        var t = getTrabajador(s.trabajador_id);
+        var texto = (t ? t.nombres + ' ' + t.apellidos + ' ' + t.cedula : '') + ' ' + (s.tipo || '') + ' ' + (s.descripcion || '') + ' ' + (s.usuario || '');
+        return texto.toLowerCase().indexOf(q) !== -1;
+      });
+      var tbody = document.getElementById('sensTableBody');
+      var countEl = document.getElementById('sensCount');
+      if (countEl) countEl.textContent = data.length + ' registro' + (data.length !== 1 ? 's' : '');
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">' + (q ? 'Sin resultados' : 'Sin información sensible registrada') + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(function(s) {
+        var t = getTrabajador(s.trabajador_id);
+        var nombre = t ? t.nombres + ' ' + t.apellidos : '-';
+        var cedula = t ? t.cedula : '';
+        var marca = s.estado === 'Entregado'
+          ? '<span class="badge badge-active">Entregado</span>'
+          : '<span class="badge badge-pending">Pendiente</span>';
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + nombre + '</span><div style="font-size:11px;color:var(--color-text-secondary);">C.I. ' + cedula + '</div></td>'
+          + '<td>' + escInfoSensible(s.tipo || 'Otro') + '</td>'
+          + '<td>' + escInfoSensible(s.descripcion || '') + '</td>'
+          + '<td>' + escInfoSensible(s.usuario || '-') + '</td>'
+          + '<td>' + marca + '</td>'
+          + '<td>'
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="rlOpenSensibleModal(' + s.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="rlDeleteSensible(' + s.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function escInfoSensible(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function rlOpenSensibleModal(id) {
+      editSensibleId = id || null;
+      populateTrabajadorSelect('sens_trabajador_id');
+      document.getElementById('modalSensibleTitle').textContent = id ? 'Editar información sensible' : 'Nueva información sensible';
+      if (id) {
+        var s = rlInfoSensible.find(function(x) { return String(x.id) === String(id); });
+        if (s) {
+          document.getElementById('sens_trabajador_id').value = s.trabajador_id || '';
+          document.getElementById('sens_tipo').value = s.tipo || 'Aplicación';
+          document.getElementById('sens_descripcion').value = s.descripcion || '';
+          document.getElementById('sens_usuario').value = s.usuario || '';
+          document.getElementById('sens_estado').value = s.estado || 'Pendiente';
+          document.getElementById('sens_notas').value = s.notas || '';
+        }
+      } else {
+        document.getElementById('sens_tipo').value = 'Aplicación';
+        document.getElementById('sens_estado').value = 'Pendiente';
+        document.getElementById('sens_descripcion').value = '';
+        document.getElementById('sens_usuario').value = '';
+        document.getElementById('sens_notas').value = '';
+      }
+      rlOpenModal('modalInfoSensible');
+    }
+
+    async function rlSaveSensible() {
+      var trabajadorId = document.getElementById('sens_trabajador_id').value;
+      var tipo = document.getElementById('sens_tipo').value;
+      var descripcion = document.getElementById('sens_descripcion').value.trim();
+      var usuario = document.getElementById('sens_usuario').value.trim();
+      var estado = document.getElementById('sens_estado').value;
+      var notas = document.getElementById('sens_notas').value.trim();
+      if (!trabajadorId || !descripcion) { showAlert('Completa el trabajador y la descripción del acceso', 'warning'); return; }
+      var payload = {
+        trabajador_id: trabajadorId,
+        tipo: tipo,
+        descripcion: descripcion,
+        usuario: usuario || null,
+        estado: estado,
+        notas: notas || null
+      };
+      try {
+        if (editSensibleId) {
+          var { error } = await supabaseClient.from('rl_info_sensible').update(payload).eq('id', editSensibleId);
+          if (error) throw error;
+        } else {
+          var { error } = await supabaseClient.from('rl_info_sensible').insert(payload);
+          if (error) throw error;
+        }
+        rlCloseModal('modalInfoSensible');
+        showAlert('Información sensible guardada', 'success');
+        await loadRelacionesData();
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function rlDeleteSensible(id) {
+      if (!(await showConfirm('¿Eliminar este registro de información sensible?'))) return;
+      try {
+        var { error } = await supabaseClient.from('rl_info_sensible').delete().eq('id', id);
+        if (error) throw error;
+        showAlert('Registro eliminado', 'success');
+        await loadRelacionesData();
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
     }
 
     /* ===== ACTAS Y REUNIONES ===== */
@@ -1129,6 +1299,13 @@
       var estado = document.getElementById('trab_estado').value;
       var fechaEgreso = document.getElementById('trab_fecha_egreso').value || null;
       if (!unidadId || !cargoId || !fechaIngreso) { showAlert('Completa unidad, cargo y fecha de ingreso', 'warning'); return; }
+      if (estado === 'Retirado') {
+        var trabActual = getTrabajador(editTrabajadorId);
+        if (trabActual && trabActual.estado !== 'Retirado') {
+          var okRetiro = await alertarPendientesAlRetirar(editTrabajadorId);
+          if (!okRetiro) return;
+        }
+      }
       try {
         var { error } = await supabaseClient.from('plantilla_trabajadores').update({
           unidad_id: unidadId,
@@ -1161,6 +1338,7 @@
   </script>
 
 <script src="../js/module-help.js"></script>
+    <script src="../js/retiro-check.js"></script>
     <script src="../js/access.js"></script>
 </body>
 </html>

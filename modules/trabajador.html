@@ -121,7 +121,19 @@
                 <div style="font-size:12px;color:var(--color-text-secondary);margin-top:2px;" id="detCedula"></div>
                 <div style="font-size:12px;color:var(--color-text-secondary);" id="detLaboral"></div>
               </div>
-              <span id="detEstadoBadge" style="padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;"></span>
+              <div style="display:flex;flex-direction:column;align-items:stretch;gap:8px;flex-shrink:0;">
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <select id="det_estado_top" class="form-select" style="height:34px;min-width:130px;" onchange="document.getElementById('detEgresoTopWrap').style.display = this.value === 'Retirado' ? '' : 'none';">
+                    <option value="Activo">Activo</option>
+                    <option value="Suspendido">Suspendido</option>
+                    <option value="Retirado">Retirado</option>
+                  </select>
+                  <button class="btn btn-captacion btn-sm" onclick="guardarEstadoTop()" style="height:34px;">Guardar</button>
+                </div>
+                <div id="detEgresoTopWrap" style="display:none;">
+                  <input type="date" class="form-input" id="det_fecha_egreso_top" style="height:34px;width:100%;">
+                </div>
+              </div>
             </div>
             <button class="btn btn-outline" onclick="location.href='captacion.html'" style="flex-shrink:0;margin-left:16px;">← Volver a plantilla</button>
           </header>
@@ -284,10 +296,6 @@
                     <div class="form-group">
                       <label>Fecha de ingreso</label>
                       <input type="text" class="form-input" id="det_ingreso" readonly style="background:var(--color-bg);">
-                    </div>
-                    <div class="form-group">
-                      <label>Estado</label>
-                      <input type="text" class="form-input" id="det_estado" readonly style="background:var(--color-bg);">
                     </div>
                   </div>
                 </form>
@@ -481,6 +489,7 @@
     var detalleFotoActual = null;
     var detalleContratoId = null;
     var detalleContratoArchivo = null;
+    var detalleEstadoActual = null;
 
     function openDetFotoLightbox() {
       if (!detalleFotoActual) return;
@@ -610,9 +619,6 @@
         document.getElementById('detTitulo').textContent = t.nombres + ' ' + t.apellidos;
         document.getElementById('detCedula').textContent = 'C.I.: ' + t.cedula;
         document.getElementById('detLaboral').textContent = getCargoNombre(t.cargo_id) + ' · ' + getUnidadNombre(t.unidad_id) + ' · Ingreso: ' + (t.fecha_ingreso || '-');
-        var badge = document.getElementById('detEstadoBadge');
-        badge.textContent = t.estado;
-        badge.style.background = t.estado === 'Activo' ? '#059669' : t.estado === 'Suspendido' ? '#D97706' : '#DC2626';
         setDetFoto(t.foto_url, t.nombres + ' ' + t.apellidos);
         detalleFotoArchivo = null;
         document.getElementById('det_fecha_nacimiento').value = t.fecha_nacimiento || '';
@@ -630,7 +636,10 @@
         document.getElementById('det_unidad').value = getUnidadNombre(t.unidad_id);
         document.getElementById('det_cargo').value = getCargoNombre(t.cargo_id);
         document.getElementById('det_ingreso').value = t.fecha_ingreso || '';
-        document.getElementById('det_estado').value = t.estado;
+        document.getElementById('det_estado_top').value = t.estado || 'Activo';
+        document.getElementById('det_fecha_egreso_top').value = t.fecha_egreso || '';
+        document.getElementById('detEgresoTopWrap').style.display = t.estado === 'Retirado' ? '' : 'none';
+        detalleEstadoActual = t.estado;
         switchDetalleTab('datos', document.querySelector('.det-tab[data-dtab="datos"]'));
         loadDocumentos();
         loadCargaFamiliar();
@@ -680,6 +689,30 @@
         showAlert('Datos guardados correctamente', 'success');
       } catch (err) {
         showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function guardarEstadoTop() {
+      if (!detalleTrabajadorId) return;
+      var nuevoEstado = document.getElementById('det_estado_top').value;
+      var fechaEgreso = document.getElementById('det_fecha_egreso_top').value || null;
+      if (nuevoEstado === 'Retirado' && detalleEstadoActual && detalleEstadoActual !== 'Retirado') {
+        if (typeof alertarPendientesAlRetirar === 'function') {
+          var okRetiro = await alertarPendientesAlRetirar(detalleTrabajadorId);
+          if (!okRetiro) return;
+        }
+      }
+      try {
+        var { error, count } = await supabaseClient
+          .from('plantilla_trabajadores')
+          .update({ estado: nuevoEstado, fecha_egreso: nuevoEstado === 'Retirado' ? fechaEgreso : null }, { count: 'exact' })
+          .eq('id', detalleTrabajadorId);
+        if (error) throw error;
+        if (count === 0) throw new Error('0 filas actualizadas. Revisa la política de UPDATE en plantilla_trabajadores (RLS).');
+        detalleEstadoActual = nuevoEstado;
+        showAlert('Estado actualizado', 'success');
+      } catch (err) {
+        showAlert('Error al actualizar el estado: ' + err.message, 'error');
       }
     }
 
@@ -990,6 +1023,7 @@
   </script>
 
 <script src="../js/module-help.js"></script>
+    <script src="../js/retiro-check.js"></script>
     <script src="../js/access.js"></script>
 </body>
 </html>

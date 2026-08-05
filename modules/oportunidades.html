@@ -50,13 +50,60 @@
     .op-phase-list { list-style: none; margin: 0; padding: 0; }
     .op-phase-list li { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px dashed var(--color-border); font-size: 13px; }
     .op-phase-list li i.fi { color: var(--color-text-secondary); font-size: 15px; }
+    /* Propuesta de costos */
+    .cs-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 22px; }
+    .cs-kpi { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 18px; box-shadow: var(--shadow-sm); }
+    .cs-kpi-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--color-text-secondary); margin-bottom: 6px; }
+    .cs-kpi-value { font-size: 26px; font-weight: 800; color: var(--module-oportunidades); letter-spacing: -.5px; }
+    .cs-kpi-value span { font-size: 14px; color: var(--color-text-secondary); font-weight: 600; }
+    .cs-kpi-sub { font-size: 12px; color: var(--color-text-secondary); margin-top: 6px; line-height: 1.5; }
+    .cs-sec { margin-bottom: 24px; }
+    .cs-sec-title { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 800; margin-bottom: 14px; }
+    .cs-sec-title .num { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 7px; background: var(--module-oportunidades); color: #fff; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+    .cs-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
+    .cs-card table { width: 100%; border-collapse: collapse; }
+    .cs-card th { text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--color-text-secondary); background: var(--color-bg); padding: 12px 16px; border-bottom: 1px solid var(--color-border); }
+    .cs-card td { padding: 14px 16px; font-size: 13px; border-bottom: 1px solid var(--color-border); vertical-align: top; }
+    .cs-card tr:last-child td { border-bottom: none; }
+    .cs-card tbody tr:hover { background: var(--color-bg); }
+    .cs-price { text-align: right; white-space: nowrap; font-weight: 700; }
+    .cs-free { color: #059669; }
+    .cs-paid { color: var(--module-oportunidades); }
+    .cs-badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 10.5px; font-weight: 700; }
+    .cs-badge.free { background: #ecfdf5; color: #059669; }
+    .cs-badge.paid { background: rgba(101,163,13,.12); color: var(--module-oportunidades); }
+    .cs-svc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .cs-svc { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 12px; }
+    .cs-svc-head { display: flex; align-items: center; justify-content: space-between; }
+    .cs-svc-name { font-size: 15px; font-weight: 800; }
+    .cs-svc-logo { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff; flex-shrink: 0; }
+    .cs-svc-logo.supabase { background: linear-gradient(135deg, #3ecf8e, #1f9d6b); }
+    .cs-svc-logo.vercel { background: linear-gradient(135deg, #111, #000); }
+    .cs-svc-logo.github { background: linear-gradient(135deg, #24292f, #0d1117); }
+    .cs-svc-cost { font-size: 22px; font-weight: 800; letter-spacing: -.5px; }
+    .cs-svc-cost .plan { font-size: 12px; font-weight: 600; color: var(--color-text-secondary); }
+    .cs-svc ul { list-style: none; margin: 0; padding: 0; }
+    .cs-svc li { position: relative; padding-left: 18px; font-size: 12.5px; margin-bottom: 7px; }
+    .cs-svc li::before { content: '✓'; position: absolute; left: 0; color: #059669; font-weight: 700; font-size: 11px; }
+    .cs-svc small { font-size: 11px; color: var(--color-text-secondary); line-height: 1.5; }
+    .cs-alert { display: flex; gap: 10px; align-items: flex-start; border-radius: var(--radius-md); padding: 14px 16px; font-size: 12.5px; margin-top: 12px; }
+    .cs-alert.warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .cs-alert.good { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+    .cs-reco { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 22px; }
+    .cs-reco-total { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .cs-reco-total .lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--color-text-secondary); }
+    .cs-reco-total .val { font-size: 30px; font-weight: 800; letter-spacing: -1px; color: var(--module-oportunidades); }
+    .cs-reco-total .val small { font-size: 14px; color: var(--color-text-secondary); font-weight: 600; }
+    .cs-reco-list { margin-top: 16px; display: grid; gap: 10px; }
+    .cs-reco-item { display: flex; gap: 10px; font-size: 12.5px; padding: 11px 13px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-bg); }
+    .cs-reco-item .n { flex-shrink: 0; width: 20px; height: 20px; border-radius: 6px; background: var(--module-oportunidades); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
   </style>
 </head>
 <body>
   <div class="app-layout">
 
     <nav class="topnav" style="background:var(--module-oportunidades);">
-      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><span class="topnav-logo"></span>VEN<span>-Intranet</span></div>
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><span class="topnav-logo"></span>Intranet</div>
       <div class="topnav-spacer"></div>
       <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
         <option value="../dashboard.html">Dashboard</option>
@@ -83,6 +130,7 @@
           <div class="panel-item active" data-tool="vision" onclick="switchTool('vision')" title="Visión general"><span class="panel-item-indicator bg-oportunidades"></span><i class="fi fi-sr-bullseye" style="font-size:24px;pointer-events:none;"></i></div>
           <div class="panel-item" data-tool="oportunidades" onclick="switchTool('oportunidades')" title="Oportunidades de crecimiento"><span class="panel-item-indicator bg-oportunidades"></span><i class="fi fi-sr-rocket" style="font-size:24px;pointer-events:none;"></i></div>
           <div class="panel-item" data-tool="roadmap" onclick="switchTool('roadmap')" title="Hoja de ruta"><span class="panel-item-indicator bg-oportunidades"></span><i class="fi fi-sr-route" style="font-size:24px;pointer-events:none;"></i></div>
+          <div class="panel-item" data-tool="costos" onclick="switchTool('costos')" title="Propuesta de costos"><span class="panel-item-indicator bg-oportunidades"></span><i class="fi fi-sr-coins" style="font-size:24px;pointer-events:none;"></i></div>
         </div>
 
         <div class="module-body">
@@ -284,6 +332,181 @@
                     <li><i class="fi fi-sr-chart-scatter"></i> Business Intelligence</li>
                     <li><i class="fi fi-sr-mobile-button"></i> Conectividad móvil</li>
                   </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="tool-section" id="tool-costos">
+              <div class="op-intro">
+                <h2>Propuesta de costos</h2>
+                <p>Estimación de gastos de infraestructura para operar la intranet en producción: base de datos (Supabase), despliegue (Vercel) y repositorio (GitHub).</p>
+              </div>
+
+              <div class="cs-kpis">
+                <div class="cs-kpi">
+                  <div class="cs-kpi-label">Costo actual (todo Free)</div>
+                  <div class="cs-kpi-value">$0<span>/mes</span></div>
+                  <div class="cs-kpi-sub">Funciona, pero con riesgos de disponibilidad y restricciones de uso comercial</div>
+                </div>
+                <div class="cs-kpi">
+                  <div class="cs-kpi-label">Plan de producción recomendado</div>
+                  <div class="cs-kpi-value">$45–49<span>/mes</span></div>
+                  <div class="cs-kpi-sub">Supabase Pro + Vercel Pro + GitHub (Free/Pro)</div>
+                </div>
+                <div class="cs-kpi">
+                  <div class="cs-kpi-label">Costo anual estimado</div>
+                  <div class="cs-kpi-value">≈ $540–588<span>/año</span></div>
+                  <div class="cs-kpi-sub">Equivale a menos de $50 al mes para operar en producción</div>
+                </div>
+              </div>
+
+              <div class="cs-sec">
+                <div class="cs-sec-title"><span class="num">1</span> Situación actual (planes gratuitos)</div>
+                <div class="cs-card">
+                  <table>
+                    <thead>
+                      <tr><th>Servicio</th><th>Plan</th><th>Costo</th><th>Límites clave</th><th>Riesgo</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><b>Supabase</b> <span class="cs-badge free">Gratis</span></td>
+                        <td>Free</td>
+                        <td class="cs-price cs-free">$0</td>
+                        <td>500 MB BD · 5 GB egress · ~1 GB storage · 50.000 usuarios</td>
+                        <td>El proyecto <b>se pausa tras 7 días sin actividad</b>; sin backups</td>
+                      </tr>
+                      <tr>
+                        <td><b>Vercel</b> <span class="cs-badge free">Gratis</span></td>
+                        <td>Hobby</td>
+                        <td class="cs-price cs-free">$0</td>
+                        <td>100 GB transferencia · 1M invocaciones</td>
+                        <td><b>Prohíbe uso comercial</b>; si se superan límites, la app se pausa</td>
+                      </tr>
+                      <tr>
+                        <td><b>GitHub</b> <span class="cs-badge free">Gratis</span></td>
+                        <td>Free</td>
+                        <td class="cs-price cs-free">$0</td>
+                        <td>Repos privados ilimitados · 2.000 min Actions</td>
+                        <td>Sin riesgo para un solo desarrollador</td>
+                      </tr>
+                      <tr>
+                        <td colspan="2"><b>Total actual</b></td>
+                        <td class="cs-price cs-free"><b>$0/mes</b></td>
+                        <td colspan="2"></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="cs-alert warn">
+                  <span>⚠️</span>
+                  <div><b>Por qué gratis no es viable en producción:</b> en Supabase el proyecto se <b>pausa automáticamente tras 7 días de inactividad</b> (la intranet quedaría inaccesible), no hay backups automáticos, y en Vercel el plan gratuito <b>no permite uso comercial</b>. Además, las imágenes guardadas en base64 llenan los 500 MB disponibles rápidamente.</div>
+                </div>
+              </div>
+
+              <div class="cs-sec">
+                <div class="cs-sec-title"><span class="num">2</span> Desglose por servicio (plan de pago)</div>
+                <div class="cs-svc-grid">
+                  <div class="cs-svc">
+                    <div class="cs-svc-head"><span class="cs-svc-name">Supabase</span><span class="cs-svc-logo supabase">S</span></div>
+                    <div class="cs-svc-cost">$25<span class="plan">/mes · Pro</span></div>
+                    <ul>
+                      <li>8 GB base de datos</li>
+                      <li>250 GB transferencia (egress)</li>
+                      <li>100 GB de archivos (storage)</li>
+                      <li>100.000 usuarios activos/mes</li>
+                      <li>Backups diarios (7 días)</li>
+                      <li>Sin pausas por inactividad</li>
+                      <li>Soporte por email</li>
+                    </ul>
+                    <small>Proyecto adicional: +$10/mes · Sobrecostos: BD $0.125/GB, egress $0.09/GB, storage $0.021/GB, cómputo Small +$5</small>
+                  </div>
+                  <div class="cs-svc">
+                    <div class="cs-svc-head"><span class="cs-svc-name">Vercel</span><span class="cs-svc-logo vercel">▲</span></div>
+                    <div class="cs-svc-cost">$20<span class="plan">/mes · Pro</span></div>
+                    <ul>
+                      <li>1 TB transferencia por mes</li>
+                      <li>Uso comercial permitido</li>
+                      <li>$20 de crédito mensual de uso</li>
+                      <li>Despliegues automáticos desde GitHub</li>
+                      <li>CDN global + HTTPS</li>
+                      <li>Soporte por email</li>
+                    </ul>
+                    <small>Precio por asiento de desarrollador. El sitio es estático y las imágenes se sirven desde Supabase, por lo que el consumo real de transferencia es mínimo.</small>
+                  </div>
+                  <div class="cs-svc">
+                    <div class="cs-svc-head"><span class="cs-svc-name">GitHub</span><span class="cs-svc-logo github">G</span></div>
+                    <div class="cs-svc-cost">$0–4<span class="plan">/mes</span></div>
+                    <ul>
+                      <li>Repositorios privados ilimitados</li>
+                      <li>Historial de versiones y colaboración</li>
+                      <li>2.000–3.000 min de Actions</li>
+                      <li>GitHub Pages (gratis)</li>
+                      <li>Soporte por email (Pro)</li>
+                    </ul>
+                    <small>El plan Free ($0) es suficiente para un desarrollador. GitHub Pro ($4/mes) solo agrega más minutos de Actions, Codespaces y soporte.</small>
+                  </div>
+                </div>
+              </div>
+
+              <div class="cs-sec">
+                <div class="cs-sec-title"><span class="num">3</span> Escenarios de costos totales</div>
+                <div class="cs-card">
+                  <table>
+                    <thead>
+                      <tr><th>Escenario</th><th>Supabase</th><th>Vercel</th><th>GitHub</th><th style="text-align:right;">Total / mes</th><th style="text-align:right;">Total / año</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><b>Actual</b> (solo desarrollo)</td>
+                        <td>Free $0</td><td>Hobby $0</td><td>Free $0</td>
+                        <td class="cs-price cs-free">$0</td>
+                        <td class="cs-price cs-free">$0</td>
+                      </tr>
+                      <tr>
+                        <td><b>Mínimo producción</b></td>
+                        <td>Pro $25</td><td>Pro $20</td><td>Free $0</td>
+                        <td class="cs-price cs-paid"><b>$45</b></td>
+                        <td class="cs-price cs-paid"><b>≈ $540</b></td>
+                      </tr>
+                      <tr>
+                        <td><b>Mínimo + GitHub Pro</b></td>
+                        <td>Pro $25</td><td>Pro $20</td><td>Pro $4</td>
+                        <td class="cs-price cs-paid"><b>$49</b></td>
+                        <td class="cs-price cs-paid"><b>≈ $588</b></td>
+                      </tr>
+                      <tr>
+                        <td><b>Con margen de cómputo</b></td>
+                        <td>Pro + Small $30</td><td>Pro $20</td><td>Pro $4</td>
+                        <td class="cs-price cs-paid"><b>$54</b></td>
+                        <td class="cs-price cs-paid"><b>≈ $648</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="cs-sec">
+                <div class="cs-sec-title"><span class="num">4</span> Recomendación</div>
+                <div class="cs-reco">
+                  <div class="cs-reco-total">
+                    <div>
+                      <div class="lbl">Inversión recomendada</div>
+                      <div class="val">$45 – $49 <small>/mes</small></div>
+                    </div>
+                    <div style="text-align:right;font-size:12.5px;color:var(--color-text-secondary);">
+                      ≈ $540 – $588 al año<br><b style="color:var(--color-text);">menos de $50/mes</b> para operar en producción
+                    </div>
+                  </div>
+                  <div class="cs-reco-list">
+                    <div class="cs-reco-item"><span class="n">1</span><div><b>Supabase Pro ($25/mes)</b> es el mínimo razonable: elimina las pausas por inactividad, añade backups diarios de 7 días y sube la base de datos a 8 GB.</div></div>
+                    <div class="cs-reco-item"><span class="n">2</span><div><b>Vercel Pro ($20/mes)</b> es necesario por la cláusula de uso comercial; tu consumo real de ancho de banda será mínimo porque las imágenes se sirven desde Supabase.</div></div>
+                    <div class="cs-reco-item"><span class="n">3</span><div><b>GitHub Free ($0)</b> es suficiente. Si se usa con intensidad de Actions/Codespaces, GitHub Pro ($4/mes) es un costo menor.</div></div>
+                    <div class="cs-reco-item"><span class="n">4</span><div><b>El principal driver de costo</b> es el tamaño de la base de datos (las imágenes en base64 pesan ~33% más) y el storage de archivos; ambos quedan cubiertos con holgura por el plan Pro.</div></div>
+                  </div>
+                </div>
+                <div class="cs-alert good">
+                  <span>✅</span>
+                  <div><b>Resumen ejecutivo:</b> migrar de $0 a producción cuesta aproximadamente <strong>$45–49 mensuales</strong>. No hay costos ocultos significativos al nivel de uso de una intranet corporativa; los sobrecargos (banda ancha, storage, cómputo) solo aparecerían con tráfico o volumen muy superiores a los actuales.</div>
                 </div>
               </div>
             </div>

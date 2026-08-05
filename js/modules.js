@@ -121,6 +121,9 @@ function getBadgeClass(estado) {
     'No apto': 'badge-inactive',
     'Anulada': 'badge-inactive',
     'Anulado': 'badge-inactive',
+    'Entregado': 'badge-active',
+    'Devuelto': 'badge-inactive',
+    'Dañado': 'badge-inactive',
   };
   return map[estado] || 'badge-pending';
 }

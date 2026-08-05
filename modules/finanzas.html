@@ -13,30 +13,94 @@
     :root { --module-color: var(--module-finanzas); }
     .tool-section.active { height: 100%; overflow-y: auto; padding-right: 4px; }
     .tabla-scroll { overflow-x: auto; }
-    .toolbar-content[data-toolbar="movimientos"] .form-input,
-    .toolbar-content[data-toolbar="movimientos"] .form-select,
-    .toolbar-content[data-toolbar="reportes"] .form-input,
-    .toolbar-content[data-toolbar="reportes"] .form-select { height: 36px; }
-    .fin-hint { font-size: 12px; color: var(--color-text-secondary); padding: 4px 0 14px; }
-    .fin-filters { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; background: var(--color-surface); border: 1px solid var(--color-border); padding: 12px; margin-bottom: 14px; }
-    .fin-filters .form-group { margin: 0; min-width: 150px; }
-    .fin-filters .form-group.fin-grow { flex: 1; min-width: 200px; }
-    .fin-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; }
-    .fin-card { background: var(--color-surface); border: 1px solid var(--color-border); border-top: 3px solid var(--module-finanzas); padding: 14px 16px; }
-    .fin-card .fin-card-label { font-size: 12px; color: var(--color-text-secondary); }
-    .fin-card .fin-card-value { font-size: 20px; font-weight: 700; margin-top: 4px; }
-    .fin-card .fin-card-sub { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
-    .fin-sec-title { font-size: 14px; font-weight: 700; margin: 18px 0 8px; display: flex; align-items: center; gap: 8px; }
-    .fin-sec-title i.fi { color: var(--module-finanzas); font-size: 18px; }
+
+    /* ===== Barra de filtros ===== */
+    .toolbar-content[data-toolbar] label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--color-text-secondary); margin-bottom: 5px; display: block; }
+    .toolbar-content[data-toolbar] .form-input,
+    .toolbar-content[data-toolbar] .form-select { height: 36px; border-radius: 10px; background: var(--color-bg); border: 1px solid transparent; transition: all 0.15s ease; }
+    .toolbar-content[data-toolbar] .form-input:focus,
+    .toolbar-content[data-toolbar] .form-select:focus { outline: none; border-color: #1e3a8a; background: #fff; box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.12); }
+
+    /* ===== Botones ===== */
+    .btn-finanzas { background: linear-gradient(135deg, #1e3a8a, #172554); border: none; border-radius: 10px; color: #fff; box-shadow: var(--shadow-sm); transition: filter 0.15s ease, transform 0.1s ease; }
+    .btn-finanzas:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .btn-finanzas:active { transform: translateY(0); }
+    .btn-outline { border-radius: 10px; }
+
+    /* ===== Hero de balance (tarjeta tipo banco) ===== */
+    .fin-hero { position: relative; border-radius: 20px; padding: 22px 26px; color: #fff; overflow: hidden; margin-bottom: 14px; background: linear-gradient(135deg, #111827 0%, #1f2937 45%, #374151 100%); box-shadow: var(--shadow-md); }
+    .fin-hero::before { content: ''; position: absolute; right: -70px; top: -80px; width: 230px; height: 230px; border-radius: 50%; background: radial-gradient(circle, rgba(30, 58, 138, 0.6), transparent 70%); }
+    .fin-hero::after { content: ''; position: absolute; right: 80px; bottom: -110px; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(255, 255, 255, 0.08), transparent 70%); }
+    .fin-hero-grid { position: relative; display: flex; gap: 24px; z-index: 1; align-items: flex-end; }
+    .fin-hero-cell { flex: 1; min-width: 0; }
+    .fin-hero-cell:first-child { flex: 1.6; }
+    .fin-hero-cell .fin-hero-label { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; opacity: 0.75; display: flex; align-items: center; gap: 6px; }
+    .fin-hero-cell .fin-hero-value { font-size: 30px; font-weight: 800; letter-spacing: -0.5px; margin-top: 4px; line-height: 1.15; }
+    .fin-hero-cell .fin-hero-value small { display: block; font-size: 13px; font-weight: 500; opacity: 0.75; margin-top: 2px; letter-spacing: 0; }
+    .fin-hero-cell .fin-hero-value.pos { color: #34d399; }
+    .fin-hero-cell .fin-hero-value.neg { color: #f87171; }
+    .fin-hero-cell .fin-hero-sub { font-size: 12px; opacity: 0.7; margin-top: 3px; }
+
+    /* ===== Tarjetas de reportes ===== */
+    .fin-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 16px; }
+    .fin-card { position: relative; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 16px 18px; box-shadow: var(--shadow-sm); transition: box-shadow 0.15s ease, transform 0.15s ease; }
+    .fin-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .fin-card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .fin-card .fin-card-label { font-size: 12px; font-weight: 600; color: var(--color-text-secondary); letter-spacing: 0.2px; }
+    .fin-card .fin-card-value { font-size: 22px; font-weight: 800; letter-spacing: -0.4px; }
+    .fin-card .fin-card-value small { font-size: 14px; font-weight: 500; color: var(--color-text-secondary); }
+    .fin-card .fin-card-sub { font-size: 12px; color: var(--color-text-secondary); margin-top: 6px; }
+    .fin-ico { width: 38px; height: 38px; border-radius: 11px; display: inline-flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .fin-ico-gasto { background: #fef2f2; color: #dc2626; }
+    .fin-ico-ingreso { background: #ecfdf5; color: #059669; }
+    .fin-ico-balance { background: #eef2ff; color: #1e3a8a; }
+    .fin-ico-op { background: #eef2ff; color: #4f46e5; }
+
+    /* ===== Tablas tipo estado de cuenta ===== */
+    .fin-table-wrap { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm); }
+    .fin-table-wrap .tabla-scroll { overflow-x: auto; }
+    .fin-table-wrap .data-table { border: none; box-shadow: none; border-radius: 0; }
+    .data-table th { background: #faf7f2; }
+    .fin-chip { width: 30px; height: 30px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; margin-right: 8px; vertical-align: middle; }
+    .fin-chip-gasto { background: #fef2f2; color: #dc2626; }
+    .fin-chip-ingreso { background: #ecfdf5; color: #059669; }
+
+    /* ===== Títulos de sección ===== */
+    .fin-sec-title { font-size: 14px; font-weight: 700; margin: 20px 0 10px; display: flex; align-items: center; gap: 8px; color: var(--color-text); }
+    .fin-sec-title::before { content: ''; width: 4px; height: 16px; border-radius: 2px; background: linear-gradient(180deg, #1e3a8a, #172554); }
+    .fin-sec-title i.fi { color: var(--module-finanzas); font-size: 17px; }
+
+    /* ===== Resumen / hint ===== */
+    .fin-hint { font-size: 12px; color: var(--color-text-secondary); padding: 0 0 14px; }
+    .fin-resumen { font-size: 12px; color: var(--color-text-secondary); margin: 0 0 10px; }
+
+    /* ===== Barras de evolución ===== */
     .fin-bar-row { display: flex; align-items: center; gap: 10px; }
-    .fin-bar-track { flex: 1; background: var(--color-bg); height: 10px; border-radius: 2px; overflow: hidden; }
-    .fin-bar-ing { background: #059669; height: 100%; }
-    .fin-bar-egr { background: #dc2626; height: 100%; }
+    .fin-bar-track { flex: 1; background: #f1f5f9; height: 10px; border-radius: 6px; overflow: hidden; }
+    .fin-bar-ing { background: linear-gradient(90deg, #059669, #10b981); height: 100%; border-radius: 6px; }
+    .fin-bar-egr { background: linear-gradient(90deg, #dc2626, #ef4444); height: 100%; border-radius: 6px; }
+
+    /* ===== Colores financieros ===== */
     .fin-tipo-gasto { color: #dc2626; font-weight: 600; }
     .fin-tipo-ingreso { color: #059669; font-weight: 600; }
-    .fin-pos { color: #059669; font-weight: 700; }
-    .fin-neg { color: #dc2626; font-weight: 700; }
-    .fin-resumen { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 10px; }
+    .fin-pos { color: #059669; }
+    .fin-neg { color: #dc2626; }
+
+    /* ===== Modal estilo banca ===== */
+    .modal-overlay .modal { border-radius: 20px; border: 1px solid var(--color-border); box-shadow: var(--shadow-lg); }
+    .modal-overlay .modal-header { background: linear-gradient(135deg, #1e3a8a, #172554); color: #fff; border-radius: 19px 19px 0 0; }
+    .modal-overlay .modal-header h3 { color: #fff; }
+    .modal-overlay .modal-close { color: #fff; }
+    .modal-overlay .modal-close:hover { opacity: 0.85; }
+    .modal-overlay .form-input,
+    .modal-overlay .form-select,
+    .modal-overlay .form-textarea { border-radius: 10px; border: 1px solid var(--color-border); background: var(--color-surface); font-size: 13px; }
+    .modal-overlay .form-input:focus,
+    .modal-overlay .form-select:focus,
+    .modal-overlay .form-textarea:focus { outline: none; border-color: #1e3a8a; box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.12); }
+
+    /* ===== Badges píldora ===== */
+    .badge { border-radius: 999px; font-size: 11px; font-weight: 600; padding: 3px 10px; }
   </style>
 </head>
 <body>
@@ -113,16 +177,18 @@
               <div class="form-group" style="margin:0;"><label>Movimiento</label>
                 <select class="form-select" id="rep_tipo" onchange="renderReportes()"><option value="">Todos</option><option value="Gasto">Gasto</option><option value="Ingreso">Ingreso</option></select>
               </div>
+              <div style="margin-left:auto;"><button class="btn btn-finanzas btn-sm" onclick="exportarReportePDF()" title="Exportar el resumen del período en PDF"><i class="fi fi-sr-file-pdf" style="pointer-events:none;margin-right:6px;"></i>Exportar PDF</button></div>
             </div>
           </header>
 
           <div class="module-content">
             <div class="tool-section active" id="tool-movimientos">
-              <div class="fin-hint">Registro de <b>gastos</b> e <b>ingresos</b> de la operación (recepción y distribución de vehículos). Los montos se registran en bolívares.</div>
+              <div class="fin-hero" id="finHero"></div>
+              <div class="fin-hint">La moneda principal es el <b>dólar (USD)</b> y la secundaria el <b>bolívar (Bs.)</b>; al registrar un monto se indica la tasa de cambio para guardar ambos valores.</div>
               <div class="fin-resumen" id="movResumen"></div>
-              <div class="tabla-scroll">
+              <div class="tabla-scroll fin-table-wrap">
                 <table class="data-table">
-                  <thead><tr><th>Fecha</th><th>Tipo</th><th>Concepto</th><th>Monto (Bs.)</th><th>Pago</th><th>Proveedor</th><th>Área</th><th>Estado</th><th style="width:110px;">Acciones</th></tr></thead>
+                  <thead><tr><th>Fecha</th><th>Tipo</th><th>Concepto</th><th style="text-align:right;">Monto</th><th>Pago</th><th>Proveedor</th><th>Área</th><th>Estado</th><th style="width:110px;">Acciones</th></tr></thead>
                   <tbody id="movimientosBody">
                     <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
                     <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
@@ -133,13 +199,12 @@
             </div>
 
             <div class="tool-section" id="tool-reportes">
-              <div class="fin-resumen" id="repPeriodoLabel"></div>
               <div class="fin-cards" id="repCards"></div>
 
               <div class="fin-sec-title"><i class="fi fi-sr-chart-pie"></i> Resumen por categoría</div>
-              <div class="tabla-scroll">
+              <div class="tabla-scroll fin-table-wrap">
                 <table class="data-table">
-                  <thead><tr><th>Categoría</th><th>Tipo</th><th style="text-align:center;">Movimientos</th><th>Monto (Bs.)</th></tr></thead>
+                  <thead><tr><th>Categoría</th><th>Tipo</th><th style="text-align:center;">Movimientos</th><th>Monto</th></tr></thead>
                   <tbody id="repCatBody"></tbody>
                 </table>
               </div>
@@ -148,9 +213,9 @@
               <div id="repEvo"></div>
 
               <div class="fin-sec-title"><i class="fi fi-sr-receipt"></i> Últimos movimientos del período</div>
-              <div class="tabla-scroll">
+              <div class="tabla-scroll fin-table-wrap">
                 <table class="data-table">
-                  <thead><tr><th>Fecha</th><th>Concepto</th><th>Tipo</th><th>Monto (Bs.)</th><th>Estado</th></tr></thead>
+                  <thead><tr><th>Fecha</th><th>Concepto</th><th>Tipo</th><th>Monto</th><th>Estado</th></tr></thead>
                   <tbody id="repUltBody"></tbody>
                 </table>
               </div>
@@ -176,9 +241,16 @@
           </div>
           <div class="form-group"><label>Concepto</label><input type="text" class="form-input" id="mov_concepto" placeholder="Ej: Combustible flota de reparto" required></div>
           <div class="form-row">
-            <div class="form-group"><label>Monto (Bs.)</label><input type="number" step="0.01" min="0.01" class="form-input" id="mov_monto" required></div>
+            <div class="form-group"><label>Monto <span id="mov_moneda_label">(USD)</span></label><input type="number" step="0.01" min="0.01" class="form-input" id="mov_monto" oninput="movTasaCalc()" required></div>
             <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="mov_fecha" required></div>
           </div>
+          <div class="form-row">
+            <div class="form-group"><label>Moneda del monto</label>
+              <select class="form-select" id="mov_moneda" onchange="movMonedaChange()"><option value="USD">Dólares (USD)</option><option value="Bs">Bolívares (Bs.)</option></select>
+            </div>
+            <div class="form-group"><label>Tasa de cambio (Bs. por 1 USD)</label><input type="number" step="0.0001" min="0" class="form-input" id="mov_tasa" oninput="movTasaCalc()" placeholder="Ej: 36.50" required></div>
+          </div>
+          <div class="form-group" id="mov_equivalente_wrap" style="display:none;"><label>Equivalente</label><div id="mov_equivalente" style="font-weight:700;color:#2563eb;">—</div></div>
           <div class="form-row">
             <div class="form-group"><label>Método de pago</label>
               <select class="form-select" id="mov_metodo_pago"><option value="">—</option><option value="Efectivo">Efectivo</option><option value="Transferencia">Transferencia</option><option value="Tarjeta">Tarjeta</option><option value="Cheque">Cheque</option><option value="Otro">Otro</option></select>
@@ -207,6 +279,8 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <script src="../js/supabase-config.js"></script>
   <script src="../js/ui.js"></script>
   <script src="../js/auth.js"></script>
@@ -241,6 +315,38 @@
       return 'Bs. ' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
+    function fmtUsd(n) {
+      return '$ ' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function montosDe(m) {
+      var monto = Number(m.monto) || 0;
+      var tasa = Number(m.tasa_cambio) || 0;
+      if (m.monto_bs != null && m.monto_usd != null) {
+        return { bs: Number(m.monto_bs) || 0, usd: Number(m.monto_usd) || 0, moneda: m.moneda || 'Bs', tasa: tasa };
+      }
+      if ((m.moneda || 'Bs') === 'USD') return { bs: monto * tasa, usd: monto, moneda: 'USD', tasa: tasa };
+      return { bs: monto, usd: tasa > 0 ? monto / tasa : 0, moneda: 'Bs', tasa: tasa };
+    }
+
+    function montoDoble(bs, usd) {
+      return usd !== 0 ? fmtUsd(usd) + ' · ' + fmtBs(bs) : fmtBs(bs);
+    }
+
+    function cardMonto(bs, usd) {
+      if (usd !== 0) {
+        return fmtUsd(usd) + '<small>' + fmtBs(bs) + '</small>';
+      }
+      return fmtBs(bs);
+    }
+
+    function celdaMonto(bs, usd) {
+      if (usd > 0) {
+        return fmtUsd(usd) + '<div style="font-size:12px;color:var(--color-text-secondary);font-weight:500;">' + fmtBs(bs) + '</div>';
+      }
+      return fmtBs(bs);
+    }
+
     function todayISO() {
       var d = new Date();
       return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
@@ -267,6 +373,30 @@
     }
 
     /* ===== MOVIMIENTOS ===== */
+    function movMonedaChange() {
+      var moneda = document.getElementById('mov_moneda').value;
+      document.getElementById('mov_moneda_label').textContent = moneda === 'USD' ? '(USD)' : '(Bs.)';
+      movTasaCalc();
+    }
+
+    function movTasaCalc() {
+      var moneda = document.getElementById('mov_moneda').value;
+      var monto = parseFloat(document.getElementById('mov_monto').value);
+      var tasa = parseFloat(document.getElementById('mov_tasa').value);
+      var wrap = document.getElementById('mov_equivalente_wrap');
+      var out = document.getElementById('mov_equivalente');
+      if (!monto || monto <= 0 || !tasa || tasa <= 0) {
+        wrap.style.display = 'none';
+        return;
+      }
+      if (moneda === 'USD') {
+        out.textContent = fmtUsd(monto) + ' · ' + fmtBs(monto * tasa);
+      } else {
+        out.textContent = fmtUsd(monto / tasa) + ' · ' + fmtBs(monto);
+      }
+      wrap.style.display = '';
+    }
+
     async function loadMovimientos() {
       try {
         var { data, error } = await supabaseClient.from('finanzas_movimientos').select('*').order('fecha', { ascending: false });
@@ -274,6 +404,7 @@
         finMovimientos = data || [];
         llenarFiltroCategorias();
         renderMovimientos();
+        renderReportes();
       } catch (err) {
         document.getElementById('movimientosBody').innerHTML =
           '<tr><td colspan="9" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar los movimientos: ' + finEscape(err.message) + '</td></tr>';
@@ -310,15 +441,39 @@
       });
     }
 
+    function heroMonto(bs, usd) {
+      if (usd !== 0) return fmtUsd(usd) + '<small>' + fmtBs(bs) + '</small>';
+      return fmtBs(bs);
+    }
+
+    function renderHero(lista) {
+      var totIng = 0, totEgr = 0, ingUsd = 0, egrUsd = 0;
+      lista.forEach(function(m) {
+        var mx = montosDe(m);
+        if (m.tipo === 'Ingreso') { totIng += mx.bs; ingUsd += mx.usd; }
+        else { totEgr += mx.bs; egrUsd += mx.usd; }
+      });
+      var bal = totIng - totEgr;
+      var balUsd = ingUsd - egrUsd;
+      document.getElementById('finHero').innerHTML =
+        '<div class="fin-hero-grid">'
+        + '<div class="fin-hero-cell"><div class="fin-hero-label"><i class="fi fi-sr-wallet"></i> Balance general</div><div class="fin-hero-value ' + (bal >= 0 ? 'pos' : 'neg') + '">' + heroMonto(bal, balUsd) + '</div><div class="fin-hero-sub">Según los filtros aplicados</div></div>'
+        + '<div class="fin-hero-cell"><div class="fin-hero-label"><i class="fi fi-sr-arrow-trend-up"></i> Ingresos</div><div class="fin-hero-value">' + heroMonto(totIng, ingUsd) + '</div><div class="fin-hero-sub">' + lista.filter(function(m) { return m.tipo === 'Ingreso'; }).length + ' registros</div></div>'
+        + '<div class="fin-hero-cell"><div class="fin-hero-label"><i class="fi fi-sr-arrow-trend-down"></i> Gastos</div><div class="fin-hero-value">' + heroMonto(totEgr, egrUsd) + '</div><div class="fin-hero-sub">' + lista.filter(function(m) { return m.tipo === 'Gasto'; }).length + ' registros</div></div>'
+        + '</div>';
+    }
+
     function renderMovimientos() {
       var lista = movimientosFiltrados();
-      var totGastos = 0, totIngresos = 0;
+      renderHero(lista);
+      var totGastos = 0, totIngresos = 0, totGastosUsd = 0, totIngresosUsd = 0;
       lista.forEach(function(m) {
-        if (m.tipo === 'Gasto') totGastos += Number(m.monto) || 0;
-        else totIngresos += Number(m.monto) || 0;
+        var mx = montosDe(m);
+        if (m.tipo === 'Gasto') { totGastos += mx.bs; totGastosUsd += mx.usd; }
+        else { totIngresos += mx.bs; totIngresosUsd += mx.usd; }
       });
       document.getElementById('movResumen').innerHTML =
-        lista.length + ' movimiento(s) · <span class="fin-tipo-gasto">Gastos: ' + fmtBs(totGastos) + '</span> · <span class="fin-tipo-ingreso">Ingresos: ' + fmtBs(totIngresos) + '</span>';
+        lista.length + ' movimiento(s) · <span class="fin-tipo-gasto">Gastos: ' + montoDoble(totGastos, totGastosUsd) + '</span> · <span class="fin-tipo-ingreso">Ingresos: ' + montoDoble(totIngresos, totIngresosUsd) + '</span>';
 
       var tbody = document.getElementById('movimientosBody');
       if (!lista.length) {
@@ -326,11 +481,12 @@
         return;
       }
       tbody.innerHTML = lista.map(function(m) {
+        var mx = montosDe(m);
         return '<tr>'
           + '<td>' + finEscape(m.fecha) + '</td>'
-          + '<td><span class="' + (m.tipo === 'Gasto' ? 'fin-tipo-gasto' : 'fin-tipo-ingreso') + '">' + finEscape(m.tipo) + '</span></td>'
+          + '<td><span class="fin-chip ' + (m.tipo === 'Gasto' ? 'fin-chip-gasto' : 'fin-chip-ingreso') + '"><i class="fi ' + (m.tipo === 'Gasto' ? 'fi-sr-arrow-small-down' : 'fi-sr-arrow-small-up') + '" style="pointer-events:none;"></i></span><span class="' + (m.tipo === 'Gasto' ? 'fin-tipo-gasto' : 'fin-tipo-ingreso') + '">' + finEscape(m.tipo) + '</span></td>'
           + '<td><span style="font-weight:600;">' + finEscape(m.concepto) + '</span><div style="font-size:12px;color:var(--color-text-secondary);">' + finEscape(m.categoria) + '</div></td>'
-          + '<td style="font-weight:700;">' + fmtBs(m.monto) + '</td>'
+          + '<td style="font-weight:700;text-align:right;" class="' + (m.tipo === 'Gasto' ? 'fin-neg' : 'fin-pos') + '">' + celdaMonto(mx.bs, mx.usd) + '</td>'
           + '<td>' + finEscape(m.metodo_pago || '-') + '</td>'
           + '<td>' + finEscape(m.proveedor || '-') + '</td>'
           + '<td>' + finEscape(m.area || '-') + '</td>'
@@ -361,6 +517,9 @@
           document.getElementById('mov_concepto').value = m.concepto || '';
           document.getElementById('mov_descripcion').value = m.descripcion || '';
           document.getElementById('mov_monto').value = m.monto;
+          document.getElementById('mov_moneda').value = m.moneda || 'Bs';
+          document.getElementById('mov_tasa').value = m.tasa_cambio != null ? m.tasa_cambio : '';
+          movMonedaChange();
           document.getElementById('mov_fecha').value = m.fecha || todayISO();
           document.getElementById('mov_metodo_pago').value = m.metodo_pago || '';
           movEstados();
@@ -386,6 +545,22 @@
         showAlert('El monto debe ser mayor que 0', 'warning');
         return;
       }
+      var moneda = document.getElementById('mov_moneda').value;
+      var tasa = parseFloat(document.getElementById('mov_tasa').value);
+      if (!tasa || tasa <= 0) {
+        showAlert('Debe indicar la tasa de cambio (Bs. por 1 USD)', 'warning');
+        return;
+      }
+      var montoBs, montoUsd;
+      if (moneda === 'USD') {
+        montoUsd = monto;
+        montoBs = monto * tasa;
+      } else {
+        montoBs = monto;
+        montoUsd = monto / tasa;
+      }
+      montoBs = Math.round(montoBs * 100) / 100;
+      montoUsd = Math.round(montoUsd * 100) / 100;
       var fecha = document.getElementById('mov_fecha').value;
       if (!fecha) {
         showAlert('La fecha es obligatoria', 'warning');
@@ -398,6 +573,10 @@
         concepto: concepto,
         descripcion: document.getElementById('mov_descripcion').value.trim() || null,
         monto: monto,
+        moneda: moneda,
+        tasa_cambio: tasa,
+        monto_bs: montoBs,
+        monto_usd: montoUsd,
         fecha: fecha,
         metodo_pago: document.getElementById('mov_metodo_pago').value || null,
         estado: document.getElementById('mov_estado').value,
@@ -417,7 +596,6 @@
         }
         finHideModal('modalMovimiento');
         loadMovimientos();
-        renderReportes();
         showAlert(editingMovId ? 'Movimiento actualizado' : 'Movimiento registrado', 'success');
       } catch (err) {
         showAlert('Error al guardar: ' + err.message, 'error');
@@ -431,7 +609,6 @@
         var { error } = await supabaseClient.from('finanzas_movimientos').delete().eq('id', id);
         if (error) throw error;
         loadMovimientos();
-        renderReportes();
         showAlert('Movimiento eliminado', 'success');
       } catch (err) {
         showAlert('Error al eliminar: ' + err.message, 'error');
@@ -493,27 +670,28 @@
       var lista = movimientosDelPeriodo();
       if (!lista) return;
       var pf = periodoFiltro();
-      document.getElementById('repPeriodoLabel').textContent = 'Período: ' + etiquetaPeriodo(pf) + ' · ' + lista.length + ' movimiento(s)';
 
-      var totIng = 0, totEgr = 0;
+      var totIng = 0, totEgr = 0, totIngUsd = 0, totEgrUsd = 0;
       lista.forEach(function(m) {
-        if (m.tipo === 'Ingreso') totIng += Number(m.monto) || 0;
-        else totEgr += Number(m.monto) || 0;
+        var mx = montosDe(m);
+        if (m.tipo === 'Ingreso') { totIng += mx.bs; totIngUsd += mx.usd; }
+        else { totEgr += mx.bs; totEgrUsd += mx.usd; }
       });
 
       var cards = '';
       var tipoFiltro = document.getElementById('rep_tipo').value;
       if (tipoFiltro !== 'Ingreso') {
-        cards += '<div class="fin-card"><div class="fin-card-label"><i class="fi fi-sr-money-bill-wave" style="color:#dc2626;"></i> Total gastos</div><div class="fin-card-value fin-neg">' + fmtBs(totEgr) + '</div><div class="fin-card-sub">' + lista.filter(function(m) { return m.tipo === 'Gasto'; }).length + ' gastos</div></div>';
+        cards += '<div class="fin-card"><div class="fin-card-head"><span class="fin-ico fin-ico-gasto"><i class="fi fi-sr-money-bill-wave"></i></span><span class="fin-card-label">Total gastos</span></div><div class="fin-card-value fin-neg">' + cardMonto(totEgr, totEgrUsd) + '</div><div class="fin-card-sub">' + lista.filter(function(m) { return m.tipo === 'Gasto'; }).length + ' gastos</div></div>';
       }
       if (tipoFiltro !== 'Gasto') {
-        cards += '<div class="fin-card"><div class="fin-card-label"><i class="fi fi-sr-coins" style="color:#059669;"></i> Total ingresos</div><div class="fin-card-value fin-pos">' + fmtBs(totIng) + '</div><div class="fin-card-sub">' + lista.filter(function(m) { return m.tipo === 'Ingreso'; }).length + ' ingresos</div></div>';
+        cards += '<div class="fin-card"><div class="fin-card-head"><span class="fin-ico fin-ico-ingreso"><i class="fi fi-sr-coins"></i></span><span class="fin-card-label">Total ingresos</span></div><div class="fin-card-value fin-pos">' + cardMonto(totIng, totIngUsd) + '</div><div class="fin-card-sub">' + lista.filter(function(m) { return m.tipo === 'Ingreso'; }).length + ' ingresos</div></div>';
       }
       if (!tipoFiltro) {
         var balance = totIng - totEgr;
-        cards += '<div class="fin-card"><div class="fin-card-label"><i class="fi fi-sr-arrow-trend-up"></i> Balance del período</div><div class="fin-card-value ' + (balance >= 0 ? 'fin-pos' : 'fin-neg') + '">' + fmtBs(balance) + '</div><div class="fin-card-sub">' + (balance >= 0 ? 'Superávit' : 'Déficit') + '</div></div>';
+        var balanceUsd = totIngUsd - totEgrUsd;
+        cards += '<div class="fin-card"><div class="fin-card-head"><span class="fin-ico fin-ico-balance"><i class="fi fi-sr-arrow-trend-up"></i></span><span class="fin-card-label">Balance del período</span></div><div class="fin-card-value ' + (balance >= 0 ? 'fin-pos' : 'fin-neg') + '">' + cardMonto(balance, balanceUsd) + '</div><div class="fin-card-sub">' + (balance >= 0 ? 'Superávit' : 'Déficit') + '</div></div>';
       }
-      cards += '<div class="fin-card"><div class="fin-card-label"><i class="fi fi-sr-receipt"></i> Operaciones</div><div class="fin-card-value">' + lista.length + '</div><div class="fin-card-sub">Registros en el período</div></div>';
+      cards += '<div class="fin-card"><div class="fin-card-head"><span class="fin-ico fin-ico-op"><i class="fi fi-sr-receipt"></i></span><span class="fin-card-label">Operaciones</span></div><div class="fin-card-value">' + lista.length + '</div><div class="fin-card-sub">Registros en el período</div></div>';
       document.getElementById('repCards').innerHTML = cards;
 
       renderCategorias(lista);
@@ -529,23 +707,26 @@
       }
       var map = {};
       lista.forEach(function(m) {
+        var mx = montosDe(m);
         var k = m.tipo + '|' + (m.categoria || 'Sin categoría');
-        map[k] = map[k] || { tipo: m.tipo, categoria: m.categoria || 'Sin categoría', count: 0, monto: 0 };
+        map[k] = map[k] || { tipo: m.tipo, categoria: m.categoria || 'Sin categoría', count: 0, monto: 0, montoUsd: 0 };
         map[k].count++;
-        map[k].monto += Number(m.monto) || 0;
+        map[k].monto += mx.bs;
+        map[k].montoUsd += mx.usd;
       });
       var filas = Object.keys(map).map(function(k) { return map[k]; }).sort(function(a, b) { return b.monto - a.monto; });
-      var tot = 0;
+      var tot = 0, totUsd = 0;
       tbody.innerHTML = filas.map(function(f) {
         tot += f.monto;
+        totUsd += f.montoUsd;
         return '<tr>'
           + '<td>' + finEscape(f.categoria) + '</td>'
           + '<td><span class="' + (f.tipo === 'Gasto' ? 'fin-tipo-gasto' : 'fin-tipo-ingreso') + '">' + finEscape(f.tipo) + '</span></td>'
           + '<td style="text-align:center;">' + f.count + '</td>'
-          + '<td style="font-weight:700;">' + fmtBs(f.monto) + '</td>'
+          + '<td style="font-weight:700;">' + montoDoble(f.monto, f.montoUsd) + '</td>'
           + '</tr>';
       }).join('')
-        + '<tr style="border-top:2px solid var(--color-border);"><td colspan="3" style="text-align:right;font-weight:700;">Total</td><td style="font-weight:700;">' + fmtBs(tot) + '</td></tr>';
+        + '<tr style="border-top:2px solid var(--color-border);"><td colspan="3" style="text-align:right;font-weight:700;">Total</td><td style="font-weight:700;">' + montoDoble(tot, totUsd) + '</td></tr>';
     }
 
     function renderEvolucion(lista, pf) {
@@ -559,22 +740,23 @@
       title.style.display = '';
       var map = {};
       lista.forEach(function(m) {
+        var mx = montosDe(m);
         var k = (m.fecha || '').slice(0, 7);
-        map[k] = map[k] || { ing: 0, egr: 0 };
-        if (m.tipo === 'Ingreso') map[k].ing += Number(m.monto) || 0;
-        else map[k].egr += Number(m.monto) || 0;
+        map[k] = map[k] || { ing: 0, egr: 0, ingUsd: 0, egrUsd: 0 };
+        if (m.tipo === 'Ingreso') { map[k].ing += mx.bs; map[k].ingUsd += mx.usd; }
+        else { map[k].egr += mx.bs; map[k].egrUsd += mx.usd; }
       });
       var filas = [];
       if (pf.p === 'Año') {
         var anio = parseInt(document.getElementById('rep_anio').value, 10);
         for (var i = 1; i <= 12; i++) {
           var k = anio + '-' + (i < 10 ? '0' : '') + i;
-          filas.push({ key: k, mes: FIN_MESES[i - 1], ing: (map[k] || {}).ing || 0, egr: (map[k] || {}).egr || 0 });
+          filas.push({ key: k, mes: FIN_MESES[i - 1], ing: (map[k] || {}).ing || 0, egr: (map[k] || {}).egr || 0, ingUsd: (map[k] || {}).ingUsd || 0, egrUsd: (map[k] || {}).egrUsd || 0 });
         }
       } else {
         Object.keys(map).sort().forEach(function(k) {
           var m = parseInt(k.slice(5), 10);
-          filas.push({ key: k, mes: FIN_MESES[m - 1] + ' ' + k.slice(0, 4), ing: map[k].ing, egr: map[k].egr });
+          filas.push({ key: k, mes: FIN_MESES[m - 1] + ' ' + k.slice(0, 4), ing: map[k].ing, egr: map[k].egr, ingUsd: map[k].ingUsd, egrUsd: map[k].egrUsd });
         });
       }
       var max = 1;
@@ -586,11 +768,12 @@
       var html = '<div class="tabla-scroll"><table class="data-table"><thead><tr><th>Mes</th><th style="width:34%;">Ingresos</th><th style="width:34%;">Egresos</th><th>Balance</th></tr></thead><tbody>';
       html += filas.map(function(f) {
         var bal = f.ing - f.egr;
+        var balUsd = f.ingUsd - f.egrUsd;
         return '<tr>'
           + '<td>' + f.mes + '</td>'
-          + '<td><div class="fin-bar-row"><div class="fin-bar-track"><div class="fin-bar-ing" style="width:' + Math.round((f.ing / max) * 100) + '%;"></div></div><span style="white-space:nowrap;font-size:12px;">' + fmtBs(f.ing) + '</span></div></td>'
-          + '<td><div class="fin-bar-row"><div class="fin-bar-track"><div class="fin-bar-egr" style="width:' + Math.round((f.egr / max) * 100) + '%;"></div></div><span style="white-space:nowrap;font-size:12px;">' + fmtBs(f.egr) + '</span></div></td>'
-          + '<td style="font-weight:700;" class="' + (bal >= 0 ? 'fin-pos' : 'fin-neg') + '">' + fmtBs(bal) + '</td>'
+          + '<td><div class="fin-bar-row"><div class="fin-bar-track"><div class="fin-bar-ing" style="width:' + Math.round((f.ing / max) * 100) + '%;"></div></div><span style="white-space:nowrap;font-size:12px;">' + montoDoble(f.ing, f.ingUsd) + '</span></div></td>'
+          + '<td><div class="fin-bar-row"><div class="fin-bar-track"><div class="fin-bar-egr" style="width:' + Math.round((f.egr / max) * 100) + '%;"></div></div><span style="white-space:nowrap;font-size:12px;">' + montoDoble(f.egr, f.egrUsd) + '</span></div></td>'
+          + '<td style="font-weight:700;" class="' + (bal >= 0 ? 'fin-pos' : 'fin-neg') + '">' + montoDoble(bal, balUsd) + '</td>'
           + '</tr>';
       }).join('');
       html += '</tbody></table></div>';
@@ -605,14 +788,128 @@
       }
       var recientes = lista.slice().sort(function(a, b) { return (b.fecha || '').localeCompare(a.fecha || ''); }).slice(0, 10);
       tbody.innerHTML = recientes.map(function(m) {
+        var mx = montosDe(m);
         return '<tr>'
           + '<td>' + finEscape(m.fecha) + '</td>'
           + '<td><span style="font-weight:600;">' + finEscape(m.concepto) + '</span><div style="font-size:12px;color:var(--color-text-secondary);">' + finEscape(m.categoria) + '</div></td>'
           + '<td><span class="' + (m.tipo === 'Gasto' ? 'fin-tipo-gasto' : 'fin-tipo-ingreso') + '">' + finEscape(m.tipo) + '</span></td>'
-          + '<td style="font-weight:700;">' + fmtBs(m.monto) + '</td>'
+          + '<td style="font-weight:700;">' + celdaMonto(mx.bs, mx.usd) + '</td>'
           + '<td><span class="badge ' + getBadgeClass(m.estado) + '">' + finEscape(m.estado) + '</span></td>'
           + '</tr>';
       }).join('');
+    }
+
+    function exportarReportePDF() {
+      var lista = movimientosDelPeriodo();
+      if (!lista) return;
+      var pf = periodoFiltro();
+      if (!pf) return;
+      if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') {
+        showAlert('El generador de PDF no ha cargado. Verifique su conexión a internet.', 'error');
+        return;
+      }
+
+      var totIng = 0, totEgr = 0, totIngUsd = 0, totEgrUsd = 0;
+      lista.forEach(function(m) {
+        var mx = montosDe(m);
+        if (m.tipo === 'Ingreso') { totIng += mx.bs; totIngUsd += mx.usd; }
+        else { totEgr += mx.bs; totEgrUsd += mx.usd; }
+      });
+      var bal = totIng - totEgr;
+      var balUsd = totIngUsd - totEgrUsd;
+
+      var doc = new window.jspdf.jsPDF();
+      var pageW = doc.internal.pageSize.getWidth();
+
+      doc.setFillColor(30, 58, 138);
+      doc.rect(0, 0, pageW, 28, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.text('Resumen Financiero', 14, 14);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text('braindev Intranet · Finanzas', 14, 21);
+
+      doc.setTextColor(15, 23, 42);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text('Período: ' + etiquetaPeriodo(pf), 14, 38);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(100, 116, 139);
+      doc.text(lista.length + ' movimiento(s) · Generado el ' + new Date().toLocaleDateString('es-VE'), 14, 44);
+
+      var y = 52;
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.setTextColor(15, 23, 42);
+      doc.text('Total gastos:', 14, y);
+      doc.setTextColor(220, 38, 38);
+      doc.text(fmtUsd(totEgrUsd) + ' / ' + fmtBs(totEgr), pageW - 14, y, { align: 'right' });
+      y += 7;
+      doc.setTextColor(15, 23, 42);
+      doc.text('Total ingresos:', 14, y);
+      doc.setTextColor(5, 150, 105);
+      doc.text(fmtUsd(totIngUsd) + ' / ' + fmtBs(totIng), pageW - 14, y, { align: 'right' });
+      y += 7;
+      doc.setTextColor(15, 23, 42);
+      doc.text('Balance:', 14, y);
+      doc.setTextColor(bal >= 0 ? 5 : 220, bal >= 0 ? 150 : 38, bal >= 0 ? 105 : 38);
+      doc.text(fmtUsd(balUsd) + ' / ' + fmtBs(bal), pageW - 14, y, { align: 'right' });
+      y += 10;
+
+      var map = {};
+      lista.forEach(function(m) {
+        var mx = montosDe(m);
+        var k = m.tipo + '|' + (m.categoria || 'Sin categoría');
+        map[k] = map[k] || { tipo: m.tipo, categoria: m.categoria || 'Sin categoría', count: 0, monto: 0, montoUsd: 0 };
+        map[k].count++;
+        map[k].monto += mx.bs;
+        map[k].montoUsd += mx.usd;
+      });
+      var filas = Object.keys(map).map(function(k) { return map[k]; }).sort(function(a, b) { return b.monto - a.monto; });
+      var totCat = 0, totCatUsd = 0;
+      filas.forEach(function(f) { totCat += f.monto; totCatUsd += f.montoUsd; });
+
+      doc.autoTable({
+        startY: y,
+        head: [['Categoría', 'Tipo', 'Movs.', 'Monto']],
+        body: filas.map(function(f) {
+          return [f.categoria, f.tipo, String(f.count), fmtUsd(f.montoUsd) + ' / ' + fmtBs(f.monto)];
+        }),
+        foot: [[{ content: 'Total', colSpan: 3, styles: { halign: 'right', fontStyle: 'bold' } }, { content: fmtUsd(totCatUsd) + ' / ' + fmtBs(totCat), styles: { halign: 'right', fontStyle: 'bold' } }]],
+        theme: 'grid',
+        styles: { fontSize: 9, cellPadding: 3 },
+        headStyles: { fillColor: [30, 58, 138], textColor: 255, fontStyle: 'bold' },
+        footStyles: { fillColor: [241, 245, 249], textColor: [15, 23, 42] },
+        alternateRowStyles: { fillColor: [248, 250, 252] },
+        margin: { left: 14, right: 14 }
+      });
+
+      var detalle = lista.slice().sort(function(a, b) { return (a.fecha || '').localeCompare(b.fecha || ''); });
+      doc.setTextColor(15, 23, 42);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
+      doc.text('Detalle de movimientos', 14, doc.lastAutoTable.finalY + 12);
+      doc.autoTable({
+        startY: doc.lastAutoTable.finalY + 15,
+        head: [['Fecha', 'Concepto', 'Categoría', 'Tipo', 'Monto']],
+        body: detalle.map(function(m) {
+          var mx = montosDe(m);
+          return [m.fecha || '-', m.concepto || '-', m.categoria || '-', m.tipo || '-', fmtUsd(mx.usd) + ' / ' + fmtBs(mx.bs)];
+        }),
+        theme: 'grid',
+        styles: { fontSize: 9, cellPadding: 3 },
+        headStyles: { fillColor: [30, 58, 138], textColor: 255, fontStyle: 'bold' },
+        alternateRowStyles: { fillColor: [248, 250, 252] },
+        margin: { left: 14, right: 14 }
+      });
+
+      var fname = 'resumen-finanzas';
+      if (pf.desde) fname += '-' + pf.desde;
+      if (pf.hasta) fname += '_' + pf.hasta;
+      doc.save(fname + '.pdf');
     }
 
     function togglePeriodo() {

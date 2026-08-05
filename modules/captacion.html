@@ -1873,6 +1873,13 @@
       var estado = document.getElementById('trab_estado').value;
       var fechaEgreso = document.getElementById('trab_fecha_egreso').value || null;
       if (!unidadId || !cargoId || !fechaIngreso) { showAlert('Completa unidad, cargo y fecha de ingreso', 'warning'); return; }
+      if (estado === 'Retirado' && editingTrabId) {
+        var trabActual = allTrabajadores.find(function(x) { return x.id === editingTrabId; });
+        if (trabActual && trabActual.estado !== 'Retirado') {
+          var okRetiro = await alertarPendientesAlRetirar(editingTrabId);
+          if (!okRetiro) return;
+        }
+      }
       try {
         if (editingTrabId) {
           var { error } = await supabaseClient.from('plantilla_trabajadores').update({
@@ -2351,6 +2358,7 @@
   </script>
 
 <script src="../js/module-help.js"></script>
+    <script src="../js/retiro-check.js"></script>
     <script src="../js/access.js"></script>
 </body>
 </html>

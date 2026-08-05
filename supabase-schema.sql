@@ -272,6 +272,18 @@ CREATE TABLE IF NOT EXISTS rl_asignaciones (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS rl_info_sensible (
+  id BIGSERIAL PRIMARY KEY,
+  trabajador_id UUID NOT NULL REFERENCES plantilla_trabajadores(id) ON DELETE CASCADE,
+  tipo TEXT NOT NULL DEFAULT 'Aplicación' CHECK (tipo IN ('Aplicación','Ente gubernamental','Otro')),
+  descripcion TEXT NOT NULL,
+  usuario TEXT,
+  estado TEXT NOT NULL DEFAULT 'Pendiente' CHECK (estado IN ('Pendiente','Entregado')),
+  notas TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS rl_actas (
   id BIGSERIAL PRIMARY KEY,
   tema TEXT NOT NULL,
@@ -430,6 +442,7 @@ ALTER TABLE trabajador_carga_familiar ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rl_conceptos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rl_equipos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rl_asignaciones ENABLE ROW LEVEL SECURITY;
+ALTER TABLE rl_info_sensible ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rl_actas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rl_acta_acuerdos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE repo_categorias ENABLE ROW LEVEL SECURITY;
@@ -500,6 +513,19 @@ CREATE POLICY "Usuarios autenticados pueden actualizar asignaciones"
 DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar asignaciones" ON rl_asignaciones;
 CREATE POLICY "Usuarios autenticados pueden eliminar asignaciones"
   ON rl_asignaciones FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver informacion sensible" ON rl_info_sensible;
+CREATE POLICY "Usuarios autenticados pueden ver informacion sensible"
+  ON rl_info_sensible FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear informacion sensible" ON rl_info_sensible;
+CREATE POLICY "Usuarios autenticados pueden crear informacion sensible"
+  ON rl_info_sensible FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar informacion sensible" ON rl_info_sensible;
+CREATE POLICY "Usuarios autenticados pueden actualizar informacion sensible"
+  ON rl_info_sensible FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar informacion sensible" ON rl_info_sensible;
+CREATE POLICY "Usuarios autenticados pueden eliminar informacion sensible"
+  ON rl_info_sensible FOR DELETE TO authenticated USING (true);
 
 DROP POLICY IF EXISTS "Usuarios autenticados pueden ver actas" ON rl_actas;
 CREATE POLICY "Usuarios autenticados pueden ver actas"

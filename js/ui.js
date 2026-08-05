@@ -27,7 +27,7 @@ const UI_DIALOG_TYPES = {
   warning: { icon: '<i class="fi fi-sr-exclamation"></i>', title: 'Advertencia', cls: 'type-warning' },
 };
 
-function uiDialogMarkup(type, message, buttons) {
+function uiDialogMarkup(type, message, buttons, renderHtml) {
   const conf = UI_DIALOG_TYPES[type] || UI_DIALOG_TYPES.info;
   return `
     <div class="modal-overlay show ui-dialog-overlay" id="uiDialogOverlay">
@@ -39,7 +39,7 @@ function uiDialogMarkup(type, message, buttons) {
         <div class="modal-body">
           <div class="ui-dialog-content">
             <div class="ui-dialog-icon ${conf.cls}">${conf.icon}</div>
-            <p class="ui-dialog-message">${uiEscape(message)}</p>
+            <div class="ui-dialog-message">${renderHtml ? message : uiEscape(message)}</div>
           </div>
         </div>
         <div class="modal-footer">${buttons}</div>
@@ -57,8 +57,8 @@ function uiDialogDismiss(value) {
   }
 }
 
-function uiDialogOpen(type, message, buttons) {
-  document.body.insertAdjacentHTML('beforeend', uiDialogMarkup(type, message, buttons));
+function uiDialogOpen(type, message, buttons, opts) {
+  document.body.insertAdjacentHTML('beforeend', uiDialogMarkup(type, message, buttons, opts && opts.html));
   const overlay = document.getElementById('uiDialogOverlay');
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) uiDialogDismiss(false);
@@ -68,7 +68,7 @@ function uiDialogOpen(type, message, buttons) {
 function showAlert(message, type) {
   uiDialogOpen(type || 'info', message, `
     <button class="btn" style="background:${uiModuleColor()}" onclick="uiDialogDismiss()">Aceptar</button>
-  `);
+  `, { html: false });
 }
 
 function showConfirm(message, confirmText) {
@@ -77,7 +77,7 @@ function showConfirm(message, confirmText) {
     uiDialogOpen('warning', message, `
       <button class="btn btn-outline" onclick="uiDialogDismiss(false)">Cancelar</button>
       <button class="btn" style="background:${uiModuleColor()}" onclick="uiDialogDismiss(true)">${uiEscape(confirmText || 'Confirmar')}</button>
-    `);
+    `, { html: true });
   });
 }
 

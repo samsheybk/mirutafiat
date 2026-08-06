@@ -190,7 +190,7 @@
     splashBtn.type = 'button';
     splashBtn.title = 'Ver el anuncio activo';
     splashBtn.style.display = 'none';
-    splashBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-7v16L3 13v-2z"></path><path d="M7 13v6"></path></svg> Anuncio';
+    splashBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-7v16L3 13v-2z"></path><path d="M7 13v6"></path></svg> Anuncio<span id="navSplashCount" class="nav-splash-count"></span>';
     splashBtn.addEventListener('click', function (e) {
       e.stopPropagation();
       openSplashFromNav();
@@ -466,8 +466,13 @@
   function setSplashNavVisible(items) {
     var btn = document.getElementById('navSplashBtn');
     if (!btn) return;
-    var hay = items ? items.some(splashVigenteGlobal) : false;
-    btn.style.display = hay ? '' : 'none';
+    var vigentes = items ? items.filter(splashVigenteGlobal) : [];
+    var countEl = document.getElementById('navSplashCount');
+    if (countEl) {
+      countEl.textContent = vigentes.length;
+      countEl.style.display = vigentes.length ? '' : 'none';
+    }
+    btn.style.display = vigentes.length ? '' : 'none';
   }
 
   function refreshSplashNav() {

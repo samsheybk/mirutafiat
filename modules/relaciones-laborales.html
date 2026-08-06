@@ -122,7 +122,7 @@
               </div>
               <table class="data-table">
                 <thead>
-                  <tr><th>Concepto</th><th>Descripción</th><th>Estado</th><th style="width:170px;">Acción</th></tr>
+                  <tr><th>Concepto</th><th>Descripción</th><th>Estado</th><th style="width:80px;">Acción</th></tr>
                 </thead>
                 <tbody id="conTableBody">
                   <tr><td colspan="4" style="text-align:center;padding:40px;color:#999;">Sin conceptos registrados</td></tr>
@@ -154,7 +154,7 @@
                 </div>
                 <table class="data-table">
                   <thead>
-                    <tr><th>Tipo</th><th>Equipo</th><th>Marca / Modelo</th><th>Serial</th><th>Código</th><th>Estado</th><th style="width:150px;">Acción</th></tr>
+                    <tr><th>Tipo</th><th>Equipo</th><th>Marca / Modelo</th><th>Serial</th><th>Código</th><th>Estado</th><th style="width:180px;">Acción</th></tr>
                   </thead>
                   <tbody id="eqTableBody">
                     <tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Sin equipos registrados</td></tr>
@@ -273,6 +273,7 @@
         </form>
       </div>
       <div class="modal-footer">
+        <button class="btn btn-outline" id="conEliminarBtn" onclick="rlDeleteConcepto(editConceptoId)" style="color:#dc2626;border-color:#fca5a5;margin-right:auto;display:none;"><i class="fi fi-sr-trash" style="font-size:14px;line-height:1;pointer-events:none;"></i>&nbsp;Eliminar</button>
         <button class="btn btn-outline" onclick="rlCloseModal('modalConcepto')">Cancelar</button>
         <button class="btn btn-relaciones" onclick="rlSaveConcepto()">Guardar</button>
       </div>
@@ -314,6 +315,25 @@
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="rlCloseModal('modalEquipo')">Cancelar</button>
         <button class="btn btn-relaciones" onclick="rlSaveEquipo()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalEquipoDetalle">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalEquipoDetalleTitle">Detalle del equipo</h3><button class="modal-close" onclick="rlCloseModal('modalEquipoDetalle')">&times;</button></div>
+      <div class="modal-body">
+        <div id="eqDetalleInfo" style="margin-bottom:16px;"></div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Historial de custodios</div>
+        <div style="max-height:320px;overflow-y:auto;">
+          <table class="data-table">
+            <thead><tr><th>Custodio</th><th>Asignación</th><th>Devolución</th><th>Estado</th><th>Notas</th></tr></thead>
+            <tbody id="eqDetalleHistBody"><tr><td colspan="5" style="text-align:center;padding:30px;color:#999;">Sin historial de asignaciones</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="rlCloseModal('modalEquipoDetalle')">Cerrar</button>
       </div>
     </div>
   </div>
@@ -694,6 +714,7 @@
     function rlOpenConceptoModal(id) {
       editConceptoId = id || null;
       document.getElementById('modalConceptoTitle').textContent = id ? 'Editar concepto' : 'Nuevo concepto';
+      document.getElementById('conEliminarBtn').style.display = id ? 'inline-flex' : 'none';
       if (id) {
         var c = rlConceptos.find(function(x) { return String(x.id) === String(id); });
         if (c) {
@@ -740,14 +761,19 @@
         return;
       }
       tbody.innerHTML = data.map(function(c) {
+        var activo = c.activo !== false;
         return '<tr>'
           + '<td><span style="font-weight:600;">' + c.nombre + '</span></td>'
           + '<td>' + (c.descripcion || '-') + '</td>'
-          + '<td><span class="badge ' + (c.activo !== false ? 'badge-active' : 'badge-inactive') + '">' + (c.activo !== false ? 'Activo' : 'Inactivo') + '</span></td>'
           + '<td>'
-          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="rlOpenConceptoModal(' + c.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
-          + '<button class="btn btn-sm btn-outline" title="' + (c.activo !== false ? 'Desactivar' : 'Activar') + '" onclick="rlToggleConcepto(' + c.id + ')"><i class="fi fi-sr-power" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
-          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="rlDeleteConcepto(' + c.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;"></i></button>'
+          + '<label class="switch" title="' + (activo ? 'Activo' : 'Inactivo') + '">'
+          + '<input type="checkbox" ' + (activo ? 'checked' : '') + ' onchange="rlToggleConcepto(' + c.id + ', this)">'
+          + '<span class="slider"></span>'
+          + '</label>'
+          + '<span style="font-size:11px;color:var(--color-text-secondary);margin-left:6px;">' + (activo ? 'Activo' : 'Inactivo') + '</span>'
+          + '</td>'
+          + '<td>'
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="rlOpenConceptoModal(' + c.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button>'
           + '</td>'
           + '</tr>';
       }).join('');
@@ -755,15 +781,17 @@
 
     function filterConceptos() { renderConceptos(); }
 
-    async function rlToggleConcepto(id) {
+    async function rlToggleConcepto(id, checkbox) {
       var c = rlConceptos.find(function(x) { return String(x.id) === String(id); });
       if (!c) return;
       var nuevo = c.activo !== false ? false : true;
       try {
         var { error } = await supabaseClient.from('rl_conceptos').update({ activo: nuevo }).eq('id', id);
         if (error) throw error;
+        if (checkbox) checkbox.checked = nuevo;
         await loadRelacionesData();
       } catch (err) {
+        if (checkbox) checkbox.checked = !nuevo;
         showAlert('Error: ' + err.message, 'error');
       }
     }
@@ -773,6 +801,7 @@
       try {
         var { error } = await supabaseClient.from('rl_conceptos').delete().eq('id', id);
         if (error) throw error;
+        rlCloseModal('modalConcepto');
         showAlert('Concepto eliminado', 'success');
         await loadRelacionesData();
       } catch (err) {
@@ -860,9 +889,47 @@
           + '<td>' + (e.serial || '-') + '</td>'
           + '<td>' + (e.codigo || '-') + '</td>'
           + '<td><span class="badge ' + rlBadge(estado) + '">' + estado + '</span></td>'
-          + '<td><button class="btn btn-sm btn-outline" title="Editar" onclick="rlOpenEquipoModal(' + e.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> <button class="btn btn-sm btn-outline" title="Eliminar" onclick="rlDeleteEquipo(' + e.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;"></i></button></td>'
+          + '<td>'
+          + '<button class="btn btn-sm btn-outline" title="Ver detalle e historial" onclick="rlOpenEquipoDetalle(' + e.id + ')"><i class="fi fi-sr-eye" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="rlOpenEquipoModal(' + e.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> <button class="btn btn-sm btn-outline" title="Eliminar" onclick="rlDeleteEquipo(' + e.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;"></i></button></td>'
           + '</tr>';
       }).join('');
+    }
+
+    function rlOpenEquipoDetalle(id) {
+      var e = getEquipo(id);
+      if (!e) return;
+      document.getElementById('modalEquipoDetalleTitle').textContent = 'Detalle del equipo';
+      var info = '<table class="data-table" style="margin-bottom:0;">'
+        + '<tbody>'
+        + '<tr><td style="width:140px;color:var(--color-text-secondary);">Equipo</td><td><span style="font-weight:600;">' + (e.descripcion || '-') + '</span></td></tr>'
+        + '<tr><td style="color:var(--color-text-secondary);">Tipo</td><td>' + (e.tipo || '-') + '</td></tr>'
+        + '<tr><td style="color:var(--color-text-secondary);">Marca / Modelo</td><td>' + ((e.marca || '-') + (e.modelo ? ' / ' + e.modelo : '')) + '</td></tr>'
+        + '<tr><td style="color:var(--color-text-secondary);">Serial</td><td>' + (e.serial || '-') + '</td></tr>'
+        + '<tr><td style="color:var(--color-text-secondary);">Código</td><td>' + (e.codigo || '-') + '</td></tr>'
+        + '<tr><td style="color:var(--color-text-secondary);">Estado</td><td><span class="badge ' + rlBadge(e.estado) + '">' + e.estado + '</span></td></tr>'
+        + '</tbody></table>';
+      document.getElementById('eqDetalleInfo').innerHTML = info;
+      var hist = rlAsignaciones.filter(function(a) { return String(a.equipo_id) === String(id); })
+        .sort(function(x, y) { return (y.fecha_asignacion || '').localeCompare(x.fecha_asignacion || ''); });
+      var tbody = document.getElementById('eqDetalleHistBody');
+      if (!hist.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:#999;">Este equipo aún no ha sido asignado</td></tr>';
+      } else {
+        tbody.innerHTML = hist.map(function(a) {
+          var t = getTrabajador(a.trabajador_id);
+          var nombre = t ? t.nombres + ' ' + t.apellidos : '-';
+          var cedula = t ? t.cedula : '';
+          return '<tr>'
+            + '<td><span style="font-weight:600;">' + nombre + '</span><div style="font-size:11px;color:var(--color-text-secondary);">C.I. ' + cedula + '</div></td>'
+            + '<td>' + a.fecha_asignacion + '</td>'
+            + '<td>' + (a.fecha_devolucion || '-') + '</td>'
+            + '<td><span class="badge ' + rlBadge(a.estado) + '">' + a.estado + '</span></td>'
+            + '<td>' + (a.notas || '-') + '</td>'
+            + '</tr>';
+        }).join('');
+      }
+      rlOpenModal('modalEquipoDetalle');
     }
 
     async function rlDeleteEquipo(id) {

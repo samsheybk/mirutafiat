@@ -114,12 +114,11 @@
                     <th>Teléfono</th>
                     <th>Correo</th>
                     <th>Estado</th>
-                    <th style="width:80px;">Acción</th>
                   </tr>
                 </thead>
                 <tbody id="atsTableBody">
                   <tr>
-                    <td colspan="6" style="text-align:center;padding:40px;color:#999;">No hay candidatos registrados</td>
+                    <td colspan="5" style="text-align:center;padding:40px;color:#999;">No hay candidatos registrados</td>
                   </tr>
                 </tbody>
               </table>
@@ -166,16 +165,45 @@
           <div class="tool-section" id="tool-psicologia">
             <div class="tool-section-header">
               <h2 style="color:var(--module-captacion);">Evaluaciones psicológicas</h2>
-              <button class="btn btn-captacion">+ Nueva evaluación</button>
             </div>
-            <table class="data-table">
-              <thead>
-                <tr><th>Candidato</th><th>Tipo de prueba</th><th>Fecha</th><th>Resultado</th><th>Estado</th></tr>
-              </thead>
-              <tbody>
-                <tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr>
-              </tbody>
-            </table>
+            <div class="tests-banner">
+              <div class="tests-banner-icon"><i class="fi fi-sr-clock"></i></div>
+              <div>
+                <div class="tests-banner-title">Próximamente: aplicación automatizada de pruebas psicológicas</div>
+                <div class="tests-banner-text">Pronto podrás aplicar los test de forma <strong>automatizada</strong>, con resultados e informes generados de manera automática. Pruebas disponibles:</div>
+              </div>
+            </div>
+            <div class="tests-grid">
+              <div class="test-card">
+                <div class="test-card-icon"><i class="fi fi-sr-head-side-thinking"></i></div>
+                <div>
+                  <div class="test-card-name">16 PF</div>
+                  <div class="test-card-desc">Evalúa los 16 factores de la personalidad según Cattell: estabilidad emocional, apertura, control de impulsos, sociabilidad y más. Ideal para descartar perfiles de candidatos.</div>
+                </div>
+              </div>
+              <div class="test-card">
+                <div class="test-card-icon"><i class="fi fi-sr-users"></i></div>
+                <div>
+                  <div class="test-card-name">Big Five</div>
+                  <div class="test-card-desc">Mide los cinco grandes rasgos de la personalidad: apertura, responsabilidad, extraversión, amabilidad y neuroticismo. Referencia moderna para el ajuste al puesto.</div>
+                </div>
+              </div>
+              <div class="test-card">
+                <div class="test-card-icon"><i class="fi fi-sr-heart"></i></div>
+                <div>
+                  <div class="test-card-name">MCMI de Millon</div>
+                  <div class="test-card-desc">Inventario clínico multiaxial que detecta trastornos de personalidad y síndromes clínicos. Para evaluaciones psicológicas en profundidad de candidatos y personal.</div>
+                </div>
+              </div>
+              <div class="test-card">
+                <div class="test-card-icon"><i class="fi fi-sr-draw-square"></i></div>
+                <div>
+                  <div class="test-card-name">Wartegg</div>
+                  <div class="test-card-desc">Prueba proyectiva basada en 8 casillas de dibujo. Explora estructura de la personalidad, emociones, creatividad y toma de decisiones de forma libre.</div>
+                </div>
+              </div>
+            </div>
+            <div style="font-size:13px;color:var(--color-text-secondary);"><strong style="color:var(--color-text);">Entre otras pruebas más...</strong></div>
           </div>
 
           <div class="tool-section" id="tool-requisiciones">
@@ -189,14 +217,14 @@
             <div id="reqVacantesView" style="height:calc(100vh - 260px);overflow-y:auto;">
               <table class="data-table">
                 <thead>
-                  <tr><th>Cargo</th><th>Unidad</th><th>Vacantes totales</th><th>Ocupados</th><th style="color:var(--module-captacion);font-weight:700;">Pendientes</th></tr>
+                  <tr><th>Cargo</th><th>Unidad</th><th>Vacantes totales</th><th>Ocupados</th><th>Candidatos en ATS</th><th style="color:var(--module-captacion);font-weight:700;">Pendientes</th></tr>
                 </thead>
                 <tbody id="reqTableBody">
-                  <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                  <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                  <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                  <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                  <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
                 </tbody>
               </table>
             </div>
@@ -863,21 +891,17 @@
     function renderATSTable(data) {
       const tbody = document.getElementById('atsTableBody');
       if (!data.length) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">No hay candidatos registrados</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">No hay candidatos registrados</td></tr>';
         return;
       }
       tbody.innerHTML = data.map(function(c) {
         var clr = colorEstado(c.estado_kanban);
-        var descBtn = c.estado_kanban !== 'No elegible'
-          ? '<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();openDescarta(' + c.id + ',\'' + c.nombres + ' ' + c.apellidos + '\')" style="color:#dc2626;">Descarta</button>'
-          : '';
         return '<tr style="cursor:pointer;border-left:3px solid ' + clr + ';" onclick="openFichaTecnica(' + c.id + ')">'
           + '<td><span style="font-weight:600;">' + c.nombres + ' ' + c.apellidos + '</span><br><span class="text-sm text-secondary">' + c.cedula + '</span></td>'
           + '<td>' + c.cargo_interes + '</td>'
           + '<td>' + (c.telefono || '-') + '</td>'
           + '<td>' + (c.correo || '-') + '</td>'
           + '<td><span class="badge" style="background:' + clr + ';color:#fff;border:0;">' + c.estado_kanban + '</span></td>'
-          + '<td style="width:80px;">' + descBtn + '</td>'
           + '</tr>';
       }).join('');
     }
@@ -1090,6 +1114,28 @@
       document.getElementById('modalFicha').classList.remove('show');
     }
 
+    async function eliminarCandidato(id, nombre) {
+      if (!(await showConfirm('¿Eliminar a ' + nombre + '? Se eliminarán también sus comentarios y su historial de movimientos.', 'Eliminar'))) return;
+      try {
+        var { data: yaIngresado } = await supabaseClient.from('plantilla_trabajadores').select('id').eq('candidato_id', id).limit(1);
+        if (yaIngresado && yaIngresado.length) {
+          showAlert('No se puede eliminar: el candidato ya está en la plantilla de trabajadores.', 'error');
+          return;
+        }
+        var { error: e1 } = await supabaseClient.from('ats_comentarios').delete().eq('candidato_id', id);
+        if (e1) throw e1;
+        var { error: e2 } = await supabaseClient.from('ats_log_estados').delete().eq('candidato_id', id);
+        if (e2) throw e2;
+        var { error: e3 } = await supabaseClient.from('ats_candidatos').delete().eq('id', id);
+        if (e3) throw e3;
+        closeFichaTecnica();
+        showAlert('Candidato eliminado', 'success');
+        loadATSCandidatos();
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
     /* ===== INGRESO DESDE ATS ===== */
     var ingresoCandidatoId = null;
 
@@ -1251,9 +1297,11 @@
           + '</div>'
           + logHtml
           + renderComentarios(comentarios)
-          + '<div style="margin-top:12px;border-top:1px solid var(--color-border);padding-top:12px;display:flex;gap:8px;">'
+          + '<div style="margin-top:12px;border-top:1px solid var(--color-border);padding-top:12px;display:flex;gap:8px;flex-wrap:wrap;">'
           + (c.estado_kanban === 'Elegible' ? '<button class="btn btn-captacion" onclick="closeFichaTecnica();openIngreso(' + c.id + ')">Ingreso</button>' : '')
           + '<button class="btn btn-captacion" onclick="closeFichaTecnica();openEstadoPicker(' + c.id + ',\'' + c.nombres + ' ' + c.apellidos + '\',\'' + c.estado_kanban + '\')">Cambiar estado</button>'
+          + (c.estado_kanban !== 'No elegible' ? '<button class="btn btn-outline" style="color:#dc2626;" onclick="closeFichaTecnica();openDescarta(' + c.id + ',\'' + c.nombres + ' ' + c.apellidos + '\')">Descartar</button>' : '')
+          + '<button class="btn btn-outline" style="color:#dc2626;border-color:#fca5a5;" onclick="eliminarCandidato(' + c.id + ',\'' + c.nombres + ' ' + c.apellidos + '\')">Eliminar</button>'
           + '<button class="btn btn-outline" onclick="closeFichaTecnica()">Cerrar</button>'
           + '</div>';
 
@@ -2113,14 +2161,23 @@
 
     async function loadRequisiciones() {
       try {
-        document.getElementById('reqTableBody').innerHTML = tableLoadingHTML(5);
+        document.getElementById('reqTableBody').innerHTML = tableLoadingHTML(6);
         var q = document.getElementById('reqSearch').value.trim().toLowerCase();
         var { data: cargos } = await supabaseClient.from('est_cargos').select('*,jefe_inmediato_id').order('titulo');
         var { data: plantilla } = await supabaseClient.from('plantilla_trabajadores').select('*');
         var { data: unidades } = await supabaseClient.from('est_unidades').select('*').order('nombre');
+        var { data: candidatos } = await supabaseClient.from('ats_candidatos').select('cargo_interes,estado_kanban');
         if (!cargos) cargos = [];
         if (!plantilla) plantilla = [];
         if (!unidades) unidades = [];
+        if (!candidatos) candidatos = [];
+        var enProceso = {};
+        candidatos.forEach(function(cd) {
+          var estado = String(cd.estado_kanban || '').trim().toLowerCase();
+          if (estado === 'no elegible') return;
+          var key = normalizeHeader(cd.cargo_interes);
+          enProceso[key] = (enProceso[key] || 0) + 1;
+        });
         var ocupados = {};
         plantilla.filter(function(w) { return w.estado === 'Activo' || w.estado === 'Suspendido'; }).forEach(function(w) {
           ocupados[w.cargo_id] = (ocupados[w.cargo_id] || 0) + 1;
@@ -2130,12 +2187,12 @@
           var vac = parseInt(c.vacantes, 10) || 0;
           var ocup = ocupados[c.id] || 0;
           var pend = Math.max(0, vac - ocup);
-          if (pend > 0) { totalPend += pend; rows.push({ cargo: c, vac: vac, ocup: ocup, pend: pend }); }
+          if (pend > 0) { totalPend += pend; rows.push({ cargo: c, vac: vac, ocup: ocup, pend: pend, ats: enProceso[normalizeHeader(c.titulo)] || 0 }); }
         });
         if (q) {
           rows = rows.filter(function(r) {
             var unid = unidades.find(function(u) { return u.id === r.cargo.unidad_id; });
-            var texto = r.cargo.titulo + ' ' + (unid ? unid.nombre : '') + ' ' + r.vac + ' ' + r.ocup + ' ' + r.pend;
+            var texto = r.cargo.titulo + ' ' + (unid ? unid.nombre : '') + ' ' + r.vac + ' ' + r.ocup + ' ' + r.pend + ' ' + r.ats;
             return texto.toLowerCase().indexOf(q) !== -1;
           });
         }
@@ -2143,7 +2200,7 @@
         document.getElementById('reqCount').textContent = totalPend + ' pendiente' + (totalPend !== 1 ? 's' : '');
         var tbody = document.getElementById('reqTableBody');
         if (!rows.length) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Todas las vacantes están cubiertas</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">Todas las vacantes están cubiertas</td></tr>';
           return;
         }
         var html = rows.map(function(r) {
@@ -2153,12 +2210,15 @@
             + '<td>' + (unid ? unid.nombre : '-') + '</td>'
             + '<td style="text-align:center;">' + r.vac + '</td>'
             + '<td style="text-align:center;">' + r.ocup + '</td>'
+            + '<td style="text-align:center;">' + (r.ats > 0
+                ? '<span title="Candidatos en proceso dentro del ATS" style="display:inline-block;min-width:26px;padding:2px 8px;border-radius:999px;background:rgba(59,130,246,0.12);color:#2563eb;font-weight:600;">' + r.ats + '</span>'
+                : '<span style="color:#999;">0</span>') + '</td>'
             + '<td style="text-align:center;font-weight:700;' + (r.pend > 0 ? 'color:var(--module-captacion);' : '') + '">' + r.pend + '</td>'
             + '</tr>';
         }).join('');
         tbody.innerHTML = html;
       } catch (err) {
-        document.getElementById('reqTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:#dc2626;">Error: ' + err.message + '</td></tr>';
+        document.getElementById('reqTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#dc2626;">Error: ' + err.message + '</td></tr>';
       }
     }
 

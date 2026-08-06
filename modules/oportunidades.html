@@ -6,97 +6,498 @@
   <title>Oportunidades de acción - Intranet</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
   <style>
-    :root { --module-color: var(--module-oportunidades); }
-    .tool-section.active { height: 100%; overflow-y: auto; padding-right: 4px; }
-    .op-intro { margin-bottom: 20px; }
-    .op-intro h2 { font-size: 18px; font-weight: 700; margin: 0 0 6px; }
-    .op-intro p { margin: 0; color: var(--color-text-secondary); font-size: 13px; }
-    .op-hero { display: flex; gap: 16px; align-items: flex-start; background: linear-gradient(135deg, rgba(101,163,13,0.12), rgba(101,163,13,0.04)); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 22px 24px; margin-bottom: 18px; }
-    .op-hero-icon { width: 52px; height: 52px; flex-shrink: 0; border-radius: var(--radius-lg); background: var(--module-oportunidades); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: var(--shadow-md); }
-    .op-hero h2 { font-size: 20px; font-weight: 800; margin: 0 0 6px; }
-    .op-hero p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--color-text-secondary); }
-    .op-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 22px; }
-    .op-stat { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 16px 18px; box-shadow: var(--shadow-sm); }
-    .op-stat-value { font-size: 26px; font-weight: 800; color: var(--module-oportunidades); }
-    .op-stat-label { font-size: 12px; color: var(--color-text-secondary); margin-top: 4px; }
-    .op-sec-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; margin: 20px 0 10px; }
-    .op-sec-title i.fi { color: var(--module-oportunidades); font-size: 16px; }
-    .op-list { margin: 0; padding-left: 18px; color: var(--color-text-secondary); font-size: 13px; line-height: 1.9; }
-    .op-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
-    .op-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 18px; box-shadow: var(--shadow-sm); transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s; }
-    .op-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: rgba(101,163,13,0.45); }
-    .op-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .op-card-icon { width: 42px; height: 42px; border-radius: var(--radius-md); background: rgba(101,163,13,0.12); color: var(--module-oportunidades); display: flex; align-items: center; justify-content: center; font-size: 19px; }
-    .op-chip { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-text-secondary); border: 1px solid var(--color-border); border-radius: 999px; padding: 3px 10px; }
-    .op-card h4 { margin: 0 0 8px; font-size: 15px; font-weight: 700; }
-    .op-card > p { margin: 0 0 10px; font-size: 12.5px; line-height: 1.55; color: var(--color-text-secondary); }
-    .op-card ul { margin: 0; padding-left: 16px; font-size: 12.5px; line-height: 1.8; color: var(--color-text); }
-    .op-note { display: flex; gap: 12px; align-items: flex-start; background: var(--color-bg); border: 1px dashed var(--color-border); border-radius: var(--radius-md); padding: 14px 16px; margin-top: 18px; font-size: 12.5px; color: var(--color-text-secondary); }
-    .op-note i.fi { color: var(--module-oportunidades); font-size: 18px; margin-top: 1px; }
-    .op-note b { color: var(--color-text); }
-    .op-phases { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
-    .op-phase { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 18px; box-shadow: var(--shadow-sm); }
-    .op-phase-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-    .op-phase-head h4 { margin: 0; font-size: 15px; font-weight: 700; }
-    .op-phase-badge { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; color: #fff; border-radius: 999px; padding: 4px 12px; }
-    .op-phase-badge.p1 { background: #0d9488; }
-    .op-phase-badge.p2 { background: #d97706; }
-    .op-phase-badge.p3 { background: #7c3aed; }
-    .op-phase > p { margin: 0 0 12px; font-size: 12.5px; line-height: 1.55; color: var(--color-text-secondary); }
-    .op-phase-list { list-style: none; margin: 0; padding: 0; }
-    .op-phase-list li { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px dashed var(--color-border); font-size: 13px; }
-    .op-phase-list li i.fi { color: var(--color-text-secondary); font-size: 15px; }
-    /* Propuesta de costos */
-    .cs-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 22px; }
-    .cs-kpi { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 18px; box-shadow: var(--shadow-sm); }
-    .cs-kpi-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--color-text-secondary); margin-bottom: 6px; }
-    .cs-kpi-value { font-size: 26px; font-weight: 800; color: var(--module-oportunidades); letter-spacing: -.5px; }
+    :root {
+      --lp-brand: #059669;
+      --lp-accent: #34d399;
+      --lp-navy: #064e3b;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { overflow-y: auto; }
+    .app-layout { height: auto; min-height: 100vh; overflow: visible; }
+    .main-content { overflow: visible; flex: none; }
+    section[id] { scroll-margin-top: 128px; }
+
+    .lp-main { width: 100%; }
+
+    .lp-wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+
+    /* ===== HERO ===== */
+    .lp-hero {
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+      background: linear-gradient(140deg, #059669 0%, #047857 46%, #064e3b 100%);
+      padding: 72px 0 60px;
+    }
+    .lp-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(520px 260px at 88% -15%, rgba(255,255,255,.16), transparent 60%),
+        radial-gradient(440px 260px at -8% 115%, rgba(255,255,255,.10), transparent 60%);
+    }
+    .lp-hero::after {
+      content: '';
+      position: absolute;
+      right: -120px;
+      top: -120px;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      border: 1px dashed rgba(255,255,255,.18);
+      pointer-events: none;
+    }
+    .lp-hero-inner { position: relative; }
+
+    .lp-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.4px;
+      color: rgba(255,255,255,.85);
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.22);
+      border-radius: 999px;
+      padding: 7px 16px;
+      backdrop-filter: blur(4px);
+      margin-bottom: 20px;
+    }
+    .lp-hero h1 {
+      margin: 0 0 16px;
+      font-size: clamp(30px, 4.6vw, 48px);
+      font-weight: 800;
+      letter-spacing: -1.2px;
+      line-height: 1.08;
+      max-width: 780px;
+    }
+    .lp-hero h1 span { color: #6ee7b7; }
+    .lp-hero > .lp-wrap > .lp-hero-inner > p {
+      margin: 0 0 28px;
+      font-size: 15px;
+      line-height: 1.75;
+      color: rgba(255,255,255,.88);
+      max-width: 700px;
+    }
+    .lp-hero > .lp-wrap > .lp-hero-inner > p b { color: #fff; }
+
+    .lp-hero-cta { display: flex; flex-wrap: wrap; gap: 12px; }
+    .lp-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 12px 22px;
+      border-radius: 999px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform .15s, box-shadow .15s, background .15s;
+    }
+    .lp-btn:hover { transform: translateY(-2px); }
+    .lp-btn.solid { background: #fff; color: #064e3b; box-shadow: 0 10px 26px rgba(0,0,0,.18); }
+    .lp-btn.solid:hover { background: #a7f3d0; }
+    .lp-btn.ghost { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.32); color: #fff; }
+    .lp-btn.ghost:hover { background: rgba(255,255,255,.22); }
+
+    .lp-hero-stats {
+      position: relative;
+      margin-top: 48px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    .lp-hero-stat {
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 18px;
+      padding: 18px 20px;
+      backdrop-filter: blur(5px);
+      transition: transform .15s, background .15s;
+    }
+    .lp-hero-stat:hover { transform: translateY(-3px); background: rgba(255,255,255,.15); }
+    .lp-hero-stat b { display: block; font-size: 30px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; }
+    .lp-hero-stat span { font-size: 12px; color: rgba(255,255,255,.75); line-height: 1.4; display: block; margin-top: 4px; }
+
+    /* ===== ANCLAS STICKY ===== */
+    .lp-anchors {
+      position: sticky;
+      top: 60px;
+      z-index: 90;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 12px 28px;
+      background: rgba(255,255,255,.88);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .lp-anchors a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #57534e;
+      text-decoration: none;
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      padding: 7px 14px;
+      white-space: nowrap;
+      transition: all .15s;
+    }
+    .lp-anchors a i.fi { font-size: 13px; color: var(--lp-brand); }
+    .lp-anchors a:hover { color: var(--lp-brand); border-color: rgba(5,150,105,.5); background: #ecfdf5; }
+
+    /* ===== SECCIONES ===== */
+    .lp-section { padding: 64px 0; }
+    .lp-section.alt { background: #f1f5f9; }
+    .lp-section.dark { background: var(--lp-navy); color: #fff; }
+
+    .lp-sec-head { max-width: 780px; margin-bottom: 30px; }
+    .lp-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--lp-brand);
+      background: rgba(5,150,105,.10);
+      border-radius: 999px;
+      padding: 6px 14px;
+    }
+    .lp-sec-head h2 { margin: 14px 0 10px; font-size: clamp(22px, 3vw, 30px); font-weight: 800; letter-spacing: -.7px; line-height: 1.15; }
+    .lp-sec-head p { margin: 0; font-size: 13.5px; line-height: 1.7; color: var(--color-text-secondary); }
+
+    /* ===== VULNERABILIDADES ===== */
+    .lp-vuln-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .lp-vuln {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #fff;
+      border: 1px solid #fecaca;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 6px 18px rgba(153, 27, 27, .07);
+      transition: transform .16s, box-shadow .16s;
+    }
+    .lp-vuln:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(153, 27, 27, .13); }
+    .lp-vuln-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: #fee2e2;
+      color: #b91c1c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .lp-vuln h3 { margin: 0; font-size: 15px; font-weight: 800; color: #991b1b; letter-spacing: -.2px; }
+    .lp-vuln p { margin: 0; font-size: 12.5px; line-height: 1.6; color: #7f1d1d; }
+    .lp-vuln-res {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      background: #fef2f2;
+      border: 1px dashed #fca5a5;
+      border-radius: 14px;
+      padding: 15px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #991b1b;
+      line-height: 1.5;
+    }
+    .lp-vuln-res i.fi { font-size: 17px; color: #dc2626; }
+
+    /* ===== SOLUCIÓN ===== */
+    .lp-sol-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+    .lp-sol {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+      transition: transform .16s, box-shadow .16s, border-color .16s;
+    }
+    .lp-sol:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: rgba(5,150,105,.45); }
+    .lp-sol-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: rgba(5,150,105,.12);
+      color: var(--lp-brand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 14px;
+    }
+    .lp-sol h3 { margin: 0 0 6px; font-size: 15px; font-weight: 800; letter-spacing: -.2px; }
+    .lp-sol p { margin: 0; font-size: 12.5px; line-height: 1.6; color: var(--color-text-secondary); }
+
+    /* ===== MÓDULOS ===== */
+    .lp-mod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+    .lp-mod {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      background: #fff;
+      border: 1px solid var(--color-border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 4px 14px rgba(15,23,42,.05);
+      transition: transform .16s, box-shadow .16s, border-color .16s;
+    }
+    .lp-mod:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: rgba(5,150,105,.45); }
+    .lp-mod-icon {
+      width: 46px;
+      height: 46px;
+      flex-shrink: 0;
+      border-radius: 13px;
+      background: rgba(5,150,105,.12);
+      color: var(--lp-brand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .lp-mod h3 { margin: 0 0 4px; font-size: 14.5px; font-weight: 800; letter-spacing: -.1px; }
+    .lp-mod p { margin: 0; font-size: 12px; line-height: 1.55; color: var(--color-text-secondary); }
+
+    /* ===== NUEVAS FRONTERAS ===== */
+    .lp-front-head { margin-top: 56px; padding-top: 40px; border-top: 1px dashed var(--color-border); }
+    .lp-front-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+    .lp-front {
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border: 1px solid var(--color-border);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 4px 14px rgba(15,23,42,.05);
+      transition: transform .16s, box-shadow .16s, border-color .16s;
+    }
+    .lp-front:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: rgba(5,150,105,.45); }
+    .lp-front-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .lp-front-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: rgba(5,150,105,.12);
+      color: var(--lp-brand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .lp-chip { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; border: 1px solid; border-radius: 999px; padding: 4px 11px; }
+    .chip-seguridad { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+    .chip-operaciones { background: #d1fae5; color: #047857; border-color: #6ee7b7; }
+    .chip-comercial { background: #d1fae5; color: #047857; border-color: #6ee7b7; }
+    .chip-comunicacion { background: #a7f3d0; color: #065f46; border-color: #34d399; }
+    .chip-rrhh { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+    .chip-tecnologia { background: #f1f5f9; color: #334155; border-color: #cbd5e1; }
+    .lp-front h3 { margin: 0 0 8px; font-size: 15px; font-weight: 800; letter-spacing: -.2px; }
+    .lp-front > p { margin: 0 0 12px; font-size: 12.5px; line-height: 1.6; color: var(--color-text-secondary); flex: 1; }
+    .lp-front ul { margin: 0 0 14px; padding-left: 16px; font-size: 12.5px; line-height: 1.9; color: var(--color-text); }
+    .lp-front-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
+    .lp-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; padding: 4px 10px; border-radius: 999px; }
+    .lp-tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+    .lp-tag.impact { background: #ecfdf5; color: #065f46; }
+    .lp-tag.impact::before { background: #059669; }
+    .lp-tag.effort-low { background: #ecfdf5; color: #065f46; }
+    .lp-tag.effort-low::before { background: #059669; }
+    .lp-tag.effort-mid { background: #d1fae5; color: #047857; }
+    .lp-tag.effort-mid::before { background: #10b981; }
+    .lp-tag.effort-high { background: #fef2f2; color: #991b1b; }
+    .lp-tag.effort-high::before { background: #dc2626; }
+
+    /* ===== HOJA DE RUTA ===== */
+    .lp-phases { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .lp-phases::before {
+      content: '';
+      position: absolute;
+      top: 30px;
+      left: 15%;
+      right: 15%;
+      height: 3px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, #34d399, #059669, #047857);
+      opacity: .45;
+    }
+    .lp-phase {
+      position: relative;
+      background: #fff;
+      border: 1px solid var(--color-border);
+      border-radius: 20px;
+      padding: 26px 20px 20px;
+      box-shadow: var(--shadow-sm);
+      transition: transform .16s, box-shadow .16s;
+    }
+    .lp-phase:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+    .lp-phase-node {
+      width: 60px;
+      height: 60px;
+      margin: -56px auto 16px;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 19px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 5px solid #f1f5f9;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+    .lp-phase-node.p1 { background: linear-gradient(135deg, #6ee7b7, #10b981); }
+    .lp-phase-node.p2 { background: linear-gradient(135deg, #34d399, #059669); }
+    .lp-phase-node.p3 { background: linear-gradient(135deg, #059669, #064e3b); }
+    .lp-phase-head { display: flex; flex-direction: column; align-items: center; gap: 7px; margin-bottom: 10px; text-align: center; }
+    .lp-phase-head h3 { margin: 0; font-size: 16px; font-weight: 800; letter-spacing: -.2px; }
+    .lp-phase-chip { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; padding: 3px 11px; border-radius: 999px; border: 1px solid var(--color-border); color: var(--color-text-secondary); }
+    .lp-phase > p { margin: 0 0 12px; font-size: 12.5px; line-height: 1.6; color: var(--color-text-secondary); text-align: center; }
+    .lp-phase-list { list-style: none; margin: 0 0 14px; padding: 0; }
+    .lp-phase-list li { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px dashed var(--color-border); font-size: 13px; }
+    .lp-phase-list li i.fi { color: var(--color-text-secondary); font-size: 15px; }
+    .lp-phase-outcome { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: var(--color-text-secondary); background: var(--color-bg); border-radius: 10px; padding: 10px 12px; line-height: 1.5; }
+    .lp-phase-outcome i.fi { color: var(--lp-brand); font-size: 15px; margin-top: 1px; }
+
+    /* ===== COSTOS ===== */
+    .cs-exec {
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+      border-radius: 22px;
+      padding: 30px 32px;
+      margin-bottom: 22px;
+      background: linear-gradient(140deg, #059669, #064e3b);
+      box-shadow: 0 18px 42px rgba(5, 150, 105, 0.28);
+    }
+    .cs-exec::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(420px 200px at 92% -10%, rgba(255,255,255,.16), transparent 60%);
+      pointer-events: none;
+    }
+    .cs-exec .k { position: relative; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,.72); margin: 0 0 8px; }
+    .cs-exec h3 { position: relative; font-size: 22px; font-weight: 800; margin: 0 0 8px; letter-spacing: -.4px; }
+    .cs-exec p { position: relative; font-size: 13px; line-height: 1.7; color: rgba(255,255,255,.88); margin: 0 0 18px; max-width: 720px; }
+    .cs-exec p b { color: #fff; }
+    .cs-exec-nums { position: relative; display: flex; flex-wrap: wrap; gap: 30px; }
+    .cs-exec-nums div b { display: block; font-size: 24px; font-weight: 800; line-height: 1.1; }
+    .cs-exec-nums div span { font-size: 11.5px; color: rgba(255,255,255,.72); }
+
+    .cs-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-bottom: 30px; }
+    .cs-kpi { background: #fff; border: 1px solid var(--color-border); border-radius: 18px; padding: 18px; box-shadow: var(--shadow-sm); transition: transform .15s, box-shadow .15s; }
+    .cs-kpi:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .cs-kpi-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .cs-kpi-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(5,150,105,.12);
+      color: var(--lp-brand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0; }
+    .cs-kpi-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; color: var(--color-text-secondary); }
+    .cs-kpi-value { font-size: 28px; font-weight: 800; color: var(--lp-brand); letter-spacing: -.5px; }
     .cs-kpi-value span { font-size: 14px; color: var(--color-text-secondary); font-weight: 600; }
     .cs-kpi-sub { font-size: 12px; color: var(--color-text-secondary); margin-top: 6px; line-height: 1.5; }
-    .cs-sec { margin-bottom: 24px; }
-    .cs-sec-title { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 800; margin-bottom: 14px; }
-    .cs-sec-title .num { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 7px; background: var(--module-oportunidades); color: #fff; font-size: 12px; font-weight: 700; flex-shrink: 0; }
-    .cs-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; }
+
+    .cs-sec { margin-bottom: 34px; }
+    .cs-sec-title { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 800; margin-bottom: 16px; letter-spacing: -.2px; }
+    .cs-sec-title .num { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 8px; background: var(--lp-brand); color: #fff; font-size: 12px; font-weight: 800; flex-shrink: 0; }
+
+    .cs-card { background: #fff; border: 1px solid var(--color-border); border-radius: 18px; box-shadow: var(--shadow-sm); overflow: hidden; }
     .cs-card table { width: 100%; border-collapse: collapse; }
-    .cs-card th { text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--color-text-secondary); background: var(--color-bg); padding: 12px 16px; border-bottom: 1px solid var(--color-border); }
-    .cs-card td { padding: 14px 16px; font-size: 13px; border-bottom: 1px solid var(--color-border); vertical-align: top; }
+    .cs-card th { text-align: left; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; color: var(--color-text-secondary); background: var(--color-bg); padding: 13px 18px; border-bottom: 1px solid var(--color-border); }
+    .cs-card td { padding: 16px 18px; font-size: 13px; border-bottom: 1px solid var(--color-border); vertical-align: top; }
     .cs-card tr:last-child td { border-bottom: none; }
     .cs-card tbody tr:hover { background: var(--color-bg); }
-    .cs-price { text-align: right; white-space: nowrap; font-weight: 700; }
+    .cs-price { white-space: nowrap; font-weight: 700; }
     .cs-free { color: #059669; }
-    .cs-paid { color: var(--module-oportunidades); }
-    .cs-badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 10.5px; font-weight: 700; }
-    .cs-badge.free { background: #ecfdf5; color: #059669; }
-    .cs-badge.paid { background: rgba(101,163,13,.12); color: var(--module-oportunidades); }
-    .cs-svc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
-    .cs-svc { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 12px; }
-    .cs-svc-head { display: flex; align-items: center; justify-content: space-between; }
-    .cs-svc-name { font-size: 15px; font-weight: 800; }
-    .cs-svc-logo { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 800; color: #fff; flex-shrink: 0; }
-    .cs-svc-logo.supabase { background: linear-gradient(135deg, #3ecf8e, #1f9d6b); }
-    .cs-svc-logo.vercel { background: linear-gradient(135deg, #111, #000); }
-    .cs-svc-logo.github { background: linear-gradient(135deg, #24292f, #0d1117); }
-    .cs-svc-cost { font-size: 22px; font-weight: 800; letter-spacing: -.5px; }
-    .cs-svc-cost .plan { font-size: 12px; font-weight: 600; color: var(--color-text-secondary); }
-    .cs-svc ul { list-style: none; margin: 0; padding: 0; }
-    .cs-svc li { position: relative; padding-left: 18px; font-size: 12.5px; margin-bottom: 7px; }
-    .cs-svc li::before { content: '✓'; position: absolute; left: 0; color: #059669; font-weight: 700; font-size: 11px; }
-    .cs-svc small { font-size: 11px; color: var(--color-text-secondary); line-height: 1.5; }
-    .cs-alert { display: flex; gap: 10px; align-items: flex-start; border-radius: var(--radius-md); padding: 14px 16px; font-size: 12.5px; margin-top: 12px; }
-    .cs-alert.warn { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; }
+    .cs-paid { color: var(--lp-brand); }
+    .cs-badge { display: inline-block; margin-left: 4px; padding: 2px 9px; border-radius: 999px; font-size: 10.5px; font-weight: 800; }
+    .cs-badge.paid { background: rgba(5,150,105,.12); color: var(--lp-brand); }
+
+    .cs-alert { display: flex; gap: 10px; align-items: flex-start; border-radius: 14px; padding: 15px 17px; font-size: 12.5px; margin-top: 14px; line-height: 1.6; }
     .cs-alert.good { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
-    .cs-reco { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 22px; }
+    .cs-alert.info { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+
+    .cs-list { display: grid; gap: 10px; }
+    .cs-item { display: flex; gap: 12px; align-items: flex-start; font-size: 12.5px; line-height: 1.55; padding: 14px 16px; border: 1px solid var(--color-border); border-radius: 14px; background: #fff; box-shadow: var(--shadow-sm); }
+    .cs-item i.fi { color: var(--lp-brand); font-size: 16px; margin-top: 1px; }
+
+    .lp-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .lp-compare-col { border-radius: 18px; padding: 22px; box-shadow: var(--shadow-sm); }
+    .lp-compare-col.today { background: #fef2f2; border: 1px solid #fecaca; }
+    .lp-compare-col.proposal { background: #ecfdf5; border: 1px solid #a7f3d0; }
+    .lp-compare-head { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; margin-bottom: 14px; }
+    .lp-compare-col.today .lp-compare-head { color: #b91c1c; }
+    .lp-compare-col.proposal .lp-compare-head { color: #047857; }
+    .lp-compare-col ul { list-style: none; margin: 0 0 14px; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+    .lp-compare-col li { display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; line-height: 1.5; }
+    .lp-compare-col li::before { content: '•'; font-weight: 800; }
+    .lp-compare-col.today li::before { color: #dc2626; }
+    .lp-compare-col.proposal li::before { color: #059669; }
+    .lp-compare-result { margin: 0; font-size: 12.5px; font-weight: 700; line-height: 1.5; }
+    .lp-compare-col.today .lp-compare-result { color: #991b1b; }
+    .lp-compare-col.proposal .lp-compare-result { color: #047857; }
+
+    .cs-reco { background: #fff; border: 1px solid var(--color-border); border-radius: 20px; box-shadow: var(--shadow-md); padding: 24px; }
     .cs-reco-total { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-    .cs-reco-total .lbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--color-text-secondary); }
-    .cs-reco-total .val { font-size: 30px; font-weight: 800; letter-spacing: -1px; color: var(--module-oportunidades); }
-    .cs-reco-total .val small { font-size: 14px; color: var(--color-text-secondary); font-weight: 600; }
-    .cs-reco-list { margin-top: 16px; display: grid; gap: 10px; }
-    .cs-reco-item { display: flex; gap: 10px; font-size: 12.5px; padding: 11px 13px; border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-bg); }
-    .cs-reco-item .n { flex-shrink: 0; width: 20px; height: 20px; border-radius: 6px; background: var(--module-oportunidades); color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .cs-reco-total .lbl { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; color: var(--color-text-secondary); }
+    .cs-reco-total .val { font-size: 28px; font-weight: 800; letter-spacing: -1px; color: var(--lp-brand); }
+    .cs-reco-total .val small { font-size: 13px; color: var(--color-text-secondary); font-weight: 600; }
+    .cs-reco-list { margin-top: 18px; display: grid; gap: 10px; }
+    .cs-reco-item { display: flex; gap: 12px; font-size: 12.5px; padding: 13px 15px; border: 1px solid var(--color-border); border-radius: 14px; background: var(--color-bg); }
+    .cs-reco-item .n { flex-shrink: 0; width: 22px; height: 22px; border-radius: 7px; background: var(--lp-brand); color: #fff; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+
+    /* ===== FOOTER ===== */
+    .lp-footer { background: linear-gradient(140deg, #047857, #064e3b); color: rgba(255,255,255,.8); padding: 44px 0; text-align: center; }
+    .lp-footer b { color: #fff; }
+    .lp-footer .lp-footer-chips { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 18px; }
+    .lp-footer .lp-footer-chips span {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 999px;
+      padding: 6px 14px;
+    }
+    .lp-footer p { margin: 0; font-size: 12.5px; }
+
+    @media (max-width: 900px) {
+      .lp-hero-stats { grid-template-columns: repeat(2, 1fr); }
+      .lp-vuln-grid { grid-template-columns: 1fr; }
+      .lp-phases { grid-template-columns: 1fr; }
+      .lp-phases::before { display: none; }
+      .lp-phase-node { margin: 0 auto 16px; }
+      .lp-compare { grid-template-columns: 1fr; }
+      .lp-hero { padding: 48px 0 44px; }
+    }
+    @media (max-width: 560px) {
+      .lp-hero-stats { grid-template-columns: 1fr; }
+      .cs-item { flex-direction: column; gap: 6px; }
+      .lp-wrap { padding: 0 18px; }
+    }
   </style>
 </head>
 <body>
@@ -124,397 +525,594 @@
       </div>
     </nav>
 
-    <div class="main-content">
-      <div class="module-layout">
-        <div class="module-panel">
-          <div class="panel-item active" data-tool="vision" onclick="switchTool('vision')" title="Visión general"><span class="panel-item-indicator bg-oportunidades"></span><i class="fi fi-sr-bullseye" style="font-size:24px;pointer-events:none;"></i></div>
-          <div class="panel-item" data-tool="oportunidades" onclick="switchTool('oportunidades')" title="Oportunidades de crecimiento"><span class="panel-item-indicator bg-oportunidades"></span><i class="fi fi-sr-rocket" style="font-size:24px;pointer-events:none;"></i></div>
-          <div class="panel-item" data-tool="roadmap" onclick="switchTool('roadmap')" title="Hoja de ruta"><span class="panel-item-indicator bg-oportunidades"></span><i class="fi fi-sr-route" style="font-size:24px;pointer-events:none;"></i></div>
-          <div class="panel-item" data-tool="costos" onclick="switchTool('costos')" title="Propuesta de costos"><span class="panel-item-indicator bg-oportunidades"></span><i class="fi fi-sr-coins" style="font-size:24px;pointer-events:none;"></i></div>
-        </div>
+    <main class="lp-main">
 
-        <div class="module-body">
-          <div class="module-content">
-
-            <div class="tool-section active" id="tool-vision">
-              <div class="op-hero">
-                <div class="op-hero-icon"><i class="fi fi-sr-rocket"></i></div>
-                <div>
-                  <h2>La intranet puede crecer</h2>
-                  <p>Este módulo reúne las oportunidades de evolución de la intranet para apoyar nuevas áreas y procesos de la empresa: desde seguridad física y gestión de la zona gourmet, hasta CRM de ventas, comunicaciones unificadas, evaluaciones de desempeño por puesto e inteligencia de negocio.</p>
-                </div>
-              </div>
-
-              <div class="op-stats">
-                <div class="op-stat"><div class="op-stat-value">11</div><div class="op-stat-label">Oportunidades propuestas</div></div>
-                <div class="op-stat"><div class="op-stat-value">6</div><div class="op-stat-label">Áreas de la empresa cubiertas</div></div>
-                <div class="op-stat"><div class="op-stat-value">3</div><div class="op-stat-label">Fases de implementación</div></div>
-                <div class="op-stat"><div class="op-stat-value">100%</div><div class="op-stat-label">Integrado a la plataforma actual</div></div>
-              </div>
-
-              <div class="op-sec-title"><i class="fi fi-sr-lightbulb-exclamation"></i> ¿Qué encontrarás en este módulo?</div>
-              <ul class="op-list">
-                <li><b>Oportunidades de crecimiento:</b> catálogo de nuevas capacidades, cada una con su descripción y beneficios esperados.</li>
-                <li><b>Hoja de ruta:</b> fases sugeridas para priorizar e implementar las oportunidades según su impacto y esfuerzo.</li>
-                <li>Todas las propuestas se integran con la infraestructura actual (Supabase, login, navegación) sin duplicar esfuerzos.</li>
-              </ul>
+      <section class="lp-hero">
+        <div class="lp-wrap">
+          <div class="lp-hero-inner">
+            <span class="lp-badge"><i class="fi fi-sr-bullseye"></i> Propuesta de transformación digital</span>
+            <h1>La oportunidad de <span>innovar</span> en la gestión del talento humano</h1>
+            <p>Reconstruir la gestión del departamento de Recursos Humanos de forma <b>rápida, efectiva y totalmente segura</b>, con la posibilidad de extender el proyecto a <b>nuevas fronteras</b>. Todo en una plataforma <b>a medida</b>, sin comprar licencias de gestión, sobre una infraestructura profesional de Supabase, Vercel y GitHub: cada módulo es una pieza clave de la eficiencia de la organización.</p>
+            <div class="lp-hero-cta">
+              <a class="lp-btn solid" href="#solucion"><i class="fi fi-sr-rocket"></i> Ver la solución</a>
+              <a class="lp-btn ghost" href="#modulos"><i class="fi fi-sr-puzzle-piece"></i> Las piezas del proyecto</a>
+              <a class="lp-btn ghost" href="#costos"><i class="fi fi-sr-coins"></i> Propuesta de costos</a>
             </div>
-
-            <div class="tool-section" id="tool-oportunidades">
-              <div class="op-intro">
-                <h2>Oportunidades de crecimiento</h2>
-                <p>Capacidades propuestas para ampliar el alcance de la intranet en toda la organización.</p>
-              </div>
-
-              <div class="op-grid">
-                <div class="op-card">
-                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-camera-security"></i></div><span class="op-chip">Seguridad</span></div>
-                  <h4>Seguridad Física</h4>
-                  <p>Vigilancia electrónica, control de accesos y reporte de novedades de seguridad física en las instalaciones.</p>
-                  <ul>
-                    <li>Registro de rondas de vigilancia</li>
-                    <li>Control de visitantes y accesos</li>
-                    <li>Alertas y novedades de seguridad</li>
-                  </ul>
-                </div>
-
-                <div class="op-card">
-                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-utensils"></i></div><span class="op-chip">Operaciones</span></div>
-                  <h4>Gestión de zona gourmet</h4>
-                  <p>Administración del servicio de la zona gourmet: menús, pedidos, inventario y control de consumo.</p>
-                  <ul>
-                    <li>Menús y programación semanal</li>
-                    <li>Control de inventario y mermas</li>
-                    <li>Reservas y pedidos en línea</li>
-                  </ul>
-                </div>
-
-                <div class="op-card">
-                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-sack-dollar"></i></div><span class="op-chip">Comercial</span></div>
-                  <h4>CRM para el área de ventas</h4>
-                  <p>Seguimiento de clientes, oportunidades de negocio y cierre de ventas para el equipo comercial.</p>
-                  <ul>
-                    <li>Ficha de clientes y contactos</li>
-                    <li>Pipeline de oportunidades</li>
-                    <li>Reportes de ventas por asesor</li>
-                  </ul>
-                </div>
-
-                <div class="op-card">
-                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-video-camera"></i></div><span class="op-chip">Comunicación</span></div>
-                  <h4>Videoconferencias</h4>
-                  <p>Reuniones virtuales integradas a la intranet para equipos remotos y sedes múltiples.</p>
-                  <ul>
-                    <li>Salas de reunión virtuales</li>
-                    <li>Agenda y grabaciones</li>
-                    <li>Integración con el calendario</li>
-                  </ul>
-                </div>
-
-                <div class="op-card">
-                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-calendar"></i></div><span class="op-chip">Comunicación</span></div>
-                  <h4>Calendarios compartidos</h4>
-                  <p>Calendarios por unidad y corporativos para coordinar reuniones, eventos y disponibilidad de recursos.</p>
-                  <ul>
-                    <li>Disponibilidad de salas y equipos</li>
-                    <li>Coordinación de reuniones</li>
-                    <li>Eventos de la empresa</li>
-                  </ul>
-                </div>
-
-                <div class="op-card">
-                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-envelope"></i></div><span class="op-chip">Comunicación</span></div>
-                  <h4>Correos y canales de comunicación</h4>
-                  <p>Uso eficiente del correo corporativo y de los canales de comunicación internos por área y proyecto.</p>
-                  <ul>
-                    <li>Correo corporativo integrado</li>
-                    <li>Directorio de canales y grupos</li>
-                    <li>Políticas y buenas prácticas</li>
-                  </ul>
-                </div>
-
-                <div class="op-card">
-                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-chart-user"></i></div><span class="op-chip">RRHH</span></div>
-                  <h4>Evaluaciones de desempeño por puesto</h4>
-                  <p>Métricas de las evaluaciones del desempeño de cada puesto para decisiones de desarrollo y talento.</p>
-                  <ul>
-                    <li>Matriz de competencias por cargo</li>
-                    <li>Evaluaciones de 360°</li>
-                    <li>Reportes de desempeño por unidad</li>
-                  </ul>
-                </div>
-
-                <div class="op-card">
-                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-user-crown"></i></div><span class="op-chip">RRHH</span></div>
-                  <h4>Portal del empleado</h4>
-                  <p>Autoservicio para el trabajador: recibo de pago, solicitudes, vacaciones y datos personales.</p>
-                  <ul>
-                    <li>Consulta de recibos y nómina</li>
-                    <li>Solicitudes y permisos en línea</li>
-                    <li>Actualización de datos personales</li>
-                  </ul>
-                </div>
-
-                <div class="op-card">
-                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-chart-scatter"></i></div><span class="op-chip">Tecnología</span></div>
-                  <h4>Business Intelligence</h4>
-                  <p>Tableros y análisis de datos consolidados de toda la organización para la toma de decisiones.</p>
-                  <ul>
-                    <li>Tableros por área</li>
-                    <li>Análisis de tendencias</li>
-                    <li>Exportación de reportes</li>
-                  </ul>
-                </div>
-
-                <div class="op-card">
-                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-check-double"></i></div><span class="op-chip">Tecnología</span></div>
-                  <h4>Flujos de aprobación</h4>
-                  <p>Aprobaciones automatizadas de solicitudes, documentos y procesos con trazabilidad completa.</p>
-                  <ul>
-                    <li>Solicitudes con flujo definido</li>
-                    <li>Notificaciones de aprobación</li>
-                    <li>Historial de trámites</li>
-                  </ul>
-                </div>
-
-                <div class="op-card">
-                  <div class="op-card-top"><div class="op-card-icon"><i class="fi fi-sr-mobile-button"></i></div><span class="op-chip">Tecnología</span></div>
-                  <h4>Conectividad móvil</h4>
-                  <p>Acceso a la intranet desde dispositivos móviles para trabajo de campo y fuera de la oficina.</p>
-                  <ul>
-                    <li>Versión móvil optimizada</li>
-                    <li>Notificaciones push</li>
-                    <li>Acceso seguro desde cualquier lugar</li>
-                  </ul>
-                </div>
-              </div>
-
-              <div class="op-note">
-                <i class="fi fi-sr-lightbulb-exclamation"></i>
-                <div><b>¿Tienes otra idea?</b> Estas propuestas son la base para el crecimiento de la intranet; cualquier área de la empresa puede proponer nuevas capacidades para incorporar a la hoja de ruta.</div>
-              </div>
+            <div class="lp-hero-stats">
+              <div class="lp-hero-stat"><b>10+</b><span>Módulos, piezas clave de la eficiencia</span></div>
+              <div class="lp-hero-stat"><b>6</b><span>Áreas de la empresa impactadas</span></div>
+              <div class="lp-hero-stat"><b>100%</b><span>Software a medida, bajo la marca de la empresa</span></div>
+              <div class="lp-hero-stat"><b>$45–49</b><span>Infraestructura mensual en producción</span></div>
             </div>
-
-            <div class="tool-section" id="tool-roadmap">
-              <div class="op-intro">
-                <h2>Hoja de ruta</h2>
-                <p>Fases sugeridas para priorizar e implementar las oportunidades, ordenadas por impacto y esfuerzo.</p>
-              </div>
-
-              <div class="op-phases">
-                <div class="op-phase">
-                  <div class="op-phase-head"><span class="op-phase-badge p1">Fase 1</span><h4>Fundamentos</h4><span class="op-chip">Corto plazo</span></div>
-                  <p>Capacidades de base que mejoran la operación diaria y la comunicación de toda la empresa.</p>
-                  <ul class="op-phase-list">
-                    <li><i class="fi fi-sr-envelope"></i> Correos y canales de comunicación</li>
-                    <li><i class="fi fi-sr-calendar"></i> Calendarios compartidos</li>
-                    <li><i class="fi fi-sr-user-crown"></i> Portal del empleado</li>
-                    <li><i class="fi fi-sr-check-double"></i> Flujos de aprobación</li>
-                  </ul>
-                </div>
-
-                <div class="op-phase">
-                  <div class="op-phase-head"><span class="op-phase-badge p2">Fase 2</span><h4>Crecimiento</h4><span class="op-chip">Mediano plazo</span></div>
-                  <p>Nuevos módulos que apoyan procesos clave de ventas, operaciones y desarrollo del talento.</p>
-                  <ul class="op-phase-list">
-                    <li><i class="fi fi-sr-sack-dollar"></i> CRM para el área de ventas</li>
-                    <li><i class="fi fi-sr-video-camera"></i> Videoconferencias</li>
-                    <li><i class="fi fi-sr-utensils"></i> Gestión de zona gourmet</li>
-                    <li><i class="fi fi-sr-chart-user"></i> Evaluaciones de desempeño por puesto</li>
-                  </ul>
-                </div>
-
-                <div class="op-phase">
-                  <div class="op-phase-head"><span class="op-phase-badge p3">Fase 3</span><h4>Transformación</h4><span class="op-chip">Largo plazo</span></div>
-                  <p>Capacidades estratégicas que integran datos, seguridad y acceso móvil de toda la organización.</p>
-                  <ul class="op-phase-list">
-                    <li><i class="fi fi-sr-camera-security"></i> Seguridad Física</li>
-                    <li><i class="fi fi-sr-chart-scatter"></i> Business Intelligence</li>
-                    <li><i class="fi fi-sr-mobile-button"></i> Conectividad móvil</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            <div class="tool-section" id="tool-costos">
-              <div class="op-intro">
-                <h2>Propuesta de costos</h2>
-                <p>Estimación de gastos de infraestructura para operar la intranet en producción: base de datos (Supabase), despliegue (Vercel) y repositorio (GitHub).</p>
-              </div>
-
-              <div class="cs-kpis">
-                <div class="cs-kpi">
-                  <div class="cs-kpi-label">Costo actual (todo Free)</div>
-                  <div class="cs-kpi-value">$0<span>/mes</span></div>
-                  <div class="cs-kpi-sub">Funciona, pero con riesgos de disponibilidad y restricciones de uso comercial</div>
-                </div>
-                <div class="cs-kpi">
-                  <div class="cs-kpi-label">Plan de producción recomendado</div>
-                  <div class="cs-kpi-value">$45–49<span>/mes</span></div>
-                  <div class="cs-kpi-sub">Supabase Pro + Vercel Pro + GitHub (Free/Pro)</div>
-                </div>
-                <div class="cs-kpi">
-                  <div class="cs-kpi-label">Costo anual estimado</div>
-                  <div class="cs-kpi-value">≈ $540–588<span>/año</span></div>
-                  <div class="cs-kpi-sub">Equivale a menos de $50 al mes para operar en producción</div>
-                </div>
-              </div>
-
-              <div class="cs-sec">
-                <div class="cs-sec-title"><span class="num">1</span> Situación actual (planes gratuitos)</div>
-                <div class="cs-card">
-                  <table>
-                    <thead>
-                      <tr><th>Servicio</th><th>Plan</th><th>Costo</th><th>Límites clave</th><th>Riesgo</th></tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td><b>Supabase</b> <span class="cs-badge free">Gratis</span></td>
-                        <td>Free</td>
-                        <td class="cs-price cs-free">$0</td>
-                        <td>500 MB BD · 5 GB egress · ~1 GB storage · 50.000 usuarios</td>
-                        <td>El proyecto <b>se pausa tras 7 días sin actividad</b>; sin backups</td>
-                      </tr>
-                      <tr>
-                        <td><b>Vercel</b> <span class="cs-badge free">Gratis</span></td>
-                        <td>Hobby</td>
-                        <td class="cs-price cs-free">$0</td>
-                        <td>100 GB transferencia · 1M invocaciones</td>
-                        <td><b>Prohíbe uso comercial</b>; si se superan límites, la app se pausa</td>
-                      </tr>
-                      <tr>
-                        <td><b>GitHub</b> <span class="cs-badge free">Gratis</span></td>
-                        <td>Free</td>
-                        <td class="cs-price cs-free">$0</td>
-                        <td>Repos privados ilimitados · 2.000 min Actions</td>
-                        <td>Sin riesgo para un solo desarrollador</td>
-                      </tr>
-                      <tr>
-                        <td colspan="2"><b>Total actual</b></td>
-                        <td class="cs-price cs-free"><b>$0/mes</b></td>
-                        <td colspan="2"></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div class="cs-alert warn">
-                  <span>⚠️</span>
-                  <div><b>Por qué gratis no es viable en producción:</b> en Supabase el proyecto se <b>pausa automáticamente tras 7 días de inactividad</b> (la intranet quedaría inaccesible), no hay backups automáticos, y en Vercel el plan gratuito <b>no permite uso comercial</b>. Además, las imágenes guardadas en base64 llenan los 500 MB disponibles rápidamente.</div>
-                </div>
-              </div>
-
-              <div class="cs-sec">
-                <div class="cs-sec-title"><span class="num">2</span> Desglose por servicio (plan de pago)</div>
-                <div class="cs-svc-grid">
-                  <div class="cs-svc">
-                    <div class="cs-svc-head"><span class="cs-svc-name">Supabase</span><span class="cs-svc-logo supabase">S</span></div>
-                    <div class="cs-svc-cost">$25<span class="plan">/mes · Pro</span></div>
-                    <ul>
-                      <li>8 GB base de datos</li>
-                      <li>250 GB transferencia (egress)</li>
-                      <li>100 GB de archivos (storage)</li>
-                      <li>100.000 usuarios activos/mes</li>
-                      <li>Backups diarios (7 días)</li>
-                      <li>Sin pausas por inactividad</li>
-                      <li>Soporte por email</li>
-                    </ul>
-                    <small>Proyecto adicional: +$10/mes · Sobrecostos: BD $0.125/GB, egress $0.09/GB, storage $0.021/GB, cómputo Small +$5</small>
-                  </div>
-                  <div class="cs-svc">
-                    <div class="cs-svc-head"><span class="cs-svc-name">Vercel</span><span class="cs-svc-logo vercel">▲</span></div>
-                    <div class="cs-svc-cost">$20<span class="plan">/mes · Pro</span></div>
-                    <ul>
-                      <li>1 TB transferencia por mes</li>
-                      <li>Uso comercial permitido</li>
-                      <li>$20 de crédito mensual de uso</li>
-                      <li>Despliegues automáticos desde GitHub</li>
-                      <li>CDN global + HTTPS</li>
-                      <li>Soporte por email</li>
-                    </ul>
-                    <small>Precio por asiento de desarrollador. El sitio es estático y las imágenes se sirven desde Supabase, por lo que el consumo real de transferencia es mínimo.</small>
-                  </div>
-                  <div class="cs-svc">
-                    <div class="cs-svc-head"><span class="cs-svc-name">GitHub</span><span class="cs-svc-logo github">G</span></div>
-                    <div class="cs-svc-cost">$0–4<span class="plan">/mes</span></div>
-                    <ul>
-                      <li>Repositorios privados ilimitados</li>
-                      <li>Historial de versiones y colaboración</li>
-                      <li>2.000–3.000 min de Actions</li>
-                      <li>GitHub Pages (gratis)</li>
-                      <li>Soporte por email (Pro)</li>
-                    </ul>
-                    <small>El plan Free ($0) es suficiente para un desarrollador. GitHub Pro ($4/mes) solo agrega más minutos de Actions, Codespaces y soporte.</small>
-                  </div>
-                </div>
-              </div>
-
-              <div class="cs-sec">
-                <div class="cs-sec-title"><span class="num">3</span> Escenarios de costos totales</div>
-                <div class="cs-card">
-                  <table>
-                    <thead>
-                      <tr><th>Escenario</th><th>Supabase</th><th>Vercel</th><th>GitHub</th><th style="text-align:right;">Total / mes</th><th style="text-align:right;">Total / año</th></tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td><b>Actual</b> (solo desarrollo)</td>
-                        <td>Free $0</td><td>Hobby $0</td><td>Free $0</td>
-                        <td class="cs-price cs-free">$0</td>
-                        <td class="cs-price cs-free">$0</td>
-                      </tr>
-                      <tr>
-                        <td><b>Mínimo producción</b></td>
-                        <td>Pro $25</td><td>Pro $20</td><td>Free $0</td>
-                        <td class="cs-price cs-paid"><b>$45</b></td>
-                        <td class="cs-price cs-paid"><b>≈ $540</b></td>
-                      </tr>
-                      <tr>
-                        <td><b>Mínimo + GitHub Pro</b></td>
-                        <td>Pro $25</td><td>Pro $20</td><td>Pro $4</td>
-                        <td class="cs-price cs-paid"><b>$49</b></td>
-                        <td class="cs-price cs-paid"><b>≈ $588</b></td>
-                      </tr>
-                      <tr>
-                        <td><b>Con margen de cómputo</b></td>
-                        <td>Pro + Small $30</td><td>Pro $20</td><td>Pro $4</td>
-                        <td class="cs-price cs-paid"><b>$54</b></td>
-                        <td class="cs-price cs-paid"><b>≈ $648</b></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div class="cs-sec">
-                <div class="cs-sec-title"><span class="num">4</span> Recomendación</div>
-                <div class="cs-reco">
-                  <div class="cs-reco-total">
-                    <div>
-                      <div class="lbl">Inversión recomendada</div>
-                      <div class="val">$45 – $49 <small>/mes</small></div>
-                    </div>
-                    <div style="text-align:right;font-size:12.5px;color:var(--color-text-secondary);">
-                      ≈ $540 – $588 al año<br><b style="color:var(--color-text);">menos de $50/mes</b> para operar en producción
-                    </div>
-                  </div>
-                  <div class="cs-reco-list">
-                    <div class="cs-reco-item"><span class="n">1</span><div><b>Supabase Pro ($25/mes)</b> es el mínimo razonable: elimina las pausas por inactividad, añade backups diarios de 7 días y sube la base de datos a 8 GB.</div></div>
-                    <div class="cs-reco-item"><span class="n">2</span><div><b>Vercel Pro ($20/mes)</b> es necesario por la cláusula de uso comercial; tu consumo real de ancho de banda será mínimo porque las imágenes se sirven desde Supabase.</div></div>
-                    <div class="cs-reco-item"><span class="n">3</span><div><b>GitHub Free ($0)</b> es suficiente. Si se usa con intensidad de Actions/Codespaces, GitHub Pro ($4/mes) es un costo menor.</div></div>
-                    <div class="cs-reco-item"><span class="n">4</span><div><b>El principal driver de costo</b> es el tamaño de la base de datos (las imágenes en base64 pesan ~33% más) y el storage de archivos; ambos quedan cubiertos con holgura por el plan Pro.</div></div>
-                  </div>
-                </div>
-                <div class="cs-alert good">
-                  <span>✅</span>
-                  <div><b>Resumen ejecutivo:</b> migrar de $0 a producción cuesta aproximadamente <strong>$45–49 mensuales</strong>. No hay costos ocultos significativos al nivel de uso de una intranet corporativa; los sobrecargos (banda ancha, storage, cómputo) solo aparecerían con tráfico o volumen muy superiores a los actuales.</div>
-                </div>
-              </div>
-            </div>
-
           </div>
         </div>
-      </div>
-    </div>
+      </section>
+
+      <nav class="lp-anchors">
+        <a href="#vulnerabilidades"><i class="fi fi-sr-shield-exclamation"></i> Vulnerabilidades</a>
+        <a href="#solucion"><i class="fi fi-sr-lightbulb-exclamation"></i> Solución</a>
+        <a href="#modulos"><i class="fi fi-sr-puzzle-piece"></i> Módulos</a>
+        <a href="#fronteras"><i class="fi fi-sr-earth-americas"></i> Nuevas fronteras</a>
+        <a href="#hoja-de-ruta"><i class="fi fi-sr-route"></i> Hoja de ruta</a>
+        <a href="#costos"><i class="fi fi-sr-coins"></i> Propuesta de costos</a>
+      </nav>
+
+      <section class="lp-section alt" id="vulnerabilidades">
+        <div class="lp-wrap">
+          <div class="lp-sec-head">
+            <span class="lp-kicker"><i class="fi fi-sr-shield-exclamation"></i> Diagnóstico</span>
+            <h2>Vulnerabilidades de una gestión no respaldada</h2>
+            <p>La información vive dispersa en archivos de Excel incompletos, documentación en físico y sistemas obsoletos que no se comunican entre sí. Estos son los riesgos que la propuesta elimina.</p>
+          </div>
+          <div class="lp-vuln-grid">
+            <div class="lp-vuln">
+              <div class="lp-vuln-icon"><i class="fi fi-sr-database"></i></div>
+              <h3>Gestión no respaldada por datos</h3>
+              <p>Las decisiones de talento se toman sin evidencia: no existe una fuente única, fiel ni en tiempo real de la información.</p>
+            </div>
+            <div class="lp-vuln">
+              <div class="lp-vuln-icon"><i class="fi fi-sr-file-signature"></i></div>
+              <h3>Vacios procedimentales</h3>
+              <p>No hay procesos documentados ni estructura heredable: el conocimiento depende de personas y de papeles que nadie más puede consultar.</p>
+            </div>
+            <div class="lp-vuln">
+              <div class="lp-vuln-icon"><i class="fi fi-sr-megaphone"></i></div>
+              <h3>Falta de comunicación interna</h3>
+              <p>Los sistemas obsoletos no se comunican entre sí y la información no fluye entre áreas: respuestas lentas, mensajes perdidos y desinformación.</p>
+            </div>
+            <div class="lp-vuln-res"><i class="fi fi-sr-exclamation"></i> El resultado: tiempos largos, errores, retrabajo y riesgo en cada decisión de talento.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-section" id="solucion">
+        <div class="lp-wrap">
+          <div class="lp-sec-head">
+            <span class="lp-kicker"><i class="fi fi-sr-lightbulb-exclamation"></i> La solución</span>
+            <h2>Una plataforma a medida, sobre infraestructura profesional</h2>
+            <p>El software se construye por y para la empresa, sin comprar licencias de gestión ni SaaS genéricos. Cada módulo es una pieza clave de la eficiencia: integrados en una sola plataforma, desplegada bajo la marca de la empresa y apoyada en una infraestructura profesional de Supabase, Vercel y GitHub que se mejora al pasar a producción.</p>
+          </div>
+          <div class="lp-sol-grid">
+            <div class="lp-sol">
+              <div class="lp-sol-icon"><i class="fi fi-sr-rocket"></i></div>
+              <h3>Rápida</h3>
+              <p>Implementación por fases priorizadas por impacto, que reconstruyen la gestión sin interrumpir la operación.</p>
+            </div>
+            <div class="lp-sol">
+              <div class="lp-sol-icon"><i class="fi fi-sr-bullseye"></i></div>
+              <h3>Efectiva</h3>
+              <p>Cada módulo resuelve un proceso real del día a día, a la medida de las necesidades de cada área.</p>
+            </div>
+            <div class="lp-sol">
+              <div class="lp-sol-icon"><i class="fi fi-sr-shield-check"></i></div>
+              <h3>Totalmente segura</h3>
+              <p>Control de accesos, trazabilidad completa y auditoría de cada registro, sin depender de terceros.</p>
+            </div>
+            <div class="lp-sol">
+              <div class="lp-sol-icon"><i class="fi fi-sr-route"></i></div>
+              <h3>Estructura heredable</h3>
+              <p>El conocimiento y los procesos quedan en la plataforma: no dependen de personas ni de archivos sueltos.</p>
+            </div>
+            <div class="lp-sol">
+              <div class="lp-sol-icon"><i class="fi fi-sr-house-building"></i></div>
+              <h3>Bajo la marca de la empresa</h3>
+              <p>Desarrollo propio con identidad corporativa: control total y sin dependencias externas.</p>
+            </div>
+            <div class="lp-sol">
+              <div class="lp-sol-icon"><i class="fi fi-sr-puzzle-piece"></i></div>
+              <h3>Software a medida</h3>
+              <p>Sin licencias de gestión ni SaaS de RRHH: el software se construye dentro del equipo, sobre la infraestructura de Supabase, Vercel y GitHub.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-section alt" id="modulos">
+        <div class="lp-wrap">
+          <div class="lp-sec-head">
+            <span class="lp-kicker"><i class="fi fi-sr-puzzle-piece"></i> Las piezas del proyecto</span>
+            <h2>Módulos que reconstruyen la gestión de RRHH</h2>
+            <p>Cada módulo es una pieza clave de la eficiencia de la organización. La plataforma ya cuenta con los módulos que reconstruyen la gestión de Recursos Humanos, y su estructura modular permite extender el proyecto a nuevas fronteras.</p>
+          </div>
+          <div class="lp-mod-grid">
+            <div class="lp-mod">
+              <div class="lp-mod-icon"><i class="fi fi-sr-search"></i></div>
+              <div>
+                <h3>Captación y Selección</h3>
+                <p>Postulaciones, requisiciones y el historial completo de cada candidato en un solo lugar.</p>
+              </div>
+            </div>
+            <div class="lp-mod">
+              <div class="lp-mod-icon"><i class="fi fi-sr-file-signature"></i></div>
+              <div>
+                <h3>Relaciones Laborales</h3>
+                <p>Registros, conceptos y actas laborales con trazabilidad de cada evento del colaborador.</p>
+              </div>
+            </div>
+            <div class="lp-mod">
+              <div class="lp-mod-icon"><i class="fi fi-sr-graduation-cap"></i></div>
+              <div>
+                <h3>Capacitación y Desarrollo</h3>
+                <p>Cursos, talleres y planes de formación que desarrollan el talento interno.</p>
+              </div>
+            </div>
+            <div class="lp-mod">
+              <div class="lp-mod-icon"><i class="fi fi-sr-users"></i></div>
+              <div>
+                <h3>Bienestar Social</h3>
+                <p>Préstamos, pólizas, uniformes y encuestas que cuidan al colaborador y a su familia.</p>
+              </div>
+            </div>
+            <div class="lp-mod">
+              <div class="lp-mod-icon"><i class="fi fi-sr-shield"></i></div>
+              <div>
+                <h3>Seguridad y Salud Laboral</h3>
+                <p>Incidentes, inspecciones, servicio médico e inventarios que protegen la operación.</p>
+              </div>
+            </div>
+            <div class="lp-mod">
+              <div class="lp-mod-icon"><i class="fi fi-sr-money-check"></i></div>
+              <div>
+                <h3>Compensación</h3>
+                <p>Estructura salarial, bonificaciones y beneficios con reglas claras y equitativas.</p>
+              </div>
+            </div>
+            <div class="lp-mod">
+              <div class="lp-mod-icon"><i class="fi fi-sr-coins"></i></div>
+              <div>
+                <h3>Finanzas</h3>
+                <p>Movimientos y reportes financieros multimoneda para decidir con cifras reales.</p>
+              </div>
+            </div>
+            <div class="lp-mod">
+              <div class="lp-mod-icon"><i class="fi fi-sr-folder"></i></div>
+              <div>
+                <h3>Repositorio</h3>
+                <p>Documentación centralizada, versionada y al alcance de quien la necesita.</p>
+              </div>
+            </div>
+            <div class="lp-mod">
+              <div class="lp-mod-icon"><i class="fi fi-sr-envelope"></i></div>
+              <div>
+                <h3>Mensajería</h3>
+                <p>Comunicación interna directa que conecta áreas y equipos sin depender de terceros.</p>
+              </div>
+            </div>
+            <div class="lp-mod">
+              <div class="lp-mod-icon"><i class="fi fi-sr-chart-line-up"></i></div>
+              <div>
+                <h3>Desarrollo Organizacional</h3>
+                <p>KPIs, OKR y salud de las áreas para medir y mejorar el desempeño con datos.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="lp-front-head" id="fronteras">
+            <div class="lp-sec-head">
+              <span class="lp-kicker"><i class="fi fi-sr-earth-americas"></i> Nuevas fronteras</span>
+              <h2>El proyecto puede crecer</h2>
+              <p>La misma estructura modular permite incorporar nuevas capacidades a otras áreas de la empresa. Estas son las fronteras propuestas para extender el proyecto.</p>
+            </div>
+            <div class="lp-front-grid">
+              <div class="lp-front">
+                <div class="lp-front-top"><div class="lp-front-icon"><i class="fi fi-sr-camera-security"></i></div><span class="lp-chip chip-seguridad">Seguridad</span></div>
+                <h3>Seguridad Física</h3>
+                <p>Un entorno protegido: control de accesos, rondas de vigilancia y respuesta inmediata ante cualquier novedad en las instalaciones.</p>
+                <ul>
+                  <li>Registro de rondas de vigilancia</li>
+                  <li>Control de visitantes y accesos</li>
+                  <li>Alertas y novedades de seguridad</li>
+                </ul>
+                <div class="lp-front-tags"><span class="lp-tag impact">Impacto alto</span><span class="lp-tag effort-mid">Esfuerzo medio</span></div>
+              </div>
+
+              <div class="lp-front">
+                <div class="lp-front-top"><div class="lp-front-icon"><i class="fi fi-sr-utensils"></i></div><span class="lp-chip chip-operaciones">Operaciones</span></div>
+                <h3>Gestión de zona gourmet</h3>
+                <p>Digitaliza el servicio de la zona gourmet: pedidos ágiles, inventario bajo control y menos mermas en tiempo real.</p>
+                <ul>
+                  <li>Menús y programación semanal</li>
+                  <li>Control de inventario y mermas</li>
+                  <li>Reservas y pedidos en línea</li>
+                </ul>
+                <div class="lp-front-tags"><span class="lp-tag impact">Impacto alto</span><span class="lp-tag effort-mid">Esfuerzo medio</span></div>
+              </div>
+
+              <div class="lp-front">
+                <div class="lp-front-top"><div class="lp-front-icon"><i class="fi fi-sr-sack-dollar"></i></div><span class="lp-chip chip-comercial">Comercial</span></div>
+                <h3>CRM para el área de ventas</h3>
+                <p>Una vista única de clientes y oportunidades para que el equipo comercial haga seguimiento y cierre más ventas.</p>
+                <ul>
+                  <li>Ficha de clientes y contactos</li>
+                  <li>Pipeline de oportunidades</li>
+                  <li>Reportes de ventas por asesor</li>
+                </ul>
+                <div class="lp-front-tags"><span class="lp-tag impact">Impacto alto</span><span class="lp-tag effort-high">Esfuerzo alto</span></div>
+              </div>
+
+              <div class="lp-front">
+                <div class="lp-front-top"><div class="lp-front-icon"><i class="fi fi-sr-video-camera"></i></div><span class="lp-chip chip-comunicacion">Comunicación</span></div>
+                <h3>Videoconferencias</h3>
+                <p>Reuniones virtuales integradas a la intranet que conectan a equipos remotos y sedes múltiples sin herramientas aparte.</p>
+                <ul>
+                  <li>Salas de reunión virtuales</li>
+                  <li>Agenda y grabaciones</li>
+                  <li>Integración con el calendario</li>
+                </ul>
+                <div class="lp-front-tags"><span class="lp-tag impact">Impacto medio</span><span class="lp-tag effort-high">Esfuerzo alto</span></div>
+              </div>
+
+              <div class="lp-front">
+                <div class="lp-front-top"><div class="lp-front-icon"><i class="fi fi-sr-calendar"></i></div><span class="lp-chip chip-comunicacion">Comunicación</span></div>
+                <h3>Calendarios compartidos</h3>
+                <p>Coordinación sin fricción: una agenda por unidad para reuniones, recursos y eventos de la empresa.</p>
+                <ul>
+                  <li>Disponibilidad de salas y equipos</li>
+                  <li>Coordinación de reuniones</li>
+                  <li>Eventos de la empresa</li>
+                </ul>
+                <div class="lp-front-tags"><span class="lp-tag impact">Impacto alto</span><span class="lp-tag effort-low">Esfuerzo bajo</span></div>
+              </div>
+
+              <div class="lp-front">
+                <div class="lp-front-top"><div class="lp-front-icon"><i class="fi fi-sr-envelope"></i></div><span class="lp-chip chip-comunicacion">Comunicación</span></div>
+                <h3>Correos y canales de comunicación</h3>
+                <p>Centraliza la comunicación interna para que la información correcta llegue al equipo correcto, a tiempo.</p>
+                <ul>
+                  <li>Correo corporativo integrado</li>
+                  <li>Directorio de canales y grupos</li>
+                  <li>Políticas y buenas prácticas</li>
+                </ul>
+                <div class="lp-front-tags"><span class="lp-tag impact">Impacto alto</span><span class="lp-tag effort-low">Esfuerzo bajo</span></div>
+              </div>
+
+              <div class="lp-front">
+                <div class="lp-front-top"><div class="lp-front-icon"><i class="fi fi-sr-chart-user"></i></div><span class="lp-chip chip-rrhh">RRHH</span></div>
+                <h3>Evaluaciones de desempeño por puesto</h3>
+                <p>Mide el talento con criterios objetivos por cargo y toma decisiones de desarrollo y compensación con datos.</p>
+                <ul>
+                  <li>Matriz de competencias por cargo</li>
+                  <li>Evaluaciones de 360°</li>
+                  <li>Reportes de desempeño por unidad</li>
+                </ul>
+                <div class="lp-front-tags"><span class="lp-tag impact">Impacto alto</span><span class="lp-tag effort-high">Esfuerzo alto</span></div>
+              </div>
+
+              <div class="lp-front">
+                <div class="lp-front-top"><div class="lp-front-icon"><i class="fi fi-sr-user-crown"></i></div><span class="lp-chip chip-rrhh">RRHH</span></div>
+                <h3>Portal del empleado</h3>
+                <p>Autoservicio para el trabajador: menos trámites presenciales, menos colas y más tiempo para lo importante.</p>
+                <ul>
+                  <li>Consulta de recibos y nómina</li>
+                  <li>Solicitudes y permisos en línea</li>
+                  <li>Actualización de datos personales</li>
+                </ul>
+                <div class="lp-front-tags"><span class="lp-tag impact">Impacto alto</span><span class="lp-tag effort-mid">Esfuerzo medio</span></div>
+              </div>
+
+              <div class="lp-front">
+                <div class="lp-front-top"><div class="lp-front-icon"><i class="fi fi-sr-chart-scatter"></i></div><span class="lp-chip chip-tecnologia">Tecnología</span></div>
+                <h3>Business Intelligence</h3>
+                <p>Tableros y análisis consolidados que convierten los datos de toda la organización en mejores decisiones.</p>
+                <ul>
+                  <li>Tableros por área</li>
+                  <li>Análisis de tendencias</li>
+                  <li>Exportación de reportes</li>
+                </ul>
+                <div class="lp-front-tags"><span class="lp-tag impact">Impacto alto</span><span class="lp-tag effort-high">Esfuerzo alto</span></div>
+              </div>
+
+              <div class="lp-front">
+                <div class="lp-front-top"><div class="lp-front-icon"><i class="fi fi-sr-check-double"></i></div><span class="lp-chip chip-tecnologia">Tecnología</span></div>
+                <h3>Flujos de aprobación</h3>
+                <p>Elimina idas y vueltas: solicitudes y documentos aprobados en línea, con trazabilidad completa de cada trámite.</p>
+                <ul>
+                  <li>Solicitudes con flujo definido</li>
+                  <li>Notificaciones de aprobación</li>
+                  <li>Historial de trámites</li>
+                </ul>
+                <div class="lp-front-tags"><span class="lp-tag impact">Impacto alto</span><span class="lp-tag effort-mid">Esfuerzo medio</span></div>
+              </div>
+
+              <div class="lp-front">
+                <div class="lp-front-top"><div class="lp-front-icon"><i class="fi fi-sr-mobile-button"></i></div><span class="lp-chip chip-tecnologia">Tecnología</span></div>
+                <h3>Conectividad móvil</h3>
+                <p>Lleva la intranet al bolsillo: acceso seguro y notificaciones desde cualquier lugar, para trabajo de campo o remoto.</p>
+                <ul>
+                  <li>Versión móvil optimizada</li>
+                  <li>Notificaciones push</li>
+                  <li>Acceso seguro desde cualquier lugar</li>
+                </ul>
+                <div class="lp-front-tags"><span class="lp-tag impact">Impacto alto</span><span class="lp-tag effort-mid">Esfuerzo medio</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-section" id="hoja-de-ruta">
+        <div class="lp-wrap">
+          <div class="lp-sec-head">
+            <span class="lp-kicker"><i class="fi fi-sr-route"></i> Implementación</span>
+            <h2>Hoja de ruta</h2>
+            <p>Tres fases para reconstruir la gestión de Recursos Humanos de forma progresiva, priorizadas por impacto y esfuerzo, con software a medida e infraestructura escalable.</p>
+          </div>
+          <div class="lp-phases">
+            <div class="lp-phase">
+              <div class="lp-phase-node p1">1</div>
+              <div class="lp-phase-head">
+                <h3>Fundamentos</h3>
+                <span class="lp-phase-chip">Corto plazo</span>
+              </div>
+              <p>Base de la operación diaria: comunicación clara, trámites sin papel y autoservicio para el empleado. Rápido de implementar, beneficio inmediato.</p>
+              <ul class="lp-phase-list">
+                <li><i class="fi fi-sr-envelope"></i> Correos y canales de comunicación</li>
+                <li><i class="fi fi-sr-calendar"></i> Calendarios compartidos</li>
+                <li><i class="fi fi-sr-user-crown"></i> Portal del empleado</li>
+                <li><i class="fi fi-sr-check-double"></i> Flujos de aprobación</li>
+              </ul>
+              <div class="lp-phase-outcome"><i class="fi fi-sr-lightbulb-exclamation"></i><div>Impacto esperado: comunicación más clara, menos trámites y ahorro de tiempo en toda la empresa.</div></div>
+            </div>
+
+            <div class="lp-phase">
+              <div class="lp-phase-node p2">2</div>
+              <div class="lp-phase-head">
+                <h3>Crecimiento</h3>
+                <span class="lp-phase-chip">Mediano plazo</span>
+              </div>
+              <p>Módulos que impulsan las áreas que mueven el negocio: ventas, operaciones y desarrollo del talento.</p>
+              <ul class="lp-phase-list">
+                <li><i class="fi fi-sr-sack-dollar"></i> CRM para el área de ventas</li>
+                <li><i class="fi fi-sr-video-camera"></i> Videoconferencias</li>
+                <li><i class="fi fi-sr-utensils"></i> Gestión de zona gourmet</li>
+                <li><i class="fi fi-sr-chart-user"></i> Evaluaciones de desempeño por puesto</li>
+              </ul>
+              <div class="lp-phase-outcome"><i class="fi fi-sr-lightbulb-exclamation"></i><div>Impacto esperado: más ventas con seguimiento, operaciones más eficientes y talento mejor medido.</div></div>
+            </div>
+
+            <div class="lp-phase">
+              <div class="lp-phase-node p3">3</div>
+              <div class="lp-phase-head">
+                <h3>Transformación</h3>
+                <span class="lp-phase-chip">Largo plazo</span>
+              </div>
+              <p>Capacidades estratégicas que integran datos, seguridad y acceso móvil de toda la organización.</p>
+              <ul class="lp-phase-list">
+                <li><i class="fi fi-sr-camera-security"></i> Seguridad Física</li>
+                <li><i class="fi fi-sr-chart-scatter"></i> Business Intelligence</li>
+                <li><i class="fi fi-sr-mobile-button"></i> Conectividad móvil</li>
+              </ul>
+              <div class="lp-phase-outcome"><i class="fi fi-sr-lightbulb-exclamation"></i><div>Impacto esperado: decisiones con datos, instalaciones protegidas y acceso desde cualquier lugar.</div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lp-section alt" id="costos">
+        <div class="lp-wrap">
+          <div class="lp-sec-head">
+            <span class="lp-kicker"><i class="fi fi-sr-coins"></i> Propuesta de costos</span>
+            <h2>Invertir en el equipo y en infraestructura profesional</h2>
+            <p>Una estructura de costos sólida: el desarrollo es a cargo del equipo y la infraestructura de producción corre sobre Supabase, Vercel y GitHub con planes mejorados.</p>
+          </div>
+
+          <div class="cs-exec">
+            <p class="k">Resumen ejecutivo</p>
+            <h3>Una inversión mínima en infraestructura para una transformación de largo plazo</h3>
+            <p>La plataforma es <b>software a medida</b>: sin licencias de gestión ni SaaS de RRHH, el desarrollo lo hace un miembro del propio equipo, que conoce de primera mano los procesos de Recursos Humanos y cuenta con experiencia en otros departamentos. En producción corre sobre una <b>infraestructura profesional de Supabase, Vercel y GitHub</b> con planes mejorados de $45 a $49 al mes.</p>
+            <div class="cs-exec-nums">
+              <div><b>$45–49</b><span>Infraestructura en producción /mes</span></div>
+              <div><b>3</b><span>Servicios de infraestructura profesional</span></div>
+              <div><b>10+</b><span>Módulos incluidos en el desarrollo</span></div>
+              <div><b>100%</b><span>Del desarrollo a cargo del equipo</span></div>
+            </div>
+          </div>
+
+          <div class="cs-kpis">
+            <div class="cs-kpi">
+              <div class="cs-kpi-head"><div class="cs-kpi-icon"><i class="fi fi-sr-database"></i></div><div class="cs-kpi-label">Infraestructura en producción</div></div>
+              <div class="cs-kpi-value">$45–49<span>/mes</span></div>
+              <div class="cs-kpi-sub">Supabase, Vercel y GitHub con planes mejorados: datos, despliegue y repositorio</div>
+            </div>
+            <div class="cs-kpi">
+              <div class="cs-kpi-head"><div class="cs-kpi-icon"><i class="fi fi-sr-coins"></i></div><div class="cs-kpi-label">Inversión anual</div></div>
+              <div class="cs-kpi-value">≈$540–588<span>/año</span></div>
+              <div class="cs-kpi-sub">Planes mejorados en producción, con respaldo y rendimiento garantizados</div>
+            </div>
+            <div class="cs-kpi">
+              <div class="cs-kpi-head"><div class="cs-kpi-icon"><i class="fi fi-sr-shield-check"></i></div><div class="cs-kpi-label">Desarrollo</div></div>
+              <div class="cs-kpi-value">$0<span>adicional</span></div>
+              <div class="cs-kpi-sub">Parte del propio equipo: sin licencias de gestión ni SaaS de RRHH que comprar</div>
+            </div>
+            <div class="cs-kpi">
+              <div class="cs-kpi-head"><div class="cs-kpi-icon"><i class="fi fi-sr-bullseye"></i></div><div class="cs-kpi-label">Módulos incluidos</div></div>
+              <div class="cs-kpi-value">10+</div>
+              <div class="cs-kpi-sub">Toda la plataforma en el mismo desarrollo a medida, lista para crecer</div>
+            </div>
+          </div>
+
+          <div class="cs-sec">
+            <div class="cs-sec-title"><span class="num">1</span> Composición del equipo de trabajo</div>
+            <div class="cs-card">
+              <table>
+                <thead>
+                  <tr><th>Rol</th><th>Responsabilidad</th><th>Costo</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><b>Desarrollador de la plataforma</b> <span class="cs-badge paid">En el equipo</span></td>
+                    <td>Construye y mantiene los módulos a medida. Conoce de primera mano los procesos de Recursos Humanos y tiene experiencia en otros departamentos: mejores tiempos de respuesta y soluciones basadas en experiencias pasadas.</td>
+                    <td class="cs-price cs-free">Ya integrado · $0</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="cs-alert good">
+              <span>✅</span>
+              <div><b>El desarrollo no se cotiza por separado:</b> es parte del propio equipo, no un costo externo. La inversión se limita a la infraestructura de Supabase, Vercel y GitHub.</div>
+            </div>
+          </div>
+
+          <div class="cs-sec">
+            <div class="cs-sec-title"><span class="num">2</span> Infraestructura con planes mejorados</div>
+            <div class="cs-card">
+              <table>
+                <thead>
+                  <tr><th>Servicio</th><th>Rol en la plataforma</th><th>Plan gratuito</th><th>Plan mejorado (producción)</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><b>Supabase</b> <span class="cs-badge paid">Base de datos</span></td>
+                    <td>Base de datos PostgreSQL, autenticación y almacenamiento de archivos de toda la plataforma.</td>
+                    <td class="cs-price cs-free">Free · $0/mes</td>
+                    <td class="cs-price cs-paid">Pro · $25/mes</td>
+                  </tr>
+                  <tr>
+                    <td><b>Vercel</b> <span class="cs-badge paid">Despliegue</span></td>
+                    <td>Hosting y despliegue del sitio web bajo la marca de la empresa, con certificados y rendimiento.</td>
+                    <td class="cs-price cs-free">Hobby · $0/mes</td>
+                    <td class="cs-price cs-paid">Pro · $20/mes</td>
+                  </tr>
+                  <tr>
+                    <td><b>GitHub</b> <span class="cs-badge paid">Repositorio</span></td>
+                    <td>Código fuente, versionado y colaboración del equipo de desarrollo.</td>
+                    <td class="cs-price cs-free">Free · $0/mes</td>
+                    <td class="cs-price cs-paid">Pro · $4/mes</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="cs-alert good">
+              <span>✅</span>
+              <div><b>Durante el desarrollo no hay costo de infraestructura:</b> los planes gratuitos de Supabase, Vercel y GitHub cubren todo el ciclo de construcción. Las mejoras a planes Pro se activan solo al pasar a producción, sumando respaldos, mayor rendimiento y cero pausas por inactividad.</div>
+            </div>
+          </div>
+
+          <div class="cs-sec">
+            <div class="cs-sec-title"><span class="num">3</span> Escenarios de costos de infraestructura</div>
+            <div class="cs-card">
+              <table>
+                <thead>
+                  <tr><th>Escenario</th><th>Servicios incluidos</th><th>Costo mensual</th><th>Costo anual</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><b>Actual</b> <span class="cs-badge paid">Desarrollo</span></td>
+                    <td>Supabase Free + Vercel Hobby + GitHub Free</td>
+                    <td class="cs-price cs-free">$0/mes</td>
+                    <td class="cs-price cs-free">$0/año</td>
+                  </tr>
+                  <tr>
+                    <td><b>Mínimo producción</b> <span class="cs-badge paid">Recomendado</span></td>
+                    <td>Supabase Pro + Vercel Pro</td>
+                    <td class="cs-price cs-paid">$45/mes</td>
+                    <td class="cs-price cs-paid">≈ $540/año</td>
+                  </tr>
+                  <tr>
+                    <td><b>Producción completa</b> <span class="cs-badge paid">Con repositorio Pro</span></td>
+                    <td>Supabase Pro + Vercel Pro + GitHub Pro</td>
+                    <td class="cs-price cs-paid">$49/mes</td>
+                    <td class="cs-price cs-paid">≈ $588/año</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="cs-alert info">
+              <span>💡</span>
+              <div><b>Las cifras cubren únicamente el mantenimiento y la operación de la infraestructura, no el desarrollo del software:</b> el desarrollo es parte del propio equipo y no se cotiza por separado.</div>
+            </div>
+          </div>
+
+          <div class="cs-sec">
+            <div class="cs-sec-title"><span class="num">4</span> El costo de no hacer nada</div>
+            <div class="lp-compare">
+              <div class="lp-compare-col today">
+                <div class="lp-compare-head"><i class="fi fi-sr-cross"></i> Sin la plataforma</div>
+                <ul>
+                  <li>Decisiones de talento sin datos fieles ni en tiempo real</li>
+                  <li>Vacios procedimentales y documentación solo en físico</li>
+                  <li>Comunicación interna fragmentada y respuestas lentas</li>
+                  <li>Retrabajo, errores y riesgo de perder el conocimiento</li>
+                </ul>
+                <p class="lp-compare-result">Cada día sin estructura cuesta más que la inversión propuesta.</p>
+              </div>
+              <div class="lp-compare-col proposal">
+                <div class="lp-compare-head"><i class="fi fi-sr-check"></i> Con la plataforma</div>
+                <ul>
+                  <li>Información confiable, centralizada y en tiempo real</li>
+                  <li>Procesos documentados, trazables y auditables</li>
+                  <li>Comunicación interna centralizada y automatizada en la plataforma</li>
+                  <li>Eficiencia, control y base para nuevas fronteras</li>
+                </ul>
+                <p class="lp-compare-result">Una inversión mínima en el equipo para una transformación de largo plazo.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="cs-sec">
+            <div class="cs-sec-title"><span class="num">5</span> Recomendación</div>
+            <div class="cs-reco">
+              <div class="cs-reco-total">
+                <div>
+                  <div class="lbl">Propuesta de inversión</div>
+                  <div class="val">$45–49 <small>/mes en infraestructura</small></div>
+                </div>
+                <div style="text-align:right;font-size:12.5px;color:var(--color-text-secondary);">
+                  <b style="color:var(--color-text);">$0 en licencias de gestión</b><br>el desarrollo es parte del equipo
+                </div>
+              </div>
+              <div class="cs-reco-list">
+                <div class="cs-reco-item"><span class="n">1</span><div><b>Aprobar los planes mejorados de infraestructura</b> para pasar a producción: Supabase y Vercel Pro desde $45/mes, y GitHub Pro desde $49/mes.</div></div>
+                <div class="cs-reco-item"><span class="n">2</span><div><b>Mantener el desarrollo dentro del equipo:</b> sin licencias de gestión, con control total de la plataforma.</div></div>
+                <div class="cs-reco-item"><span class="n">3</span><div><b>Implementar por fases</b> según la hoja de ruta, midiendo resultados en cada fase sin interrumpir la operación.</div></div>
+                <div class="cs-reco-item"><span class="n">4</span><div><b>Extender el proyecto a nuevas fronteras</b> con la misma estructura modular, sumando valor a otras áreas de la empresa.</div></div>
+              </div>
+            </div>
+            <div class="cs-alert good">
+              <span>✅</span>
+              <div><b>Resumen ejecutivo:</b> la inversión no compra herramientas: asegura la infraestructura. Con $45–49/mes en planes mejorados de Supabase, Vercel y GitHub, toda la plataforma se desarrolla a medida, por el propio equipo, bajo la marca de la empresa y sin licencias de gestión.</div>
+            </div>
+          </div>
+
+          <div class="cs-alert info">
+            <span>💡</span>
+            <div><b>Importante:</b> el desarrollo no se cotiza por separado: la propuesta es integrar al equipo de trabajo un desarrollador que conoce de primera mano los procesos de Recursos Humanos y cuenta con experiencia en otros departamentos. El desarrollo es parte del propio equipo y no un costo externo; las cifras de $45–49/mes cubren únicamente el mantenimiento y la operación de la infraestructura en producción.</div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="lp-footer">
+        <div class="lp-wrap">
+          <div class="lp-footer-chips">
+            <span>Bajo la marca de la empresa</span>
+            <span>Infraestructura profesional</span>
+            <span>Totalmente auditable</span>
+          </div>
+          <p><b>La oportunidad de innovar en la gestión del talento humano.</b> Una plataforma a medida que reconstruye la gestión de Recursos Humanos y abre nuevas fronteras.</p>
+        </div>
+      </footer>
+
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="../js/supabase-config.js"></script>
@@ -522,11 +1120,6 @@
     <script src="../js/auth.js"></script>
     <script src="../js/modules.js"></script>
     <script src="../js/module-help.js"></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        restoreTool();
-      });
-    </script>
   </div>
     <script src="../js/access.js"></script>
 </body>

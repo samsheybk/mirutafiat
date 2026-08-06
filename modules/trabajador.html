@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
   <style>
     :root { --module-color: var(--module-captacion); }
     body[data-modulo="relaciones"] {
@@ -490,6 +491,7 @@
     var detalleContratoId = null;
     var detalleContratoArchivo = null;
     var detalleEstadoActual = null;
+    var detalleEstadoCivil = null;
 
     function openDetFotoLightbox() {
       if (!detalleFotoActual) return;
@@ -570,6 +572,7 @@
       document.getElementById('detDocumentosView').style.display = tab === 'documentos' ? '' : 'none';
       document.getElementById('detFamiliaView').style.display = tab === 'familia' ? '' : 'none';
       document.getElementById('detContratoView').style.display = tab === 'contrato' ? '' : 'none';
+      if (detalleTrabajadorId) sessionStorage.setItem('detTab_' + detalleTrabajadorId, tab);
     }
 
     function setDetFoto(url, nombreCompleto) {
@@ -625,6 +628,7 @@
         document.getElementById('det_lugar_nacimiento').value = t.lugar_nacimiento || '';
         document.getElementById('det_sexo').value = t.sexo || '';
         document.getElementById('det_estado_civil').value = t.estado_civil || '';
+        detalleEstadoCivil = t.estado_civil || null;
         document.getElementById('det_correo').value = t.correo || '';
         document.getElementById('det_telefono').value = t.telefono || '';
         document.getElementById('det_direccion').value = t.direccion || '';
@@ -640,7 +644,11 @@
         document.getElementById('det_fecha_egreso_top').value = t.fecha_egreso || '';
         document.getElementById('detEgresoTopWrap').style.display = t.estado === 'Retirado' ? '' : 'none';
         detalleEstadoActual = t.estado;
-        switchDetalleTab('datos', document.querySelector('.det-tab[data-dtab="datos"]'));
+        var tabGuardado = sessionStorage.getItem('detTab_' + t.id);
+        var btnGuardado = document.querySelector('.det-tab[data-dtab="' + tabGuardado + '"]');
+        if (!btnGuardado || btnGuardado.style.display === 'none') tabGuardado = 'datos';
+        var btnInicial = document.querySelector('.det-tab[data-dtab="' + tabGuardado + '"]');
+        switchDetalleTab(tabGuardado, btnInicial);
         loadDocumentos();
         loadCargaFamiliar();
         if (new URLSearchParams(location.search).get('modulo') === 'relaciones') loadContrato();
@@ -666,6 +674,14 @@
         talla_calzado: document.getElementById('det_talla_calzado').value || null
       };
       try {
+        var nuevoEstadoCivil = document.getElementById('det_estado_civil').value;
+        if (nuevoEstadoCivil && nuevoEstadoCivil !== 'Casado/a' && nuevoEstadoCivil !== 'Concubinato') {
+          var tieneEsposo = (detalleFamilia || []).some(function(f) { return f.parentesco === 'Esposo/a'; });
+          if (tieneEsposo) {
+            showAlert('Hay una carga familiar con parentesco "Esposo/a" registrada. Elimínala o edítala antes de guardar el estado civil "' + nuevoEstadoCivil + '".', 'warning');
+            return;
+          }
+        }
         if (detalleFotoArchivo) {
           var ext = (detalleFotoArchivo.name.split('.').pop() || 'jpg').toLowerCase();
           var path = 'perfil/' + detalleTrabajadorId + '.' + ext;
@@ -946,7 +962,7 @@
             + '<td>' + (f.cedula || '-') + '</td>'
             + '<td>' + (f.fecha_nacimiento || '-') + '</td>'
             + '<td>' + (f.sexo || '-') + '</td>'
-            + '<td><button class="btn btn-sm btn-outline" onclick="openModalFamiliar(\'' + f.id + '\')">Editar</button> <button class="btn btn-sm btn-outline" onclick="deleteFamiliar(\'' + f.id + '\')" style="color:#dc2626;">Eliminar</button></td>'
+            + '<td><button class="btn btn-sm btn-outline" title="Editar" onclick="openModalFamiliar(\'' + f.id + '\')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> <button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteFamiliar(\'' + f.id + '\')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button></td>'
             + '</tr>';
         }).join('');
       } catch (err) {
@@ -982,6 +998,10 @@
       var nombre = document.getElementById('fam_nombre').value.trim();
       if (!parentesco) { showAlert('Selecciona el parentesco', 'warning'); return; }
       if (!nombre) { showAlert('Indica el nombre completo', 'warning'); return; }
+      if (parentesco === 'Esposo/a' && detalleEstadoCivil !== 'Casado/a' && detalleEstadoCivil !== 'Concubinato') {
+        showAlert('No puedes registrar un(a) esposo/a: el trabajador debe tener estado civil "Casado/a" o "Concubinato" (actual: ' + (detalleEstadoCivil || 'sin definir') + ').', 'warning');
+        return;
+      }
       var payload = {
         parentesco: parentesco,
         nombre: nombre,

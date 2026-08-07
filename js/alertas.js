@@ -47,7 +47,7 @@
     btn.type = 'button';
     btn.className = 'nav-alerta-btn';
     btn.title = 'Alertas de compromisos';
-    btn.innerHTML = '<i class="fi fi-sr-bell"></i><span id="navAlertaBadge" class="nav-alerta-badge" style="display:none;">0</span>';
+    btn.innerHTML = '<i class="fi fi-sr-bell-ring"></i><span id="navAlertaBadge" class="nav-alerta-badge" style="display:none;">0</span>';
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
       togglePanel();

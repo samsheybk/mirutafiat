@@ -139,10 +139,10 @@
                 <div style="height:calc(100vh - 240px);overflow-y:auto;">
                   <table class="data-table">
                     <thead>
-                      <tr><th>Trabajador</th><th>Equipo</th><th>Asignación</th><th>Devolución</th><th>Estado</th><th style="width:180px;">Acción</th></tr>
+                      <tr><th>Trabajador</th><th>Tipo</th><th>Equipo / Acceso</th><th>Asignación</th><th>Devolución</th><th><span class="th-help">Estado<span class="th-help-text"><strong>Activa:</strong> el trabajador tiene asignado actualmente el equipo o acceso.<br><strong>Devuelta:</strong> el equipo o acceso fue devuelto y quedó registrado en el historial.</span><span class="th-help-icon">?</span></span></th><th style="width:180px;">Acción</th></tr>
                     </thead>
                     <tbody id="asigTableBody">
-                      <tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">Sin asignaciones registradas</td></tr>
+                      <tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Sin asignaciones registradas</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -154,7 +154,7 @@
                 </div>
                 <table class="data-table">
                   <thead>
-                    <tr><th>Tipo</th><th>Equipo</th><th>Marca / Modelo</th><th>Serial</th><th>Código</th><th>Estado</th><th style="width:180px;">Acción</th></tr>
+                    <tr><th>Tipo</th><th>Equipo</th><th>Marca / Modelo</th><th>Serial</th><th>Código</th><th><span class="th-help">Estado<span class="th-help-text"><strong>Disponible:</strong> sin asignar, listo para entregar.<br><strong>Asignado:</strong> en poder de un trabajador.<br><strong>En mantenimiento:</strong> fuera de uso por reparación o revisión.<br><strong>Baja:</strong> fuera de servicio o dado de baja.</span><span class="th-help-icon">?</span></span></th><th style="width:180px;">Acción</th></tr>
                   </thead>
                   <tbody id="eqTableBody">
                     <tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Sin equipos registrados</td></tr>
@@ -169,10 +169,10 @@
                 <div style="height:calc(100vh - 240px);overflow-y:auto;">
                   <table class="data-table">
                     <thead>
-                      <tr><th>Trabajador</th><th>Tipo</th><th>Descripción</th><th>Usuario</th><th>Estado</th><th style="width:150px;">Acción</th></tr>
+                      <tr><th>Tipo</th><th>Descripción</th><th>Usuario</th><th><span class="th-help">Estado<span class="th-help-text"><strong>Pendiente:</strong> el acceso está registrado pero sin custodio activo.<br><strong>Entregado:</strong> el acceso está asignado a un trabajador (custodio).</span><span class="th-help-icon">?</span></span></th><th style="width:150px;">Acción</th></tr>
                     </thead>
                     <tbody id="sensTableBody">
-                      <tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">Sin información sensible registrada</td></tr>
+                      <tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Sin información sensible registrada</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -333,6 +333,8 @@
         </div>
       </div>
       <div class="modal-footer">
+        <button class="btn btn-outline" id="btnEquipoDetalleEditar">Editar</button>
+        <button class="btn btn-outline" id="btnEquipoDetalleEliminar">Eliminar</button>
         <button class="btn btn-outline" onclick="rlCloseModal('modalEquipoDetalle')">Cerrar</button>
       </div>
     </div>
@@ -343,11 +345,20 @@
       <div class="modal-header"><h3 id="modalAsignacionTitle">Nueva asignación de equipo</h3><button class="modal-close" onclick="rlCloseModal('modalAsignacion')">&times;</button></div>
       <div class="modal-body">
         <form id="asignacionForm">
+          <div class="form-group"><label>Tipo de asignación</label>
+            <select class="form-select" id="asig_tipo" onchange="onAsigTipoChange()">
+              <option value="equipo">Equipo</option>
+              <option value="sensible">Información sensible</option>
+            </select>
+          </div>
           <div class="form-group"><label>Trabajador</label>
             <select class="form-select" id="asig_trabajador_id"><option value="">— Selecciona —</option></select>
           </div>
-          <div class="form-group"><label>Equipo</label>
+          <div class="form-group" id="asigEquipoGroup"><label>Equipo</label>
             <select class="form-select" id="asig_equipo_id"><option value="">— Selecciona —</option></select>
+          </div>
+          <div class="form-group" id="asigSensibleGroup" style="display:none;"><label>Acceso (información sensible)</label>
+            <select class="form-select" id="asig_sensible_id"><option value="">— Selecciona —</option></select>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
             <div class="form-group"><label>Fecha de asignación</label><input type="date" class="form-input" id="asig_fecha_asignacion"></div>
@@ -374,9 +385,6 @@
       <div class="modal-header"><h3 id="modalSensibleTitle">Nueva información sensible</h3><button class="modal-close" onclick="rlCloseModal('modalInfoSensible')">&times;</button></div>
       <div class="modal-body">
         <form id="sensibleForm">
-          <div class="form-group"><label>Trabajador</label>
-            <select class="form-select" id="sens_trabajador_id"><option value="">— Selecciona —</option></select>
-          </div>
           <div class="form-group"><label>Tipo de acceso</label>
             <select class="form-select" id="sens_tipo">
               <option value="Aplicación">Aplicación</option>
@@ -403,6 +411,29 @@
       </div>
     </div>
   </div>
+
+  <div class="modal-overlay" id="modalSensibleDetalle">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalSensibleDetalleTitle">Detalle de información sensible</h3><button class="modal-close" onclick="rlCloseModal('modalSensibleDetalle')">&times;</button></div>
+      <div class="modal-body">
+        <div id="sensDetalleInfo" style="margin-bottom:16px;"></div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px;">Historial de asignaciones</div>
+        <div style="max-height:320px;overflow-y:auto;">
+          <table class="data-table">
+            <thead><tr><th>Custodio</th><th>Asignación</th><th>Devolución</th><th>Estado</th><th>Notas</th></tr></thead>
+            <tbody id="sensDetalleHistBody"><tr><td colspan="5" style="text-align:center;padding:30px;color:#999;">Este acceso aún no ha sido asignado</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-relaciones" id="btnSensibleDetalleNueva">+ Nueva asignación</button>
+        <button class="btn btn-outline" id="btnSensibleDetalleEditar">Editar</button>
+        <button class="btn btn-outline" id="btnSensibleDetalleEliminar">Eliminar</button>
+        <button class="btn btn-outline" onclick="rlCloseModal('modalSensibleDetalle')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
 
   <div class="modal-overlay" id="modalEditarTrabajador">
     <div class="modal">
@@ -453,6 +484,8 @@
     var editAsignacionId = null;
     var editSensibleId = null;
     var editTrabajadorId = null;
+    var detalleEquipoId = null;
+    var detalleSensibleId = null;
 
     function switchTool(name) {
       document.querySelectorAll('.panel-item').forEach(function(el) {
@@ -482,6 +515,7 @@
 
     function switchPlantillaView(tab, btn) {
       currentPlantillaView = tab;
+      localStorage.setItem('fiat_rl_plantilla_view', tab);
       document.querySelectorAll('.plantilla-tab').forEach(function(b) {
         b.style.background = b === btn ? 'var(--module-relaciones)' : 'transparent';
         b.style.color = b === btn ? '#fff' : 'var(--color-text)';
@@ -494,6 +528,7 @@
 
     function switchEquiposView(tab, btn) {
       currentEquiposView = tab;
+      localStorage.setItem('fiat_rl_equipos_view', tab);
       document.querySelectorAll('.eq-tab').forEach(function(b) {
         b.style.background = b === btn ? 'var(--module-relaciones)' : 'transparent';
         b.style.color = b === btn ? '#fff' : 'var(--color-text)';
@@ -531,6 +566,15 @@
 
     function getEquipo(id) {
       return rlEquipos.find(function(x) { return String(x.id) === String(id); });
+    }
+
+    function getSensible(id) {
+      return rlInfoSensible.find(function(x) { return String(x.id) === String(id); });
+    }
+
+    function sensibleNombre(s) {
+      if (!s) return '-';
+      return s.descripcion + (s.usuario ? ' — ' + s.usuario : '');
     }
 
     function equipoNombre(e) {
@@ -813,6 +857,8 @@
 
     function rlOpenEquipoModal(id) {
       editEquipoId = id || null;
+      if (!id) detalleEquipoId = null;
+      rlCloseModal('modalEquipoDetalle');
       document.getElementById('modalEquipoTitle').textContent = id ? 'Editar equipo' : 'Nuevo equipo';
       if (id) {
         var e = rlEquipos.find(function(x) { return String(x.id) === String(id); });
@@ -861,6 +907,7 @@
         rlCloseModal('modalEquipo');
         showAlert('Equipo guardado', 'success');
         await loadRelacionesData();
+        if (detalleEquipoId) rlOpenEquipoDetalle(detalleEquipoId);
       } catch (err) {
         showAlert('Error al guardar: ' + err.message, 'error');
       }
@@ -890,13 +937,14 @@
           + '<td>' + (e.codigo || '-') + '</td>'
           + '<td><span class="badge ' + rlBadge(estado) + '">' + estado + '</span></td>'
           + '<td>'
-          + '<button class="btn btn-sm btn-outline" title="Ver detalle e historial" onclick="rlOpenEquipoDetalle(' + e.id + ')"><i class="fi fi-sr-eye" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
-          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="rlOpenEquipoModal(' + e.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> <button class="btn btn-sm btn-outline" title="Eliminar" onclick="rlDeleteEquipo(' + e.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;"></i></button></td>'
+          + '<button class="btn btn-sm btn-outline" title="Ver detalle e historial" onclick="rlOpenEquipoDetalle(' + e.id + ')"><i class="fi fi-sr-eye" style="font-size:15px;line-height:1;pointer-events:none;"></i></button>'
+          + '</td>'
           + '</tr>';
       }).join('');
     }
 
     function rlOpenEquipoDetalle(id) {
+      detalleEquipoId = id;
       var e = getEquipo(id);
       if (!e) return;
       document.getElementById('modalEquipoDetalleTitle').textContent = 'Detalle del equipo';
@@ -929,6 +977,8 @@
             + '</tr>';
         }).join('');
       }
+      document.getElementById('btnEquipoDetalleEditar').onclick = function() { rlOpenEquipoModal(id); };
+      document.getElementById('btnEquipoDetalleEliminar').onclick = function() { rlDeleteEquipo(id); };
       rlOpenModal('modalEquipoDetalle');
     }
 
@@ -937,6 +987,8 @@
       try {
         var { error } = await supabaseClient.from('rl_equipos').delete().eq('id', id);
         if (error) throw error;
+        detalleEquipoId = null;
+        rlCloseModal('modalEquipoDetalle');
         showAlert('Equipo eliminado', 'success');
         await loadRelacionesData();
       } catch (err) {
@@ -944,7 +996,7 @@
       }
     }
 
-    /* ===== ASIGNACIONES DE EQUIPOS ===== */
+    /* ===== ASIGNACIONES (EQUIPOS E INFORMACIÓN SENSIBLE) ===== */
 
     function populateTrabajadorSelect(selectId) {
       var sel = document.getElementById(selectId || 'asig_trabajador_id');
@@ -955,15 +1007,34 @@
       });
     }
 
-    function rlOpenAsignacionModal(id) {
+    function onAsigTipoChange() {
+      var tipo = document.getElementById('asig_tipo').value;
+      document.getElementById('asigEquipoGroup').style.display = tipo === 'equipo' ? '' : 'none';
+      document.getElementById('asigSensibleGroup').style.display = tipo === 'sensible' ? '' : 'none';
+    }
+
+    function populateAsigSensibleSelect(keepId) {
+      var sel = document.getElementById('asig_sensible_id');
+      sel.innerHTML = '<option value="">— Selecciona —</option>';
+      rlInfoSensible.forEach(function(s) {
+        var selected = String(s.id) === String(keepId) ? ' selected' : '';
+        sel.innerHTML += '<option value="' + s.id + '"' + selected + '>' + sensibleNombre(s) + '</option>';
+      });
+    }
+
+    function rlOpenAsignacionModal(id, preselect) {
       editAsignacionId = id || null;
+      detalleSensibleId = null;
       populateTrabajadorSelect();
       var keepEquipoId = null;
-      document.getElementById('modalAsignacionTitle').textContent = id ? 'Editar asignación' : 'Nueva asignación de equipo';
+      var keepSensibleId = null;
+      var tipo = 'equipo';
+      document.getElementById('modalAsignacionTitle').textContent = id ? 'Editar asignación' : 'Nueva asignación';
       if (id) {
         var a = rlAsignaciones.find(function(x) { return String(x.id) === String(id); });
         if (a) {
-          keepEquipoId = a.equipo_id;
+          if (a.info_sensible_id) { tipo = 'sensible'; keepSensibleId = a.info_sensible_id; }
+          else keepEquipoId = a.equipo_id;
           document.getElementById('asig_trabajador_id').value = a.trabajador_id || '';
           document.getElementById('asig_fecha_asignacion').value = a.fecha_asignacion || '';
           document.getElementById('asig_fecha_devolucion').value = a.fecha_devolucion || '';
@@ -971,33 +1042,51 @@
           document.getElementById('asig_notas').value = a.notas || '';
         }
       } else {
+        if (preselect && preselect.tipo === 'sensible') {
+          tipo = 'sensible';
+          keepSensibleId = preselect.infoSensibleId;
+          detalleSensibleId = preselect.infoSensibleId;
+        }
         document.getElementById('asig_fecha_asignacion').value = new Date().toISOString().slice(0, 10);
         document.getElementById('asig_fecha_devolucion').value = '';
         document.getElementById('asig_estado').value = 'Activa';
         document.getElementById('asig_notas').value = '';
       }
-      var sel = document.getElementById('asig_equipo_id');
-      sel.innerHTML = '<option value="">— Selecciona —</option>';
+      document.getElementById('asig_tipo').value = tipo;
+      var selEq = document.getElementById('asig_equipo_id');
+      selEq.innerHTML = '<option value="">— Selecciona —</option>';
       rlEquipos.forEach(function(e) {
         var ok = e.estado === 'Disponible' || String(e.id) === String(keepEquipoId);
         if (!ok) return;
         var selected = String(e.id) === String(keepEquipoId) ? ' selected' : '';
-        sel.innerHTML += '<option value="' + e.id + '"' + selected + '>' + equipoNombre(e) + '</option>';
+        selEq.innerHTML += '<option value="' + e.id + '"' + selected + '>' + equipoNombre(e) + '</option>';
       });
+      populateAsigSensibleSelect(keepSensibleId);
+      onAsigTipoChange();
       rlOpenModal('modalAsignacion');
     }
 
-    async function recomputeEquiposEstado() {
+    async function recomputeEstados() {
       try {
         var asigs = await rlFetch('rl_asignaciones');
         var eqs = await rlFetch('rl_equipos');
-        var activas = {};
-        asigs.forEach(function(a) { if (a.estado === 'Activa') activas[a.equipo_id] = true; });
+        var sens = await rlFetch('rl_info_sensible');
+        var activasEq = {};
+        var activasSe = {};
+        asigs.forEach(function(a) {
+          if (a.estado !== 'Activa') return;
+          if (a.equipo_id) activasEq[a.equipo_id] = true;
+          if (a.info_sensible_id) activasSe[a.info_sensible_id] = true;
+        });
         var updates = [];
         eqs.forEach(function(e) {
           if (e.estado === 'Baja' || e.estado === 'En mantenimiento') return;
-          var nuevo = activas[e.id] ? 'Asignado' : 'Disponible';
+          var nuevo = activasEq[e.id] ? 'Asignado' : 'Disponible';
           if (e.estado !== nuevo) updates.push(supabaseClient.from('rl_equipos').update({ estado: nuevo }).eq('id', e.id));
+        });
+        sens.forEach(function(s) {
+          var nuevo = activasSe[s.id] ? 'Entregado' : 'Pendiente';
+          if (s.estado !== nuevo) updates.push(supabaseClient.from('rl_info_sensible').update({ estado: nuevo }).eq('id', s.id));
         });
         await Promise.all(updates);
       } catch (e) { /* noop */ }
@@ -1005,15 +1094,19 @@
 
     async function rlSaveAsignacion() {
       var trabajadorId = document.getElementById('asig_trabajador_id').value;
-      var equipoId = document.getElementById('asig_equipo_id').value;
+      var tipo = document.getElementById('asig_tipo').value;
+      var equipoId = tipo === 'equipo' ? document.getElementById('asig_equipo_id').value : '';
+      var sensibleId = tipo === 'sensible' ? document.getElementById('asig_sensible_id').value : '';
       var fechaAsig = document.getElementById('asig_fecha_asignacion').value;
       var fechaDev = document.getElementById('asig_fecha_devolucion').value || null;
       var estado = document.getElementById('asig_estado').value;
       var notas = document.getElementById('asig_notas').value.trim();
-      if (!trabajadorId || !equipoId || !fechaAsig) { showAlert('Completa trabajador, equipo y fecha de asignación', 'warning'); return; }
+      var item = tipo === 'equipo' ? 'el equipo' : 'el acceso';
+      if (!trabajadorId || (!equipoId && !sensibleId) || !fechaAsig) { showAlert('Completa trabajador, ' + item + ' y fecha de asignación', 'warning'); return; }
       var payload = {
         trabajador_id: trabajadorId,
-        equipo_id: equipoId,
+        equipo_id: tipo === 'equipo' ? equipoId : null,
+        info_sensible_id: tipo === 'sensible' ? sensibleId : null,
         fecha_asignacion: fechaAsig,
         fecha_devolucion: fechaDev,
         estado: estado,
@@ -1028,9 +1121,10 @@
           if (error) throw error;
         }
         rlCloseModal('modalAsignacion');
-        await recomputeEquiposEstado();
+        await recomputeEstados();
         showAlert('Asignación guardada', 'success');
         await loadRelacionesData();
+        if (detalleSensibleId) rlOpenSensibleDetalle(detalleSensibleId);
       } catch (err) {
         showAlert('Error al guardar: ' + err.message, 'error');
       }
@@ -1042,21 +1136,26 @@
         if (!q) return true;
         var t = getTrabajador(a.trabajador_id);
         var e = getEquipo(a.equipo_id);
-        var texto = (t ? t.nombres + ' ' + t.apellidos + ' ' + t.cedula : '') + ' ' + equipoNombre(e);
+        var s = getSensible(a.info_sensible_id);
+        var texto = (t ? t.nombres + ' ' + t.apellidos + ' ' + t.cedula : '') + ' ' + (e ? equipoNombre(e) : sensibleNombre(s));
         return texto.toLowerCase().indexOf(q) !== -1;
       });
       var tbody = document.getElementById('asigTableBody');
       var countEl = document.getElementById('asigCount');
       if (countEl) countEl.textContent = data.length + ' asignación' + (data.length !== 1 ? 'es' : '');
       if (!data.length) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">' + (q ? 'Sin resultados' : 'Sin asignaciones registradas') + '</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">' + (q ? 'Sin resultados' : 'Sin asignaciones registradas') + '</td></tr>';
         return;
       }
       tbody.innerHTML = data.map(function(a) {
         var t = getTrabajador(a.trabajador_id);
-        var e = getEquipo(a.equipo_id);
         var nombre = t ? t.nombres + ' ' + t.apellidos : '-';
         var cedula = t ? t.cedula : '';
+        var e = getEquipo(a.equipo_id);
+        var s = getSensible(a.info_sensible_id);
+        var tipo = e ? 'Equipo' : 'Info. sensible';
+        var item = e ? equipoNombre(e) : sensibleNombre(s);
+        var itemSub = e ? (e.tipo || '') : (s ? (s.tipo || '') : '');
         var accion = '';
         if (a.estado === 'Activa') {
           accion += '<button class="btn btn-sm btn-relaciones" style="padding:4px 10px;font-size:11px;" onclick="rlDevolverAsignacion(' + a.id + ')">Devolver</button> ';
@@ -1065,7 +1164,8 @@
         accion += '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="rlDeleteAsignacion(' + a.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;"></i></button>';
         return '<tr>'
           + '<td><span style="font-weight:600;">' + nombre + '</span><div style="font-size:11px;color:var(--color-text-secondary);">C.I. ' + cedula + '</div></td>'
-          + '<td>' + equipoNombre(e) + (e ? '<div style="font-size:11px;color:var(--color-text-secondary);">' + e.tipo + '</div>' : '') + '</td>'
+          + '<td>' + tipo + '</td>'
+          + '<td><span style="font-weight:600;">' + item + '</span>' + (itemSub ? '<div style="font-size:11px;color:var(--color-text-secondary);">' + itemSub + '</div>' : '') + '</td>'
           + '<td>' + a.fecha_asignacion + '</td>'
           + '<td>' + (a.fecha_devolucion || '-') + '</td>'
           + '<td><span class="badge ' + rlBadge(a.estado) + '">' + a.estado + '</span></td>'
@@ -1075,15 +1175,15 @@
     }
 
     async function rlDevolverAsignacion(id) {
-      if (!(await showConfirm('¿Registrar la devolución de este equipo?'))) return;
+      if (!(await showConfirm('¿Registrar la devolución de esta asignación?'))) return;
       try {
         var { error } = await supabaseClient.from('rl_asignaciones').update({
           estado: 'Devuelta',
           fecha_devolucion: new Date().toISOString().slice(0, 10)
         }).eq('id', id);
         if (error) throw error;
-        await recomputeEquiposEstado();
-        showAlert('Equipo devuelto', 'success');
+        await recomputeEstados();
+        showAlert('Devolución registrada', 'success');
         await loadRelacionesData();
       } catch (err) {
         showAlert('Error: ' + err.message, 'error');
@@ -1095,7 +1195,7 @@
       try {
         var { error } = await supabaseClient.from('rl_asignaciones').delete().eq('id', id);
         if (error) throw error;
-        await recomputeEquiposEstado();
+        await recomputeEstados();
         showAlert('Asignación eliminada', 'success');
         await loadRelacionesData();
       } catch (err) {
@@ -1115,33 +1215,27 @@
       var q = (document.getElementById('eqSearch').value || '').trim().toLowerCase();
       var data = rlInfoSensible.filter(function(s) {
         if (!q) return true;
-        var t = getTrabajador(s.trabajador_id);
-        var texto = (t ? t.nombres + ' ' + t.apellidos + ' ' + t.cedula : '') + ' ' + (s.tipo || '') + ' ' + (s.descripcion || '') + ' ' + (s.usuario || '');
+        var texto = (s.tipo || '') + ' ' + (s.descripcion || '') + ' ' + (s.usuario || '');
         return texto.toLowerCase().indexOf(q) !== -1;
       });
       var tbody = document.getElementById('sensTableBody');
       var countEl = document.getElementById('sensCount');
       if (countEl) countEl.textContent = data.length + ' registro' + (data.length !== 1 ? 's' : '');
       if (!data.length) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">' + (q ? 'Sin resultados' : 'Sin información sensible registrada') + '</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">' + (q ? 'Sin resultados' : 'Sin información sensible registrada') + '</td></tr>';
         return;
       }
       tbody.innerHTML = data.map(function(s) {
-        var t = getTrabajador(s.trabajador_id);
-        var nombre = t ? t.nombres + ' ' + t.apellidos : '-';
-        var cedula = t ? t.cedula : '';
         var marca = s.estado === 'Entregado'
           ? '<span class="badge badge-active">Entregado</span>'
           : '<span class="badge badge-pending">Pendiente</span>';
         return '<tr>'
-          + '<td><span style="font-weight:600;">' + nombre + '</span><div style="font-size:11px;color:var(--color-text-secondary);">C.I. ' + cedula + '</div></td>'
           + '<td>' + escInfoSensible(s.tipo || 'Otro') + '</td>'
           + '<td>' + escInfoSensible(s.descripcion || '') + '</td>'
           + '<td>' + escInfoSensible(s.usuario || '-') + '</td>'
           + '<td>' + marca + '</td>'
           + '<td>'
-          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="rlOpenSensibleModal(' + s.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
-          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="rlDeleteSensible(' + s.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '<button class="btn btn-sm btn-outline" title="Ver detalle e historial de asignaciones" onclick="rlOpenSensibleDetalle(' + s.id + ')"><i class="fi fi-sr-eye" style="font-size:15px;line-height:1;pointer-events:none;"></i></button>'
           + '</td>'
           + '</tr>';
       }).join('');
@@ -1154,12 +1248,12 @@
 
     function rlOpenSensibleModal(id) {
       editSensibleId = id || null;
-      populateTrabajadorSelect('sens_trabajador_id');
+      if (!id) detalleSensibleId = null;
+      rlCloseModal('modalSensibleDetalle');
       document.getElementById('modalSensibleTitle').textContent = id ? 'Editar información sensible' : 'Nueva información sensible';
       if (id) {
         var s = rlInfoSensible.find(function(x) { return String(x.id) === String(id); });
         if (s) {
-          document.getElementById('sens_trabajador_id').value = s.trabajador_id || '';
           document.getElementById('sens_tipo').value = s.tipo || 'Aplicación';
           document.getElementById('sens_descripcion').value = s.descripcion || '';
           document.getElementById('sens_usuario').value = s.usuario || '';
@@ -1177,15 +1271,13 @@
     }
 
     async function rlSaveSensible() {
-      var trabajadorId = document.getElementById('sens_trabajador_id').value;
       var tipo = document.getElementById('sens_tipo').value;
       var descripcion = document.getElementById('sens_descripcion').value.trim();
       var usuario = document.getElementById('sens_usuario').value.trim();
       var estado = document.getElementById('sens_estado').value;
       var notas = document.getElementById('sens_notas').value.trim();
-      if (!trabajadorId || !descripcion) { showAlert('Completa el trabajador y la descripción del acceso', 'warning'); return; }
+      if (!descripcion) { showAlert('Completa la descripción del acceso', 'warning'); return; }
       var payload = {
-        trabajador_id: trabajadorId,
         tipo: tipo,
         descripcion: descripcion,
         usuario: usuario || null,
@@ -1203,21 +1295,68 @@
         rlCloseModal('modalInfoSensible');
         showAlert('Información sensible guardada', 'success');
         await loadRelacionesData();
+        if (detalleSensibleId) rlOpenSensibleDetalle(detalleSensibleId);
       } catch (err) {
         showAlert('Error al guardar: ' + err.message, 'error');
       }
     }
 
     async function rlDeleteSensible(id) {
-      if (!(await showConfirm('¿Eliminar este registro de información sensible?'))) return;
+      if (!(await showConfirm('¿Eliminar este registro de información sensible? También se eliminarán sus asignaciones.'))) return;
       try {
         var { error } = await supabaseClient.from('rl_info_sensible').delete().eq('id', id);
         if (error) throw error;
+        detalleSensibleId = null;
+        rlCloseModal('modalSensibleDetalle');
         showAlert('Registro eliminado', 'success');
         await loadRelacionesData();
       } catch (err) {
         showAlert('Error al eliminar: ' + err.message, 'error');
       }
+    }
+
+    /* ===== DETALLE DE INFORMACIÓN SENSIBLE ===== */
+
+    function rlOpenSensibleDetalle(id) {
+      detalleSensibleId = id;
+      var s = rlInfoSensible.find(function(x) { return String(x.id) === String(id); });
+      if (!s) return;
+      var marca = s.estado === 'Entregado'
+        ? '<span class="badge badge-active">Entregado</span>'
+        : '<span class="badge badge-pending">Pendiente</span>';
+      document.getElementById('modalSensibleDetalleTitle').textContent = 'Detalle de información sensible';
+      var info = '<table class="data-table" style="margin-bottom:0;">'
+        + '<tbody>'
+        + '<tr><td style="width:150px;color:var(--color-text-secondary);">Tipo</td><td>' + escInfoSensible(s.tipo || 'Otro') + '</td></tr>'
+        + '<tr><td style="color:var(--color-text-secondary);">Descripción</td><td>' + escInfoSensible(s.descripcion || '-') + '</td></tr>'
+        + '<tr><td style="color:var(--color-text-secondary);">Usuario / cuenta</td><td>' + escInfoSensible(s.usuario || '-') + '</td></tr>'
+        + '<tr><td style="color:var(--color-text-secondary);">Estado</td><td>' + marca + '</td></tr>'
+        + '<tr><td style="color:var(--color-text-secondary);">Notas</td><td>' + escInfoSensible(s.notas || '-') + '</td></tr>'
+        + '</tbody></table>';
+      document.getElementById('sensDetalleInfo').innerHTML = info;
+      var hist = rlAsignaciones.filter(function(x) { return x.info_sensible_id != null && String(x.info_sensible_id) === String(id); })
+        .sort(function(x, y) { return (y.fecha_asignacion || '').localeCompare(x.fecha_asignacion || ''); });
+      var tbody = document.getElementById('sensDetalleHistBody');
+      if (!hist.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:#999;">Este acceso aún no ha sido asignado</td></tr>';
+      } else {
+        tbody.innerHTML = hist.map(function(x) {
+          var t = getTrabajador(x.trabajador_id);
+          var custodio = t ? t.nombres + ' ' + t.apellidos : '-';
+          var cedula = t ? t.cedula : '';
+          return '<tr>'
+            + '<td><span style="font-weight:600;">' + custodio + '</span>' + (cedula ? '<div style="font-size:11px;color:var(--color-text-secondary);">C.I. ' + cedula + '</div>' : '') + '</td>'
+            + '<td>' + x.fecha_asignacion + '</td>'
+            + '<td>' + (x.fecha_devolucion || '-') + '</td>'
+            + '<td><span class="badge ' + rlBadge(x.estado) + '">' + x.estado + '</span></td>'
+            + '<td>' + escInfoSensible(x.notas || '-') + '</td>'
+            + '</tr>';
+        }).join('');
+      }
+      document.getElementById('btnSensibleDetalleNueva').onclick = function() { rlOpenAsignacionModal(id, { tipo: 'sensible', infoSensibleId: id }); };
+      document.getElementById('btnSensibleDetalleEditar').onclick = function() { rlOpenSensibleModal(id); };
+      document.getElementById('btnSensibleDetalleEliminar').onclick = function() { rlDeleteSensible(id); };
+      rlOpenModal('modalSensibleDetalle');
     }
 
     /* ===== ACTAS Y REUNIONES ===== */
@@ -1399,6 +1538,20 @@
     document.addEventListener('DOMContentLoaded', function() {
       var saved = localStorage.getItem('fiat_tool_' + location.pathname);
       if (saved && document.getElementById('tool-' + saved)) switchTool(saved);
+      var pv = localStorage.getItem('fiat_rl_plantilla_view');
+      if (pv && pv !== 'activo') {
+        var pbtns = document.querySelectorAll('.plantilla-tab');
+        for (var i = 0; i < pbtns.length; i++) {
+          if (pbtns[i].getAttribute('data-tab') === pv) { switchPlantillaView(pv, pbtns[i]); break; }
+        }
+      }
+      var ev = localStorage.getItem('fiat_rl_equipos_view');
+      if (ev && ev !== 'asignaciones') {
+        var ebtns = document.querySelectorAll('.eq-tab');
+        for (var i = 0; i < ebtns.length; i++) {
+          if (ebtns[i].getAttribute('data-etab') === ev) { switchEquiposView(ev, ebtns[i]); break; }
+        }
+      }
     });
 
     loadRelacionesData();

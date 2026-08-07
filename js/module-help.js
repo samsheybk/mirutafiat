@@ -491,5 +491,48 @@
   window.setSplashNavVisible = setSplashNavVisible;
   window.refreshSplashNav = refreshSplashNav;
 
+  /* Tooltips de ayuda (.th-help): posición fija ajustada al viewport para
+     que no sean recortados por contenedores con overflow (tablas, scroll). */
+  document.addEventListener('mouseover', function (e) {
+    var anchor = e.target && e.target.closest ? e.target.closest('.th-help') : null;
+    if (!anchor) return;
+    var tip = anchor.querySelector('.th-help-text');
+    if (!tip) return;
+    var rect = anchor.getBoundingClientRect();
+    var tw = tip.offsetWidth || 260;
+    var th = tip.offsetHeight || 120;
+    var left = Math.round(rect.left + rect.width / 2 - tw / 2);
+    left = Math.max(8, Math.min(window.innerWidth - tw - 8, left));
+    var top = rect.bottom + 10;
+    var flip = false;
+    if (top + th > window.innerHeight - 8) {
+      top = rect.top - th - 10;
+      flip = true;
+    }
+    if (top < 8) top = 8;
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+    tip.classList.toggle('th-help-flip', flip);
+    tip.style.visibility = 'visible';
+    tip.style.opacity = '1';
+  });
+  document.addEventListener('mouseout', function (e) {
+    var anchor = e.target && e.target.closest ? e.target.closest('.th-help') : null;
+    if (!anchor) return;
+    var tip = anchor.querySelector('.th-help-text');
+    if (!tip) return;
+    tip.style.visibility = 'hidden';
+    tip.style.opacity = '0';
+  });
+  document.addEventListener('scroll', function () {
+    var tips = document.querySelectorAll('.th-help-text');
+    for (var i = 0; i < tips.length; i++) {
+      if (tips[i].style.visibility === 'visible') {
+        tips[i].style.visibility = 'hidden';
+        tips[i].style.opacity = '0';
+      }
+    }
+  }, true);
+
   document.addEventListener('DOMContentLoaded', injectNavHelp);
 })();

@@ -59,6 +59,7 @@
               </div>
               <span id="cursoEstadoBadge" style="padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;"></span>
               <button class="btn btn-capacitacion btn-sm" onclick="guardarCurso()" style="flex-shrink:0;">Guardar curso</button>
+              <button class="btn btn-outline" onclick="verComoTrabajador()" style="flex-shrink:0;">Ver como trabajador</button>
               <button class="btn btn-outline" onclick="location.href='capacitacion.html'" style="flex-shrink:0;">← Volver</button>
             </div>
           </header>
@@ -622,6 +623,11 @@
       } catch (err) {
         showAlert('Error al guardar el curso: ' + err.message, 'error');
       }
+    }
+
+    function verComoTrabajador() {
+      if (!cursoId) { showAlert('Guarda el curso antes de verlo como trabajador', 'warning'); return; }
+      location.href = 'ver-curso.html?id=' + cursoId;
     }
 
     document.addEventListener('DOMContentLoaded', cargarCurso);

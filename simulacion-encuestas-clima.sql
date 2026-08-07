@@ -9,26 +9,26 @@
 -- Idempotente: no duplica encuestas, preguntas ni respuestas.
 -- ============================================================
 
--- 1) Encuestas
-INSERT INTO bienestar_encuestas (titulo, descripcion, fecha_inicio, fecha_fin, estado)
-SELECT t.titulo, t.descripcion, t.fecha_inicio, t.fecha_fin, t.estado
+-- 1) Encuestas (una de ellas es anónima)
+INSERT INTO bienestar_encuestas (titulo, descripcion, fecha_inicio, fecha_fin, estado, anonima)
+SELECT t.titulo, t.descripcion, t.fecha_inicio, t.fecha_fin, t.estado, t.anonima
 FROM (VALUES
   ('Encuesta de Clima Laboral',
    'Encuesta anual para medir la percepción del ambiente de trabajo y la satisfacción del personal.',
    (CURRENT_DATE - INTERVAL '15 days')::date,
    (CURRENT_DATE + INTERVAL '15 days')::date,
-   'Activa'),
+   'Activa', FALSE),
   ('Encuesta de Satisfacción y Bienestar',
    'Evaluación de las actividades y beneficios de bienestar social del último trimestre.',
    (CURRENT_DATE - INTERVAL '90 days')::date,
    (CURRENT_DATE - INTERVAL '30 days')::date,
-   'Cerrada'),
+   'Cerrada', FALSE),
   ('Encuesta de Liderazgo y Comunicación',
-   'Sondeo sobre la retroalimentación de supervisores y la transparencia en la toma de decisiones.',
+   'Sondeo anónimo sobre la retroalimentación de supervisores y la transparencia en la toma de decisiones.',
    (CURRENT_DATE + INTERVAL '7 days')::date,
    (CURRENT_DATE + INTERVAL '37 days')::date,
-   'Pendiente')
-) AS t(titulo, descripcion, fecha_inicio, fecha_fin, estado)
+   'Pendiente', TRUE)
+) AS t(titulo, descripcion, fecha_inicio, fecha_fin, estado, anonima)
 WHERE NOT EXISTS (SELECT 1 FROM bienestar_encuestas x WHERE x.titulo = t.titulo);
 
 -- 2) Preguntas y opciones de cada encuesta

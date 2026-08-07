@@ -1277,6 +1277,7 @@ CREATE TABLE IF NOT EXISTS bienestar_encuestas (
   fecha_inicio DATE,
   fecha_fin DATE,
   estado TEXT NOT NULL DEFAULT 'Activa' CHECK (estado IN ('Activa','Pendiente','Cerrada')),
+  anonima BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   user_id UUID REFERENCES auth.users(id)
 );

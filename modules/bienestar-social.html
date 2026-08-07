@@ -486,6 +486,11 @@
           <div class="form-group"><label>Estado</label>
             <select class="form-select" id="enc_estado"><option value="Activa">Activa</option><option value="Pendiente">Pendiente</option><option value="Cerrada">Cerrada</option></select>
           </div>
+          <div class="form-row">
+            <div class="form-group"><label class="checkbox-label"><input type="checkbox" id="enc_anonima"> Encuesta anónima</label>
+              <div style="font-size:11px;color:var(--color-text-secondary);">Las respuestas no se asociarán a la cédula ni nombre del trabajador.</div>
+            </div>
+          </div>
           <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="enc_descripcion" rows="3"></textarea></div>
           <div class="form-group">
             <label>Preguntas (selección simple)</label>
@@ -1622,7 +1627,9 @@
       }
       tbody.innerHTML = bienestarEncuestas.map(function(e) {
         return '<tr>'
-          + '<td><span style="font-weight:600;">' + escBienestar(e.titulo) + '</span></td>'
+          + '<td><span style="font-weight:600;">' + escBienestar(e.titulo) + '</span>'
+          + (e.anonima ? ' <span class="badge badge-pending" title="Encuesta anónima">Anónima</span>' : '')
+          + '</td>'
           + '<td>' + escBienestar(e.descripcion || '-') + '</td>'
           + '<td>' + (e.fecha_inicio || '-') + '</td>'
           + '<td>' + (e.fecha_fin || '-') + '</td>'
@@ -1706,6 +1713,7 @@
           document.getElementById('enc_fecha_inicio').value = e.fecha_inicio || '';
           document.getElementById('enc_fecha_fin').value = e.fecha_fin || '';
           document.getElementById('enc_estado').value = e.estado;
+          document.getElementById('enc_anonima').checked = e.anonima === true;
         }
         try {
           var { data, error } = await supabaseClient
@@ -1762,7 +1770,8 @@
         descripcion: document.getElementById('enc_descripcion').value.trim() || null,
         fecha_inicio: document.getElementById('enc_fecha_inicio').value || null,
         fecha_fin: document.getElementById('enc_fecha_fin').value || null,
-        estado: document.getElementById('enc_estado').value
+        estado: document.getElementById('enc_estado').value,
+        anonima: document.getElementById('enc_anonima').checked
       };
       try {
         var encuestaId;

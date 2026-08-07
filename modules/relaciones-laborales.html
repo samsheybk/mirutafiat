@@ -1536,8 +1536,12 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
-      var saved = localStorage.getItem('fiat_tool_' + location.pathname);
-      if (saved && document.getElementById('tool-' + saved)) switchTool(saved);
+      if (location.hash === '#actas') {
+        switchTool('actas');
+      } else {
+        var saved = localStorage.getItem('fiat_tool_' + location.pathname);
+        if (saved && document.getElementById('tool-' + saved)) switchTool(saved);
+      }
       var pv = localStorage.getItem('fiat_rl_plantilla_view');
       if (pv && pv !== 'activo') {
         var pbtns = document.querySelectorAll('.plantilla-tab');

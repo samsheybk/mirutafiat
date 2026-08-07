@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -120,6 +120,8 @@
           </div>
           <div class="panel-item" data-tool="polizas" onclick="switchTool('polizas')" title="Pólizas"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-shield" style="font-size:24px;pointer-events:none;"></i>
           </div>
+          <div class="panel-item" data-tool="vehiculos" onclick="switchTool('vehiculos')" title="Venta de vehículos"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-car" style="font-size:24px;pointer-events:none;"></i>
+          </div>
           <div class="panel-item" data-tool="uniformes" onclick="switchTool('uniformes')" title="Inventario de uniformes"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-vest" style="font-size:24px;pointer-events:none;"></i>
           </div>
           <div class="panel-item" data-tool="encuestas" onclick="switchTool('encuestas')" title="Encuestas"><span class="panel-item-indicator bg-bienestar"></span><i class="fi fi-sr-square-poll-horizontal" style="font-size:24px;pointer-events:none;"></i>
@@ -143,7 +145,15 @@
             </div>
             <div class="toolbar-content" data-toolbar="polizas" style="display:none;align-items:center;gap:16px;width:100%;">
               <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Pólizas</h2>
-              <button class="btn btn-bienestar btn-sm" onclick="openModalPoliza()" style="margin-left:auto;">+ Nueva póliza</button>
+              <input type="text" class="form-input" id="polBuscar" placeholder="Buscar por tipo, proveedor o cobertura..." oninput="renderPolizas()" style="flex:1;max-width:300px;height:34px;" title="Filtrar pólizas">
+              <button class="btn btn-bienestar btn-sm" onclick="openModalPoliza()" style="margin-left:auto;">+ Nuevo tipo de póliza</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="vehiculos" style="display:none;align-items:center;gap:10px;width:100%;flex-wrap:wrap;">
+              <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Venta de vehículos</h2>
+              <input type="text" class="form-input" id="venBuscar" placeholder="Buscar por trabajador, vehículo o placa..." oninput="renderVentas()" style="flex:1;max-width:300px;height:34px;" title="Filtrar ventas">
+              <button class="btn btn-sm ven-tab" data-vtab="ventas" onclick="venSwitchView('ventas',this)" style="background:var(--module-bienestar);color:#fff;border:0;border-radius:4px;padding:6px 16px;">Ventas</button>
+              <button class="btn btn-sm ven-tab" data-vtab="cronograma" onclick="venSwitchView('cronograma',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Cronograma</button>
+              <button class="btn btn-bienestar btn-sm" onclick="openModalVenta()" style="margin-left:auto;">+ Nueva venta</button>
             </div>
             <div class="toolbar-content" data-toolbar="uniformes" style="display:none;align-items:center;gap:10px;width:100%;flex-wrap:wrap;">
               <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Inventario de uniformes</h2>
@@ -202,15 +212,45 @@
             <div class="tool-section" id="tool-polizas">
               <div class="tabla-scroll">
                 <table class="data-table">
-                  <thead><tr><th>Póliza</th><th>Proveedor</th><th>Tipo</th><th>Inicio</th><th>Fin</th><th>Estado</th><th style="width:120px;">Acciones</th></tr></thead>
+                  <thead><tr><th>Tipo de póliza</th><th>Proveedor</th><th>Cobertura</th><th>Trabajadores</th><th>Estado</th><th style="width:170px;">Acciones</th></tr></thead>
                   <tbody id="polizasBody">
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
                   </tbody>
                 </table>
+              </div>
+            </div>
+
+            <div class="tool-section" id="tool-vehiculos">
+              <div id="venVentasView">
+                <div class="tabla-scroll">
+                  <table class="data-table">
+                    <thead><tr><th>Trabajador</th><th>Vehículo</th><th>Placa</th><th>Precio</th><th>Inicial</th><th>Cuotas</th><th>Estado</th><th style="width:170px;">Acciones</th></tr></thead>
+                    <tbody id="vehiculosBody">
+                      <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                      <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                      <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                      <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                      <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div id="venCronogramaView" style="display:none;">
+                <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap;">
+                  <label style="font-size:13px;font-weight:600;white-space:nowrap;">Venta:</label>
+                  <select class="form-select" id="venCronSelect" onchange="renderVentaCuotas()" style="flex:1;max-width:420px;height:36px;"></select>
+                </div>
+                <div id="venCuotasResumen" style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px;"></div>
+                <div class="tabla-scroll">
+                  <table class="data-table">
+                    <thead><tr><th>Cuota</th><th>Monto</th><th>Fecha programada</th><th>Fecha de pago</th><th>Estado</th><th style="width:130px;">Acción</th></tr></thead>
+                    <tbody id="venCuotasBody"></tbody>
+                  </table>
+                </div>
               </div>
             </div>
 
@@ -309,30 +349,72 @@
 
   <div class="modal-overlay" id="modalPoliza">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalPolizaTitle">Nueva póliza</h3><button class="modal-close" onclick="bsHideModal('modalPoliza')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalPolizaTitle">Nuevo tipo de póliza</h3><button class="modal-close" onclick="bsHideModal('modalPoliza')">&times;</button></div>
       <div class="modal-body">
         <form id="formPoliza">
           <div class="form-row">
-            <div class="form-group"><label>Nombre</label><input type="text" class="form-input" id="pol_nombre" required></div>
-            <div class="form-group"><label>Proveedor</label><input type="text" class="form-input" id="pol_proveedor"></div>
+            <div class="form-group"><label>Nombre del tipo de póliza</label><input type="text" class="form-input" id="pol_nombre" required placeholder="Ej: Vida, Salud, Automóvil"></div>
+            <div class="form-group"><label>Proveedor</label><input type="text" class="form-input" id="pol_proveedor" placeholder="Ej: Seguros Venezuela"></div>
           </div>
-          <div class="form-row">
-            <div class="form-group"><label>Tipo</label><input type="text" class="form-input" id="pol_tipo" placeholder="Ej: Vida, Salud"></div>
-            <div class="form-group"><label>Estado</label>
-              <select class="form-select" id="pol_estado"><option value="Activa">Activa</option><option value="Vencida">Vencida</option><option value="Cancelada">Cancelada</option></select>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>Fecha inicio</label><input type="date" class="form-input" id="pol_fecha_inicio"></div>
-            <div class="form-group"><label>Fecha fin</label><input type="date" class="form-input" id="pol_fecha_fin"></div>
-          </div>
-          <div class="form-group"><label>Cobertura</label><textarea class="form-textarea" id="pol_cobertura" rows="2"></textarea></div>
+          <div class="form-group"><label>Cobertura</label><textarea class="form-textarea" id="pol_cobertura" rows="2" placeholder="Describe lo que cubre esta póliza"></textarea></div>
           <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="pol_descripcion" rows="2"></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label class="checkbox-label"><input type="checkbox" id="pol_activo" checked> Póliza activa</label></div>
+          </div>
         </form>
       </div>
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="bsHideModal('modalPoliza')">Cancelar</button>
         <button class="btn btn-bienestar" onclick="savePoliza()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalPolizaTrabajadores">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalPolizaTrabTitle">Trabajadores</h3><button class="modal-close" onclick="bsHideModal('modalPolizaTrabajadores')">&times;</button></div>
+      <div class="modal-body">
+        <input type="text" class="form-input" id="polTrabBuscar" placeholder="Buscar trabajador..." oninput="renderPolizaTrabajadores()" style="width:100%;margin-bottom:12px;">
+        <div style="margin-bottom:10px;"><label class="checkbox-label"><input type="checkbox" id="polTrabMarcarTodos" onchange="marcarTodosPolizaTrabajadores(this.checked)"> Marcar todos</label></div>
+        <div id="polTrabLista" style="max-height:360px;overflow-y:auto;border:1px solid var(--border-color);border-radius:6px;padding:8px;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="bsHideModal('modalPolizaTrabajadores')">Cancelar</button>
+        <button class="btn btn-bienestar" onclick="savePolizaTrabajadores()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="modalVenta">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalVentaTitle">Nueva venta</h3><button class="modal-close" onclick="bsHideModal('modalVenta')">&times;</button></div>
+      <div class="modal-body">
+        <form id="formVenta">
+          <div class="form-group"><label>Trabajador</label>
+            <select class="form-select" id="ven_trabajador_id" required></select>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Vehículo (marca, modelo, año)</label><input type="text" class="form-input" id="ven_vehiculo" required placeholder="Ej: Chevrolet Spark 2020"></div>
+            <div class="form-group"><label>Placa</label><input type="text" class="form-input" id="ven_placa" placeholder="Ej: AB123CD"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Precio total (US$)</label><input type="number" step="0.01" min="0" class="form-input" id="ven_precio" required oninput="calcularCuotaVenta()"></div>
+            <div class="form-group"><label>Inicial (US$)</label><input type="number" step="0.01" min="0" class="form-input" id="ven_inicial" value="0" required oninput="calcularCuotaVenta()"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>N° de cuotas</label><input type="number" min="1" class="form-input" id="ven_cuotas" value="1" required oninput="calcularCuotaVenta()"></div>
+            <div class="form-group"><label>Fecha de venta</label><input type="date" class="form-input" id="ven_fecha" required></div>
+          </div>
+          <div class="form-group"><label>Cuota estimada</label><input type="text" class="form-input" id="ven_cuota_est" readonly style="background:var(--border-color);"></div>
+          <div class="form-group"><label>Estado</label>
+            <select class="form-select" id="ven_estado"><option value="Activa">Activa</option><option value="Completada">Completada</option><option value="Cancelada">Cancelada</option></select>
+          </div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="ven_descripcion" rows="2"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="bsHideModal('modalVenta')">Cancelar</button>
+        <button class="btn btn-bienestar" onclick="saveVenta()">Guardar</button>
       </div>
     </div>
   </div>
@@ -687,35 +769,53 @@
 
     /* ===== PÓLIZAS ===== */
     var bienestarPolizas = [];
+    var bienestarPolizaAsig = [];
     var editingPolizaId = null;
+    var polizaTipoActual = null;
 
     async function loadPolizas() {
       try {
-        var { data, error } = await supabaseClient.from('bienestar_polizas').select('*').order('created_at', { ascending: false });
-        if (error) throw error;
-        bienestarPolizas = data || [];
+        var [tiposRes, asigRes] = await Promise.all([
+          supabaseClient.from('bienestar_poliza_tipos').select('*').order('created_at', { ascending: false }),
+          supabaseClient.from('bienestar_poliza_trabajadores').select('*')
+        ]);
+        if (tiposRes.error) throw tiposRes.error;
+        if (asigRes.error) throw asigRes.error;
+        bienestarPolizas = tiposRes.data || [];
+        bienestarPolizaAsig = asigRes.data || [];
         renderPolizas();
       } catch (err) {
         document.getElementById('polizasBody').innerHTML =
-          '<tr><td colspan="7" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar pólizas: ' + escBienestar(err.message) + '</td></tr>';
+          '<tr><td colspan="6" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar pólizas: ' + escBienestar(err.message) + '</td></tr>';
       }
     }
 
     function renderPolizas() {
       var tbody = document.getElementById('polizasBody');
-      if (!bienestarPolizas.length) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay pólizas registradas</td></tr>';
+      var q = document.getElementById('polBuscar').value.trim().toLowerCase();
+      var data = bienestarPolizas.filter(function(p) {
+        if (!q) return true;
+        return (p.nombre || '').toLowerCase().indexOf(q) !== -1
+          || (p.proveedor || '').toLowerCase().indexOf(q) !== -1
+          || (p.cobertura || '').toLowerCase().indexOf(q) !== -1;
+      });
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">'
+          + (q ? 'Sin resultados para "' + escBienestar(q) + '"' : 'No hay tipos de póliza registrados') + '</td></tr>';
         return;
       }
-      tbody.innerHTML = bienestarPolizas.map(function(p) {
+      tbody.innerHTML = data.map(function(p) {
+        var total = bienestarPolizaAsig.filter(function(a) { return a.poliza_tipo_id === p.id; }).length;
+        var badge = p.activo ? getBadgeClass('Activa') : getBadgeClass('Vencida');
+        var estadoTxt = p.activo ? 'Activa' : 'Inactiva';
         return '<tr>'
           + '<td><span style="font-weight:600;">' + escBienestar(p.nombre) + '</span></td>'
           + '<td>' + escBienestar(p.proveedor || '-') + '</td>'
-          + '<td>' + escBienestar(p.tipo || '-') + '</td>'
-          + '<td>' + (p.fecha_inicio || '-') + '</td>'
-          + '<td>' + (p.fecha_fin || '-') + '</td>'
-          + '<td><span class="badge ' + getBadgeClass(p.estado) + '">' + escBienestar(p.estado) + '</span></td>'
-          + '<td>'
+          + '<td>' + escBienestar(p.cobertura || '-') + '</td>'
+          + '<td>' + total + '</td>'
+          + '<td><span class="badge ' + badge + '">' + estadoTxt + '</span></td>'
+          + '<td style="white-space:nowrap;">'
+          + '<button class="btn btn-sm btn-bienestar" title="Trabajadores" onclick="openPolizaTrabajadores(' + p.id + ')"><i class="fi fi-sr-users" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
           + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalPoliza(' + p.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
           + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deletePoliza(' + p.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
           + '</td>'
@@ -726,18 +826,16 @@
     function openModalPoliza(id) {
       editingPolizaId = id || null;
       document.getElementById('formPoliza').reset();
-      document.getElementById('modalPolizaTitle').textContent = id ? 'Editar póliza' : 'Nueva póliza';
+      document.getElementById('pol_activo').checked = true;
+      document.getElementById('modalPolizaTitle').textContent = id ? 'Editar tipo de póliza' : 'Nuevo tipo de póliza';
       if (id) {
         var p = bienestarPolizas.find(function(x) { return x.id === id; });
         if (p) {
           document.getElementById('pol_nombre').value = p.nombre;
           document.getElementById('pol_proveedor').value = p.proveedor || '';
-          document.getElementById('pol_tipo').value = p.tipo || '';
           document.getElementById('pol_cobertura').value = p.cobertura || '';
-          document.getElementById('pol_fecha_inicio').value = p.fecha_inicio || '';
-          document.getElementById('pol_fecha_fin').value = p.fecha_fin || '';
-          document.getElementById('pol_estado').value = p.estado;
           document.getElementById('pol_descripcion').value = p.descripcion || '';
+          document.getElementById('pol_activo').checked = p.activo !== false;
         }
       }
       bsShowModal('modalPoliza');
@@ -746,45 +844,419 @@
     async function savePoliza() {
       var nombre = document.getElementById('pol_nombre').value.trim();
       if (!nombre) {
-        showAlert('El nombre de la póliza es obligatorio', 'warning');
+        showAlert('El nombre del tipo de póliza es obligatorio', 'warning');
         return;
       }
       var payload = {
         nombre: nombre,
         proveedor: document.getElementById('pol_proveedor').value.trim() || null,
-        tipo: document.getElementById('pol_tipo').value.trim() || null,
         cobertura: document.getElementById('pol_cobertura').value.trim() || null,
-        fecha_inicio: document.getElementById('pol_fecha_inicio').value || null,
-        fecha_fin: document.getElementById('pol_fecha_fin').value || null,
-        estado: document.getElementById('pol_estado').value,
-        descripcion: document.getElementById('pol_descripcion').value.trim() || null
+        descripcion: document.getElementById('pol_descripcion').value.trim() || null,
+        activo: document.getElementById('pol_activo').checked
       };
       try {
+        var nuevoId = null;
         if (editingPolizaId) {
-          var { error } = await supabaseClient.from('bienestar_polizas').update(payload).eq('id', editingPolizaId);
+          var { error } = await supabaseClient.from('bienestar_poliza_tipos').update(payload).eq('id', editingPolizaId);
           if (error) throw error;
         } else {
-          var { error } = await supabaseClient.from('bienestar_polizas').insert([payload]);
-          if (error) throw error;
+          var res = await supabaseClient.from('bienestar_poliza_tipos').insert([payload]).select('id');
+          if (res.error) throw res.error;
+          nuevoId = res.data && res.data[0] ? res.data[0].id : null;
         }
         bsHideModal('modalPoliza');
-        loadPolizas();
-        showAlert(editingPolizaId ? 'Póliza actualizada' : 'Póliza creada', 'success');
+        await loadPolizas();
+        if (nuevoId) {
+          showAlert('Tipo de póliza creado. Ahora asigna los trabajadores', 'success');
+          openPolizaTrabajadores(nuevoId);
+        } else {
+          showAlert('Tipo de póliza actualizado', 'success');
+        }
       } catch (err) {
         showAlert('Error al guardar: ' + err.message, 'error');
       }
     }
 
     async function deletePoliza(id) {
-      var ok = await showConfirm('¿Eliminar esta póliza?', 'Eliminar');
+      var ok = await showConfirm('¿Eliminar este tipo de póliza? También se quitará de los trabajadores asignados.', 'Eliminar');
       if (!ok) return;
       try {
-        var { error } = await supabaseClient.from('bienestar_polizas').delete().eq('id', id);
+        var { error } = await supabaseClient.from('bienestar_poliza_tipos').delete().eq('id', id);
         if (error) throw error;
-        loadPolizas();
-        showAlert('Póliza eliminada', 'success');
+        await loadPolizas();
+        showAlert('Tipo de póliza eliminado', 'success');
       } catch (err) {
         showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    async function openPolizaTrabajadores(id) {
+      var p = bienestarPolizas.find(function(x) { return x.id === id; });
+      if (!p) return;
+      polizaTipoActual = id;
+      document.getElementById('modalPolizaTrabTitle').textContent = 'Trabajadores con ' + p.nombre;
+      document.getElementById('polTrabBuscar').value = '';
+      document.getElementById('polTrabMarcarTodos').checked = false;
+      document.getElementById('polTrabLista').innerHTML =
+        '<div style="text-align:center;padding:20px;color:#999;">Cargando trabajadores...</div>';
+      try {
+        var res = await supabaseClient.from('bienestar_poliza_trabajadores').select('trabajador_id').eq('poliza_tipo_id', id);
+        if (res.error) throw res.error;
+        polizaTrabSeleccion = {};
+        (res.data || []).forEach(function(a) { polizaTrabSeleccion[a.trabajador_id] = true; });
+        renderPolizaTrabajadores();
+        bsShowModal('modalPolizaTrabajadores');
+      } catch (err) {
+        showAlert('Error al cargar trabajadores: ' + err.message, 'error');
+      }
+    }
+
+    var polizaTrabSeleccion = {};
+
+    function renderPolizaTrabajadores() {
+      var q = document.getElementById('polTrabBuscar').value.trim().toLowerCase();
+      var lista = bienestarTrabajadores.filter(function(t) {
+        if (t.estado !== 'Activo') return false;
+        if (!q) return true;
+        var n = (t.nombres || '') + ' ' + (t.apellidos || '');
+        return n.toLowerCase().indexOf(q) !== -1;
+      });
+      var container = document.getElementById('polTrabLista');
+      if (!lista.length) {
+        container.innerHTML = '<div style="text-align:center;padding:20px;color:#999;">No hay trabajadores activos</div>';
+        return;
+      }
+      container.innerHTML = lista.map(function(t) {
+        var nombre = (t.nombres || '') + ' ' + (t.apellidos || '');
+        return '<label class="checkbox-label" style="display:flex;align-items:center;gap:10px;padding:8px 6px;border-bottom:1px solid var(--border-color);cursor:pointer;">'
+          + '<input type="checkbox" class="pol-trab-check" value="' + t.id + '"' + (polizaTrabSeleccion[t.id] ? ' checked' : '') + ' style="accent-color:var(--module-bienestar);width:16px;height:16px;flex-shrink:0;">'
+          + '<span>' + escBienestar(nombre) + '</span>'
+          + '</label>';
+      }).join('');
+    }
+
+    function marcarTodosPolizaTrabajadores(checked) {
+      var checks = document.querySelectorAll('.pol-trab-check');
+      for (var i = 0; i < checks.length; i++) checks[i].checked = checked;
+    }
+
+    async function savePolizaTrabajadores() {
+      if (!polizaTipoActual) return;
+      var checks = document.querySelectorAll('.pol-trab-check:checked');
+      var rows = [];
+      for (var i = 0; i < checks.length; i++) {
+        rows.push({
+          poliza_tipo_id: polizaTipoActual,
+          trabajador_id: checks[i].value,
+          fecha_inicio: new Date().toISOString().slice(0, 10),
+          estado: 'Activa'
+        });
+      }
+      try {
+        var delRes = await supabaseClient.from('bienestar_poliza_trabajadores').delete().eq('poliza_tipo_id', polizaTipoActual);
+        if (delRes.error) throw delRes.error;
+        if (rows.length) {
+          var insRes = await supabaseClient.from('bienestar_poliza_trabajadores').insert(rows);
+          if (insRes.error) throw insRes.error;
+        }
+        bsHideModal('modalPolizaTrabajadores');
+        await loadPolizas();
+        showAlert('Asignación de trabajadores actualizada', 'success');
+      } catch (err) {
+        showAlert('Error al guardar trabajadores: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== VENTA DE VEHÍCULOS A CUOTAS ===== */
+    var bienestarVentas = [];
+    var bienestarVentaPagos = [];
+    var editingVentaId = null;
+    var ventaCuotasActualId = null;
+
+    function fmtUSD(n) {
+      return 'US$ ' + Number(n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function isoDate(d) {
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    function calcularCuotaVenta() {
+      var precio = parseFloat(document.getElementById('ven_precio').value);
+      var inicial = parseFloat(document.getElementById('ven_inicial').value) || 0;
+      var cuotas = parseInt(document.getElementById('ven_cuotas').value) || 0;
+      var est = document.getElementById('ven_cuota_est');
+      if (!isNaN(precio) && cuotas > 0) {
+        var financiado = Math.max(precio - inicial, 0);
+        est.value = fmtUSD(Math.round((financiado / cuotas) * 100) / 100);
+      } else {
+        est.value = '';
+      }
+    }
+
+    function buildCuotasVenta(financiado, cuotas, fechaVenta) {
+      var rows = [];
+      var base = Math.round((financiado / cuotas) * 100) / 100;
+      var d = new Date(fechaVenta + 'T00:00:00');
+      for (var i = 1; i <= cuotas; i++) {
+        d = new Date(d.getFullYear(), d.getMonth() + 1, d.getDate());
+        var monto = (i === cuotas) ? Math.round((financiado - base * (cuotas - 1)) * 100) / 100 : base;
+        rows.push({ numero_cuota: i, monto: monto, fecha_programada: isoDate(d), estado: 'Pendiente' });
+      }
+      return rows;
+    }
+
+    async function loadVentas() {
+      try {
+        var [ventasRes, pagosRes] = await Promise.all([
+          supabaseClient.from('bienestar_vehiculos_ventas').select('*').order('fecha_venta', { ascending: false }),
+          supabaseClient.from('bienestar_vehiculos_pagos').select('*')
+        ]);
+        if (ventasRes.error) throw ventasRes.error;
+        if (pagosRes.error) throw pagosRes.error;
+        bienestarVentas = ventasRes.data || [];
+        bienestarVentaPagos = pagosRes.data || [];
+        renderVentas();
+      } catch (err) {
+        document.getElementById('vehiculosBody').innerHTML =
+          '<tr><td colspan="8" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar ventas: ' + escBienestar(err.message) + '</td></tr>';
+      }
+    }
+
+    function renderVentas() {
+      var tbody = document.getElementById('vehiculosBody');
+      var q = document.getElementById('venBuscar').value.trim().toLowerCase();
+      var data = bienestarVentas.filter(function(v) {
+        if (!q) return true;
+        return (getTrabajadorNombre(v.trabajador_id) || '').toLowerCase().indexOf(q) !== -1
+          || (v.vehiculo || '').toLowerCase().indexOf(q) !== -1
+          || (v.placa || '').toLowerCase().indexOf(q) !== -1;
+      });
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#999;">'
+          + (q ? 'Sin resultados para "' + escBienestar(q) + '"' : 'No hay ventas de vehículos registradas') + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(function(v) {
+        var pagosVenta = bienestarVentaPagos.filter(function(p) { return p.venta_id === v.id; });
+        var pagadas = pagosVenta.filter(function(p) { return p.estado === 'Pagada'; }).length;
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + escBienestar(getTrabajadorNombre(v.trabajador_id)) + '</span></td>'
+          + '<td>' + escBienestar(v.vehiculo) + '</td>'
+          + '<td>' + escBienestar(v.placa || '-') + '</td>'
+          + '<td>' + fmtUSD(v.precio_total) + '</td>'
+          + '<td>' + fmtUSD(v.inicial) + '</td>'
+          + '<td style="text-align:center;">' + pagadas + '/' + v.numero_cuotas + '</td>'
+          + '<td><span class="badge ' + getBadgeClass(v.estado) + '">' + escBienestar(v.estado) + '</span></td>'
+          + '<td style="white-space:nowrap;">'
+          + '<button class="btn btn-sm btn-bienestar" title="Cronograma de cuotas" onclick="openVentaCuotas(' + v.id + ')"><i class="fi fi-sr-calendar-lines-pen" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalVenta(' + v.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteVenta(' + v.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function openModalVenta(id) {
+      editingVentaId = id || null;
+      var sel = document.getElementById('ven_trabajador_id');
+      sel.innerHTML = '<option value="">— Selecciona —</option>';
+      bienestarTrabajadores.forEach(function(t) {
+        if (t.estado !== 'Activo') return;
+        sel.innerHTML += '<option value="' + t.id + '">' + escBienestar(t.nombres + ' ' + t.apellidos) + ' (' + escBienestar(t.cedula) + ')</option>';
+      });
+      document.getElementById('formVenta').reset();
+      document.getElementById('ven_inicial').value = '0';
+      document.getElementById('ven_cuotas').value = '1';
+      document.getElementById('ven_estado').value = 'Activa';
+      document.getElementById('ven_fecha').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('modalVentaTitle').textContent = id ? 'Editar venta' : 'Nueva venta';
+      if (id) {
+        var v = bienestarVentas.find(function(x) { return x.id === id; });
+        if (v) {
+          sel.value = v.trabajador_id || '';
+          document.getElementById('ven_vehiculo').value = v.vehiculo;
+          document.getElementById('ven_placa').value = v.placa || '';
+          document.getElementById('ven_precio').value = v.precio_total;
+          document.getElementById('ven_inicial').value = v.inicial;
+          document.getElementById('ven_cuotas').value = v.numero_cuotas;
+          document.getElementById('ven_fecha').value = v.fecha_venta || '';
+          document.getElementById('ven_estado').value = v.estado;
+          document.getElementById('ven_descripcion').value = v.descripcion || '';
+        }
+      }
+      calcularCuotaVenta();
+      bsShowModal('modalVenta');
+    }
+
+    async function saveVenta() {
+      var trabajador_id = document.getElementById('ven_trabajador_id').value;
+      var vehiculo = document.getElementById('ven_vehiculo').value.trim();
+      var precio = parseFloat(document.getElementById('ven_precio').value);
+      var inicial = parseFloat(document.getElementById('ven_inicial').value) || 0;
+      var cuotas = parseInt(document.getElementById('ven_cuotas').value) || 0;
+      var fecha = document.getElementById('ven_fecha').value;
+      if (!trabajador_id || !vehiculo || isNaN(precio) || precio <= 0 || cuotas < 1 || !fecha) {
+        showAlert('Completa los campos requeridos', 'warning');
+        return;
+      }
+      if (inicial < 0 || inicial > precio) {
+        showAlert('La inicial no puede ser negativa ni mayor que el precio', 'warning');
+        return;
+      }
+      var financiado = Math.round((precio - inicial) * 100) / 100;
+      var montoCuota = Math.round((financiado / cuotas) * 100) / 100;
+      var payload = {
+        trabajador_id: trabajador_id,
+        vehiculo: vehiculo,
+        placa: document.getElementById('ven_placa').value.trim() || null,
+        precio_total: precio,
+        inicial: inicial,
+        monto_financiado: financiado,
+        numero_cuotas: cuotas,
+        monto_cuota: montoCuota,
+        fecha_venta: fecha,
+        estado: document.getElementById('ven_estado').value,
+        descripcion: document.getElementById('ven_descripcion').value.trim() || null
+      };
+      try {
+        if (editingVentaId) {
+          var { error } = await supabaseClient.from('bienestar_vehiculos_ventas').update(payload).eq('id', editingVentaId);
+          if (error) throw error;
+        } else {
+          var res = await supabaseClient.from('bienestar_vehiculos_ventas').insert([payload]).select('id');
+          if (res.error) throw res.error;
+          var nuevoId = res.data && res.data[0] ? res.data[0].id : null;
+          if (nuevoId) {
+            var pagos = buildCuotasVenta(financiado, cuotas, fecha);
+            pagos.forEach(function(p) { p.venta_id = nuevoId; });
+            var insRes = await supabaseClient.from('bienestar_vehiculos_pagos').insert(pagos);
+            if (insRes.error) throw insRes.error;
+          }
+        }
+        bsHideModal('modalVenta');
+        await loadVentas();
+        showAlert(editingVentaId ? 'Venta actualizada' : 'Venta creada con su cronograma de cuotas', 'success');
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteVenta(id) {
+      var ok = await showConfirm('¿Eliminar esta venta? También se eliminará su cronograma de cuotas.', 'Eliminar');
+      if (!ok) return;
+      try {
+        var { error } = await supabaseClient.from('bienestar_vehiculos_ventas').delete().eq('id', id);
+        if (error) throw error;
+        await loadVentas();
+        showAlert('Venta eliminada', 'success');
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    var venView = 'ventas';
+
+    function venSwitchView(view, btn) {
+      venView = view;
+      localStorage.setItem('fiat_bienestar_ven_view', view);
+      document.getElementById('venVentasView').style.display = view === 'ventas' ? '' : 'none';
+      document.getElementById('venCronogramaView').style.display = view === 'cronograma' ? '' : 'none';
+      document.getElementById('venBuscar').style.display = view === 'ventas' ? '' : 'none';
+      document.querySelectorAll('.ven-tab').forEach(function(t) {
+        var on = t.getAttribute('data-vtab') === view;
+        t.style.background = on ? 'var(--module-bienestar)' : 'transparent';
+        t.style.color = on ? '#fff' : 'var(--color-text)';
+        t.style.border = on ? '0' : '1px solid var(--border-color)';
+      });
+      if (view === 'cronograma') {
+        llenarVenCronSelect(ventaCuotasActualId);
+        renderVentaCuotas();
+      }
+    }
+
+    function llenarVenCronSelect(selectedId) {
+      var sel = document.getElementById('venCronSelect');
+      sel.innerHTML = '';
+      bienestarVentas.forEach(function(v) {
+        var opt = document.createElement('option');
+        opt.value = v.id;
+        opt.textContent = v.vehiculo + ' — ' + getTrabajadorNombre(v.trabajador_id) + (v.placa ? ' (' + v.placa + ')' : '');
+        sel.appendChild(opt);
+      });
+      if (selectedId) sel.value = String(selectedId);
+    }
+
+    function openVentaCuotas(id) {
+      ventaCuotasActualId = id;
+      var btn = document.querySelector('.ven-tab[data-vtab="cronograma"]');
+      venSwitchView('cronograma', btn);
+    }
+
+    function renderVentaCuotas() {
+      var body = document.getElementById('venCuotasBody');
+      var id = parseInt(document.getElementById('venCronSelect').value) || null;
+      ventaCuotasActualId = id;
+      if (!id) {
+        document.getElementById('venCuotasResumen').innerHTML = '';
+        body.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#999;">Selecciona una venta para ver su cronograma</td></tr>';
+        return;
+      }
+      var pagos = bienestarVentaPagos.filter(function(p) { return p.venta_id === id; })
+        .sort(function(a, b) { return a.numero_cuota - b.numero_cuota; });
+      var pagadas = pagos.filter(function(p) { return p.estado === 'Pagada'; }).length;
+      var total = pagos.reduce(function(s, p) { return s + Number(p.monto || 0); }, 0);
+      var pagado = pagos.filter(function(p) { return p.estado === 'Pagada'; }).reduce(function(s, p) { return s + Number(p.monto || 0); }, 0);
+      document.getElementById('venCuotasResumen').innerHTML =
+        '<div style="flex:1;min-width:120px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:10px;">'
+        + '<div style="font-size:11px;color:var(--color-text-secondary);">Pagadas</div>'
+        + '<div style="font-weight:700;">' + pagadas + ' / ' + pagos.length + '</div></div>'
+        + '<div style="flex:1;min-width:120px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:10px;">'
+        + '<div style="font-size:11px;color:var(--color-text-secondary);">Pagado</div>'
+        + '<div style="font-weight:700;">' + fmtUSD(pagado) + '</div></div>'
+        + '<div style="flex:1;min-width:120px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:10px;">'
+        + '<div style="font-size:11px;color:var(--color-text-secondary);">Saldo pendiente</div>'
+        + '<div style="font-weight:700;">' + fmtUSD(total - pagado) + '</div></div>';
+      if (!pagos.length) {
+        body.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#999;">Esta venta no tiene cuotas</td></tr>';
+        return;
+      }
+      body.innerHTML = pagos.map(function(p) {
+        var accion = p.estado === 'Pendiente'
+          ? '<button class="btn btn-sm btn-bienestar" onclick="registrarPagoCuota(' + p.id + ')">Registrar pago</button>'
+          : '';
+        return '<tr>'
+          + '<td style="text-align:center;font-weight:600;">' + p.numero_cuota + '</td>'
+          + '<td>' + fmtUSD(p.monto) + '</td>'
+          + '<td>' + (p.fecha_programada || '-') + '</td>'
+          + '<td>' + (p.fecha_pagada || '-') + '</td>'
+          + '<td><span class="badge ' + getBadgeClass(p.estado) + '">' + escBienestar(p.estado) + '</span></td>'
+          + '<td>' + accion + '</td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    async function registrarPagoCuota(id) {
+      try {
+        var hoy = new Date().toISOString().slice(0, 10);
+        var { error } = await supabaseClient.from('bienestar_vehiculos_pagos')
+          .update({ estado: 'Pagada', fecha_pagada: hoy })
+          .eq('id', id);
+        if (error) throw error;
+        var pagosVenta = bienestarVentaPagos.filter(function(p) { return p.venta_id === ventaCuotasActualId; });
+        var todasPagadas = pagosVenta.length > 0 && pagosVenta.every(function(p) { return p.estado === 'Pagada'; });
+        if (todasPagadas) {
+          var upd = await supabaseClient.from('bienestar_vehiculos_ventas')
+            .update({ estado: 'Completada' })
+            .eq('id', ventaCuotasActualId)
+            .eq('estado', 'Activa');
+          if (upd.error) throw upd.error;
+        }
+        await loadVentas();
+        renderVentaCuotas();
+        showAlert('Pago registrado', 'success');
+      } catch (err) {
+        showAlert('Error al registrar pago: ' + err.message, 'error');
       }
     }
 
@@ -1804,9 +2276,15 @@
         var ubtn = document.querySelector('.uni-tab[data-utab="' + uv + '"]');
         if (ubtn) uniSwitchView(uv, ubtn);
       }
+      var vv = localStorage.getItem('fiat_bienestar_ven_view');
+      if (vv && vv !== 'ventas') {
+        var vbtn = document.querySelector('.ven-tab[data-vtab="' + vv + '"]');
+        if (vbtn) venSwitchView(vv, vbtn);
+      }
       renderCalendario();
       loadPlantilla().then(function() {
         loadPrestamos();
+        loadVentas();
       });
       loadPolizas();
       loadUniformeStock();

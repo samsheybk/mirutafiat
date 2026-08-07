@@ -1188,6 +1188,37 @@ CREATE TABLE IF NOT EXISTS bienestar_prestamos (
   user_id UUID REFERENCES auth.users(id)
 );
 
+CREATE TABLE IF NOT EXISTS bienestar_vehiculos_ventas (
+  id BIGSERIAL PRIMARY KEY,
+  trabajador_id UUID NOT NULL REFERENCES plantilla_trabajadores(id) ON DELETE CASCADE,
+  vehiculo TEXT NOT NULL,
+  placa TEXT,
+  precio_total NUMERIC(12,2) NOT NULL,
+  inicial NUMERIC(12,2) NOT NULL DEFAULT 0,
+  monto_financiado NUMERIC(12,2) NOT NULL,
+  numero_cuotas INTEGER NOT NULL DEFAULT 1,
+  monto_cuota NUMERIC(12,2) NOT NULL,
+  fecha_venta DATE NOT NULL DEFAULT CURRENT_DATE,
+  descripcion TEXT,
+  estado TEXT NOT NULL DEFAULT 'Activa' CHECK (estado IN ('Activa','Completada','Cancelada')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID REFERENCES auth.users(id)
+);
+
+CREATE TABLE IF NOT EXISTS bienestar_vehiculos_pagos (
+  id BIGSERIAL PRIMARY KEY,
+  venta_id BIGINT NOT NULL REFERENCES bienestar_vehiculos_ventas(id) ON DELETE CASCADE,
+  numero_cuota INTEGER NOT NULL,
+  monto NUMERIC(12,2) NOT NULL,
+  fecha_programada DATE NOT NULL,
+  fecha_pagada DATE,
+  estado TEXT NOT NULL DEFAULT 'Pendiente' CHECK (estado IN ('Pendiente','Pagada','Atrasada')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT uq_vehiculos_pago_cuota UNIQUE (venta_id, numero_cuota)
+);
+
+CREATE INDEX IF NOT EXISTS idx_vehiculos_pagos_venta ON bienestar_vehiculos_pagos (venta_id);
+
 CREATE TABLE IF NOT EXISTS bienestar_polizas (
   id BIGSERIAL PRIMARY KEY,
   nombre TEXT NOT NULL,
@@ -1201,6 +1232,31 @@ CREATE TABLE IF NOT EXISTS bienestar_polizas (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   user_id UUID REFERENCES auth.users(id)
 );
+
+CREATE TABLE IF NOT EXISTS bienestar_poliza_tipos (
+  id BIGSERIAL PRIMARY KEY,
+  nombre TEXT NOT NULL,
+  proveedor TEXT,
+  cobertura TEXT,
+  descripcion TEXT,
+  activo BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS bienestar_poliza_trabajadores (
+  id BIGSERIAL PRIMARY KEY,
+  poliza_tipo_id BIGINT NOT NULL REFERENCES bienestar_poliza_tipos(id) ON DELETE CASCADE,
+  trabajador_id UUID NOT NULL REFERENCES plantilla_trabajadores(id) ON DELETE CASCADE,
+  fecha_inicio DATE,
+  fecha_fin DATE,
+  estado TEXT NOT NULL DEFAULT 'Activa' CHECK (estado IN ('Activa','Vencida','Cancelada')),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT uq_bienestar_poliza_tipo_trabajador UNIQUE (poliza_tipo_id, trabajador_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_poliza_trabajadores_tipo ON bienestar_poliza_trabajadores (poliza_tipo_id);
+CREATE INDEX IF NOT EXISTS idx_poliza_trabajadores_trabajador ON bienestar_poliza_trabajadores (trabajador_id);
 
 CREATE TABLE IF NOT EXISTS bienestar_historias (
   id BIGSERIAL PRIMARY KEY,
@@ -1289,7 +1345,11 @@ ALTER TABLE bienestar_uniforme_entregas DROP COLUMN IF EXISTS cantidad;
 ALTER TABLE bienestar_uniforme_stock ADD COLUMN IF NOT EXISTS imagen_url TEXT;
 
 ALTER TABLE bienestar_prestamos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bienestar_vehiculos_ventas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bienestar_vehiculos_pagos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bienestar_polizas ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bienestar_poliza_tipos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bienestar_poliza_trabajadores ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bienestar_historias ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bienestar_encuestas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bienestar_calendario ENABLE ROW LEVEL SECURITY;
@@ -1311,6 +1371,32 @@ DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar prestamos" ON biene
 CREATE POLICY "Usuarios autenticados pueden eliminar prestamos"
   ON bienestar_prestamos FOR DELETE TO authenticated USING (true);
 
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver ventas de vehiculos" ON bienestar_vehiculos_ventas;
+CREATE POLICY "Usuarios autenticados pueden ver ventas de vehiculos"
+  ON bienestar_vehiculos_ventas FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear ventas de vehiculos" ON bienestar_vehiculos_ventas;
+CREATE POLICY "Usuarios autenticados pueden crear ventas de vehiculos"
+  ON bienestar_vehiculos_ventas FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar ventas de vehiculos" ON bienestar_vehiculos_ventas;
+CREATE POLICY "Usuarios autenticados pueden actualizar ventas de vehiculos"
+  ON bienestar_vehiculos_ventas FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar ventas de vehiculos" ON bienestar_vehiculos_ventas;
+CREATE POLICY "Usuarios autenticados pueden eliminar ventas de vehiculos"
+  ON bienestar_vehiculos_ventas FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver pagos de vehiculos" ON bienestar_vehiculos_pagos;
+CREATE POLICY "Usuarios autenticados pueden ver pagos de vehiculos"
+  ON bienestar_vehiculos_pagos FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear pagos de vehiculos" ON bienestar_vehiculos_pagos;
+CREATE POLICY "Usuarios autenticados pueden crear pagos de vehiculos"
+  ON bienestar_vehiculos_pagos FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar pagos de vehiculos" ON bienestar_vehiculos_pagos;
+CREATE POLICY "Usuarios autenticados pueden actualizar pagos de vehiculos"
+  ON bienestar_vehiculos_pagos FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar pagos de vehiculos" ON bienestar_vehiculos_pagos;
+CREATE POLICY "Usuarios autenticados pueden eliminar pagos de vehiculos"
+  ON bienestar_vehiculos_pagos FOR DELETE TO authenticated USING (true);
+
 DROP POLICY IF EXISTS "Usuarios autenticados pueden ver polizas" ON bienestar_polizas;
 CREATE POLICY "Usuarios autenticados pueden ver polizas"
   ON bienestar_polizas FOR SELECT TO authenticated USING (true);
@@ -1323,6 +1409,32 @@ CREATE POLICY "Usuarios autenticados pueden actualizar polizas"
 DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar polizas" ON bienestar_polizas;
 CREATE POLICY "Usuarios autenticados pueden eliminar polizas"
   ON bienestar_polizas FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver tipos de poliza" ON bienestar_poliza_tipos;
+CREATE POLICY "Usuarios autenticados pueden ver tipos de poliza"
+  ON bienestar_poliza_tipos FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear tipos de poliza" ON bienestar_poliza_tipos;
+CREATE POLICY "Usuarios autenticados pueden crear tipos de poliza"
+  ON bienestar_poliza_tipos FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar tipos de poliza" ON bienestar_poliza_tipos;
+CREATE POLICY "Usuarios autenticados pueden actualizar tipos de poliza"
+  ON bienestar_poliza_tipos FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar tipos de poliza" ON bienestar_poliza_tipos;
+CREATE POLICY "Usuarios autenticados pueden eliminar tipos de poliza"
+  ON bienestar_poliza_tipos FOR DELETE TO authenticated USING (true);
+
+DROP POLICY IF EXISTS "Usuarios autenticados pueden ver asignaciones de poliza" ON bienestar_poliza_trabajadores;
+CREATE POLICY "Usuarios autenticados pueden ver asignaciones de poliza"
+  ON bienestar_poliza_trabajadores FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden crear asignaciones de poliza" ON bienestar_poliza_trabajadores;
+CREATE POLICY "Usuarios autenticados pueden crear asignaciones de poliza"
+  ON bienestar_poliza_trabajadores FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden actualizar asignaciones de poliza" ON bienestar_poliza_trabajadores;
+CREATE POLICY "Usuarios autenticados pueden actualizar asignaciones de poliza"
+  ON bienestar_poliza_trabajadores FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar asignaciones de poliza" ON bienestar_poliza_trabajadores;
+CREATE POLICY "Usuarios autenticados pueden eliminar asignaciones de poliza"
+  ON bienestar_poliza_trabajadores FOR DELETE TO authenticated USING (true);
 
 DROP POLICY IF EXISTS "Usuarios autenticados pueden ver historias" ON bienestar_historias;
 CREATE POLICY "Usuarios autenticados pueden ver historias"

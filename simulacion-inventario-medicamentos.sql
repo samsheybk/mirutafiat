@@ -1,12 +1,12 @@
 -- ============================================================
--- SIMULACIÓN: INVENTARIO DE MEDICAMENTOS E INSUMOS
+-- SIMULACIÓN: INVENTARIO DE MEDICAMENTOS E INSUMOS (OBSOLETO)
 -- (seguridad_inventario_insumos) del módulo Seguridad y Salud
 -- Laboral -> "Inventario de insumos y medicamentos".
--- Incluye medicamentos, insumos médicos y botiquines con fechas
--- de vencimiento relativas a la fecha actual y el estado ya
--- calculado con la misma lógica del módulo (Vencido / Por vencer
--- / Agotado / Bajo stock / Disponible).
--- Idempotente: no duplica filas con el mismo nombre y lote.
+--
+-- ⚠️ ESTE ARCHIVO YA NO DEBE EJECUTARSE POR SEPARADO.
+-- Fue reemplazado por simulacion-movimientos-insumos.sql, que
+-- limpia las tablas y registra entradas/salidas de forma que el
+-- stock queda calculado como el neto de los movimientos.
 -- ============================================================
 
 INSERT INTO seguridad_inventario_insumos

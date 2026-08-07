@@ -1843,6 +1843,25 @@ CREATE TABLE IF NOT EXISTS seguridad_inventario_insumos (
   user_id UUID REFERENCES auth.users(id)
 );
 
+CREATE TABLE IF NOT EXISTS seguridad_inventario_movimientos (
+  id BIGSERIAL PRIMARY KEY,
+  insumo_id BIGINT NOT NULL REFERENCES seguridad_inventario_insumos(id) ON DELETE CASCADE,
+  tipo TEXT NOT NULL DEFAULT 'Salida'
+    CHECK (tipo IN ('Entrada','Salida')),
+  concepto TEXT
+    CHECK (concepto IN ('Entrega a trabajador','Vencimiento','Donación','Compra','Ajuste','Otro')),
+  trabajador_id UUID REFERENCES plantilla_trabajadores(id) ON DELETE SET NULL,
+  cantidad INTEGER NOT NULL DEFAULT 1,
+  fecha DATE NOT NULL DEFAULT CURRENT_DATE,
+  lote TEXT,
+  fecha_vencimiento DATE,
+  observaciones TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  user_id UUID REFERENCES auth.users(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_seg_inv_mov_insumo ON seguridad_inventario_movimientos (insumo_id);
+
 ALTER TABLE seguridad_inspecciones ENABLE ROW LEVEL SECURITY;
 ALTER TABLE seguridad_inspeccion_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE seguridad_servicio_medico ENABLE ROW LEVEL SECURITY;
@@ -1913,6 +1932,21 @@ CREATE POLICY "Autenticados actualizar inventario insumos"
 DROP POLICY IF EXISTS "Autenticados eliminar inventario insumos" ON seguridad_inventario_insumos;
 CREATE POLICY "Autenticados eliminar inventario insumos"
   ON seguridad_inventario_insumos FOR DELETE TO authenticated USING (true);
+
+ALTER TABLE seguridad_inventario_movimientos ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Autenticados ver movimientos inventario insumos" ON seguridad_inventario_movimientos;
+CREATE POLICY "Autenticados ver movimientos inventario insumos"
+  ON seguridad_inventario_movimientos FOR SELECT TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados crear movimientos inventario insumos" ON seguridad_inventario_movimientos;
+CREATE POLICY "Autenticados crear movimientos inventario insumos"
+  ON seguridad_inventario_movimientos FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Autenticados actualizar movimientos inventario insumos" ON seguridad_inventario_movimientos;
+CREATE POLICY "Autenticados actualizar movimientos inventario insumos"
+  ON seguridad_inventario_movimientos FOR UPDATE TO authenticated USING (true);
+DROP POLICY IF EXISTS "Autenticados eliminar movimientos inventario insumos" ON seguridad_inventario_movimientos;
+CREATE POLICY "Autenticados eliminar movimientos inventario insumos"
+  ON seguridad_inventario_movimientos FOR DELETE TO authenticated USING (true);
 
 -- ============================================
 -- 11) FINANZAS: MOVIMIENTOS (GASTOS E INGRESOS)

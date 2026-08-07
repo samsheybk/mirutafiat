@@ -262,19 +262,26 @@ CREATE TABLE IF NOT EXISTS rl_equipos (
 
 CREATE TABLE IF NOT EXISTS rl_asignaciones (
   id BIGSERIAL PRIMARY KEY,
-  equipo_id BIGINT NOT NULL REFERENCES rl_equipos(id) ON DELETE CASCADE,
+  equipo_id BIGINT REFERENCES rl_equipos(id) ON DELETE CASCADE,
+  info_sensible_id BIGINT REFERENCES rl_info_sensible(id) ON DELETE CASCADE,
   trabajador_id UUID NOT NULL REFERENCES plantilla_trabajadores(id) ON DELETE CASCADE,
   fecha_asignacion DATE NOT NULL DEFAULT CURRENT_DATE,
   fecha_devolucion DATE,
   estado TEXT NOT NULL DEFAULT 'Activa' CHECK (estado IN ('Activa','Devuelta')),
   notas TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT rl_asignaciones_un_solo_tipo CHECK (
+    (equipo_id IS NOT NULL AND info_sensible_id IS NULL)
+    OR (equipo_id IS NULL AND info_sensible_id IS NOT NULL)
+  )
 );
+
+CREATE INDEX IF NOT EXISTS idx_rl_asignaciones_info_sensible ON rl_asignaciones (info_sensible_id);
 
 CREATE TABLE IF NOT EXISTS rl_info_sensible (
   id BIGSERIAL PRIMARY KEY,
-  trabajador_id UUID NOT NULL REFERENCES plantilla_trabajadores(id) ON DELETE CASCADE,
+  trabajador_id UUID REFERENCES plantilla_trabajadores(id) ON DELETE CASCADE,
   tipo TEXT NOT NULL DEFAULT 'Aplicación' CHECK (tipo IN ('Aplicación','Ente gubernamental','Otro')),
   descripcion TEXT NOT NULL,
   usuario TEXT,

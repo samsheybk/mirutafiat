@@ -113,7 +113,7 @@
                     <th>Cargo de interés</th>
                     <th>Teléfono</th>
                     <th>Correo</th>
-                    <th>Estado</th>
+                    <th><span class="th-help">Estado<span class="th-help-text"><strong>Nuevo:</strong> candidato recién registrado.<br><strong>Contacto:</strong> se estableció el primer contacto.<br><strong>Entrevista:</strong> en proceso de entrevista.<br><strong>Técnica:</strong> en evaluación técnica o pruebas.<br><strong>Médica:</strong> en evaluación médica ocupacional.<br><strong>Elegible:</strong> aprobó el proceso y puede ingresar.<br><strong>Contratado:</strong> ingresó a la organización.<br><strong>No elegible:</strong> descartado del proceso.</span><span class="th-help-icon">?</span></span></th>
                   </tr>
                 </thead>
                 <tbody id="atsTableBody">
@@ -833,6 +833,7 @@
 
     function toggleATSView(view, btn) {
       atsView = view;
+      localStorage.setItem('fiat_captacion_ats_view', view);
       document.querySelectorAll('.view-toggle button').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('atsTableView').classList.toggle('kanban-hidden', view !== 'tabla');
@@ -920,7 +921,7 @@
           var descBtn = c.estado_kanban !== 'No elegible'
             ? '<button class="kanban-arrow" onclick="event.stopPropagation();openDescarta(' + c.id + ',\'' + c.nombres + ' ' + c.apellidos + '\')" title="Descartar" style="color:#dc2626;">&#10005;</button>'
             : '';
-          return '<div class="kanban-card">'
+          return '<div class="kanban-card" draggable="true" data-id="' + c.id + '" data-estado="' + c.estado_kanban + '" ondragstart="onKanbanDragStart(event)" ondragend="onKanbanDragEnd(event)">'
             + '<div class="kanban-card-body" onclick="openFichaTecnica(' + c.id + ')" title="Ver ficha del candidato">'
             + '<div class="kanban-card-title">' + c.nombres + ' ' + c.apellidos + '</div>'
             + '<div class="kanban-card-sub">' + c.cargo_interes + '</div>'
@@ -934,6 +935,65 @@
             + '</div>';
         }).join('');
       });
+    }
+
+    /* ===== KANBAN - ARRASTRAR Y SOLTAR ===== */
+    var dragCandidato = null;
+    var dragJustMoved = false;
+
+    function onKanbanDragStart(e) {
+      var card = e.target.closest('.kanban-card');
+      if (!card) return;
+      dragCandidato = { id: card.getAttribute('data-id'), estado: card.getAttribute('data-estado') };
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      try { e.dataTransfer.setData('text/plain', card.getAttribute('data-id')); } catch (err) {}
+    }
+
+    function onKanbanDragEnd(e) {
+      var card = e.target.closest('.kanban-card');
+      if (card) card.classList.remove('dragging');
+      dragCandidato = null;
+      document.querySelectorAll('.kanban-column-body.drag-over').forEach(function(b) { b.classList.remove('drag-over'); });
+      dragJustMoved = true;
+      setTimeout(function() { dragJustMoved = false; }, 300);
+    }
+
+    function initKanbanDragDrop() {
+      var board = document.getElementById('atsKanbanBoard');
+      if (!board) return;
+      board.addEventListener('dragover', function(e) {
+        var col = e.target.closest('.kanban-column');
+        if (!col || !dragCandidato) return;
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        var body = col.querySelector('.kanban-column-body');
+        document.querySelectorAll('.kanban-column-body.drag-over').forEach(function(b) {
+          if (b !== body) b.classList.remove('drag-over');
+        });
+        if (body && !body.classList.contains('drag-over')) body.classList.add('drag-over');
+      });
+      board.addEventListener('dragleave', function(e) {
+        var body = e.target.closest('.kanban-column-body');
+        if (body && !body.contains(e.relatedTarget)) body.classList.remove('drag-over');
+      });
+      board.addEventListener('drop', function(e) {
+        var col = e.target.closest('.kanban-column');
+        e.preventDefault();
+        if (!col || !dragCandidato) return;
+        var c = dragCandidato;
+        dragCandidato = null;
+        document.querySelectorAll('.kanban-column-body.drag-over').forEach(function(b) { b.classList.remove('drag-over'); });
+        var estadoNuevo = col.getAttribute('data-col');
+        if (!estadoNuevo || c.estado === estadoNuevo) return;
+        cambiarEstado(parseInt(c.id, 10), c.estado, estadoNuevo);
+      });
+      document.addEventListener('click', function(e) {
+        if (!dragJustMoved) return;
+        e.preventDefault();
+        e.stopPropagation();
+        dragJustMoved = false;
+      }, true);
     }
 
     /* ===== DESCARTA ===== */
@@ -1784,6 +1844,7 @@
 
     function switchPlantillaView(tab, btn) {
       currentPlantillaView = tab;
+      localStorage.setItem('fiat_captacion_plantilla_view', tab);
       document.querySelectorAll('.plantilla-tab').forEach(function(b) {
         b.style.background = b === btn ? 'var(--module-captacion)' : 'transparent';
         b.style.color = b === btn ? '#fff' : 'var(--color-text)';
@@ -2228,6 +2289,7 @@
 
     function switchReqView(tab, btn) {
       currentReqView = tab;
+      localStorage.setItem('fiat_captacion_req_view', tab);
       document.querySelectorAll('.req-tab').forEach(function(b) {
         b.style.background = b === btn ? 'var(--module-captacion)' : 'transparent';
         b.style.color = b === btn ? '#fff' : 'var(--color-text)';
@@ -2411,10 +2473,31 @@
     }
 
     initModule('captacion', 'captacion_procesos', ['cargo','departamento','vacantes','fecha_inicio','estado','descripcion']);
+    initKanbanDragDrop();
     loadATSCandidatos();
     loadEstructura();
     loadPlantilla();
     loadRequisiciones();
+
+    (function() {
+      var v = localStorage.getItem('fiat_captacion_ats_view');
+      if (v && v !== 'tabla') {
+        var abtns = document.querySelectorAll('.view-toggle button');
+        for (var i = 0; i < abtns.length; i++) {
+          if ((abtns[i].getAttribute('onclick') || '').indexOf("'" + v + "'") !== -1) { toggleATSView(v, abtns[i]); break; }
+        }
+      }
+      v = localStorage.getItem('fiat_captacion_plantilla_view');
+      if (v && v !== 'activo') {
+        var pb = document.querySelector('.plantilla-tab[data-tab="' + v + '"]');
+        if (pb) switchPlantillaView(v, pb);
+      }
+      v = localStorage.getItem('fiat_captacion_req_view');
+      if (v && v !== 'vacantes') {
+        var rb = document.querySelector('.req-tab[data-tab="' + v + '"]');
+        if (rb) switchReqView(v, rb);
+      }
+    })();
   </script>
 
 <script src="../js/module-help.js"></script>

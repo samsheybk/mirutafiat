@@ -94,6 +94,7 @@
     'acta.html': 'relaciones-laborales.html',
     'cargo.html': 'capacitacion.html',
     'curso.html': 'capacitacion.html',
+    'ver-curso.html': 'capacitacion.html',
     'inspeccion.html': 'seguridad-salud.html'
   };
 

@@ -799,6 +799,7 @@
 
     function uniSwitchView(view, btn) {
       uniView = view;
+      localStorage.setItem('fiat_bienestar_uni_view', view);
       document.getElementById('uniStockView').style.display = view === 'stock' ? '' : 'none';
       document.getElementById('uniEntregasView').style.display = view === 'entregas' ? '' : 'none';
       document.querySelectorAll('.uni-tab').forEach(function(t) {
@@ -1798,6 +1799,11 @@
     /* ===== INICIALIZACIÓN ===== */
     document.addEventListener('DOMContentLoaded', function() {
       restoreTool();
+      var uv = localStorage.getItem('fiat_bienestar_uni_view');
+      if (uv && uv !== 'stock') {
+        var ubtn = document.querySelector('.uni-tab[data-utab="' + uv + '"]');
+        if (ubtn) uniSwitchView(uv, ubtn);
+      }
       renderCalendario();
       loadPlantilla().then(function() {
         loadPrestamos();

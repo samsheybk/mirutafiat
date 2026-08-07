@@ -660,7 +660,6 @@ a {
   border-collapse: separate;
   border-spacing: 0;
   border-radius: var(--radius-md);
-  overflow: hidden;
   box-shadow: var(--shadow-sm);
 }
 
@@ -693,6 +692,66 @@ a {
   background: #f8fafc;
 }
 
+/* Tooltip de ayuda con interrogante en encabezados de tabla */
+.th-help {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: help;
+}
+.th-help .th-help-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  margin-left: 5px;
+  border-radius: 50%;
+  background: var(--color-text-secondary);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.th-help .th-help-text {
+  visibility: hidden;
+  opacity: 0;
+  position: fixed;
+  width: 260px;
+  padding: 10px 12px;
+  background: var(--color-nav);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.55;
+  text-transform: none;
+  letter-spacing: 0;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  white-space: normal;
+  text-align: left;
+  z-index: 9999;
+  transition: opacity 0.15s ease;
+}
+.th-help .th-help-text strong {
+  color: #fff;
+}
+.th-help .th-help-text::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background: var(--color-nav);
+}
+.th-help .th-help-text.th-help-flip::before {
+  top: auto;
+  bottom: -4px;
+}
+
 /* Tablas secundarias (módulos con .table) */
 .table {
   width: 100%;
@@ -701,11 +760,13 @@ a {
   border-collapse: separate;
   border-spacing: 0;
   border-radius: var(--radius-md);
-  overflow: hidden;
   box-shadow: var(--shadow-sm);
 }
 
 .table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   text-align: left;
   font-size: 11px;
   font-weight: 600;
@@ -729,6 +790,25 @@ a {
 
 .table tr:hover td {
   background: #f8fafc;
+}
+
+/* Redondeo de esquinas en tablas sin overflow:hidden (para que el
+   encabezado sticky no quede cuadrado sobre el borde redondeado) */
+.data-table thead th:first-child,
+.table thead th:first-child {
+  border-top-left-radius: var(--radius-md);
+}
+.data-table thead th:last-child,
+.table thead th:last-child {
+  border-top-right-radius: var(--radius-md);
+}
+.data-table tbody tr:last-child td:first-child,
+.table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: var(--radius-md);
+}
+.data-table tbody tr:last-child td:last-child,
+.table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: var(--radius-md);
 }
 
 .badge {
@@ -1187,8 +1267,24 @@ a {
   box-shadow: var(--shadow-sm);
   padding: 12px;
   margin-bottom: 8px;
-  cursor: pointer;
+  cursor: grab;
   transition: border-color 0.12s, box-shadow 0.12s;
+}
+
+.kanban-card:active {
+  cursor: grabbing;
+}
+
+.kanban-card.dragging {
+  opacity: 0.45;
+  border: 1px dashed var(--color-border);
+  transform: rotate(2deg);
+}
+
+.kanban-column-body.drag-over {
+  background: rgba(37, 99, 235, 0.06);
+  outline: 2px dashed rgba(37, 99, 235, 0.4);
+  outline-offset: -3px;
 }
 
 .kanban-card:hover {

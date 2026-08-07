@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ver curso - Capacitación y Desarrollo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
+  <style>
+    :root { --module-color: var(--module-capacitacion); }
+    .module-content { padding: 24px; }
+    .ll-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; height: calc(100vh - 190px); }
+    .ll-main { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+    .ll-player { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; overflow: hidden; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+    .ll-player-frame { position: relative; background: #0b1220; flex: none; margin: 0 auto; width: min(100%, calc((100vh - 255px) * 16 / 9)); aspect-ratio: 16 / 9; }
+    .ll-player-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .ll-novideo { display: none; position: absolute; inset: 0; align-items: center; justify-content: center; text-align: center; padding: 24px; color: #94a3b8; font-size: 13.5px; }
+    .ll-player-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; flex-wrap: wrap; border-top: 1px solid var(--color-border); flex-shrink: 0; margin-top: auto; }
+    .ll-now-title { font-weight: 600; font-size: 14px; }
+    .ll-now-sub { font-size: 12px; color: var(--color-text-secondary); }
+    .ll-player-nav { display: flex; gap: 8px; }
+    .ll-quiz { padding: 20px 24px 24px; flex: 1; min-height: 0; overflow-y: auto; }
+    .ll-quiz-title { font-weight: 700; font-size: 15px; margin-bottom: 14px; }
+    .ll-preg-prog { font-size: 12px; font-weight: 600; color: var(--color-text-secondary); margin-bottom: 8px; }
+    .ll-preg { margin-bottom: 18px; }
+    .ll-preg-title { font-weight: 600; font-size: 13.5px; margin-bottom: 8px; }
+    .ll-ok-tag { color: #059669; margin-left: 6px; }
+    .ll-bad-tag { color: #dc2626; margin-left: 6px; }
+    .ll-opts { display: grid; gap: 6px; }
+    .ll-opt { display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--color-border); border-radius: 8px; cursor: pointer; font-size: 13px; transition: border-color .12s ease, background .12s ease; }
+    .ll-opt:hover { border-color: var(--module-capacitacion); background: #f0fdf4; }
+    .ll-opt input { margin: 2px 0 0; }
+    .ll-opt.ok { border-color: #059669; background: #ecfdf5; }
+    .ll-opt.bad { border-color: #dc2626; background: #fef2f2; }
+    .ll-quiz-actions { margin-top: 4px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .ll-score { font-weight: 700; font-size: 13px; padding: 8px 12px; border-radius: 8px; }
+    .ll-score.ok { background: #ecfdf5; color: #059669; }
+    .ll-score.bad { background: #fef2f2; color: #dc2626; }
+    .ll-side { display: flex; flex-direction: column; min-height: 0; }
+    .ll-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; padding: 16px; }
+    .ll-toc-card { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+    .ll-toc-title { font-weight: 700; font-size: 13px; margin-bottom: 12px; flex-shrink: 0; }
+    .ll-toc { min-height: 0; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+    .ll-module { border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; flex-shrink: 0; }
+    .ll-module-head { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; font-weight: 600; font-size: 12.5px; cursor: pointer; background: #fafafa; user-select: none; }
+    .ll-module-head:hover { background: #f2f2f2; }
+    .ll-module-count { font-size: 11px; font-weight: 600; color: var(--color-text-secondary); }
+    .ll-item { display: flex; gap: 8px; align-items: center; padding: 9px 12px; cursor: pointer; border-left: 3px solid transparent; }
+    .ll-item:hover { background: #f7f7f7; }
+    .ll-item.active { background: #ecfdf5; border-left-color: var(--module-capacitacion); }
+    .ll-item-icon { color: #64748b; font-size: 15px; line-height: 1; }
+    .ll-item.active .ll-item-icon { color: var(--module-capacitacion); }
+    .ll-item-txt { flex: 1; min-width: 0; }
+    .ll-item-title { font-size: 12.5px; font-weight: 500; }
+    .ll-item-sub { font-size: 11px; color: var(--color-text-secondary); }
+    .ll-item-check { color: #059669; font-size: 13px; }
+    @media (max-width: 1024px) {
+      .module-content { overflow-y: auto; }
+      .ll-layout { grid-template-columns: 1fr; height: auto; }
+      .ll-player { position: sticky; top: 16px; }
+      .ll-quiz { overflow-y: visible; }
+      .ll-toc { max-height: 60vh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <nav class="topnav" style="background:var(--module-capacitacion);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><span class="topnav-logo"></span>Intranet</div>
+      <div class="topnav-spacer"></div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Dashboard</option>
+        <option value="captacion.html">Captación y Selección</option>
+        <option value="relaciones-laborales.html">Relaciones Laborales</option>
+        <option value="capacitacion.html" selected>Capacitación y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="compensacion.html">Compensación</option>
+        <option value="finanzas.html">Finanzas</option>
+        <option value="repositorio.html">Repositorio</option>
+        <option value="chatfiat.html">Mensajería</option>
+        <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
+      </select>
+      <div class="nav-user">
+        <span id="navUserEmail"></span>
+        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-body">
+          <header class="topbar">
+            <div style="display:flex;align-items:center;gap:16px;flex:1;min-width:0;">
+              <div style="flex:1;min-width:0;">
+                <div class="topbar-breadcrumb"><a href="capacitacion.html" style="color:var(--color-text-secondary);">Capacitación y Desarrollo</a> / <span id="vcTituloBread">Ver curso</span></div>
+                <h1 id="vcTitulo" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Cargando…</h1>
+              </div>
+              <span id="vcEstadoBadge" style="padding:4px 14px;border-radius:20px;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;display:none;"></span>
+              <button class="btn btn-capacitacion btn-sm" id="vcEditarBtn" onclick="editarCurso()" style="flex-shrink:0;display:none;">Editar curso</button>
+              <button class="btn btn-outline" onclick="location.href='capacitacion.html'" style="flex-shrink:0;">← Volver</button>
+            </div>
+          </header>
+
+          <div class="module-content">
+            <div id="vcCargando">
+              <div class="skeleton-panel">
+                <div class="skeleton skeleton-block" style="width:100%;height:180px;"></div>
+                <div class="skeleton" style="width:40%"></div>
+                <div class="skeleton" style="width:80%"></div>
+              </div>
+              <div class="skeleton-panel" style="margin-top:16px;">
+                <div class="skeleton" style="width:90%"></div>
+                <div class="skeleton" style="width:70%"></div>
+                <div class="skeleton" style="width:60%"></div>
+              </div>
+            </div>
+
+            <div id="vcError" style="display:none;text-align:center;padding:60px 20px;color:#999;">
+              <div style="font-size:40px;margin-bottom:12px;">🎬</div>
+              <div id="vcErrorMsg" style="font-size:14px;margin-bottom:16px;">No se pudo cargar el curso.</div>
+              <button class="btn btn-outline" onclick="location.href='capacitacion.html'">← Volver a cursos</button>
+            </div>
+
+            <div id="vcContenido" style="display:none;">
+              <div class="ll-layout">
+                <div class="ll-main">
+                  <div class="ll-player">
+                    <div class="ll-player-frame" id="vcFrameWrap">
+                      <iframe id="vcFrame" title="Video del curso" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                      <div class="ll-novideo" id="vcNoVideo">
+                        <div>No se pudo reproducir el video.<br><span style="font-size:12px;">Verifica la URL de YouTube o el enlace del video.</span></div>
+                      </div>
+                    </div>
+                    <div class="ll-quiz" id="vcQuiz" style="display:none;">
+                      <div class="ll-quiz-title" id="vcQuizTitle"></div>
+                      <div id="vcQuizBody"></div>
+                      <div class="ll-quiz-actions" id="vcQuizActions"></div>
+                    </div>
+                    <div class="ll-player-bar">
+                      <div style="min-width:0;">
+                        <div class="ll-now-title" id="vcNowTitle">…</div>
+                        <div class="ll-now-sub" id="vcNowSub"></div>
+                      </div>
+                      <div class="ll-player-nav">
+                        <button class="btn btn-outline btn-sm" id="vcPrev" onclick="navegarVC(-1)">← Anterior</button>
+                        <button class="btn btn-capacitacion btn-sm" id="vcNext" onclick="navegarVC(1)">Siguiente</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <aside class="ll-side">
+                  <div class="ll-card ll-toc-card">
+                    <div class="ll-toc-title">Contenido del curso</div>
+                    <div class="ll-toc" id="vcToc"></div>
+                  </div>
+                </aside>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    var cursoId = null;
+    var vcCurso = null;
+    var vcModulos = [];
+    var vcQuizCurso = [];
+    var vcItems = [];
+    var vcCurrent = -1;
+    var vcDone = {};
+    var vcQuizDone = {};
+    var vcQuizScore = {};
+    var vcQuizState = null;
+
+    function escVC(s) {
+      return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function youtubeIdVC(url) {
+      var u = String(url || '').trim();
+      var m = u.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+      return m ? m[1] : '';
+    }
+
+    function editarCurso() {
+      if (cursoId) location.href = 'curso.html?id=' + cursoId;
+    }
+
+    async function cargarCurso() {
+      var p = new URLSearchParams(location.search);
+      cursoId = p.get('id');
+      if (!cursoId) { mostrarError('Curso no encontrado. Usa el enlace desde la lista de cursos.'); return; }
+
+      try {
+        var r = await supabaseClient.from('cap_cursos').select('*').eq('id', cursoId).single();
+        if (r.error) throw r.error;
+        vcCurso = r.data;
+
+        var rm = await supabaseClient.from('cap_modulos').select('*').eq('curso_id', cursoId).order('posicion');
+        if (rm.error) throw rm.error;
+
+        vcModulos = [];
+        for (var i = 0; i < (rm.data || []).length; i++) {
+          var m = rm.data[i];
+          var rv = await supabaseClient.from('cap_videos').select('*').eq('modulo_id', m.id).order('posicion');
+          var rq = await supabaseClient.from('cap_cuestionarios').select('*').eq('curso_id', cursoId).eq('modulo_id', m.id).order('posicion');
+          if (rv.error) throw rv.error;
+          if (rq.error) throw rq.error;
+
+          var videos = [];
+          for (var j = 0; j < (rv.data || []).length; j++) {
+            var v = rv.data[j];
+            videos.push({ id: v.id, titulo: v.titulo, url: v.url });
+          }
+
+          var quizzes = [];
+          for (var k = 0; k < (rq.data || []).length; k++) {
+            quizzes.push(await cargarQuizCompleto(rq.data[k]));
+          }
+
+          vcModulos.push({ id: m.id, titulo: m.titulo, videos: videos, quizzes: quizzes });
+        }
+
+        var rc = await supabaseClient.from('cap_cuestionarios').select('*').eq('curso_id', cursoId).is('modulo_id', null).order('posicion');
+        if (rc.error) throw rc.error;
+        vcQuizCurso = [];
+        for (var t = 0; t < (rc.data || []).length; t++) {
+          vcQuizCurso.push(await cargarQuizCompleto(rc.data[t]));
+        }
+
+        buildItems();
+        renderTodo();
+      } catch (err) {
+        mostrarError('No se pudo cargar el curso: ' + err.message);
+      }
+    }
+
+    async function cargarQuizCompleto(q) {
+      var rp = await supabaseClient.from('cap_preguntas').select('*').eq('cuestionario_id', q.id).order('posicion');
+      if (rp.error) throw rp.error;
+      var preguntas = [];
+      for (var i = 0; i < (rp.data || []).length; i++) {
+        var preg = rp.data[i];
+        var rr = await supabaseClient.from('cap_respuestas').select('*').eq('pregunta_id', preg.id).order('posicion');
+        if (rr.error) throw rr.error;
+        preguntas.push({ id: preg.id, pregunta: preg.pregunta, respuestas: (rr.data || []) });
+      }
+      return { id: q.id, titulo: q.titulo, preguntas: preguntas };
+    }
+
+    function buildItems() {
+      vcItems = [];
+      vcModulos.forEach(function(m, mi) {
+        (m.videos || []).forEach(function(v) {
+          vcItems.push({ type: 'video', key: 'v' + v.id, titulo: v.titulo || ('Video'), mod: mi, url: v.url, videoId: youtubeIdVC(v.url) });
+        });
+        (m.quizzes || []).forEach(function(q) {
+          vcItems.push({ type: 'quiz', key: 'q' + q.id, titulo: q.titulo || 'Evaluación del módulo', mod: mi, quiz: q });
+        });
+      });
+      vcQuizCurso.forEach(function(q) {
+        vcItems.push({ type: 'quiz', key: 'q' + q.id, titulo: q.titulo || 'Evaluación final', mod: -1, quiz: q });
+      });
+    }
+
+    function mostrarError(msg) {
+      document.getElementById('vcCargando').style.display = 'none';
+      document.getElementById('vcContenido').style.display = 'none';
+      var e = document.getElementById('vcError');
+      e.style.display = 'block';
+      document.getElementById('vcErrorMsg').textContent = msg;
+    }
+
+    function renderTodo() {
+      document.getElementById('vcCargando').style.display = 'none';
+      document.getElementById('vcContenido').style.display = 'block';
+
+      var c = vcCurso;
+      document.getElementById('vcTitulo').textContent = c.titulo || 'Sin título';
+      document.getElementById('vcTituloBread').textContent = c.titulo || 'Ver curso';
+      document.title = (c.titulo || 'Curso') + ' · Capacitación';
+
+      var badge = document.getElementById('vcEstadoBadge');
+      badge.textContent = c.estado || '';
+      badge.style.background = c.estado === 'Publicado' ? '#059669' : '#ea580c';
+      badge.style.display = '';
+
+      var ed = document.getElementById('vcEditarBtn');
+      ed.style.display = '';
+      ed.textContent = (c.estado === 'Publicado' ? '✓ ' : '') + 'Editar curso';
+
+      vcCurrent = loadProg();
+      if (vcCurrent < 0 || vcCurrent >= vcItems.length) vcCurrent = 0;
+      renderToc();
+      renderItem();
+    }
+
+    function gruposPorModulo() {
+      var g = {};
+      vcItems.forEach(function(it, i) { (g[it.mod] = g[it.mod] || []).push(i); });
+      return g;
+    }
+
+    function itemRow(i) {
+      var it = vcItems[i];
+      var icon = it.type === 'video' ? '<i class="fi fi-sr-play-circle"></i>' : '<i class="fi fi-sr-file-chart-line"></i>';
+      var done = vcDone[it.key] ? '<i class="fi fi-sr-check"></i>' : '';
+      return '<div class="ll-item" data-i="' + i + '" onclick="selVC(' + i + ')">' +
+        '<span class="ll-item-icon">' + icon + '</span>' +
+        '<div class="ll-item-txt">' +
+          '<div class="ll-item-title">' + escVC(it.titulo) + '</div>' +
+          '<div class="ll-item-sub">' + (it.type === 'video' ? 'Video · ' : 'Evaluación · ') + (it.mod >= 0 ? 'Módulo ' + (it.mod + 1) : 'Curso') + '</div>' +
+        '</div>' +
+        '<span class="ll-item-check">' + done + '</span>' +
+      '</div>';
+    }
+
+    function renderToc() {
+      var cont = document.getElementById('vcToc');
+      var g = gruposPorModulo();
+      var html = '';
+      vcModulos.forEach(function(m, mi) {
+        var inds = g[mi] || [];
+        if (!inds.length) return;
+        html += '<div class="ll-module">' +
+          '<div class="ll-module-head" onclick="toggleMod(this)"><span>' + escVC(m.titulo || ('Módulo ' + (mi + 1))) + '</span><span class="ll-module-count">' + inds.length + ' ítems</span></div>' +
+          '<div class="ll-module-body">' + inds.map(itemRow).join('') + '</div>' +
+        '</div>';
+      });
+      var fin = g[-1] || [];
+      if (fin.length) {
+        html += '<div class="ll-module">' +
+          '<div class="ll-module-head" onclick="toggleMod(this)"><span>Evaluación final</span><span class="ll-module-count">' + fin.length + ' ítems</span></div>' +
+          '<div class="ll-module-body">' + fin.map(itemRow).join('') + '</div>' +
+        '</div>';
+      }
+      cont.innerHTML = html;
+      highlightToc();
+    }
+
+    function toggleMod(head) {
+      var body = head.nextElementSibling;
+      if (body) body.style.display = body.style.display === 'none' ? '' : 'none';
+    }
+
+    function highlightToc() {
+      var rows = document.querySelectorAll('#vcToc .ll-item');
+      rows.forEach(function(el) {
+        el.classList.toggle('active', parseInt(el.getAttribute('data-i'), 10) === vcCurrent);
+      });
+    }
+
+    function selVC(i) {
+      if (i < 0 || i >= vcItems.length) return;
+      if (i > vcCurrent && quizBloqueado()) {
+        showAlert('Responde todas las preguntas del cuestionario antes de avanzar', 'warning');
+        return;
+      }
+      vcCurrent = i;
+      renderItem();
+      saveProg();
+      var row = document.querySelector('#vcToc .ll-item[data-i="' + i + '"]');
+      if (row) {
+        var body = row.closest('.ll-module-body');
+        if (body) body.style.display = '';
+        row.scrollIntoView({ block: 'nearest' });
+      }
+    }
+
+    function quizBloqueado() {
+      var it = vcItems[vcCurrent];
+      if (!it || it.type !== 'quiz') return false;
+      return !vcQuizDone[it.key];
+    }
+
+    function renderItem() {
+      var it = vcItems[vcCurrent];
+      if (!it) return;
+      document.getElementById('vcNowTitle').textContent = it.titulo;
+      document.getElementById('vcNowSub').textContent = (it.type === 'video' ? 'Video · ' : 'Evaluación · ') + (it.mod >= 0 ? 'Módulo ' + (it.mod + 1) : 'Curso');
+      if (it.type === 'video') mostrarVideo(it);
+      else mostrarQuiz(it);
+      actualizarNav();
+      highlightToc();
+    }
+
+    function actualizarNav() {
+      var btnPrev = document.getElementById('vcPrev');
+      var btnNext = document.getElementById('vcNext');
+      btnPrev.disabled = vcCurrent <= 0;
+      var blocked = quizBloqueado();
+      var isLast = vcCurrent >= vcItems.length - 1;
+      btnNext.disabled = isLast || blocked;
+      btnNext.innerHTML = blocked
+        ? '<i class="fi fi-sr-lock" style="margin-right:6px;"></i>Cuestionario pendiente'
+        : (isLast ? '<i class="fi fi-sr-check" style="margin-right:6px;"></i>Finalizar' : 'Siguiente');
+    }
+
+    function mostrarVideo(it) {
+      document.getElementById('vcFrameWrap').style.display = 'block';
+      document.getElementById('vcQuiz').style.display = 'none';
+      var frame = document.getElementById('vcFrame');
+      var noVideo = document.getElementById('vcNoVideo');
+      if (it.videoId) {
+        frame.style.display = 'block';
+        noVideo.style.display = 'none';
+        frame.src = 'https://www.youtube.com/embed/' + it.videoId + '?rel=0';
+      } else {
+        frame.style.display = 'none';
+        noVideo.style.display = 'flex';
+      }
+    }
+
+    function mostrarQuiz(it) {
+      document.getElementById('vcFrameWrap').style.display = 'none';
+      document.getElementById('vcQuiz').style.display = 'block';
+      document.getElementById('vcQuizTitle').textContent = it.titulo;
+      var q = it.quiz;
+
+      if (!q || !q.preguntas || !q.preguntas.length) {
+        vcQuizDone[it.key] = true;
+        document.getElementById('vcQuizBody').innerHTML = '<div style="padding:24px;text-align:center;color:#94a3b8;font-size:13px;">Este cuestionario aún no tiene preguntas.</div>';
+        document.getElementById('vcQuizActions').innerHTML = '<span style="font-size:12px;color:var(--color-text-secondary);">Avanzar al siguiente contenido con el botón Siguiente.</span>';
+        return;
+      }
+
+      vcQuizState = { key: it.key, q: q, qi: 0, sel: {} };
+      renderPregunta(it);
+    }
+
+    function guardarSelQuiz() {
+      if (!vcQuizState) return;
+      var sel = document.querySelector('input[name="vcq_' + vcQuizState.key + '_' + vcQuizState.qi + '"]:checked');
+      vcQuizState.sel[vcQuizState.qi] = sel ? parseInt(sel.value, 10) : -1;
+    }
+
+    function renderPregunta(it) {
+      var st = vcQuizState;
+      var q = st.q;
+      var cont = document.getElementById('vcQuizBody');
+      var actions = document.getElementById('vcQuizActions');
+      var total = q.preguntas.length;
+      var p = q.preguntas[st.qi];
+
+      var opts = (p.respuestas || []).map(function(r, ri) {
+        var checked = st.sel[st.qi] === ri ? ' checked' : '';
+        return '<label class="ll-opt" id="llopt_' + it.key + '_' + st.qi + '_' + ri + '">' +
+          '<input type="radio" name="vcq_' + it.key + '_' + st.qi + '" value="' + ri + '"' + checked + '>' +
+          '<span>' + escVC(r.respuesta) + '</span></label>';
+      }).join('');
+
+      cont.innerHTML = '<div class="ll-preg-prog">Pregunta ' + (st.qi + 1) + ' de ' + total + '</div>' +
+        '<div class="ll-preg">' +
+          '<div class="ll-preg-title">' + (st.qi + 1) + '. ' + escVC(p.pregunta) + '</div>' +
+          '<div class="ll-opts">' + opts + '</div>' +
+        '</div>';
+
+      var isLast = st.qi >= total - 1;
+      actions.innerHTML =
+        (st.qi > 0 ? '<button class="btn btn-outline btn-sm" onclick="quizAnterior()">← Anterior</button>' : '') +
+        (isLast
+          ? '<button class="btn btn-capacitacion" onclick="corregirQuiz(' + vcCurrent + ')">Corregir</button>'
+          : '<button class="btn btn-capacitacion" onclick="quizSiguiente()">Siguiente pregunta →</button>');
+    }
+
+    function quizSiguiente() {
+      guardarSelQuiz();
+      if (vcQuizState.qi < vcQuizState.q.preguntas.length - 1) {
+        vcQuizState.qi++;
+        renderPregunta(vcItems[vcCurrent]);
+      }
+    }
+
+    function quizAnterior() {
+      guardarSelQuiz();
+      if (vcQuizState.qi > 0) {
+        vcQuizState.qi--;
+        renderPregunta(vcItems[vcCurrent]);
+      }
+    }
+
+    function corregirQuiz(i) {
+      var it = vcItems[i];
+      guardarSelQuiz();
+      var st = vcQuizState;
+      var q = st.q;
+      if (!q || !q.preguntas || !q.preguntas.length) return;
+
+      var pendientes = [];
+      q.preguntas.forEach(function(p, pi) {
+        if (st.sel[pi] == null || st.sel[pi] < 0) pendientes.push(pi);
+      });
+      if (pendientes.length) {
+        showAlert('Faltan por responder ' + pendientes.length + ' pregunta(s)', 'warning');
+        st.qi = pendientes[0];
+        renderPregunta(it);
+        return;
+      }
+
+      vcQuizDone[it.key] = true;
+
+      var score = 0;
+      var total = q.preguntas.length;
+      var resHtml = q.preguntas.map(function(p, pi) {
+        var correctIndex = -1;
+        (p.respuestas || []).forEach(function(r, ri) { if (r.es_correcta) correctIndex = ri; });
+        var val = st.sel[pi] != null ? st.sel[pi] : -1;
+        var isCorrect = val === correctIndex;
+        if (isCorrect) score++;
+        var opts = (p.respuestas || []).map(function(r, ri) {
+          var cls = '';
+          if (ri === correctIndex) cls = ' ok';
+          else if (ri === val) cls = ' bad';
+          var mark = ri === val ? '● ' : '';
+          return '<div class="ll-opt' + cls + '"><span>' + mark + escVC(r.respuesta) + '</span></div>';
+        }).join('');
+        return '<div class="ll-preg">' +
+          '<div class="ll-preg-title">' + (pi + 1) + '. ' + escVC(p.pregunta) +
+          (isCorrect ? '<span class="ll-ok-tag">✔</span>' : '<span class="ll-bad-tag">✘</span>') + '</div>' +
+          '<div class="ll-opts">' + opts + '</div></div>';
+      }).join('');
+
+      var pct = total ? Math.round(score / total * 100) : 0;
+      var aprobado = total > 0 && pct >= 60;
+      vcDone[it.key] = aprobado;
+      vcQuizScore[it.key] = pct;
+
+      document.getElementById('vcQuizBody').innerHTML = resHtml;
+      var actions = document.getElementById('vcQuizActions');
+      actions.innerHTML = '<div class="ll-score ' + (aprobado ? 'ok' : 'bad') + '">' +
+        'Resultado: ' + score + '/' + total + ' (' + pct + '%) · ' + (aprobado ? 'Aprobado' : 'Reprobado') + '</div>' +
+        '<button class="btn btn-outline btn-sm" onclick="rehacerQuiz(' + i + ')">Reintentar</button>';
+
+      renderToc();
+      actualizarNav();
+      saveProg();
+    }
+
+    function rehacerQuiz(i) {
+      renderItem();
+    }
+
+    function navegarVC(d) {
+      if (vcCurrent < 0) return;
+      if (d > 0 && quizBloqueado()) {
+        showAlert('Responde todas las preguntas del cuestionario antes de continuar', 'warning');
+        return;
+      }
+      if (d > 0 && vcItems[vcCurrent].type === 'video') {
+        vcDone[vcItems[vcCurrent].key] = true;
+        renderToc();
+        saveProg();
+      }
+      var ni = vcCurrent + d;
+      if (ni < 0) return;
+      if (ni >= vcItems.length) {
+        if (d > 0) finalizarCurso();
+        return;
+      }
+      vcCurrent = ni;
+      renderItem();
+      saveProg();
+    }
+
+    function finalizarCurso() {
+      var allOk = true;
+      vcItems.forEach(function(it) {
+        if (it.type === 'quiz' && it.quiz && it.quiz.preguntas && it.quiz.preguntas.length) {
+          if ((vcQuizScore[it.key] || 0) !== 100) allOk = false;
+        }
+      });
+
+      if (allOk) {
+        uiDialogOpen('success',
+          '¡Felicitaciones! Completaste el curso ' + escVC(vcCurso ? vcCurso.titulo : '') + ' con todas las respuestas correctas.',
+          '<button class="btn" style="background:' + uiModuleColor() + '" onclick="uiDialogDismiss()">Aceptar</button>',
+          { html: true });
+      } else {
+        uiDialogOpen('info',
+          'Repasa los módulos y vuelve a intentarlo para aprobar el curso con todas las respuestas correctas.',
+          '<button class="btn btn-outline" onclick="uiDialogDismiss()">Cerrar</button>' +
+          '<button class="btn" style="background:' + uiModuleColor() + '" onclick="repetirCurso()">Repetir curso</button>',
+          { html: true });
+      }
+    }
+
+    function repetirCurso() {
+      uiDialogDismiss();
+      vcDone = {};
+      vcQuizDone = {};
+      vcQuizScore = {};
+      vcCurrent = 0;
+      saveProg();
+      renderToc();
+      renderItem();
+      showAlert('Curso reiniciado. ¡Ánimo, vuelve a intentarlo!', 'success');
+    }
+
+    function saveProg() {
+      if (!cursoId) return;
+      try {
+        localStorage.setItem('fiat_curso_prog_' + cursoId, JSON.stringify({ done: vcDone, quizDone: vcQuizDone, quizScore: vcQuizScore, cur: vcCurrent }));
+      } catch (e) {}
+    }
+
+    function loadProg() {
+      if (!cursoId) return 0;
+      try {
+        var p = localStorage.getItem('fiat_curso_prog_' + cursoId);
+        if (p) {
+          var o = JSON.parse(p);
+          if (o.done) vcDone = o.done;
+          if (o.quizDone) vcQuizDone = o.quizDone;
+          if (o.quizScore) vcQuizScore = o.quizScore;
+          return typeof o.cur === 'number' ? o.cur : 0;
+        }
+      } catch (e) {}
+      return 0;
+    }
+
+    document.addEventListener('DOMContentLoaded', cargarCurso);
+  </script>
+
+<script src="../js/module-help.js"></script>
+    <script src="../js/access.js"></script>
+</body>
+</html>

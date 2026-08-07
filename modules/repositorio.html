@@ -588,6 +588,14 @@
       await loadCategorias();
       await loadSubcategorias();
       await loadDocumentos();
+
+      const savedRepoView = localStorage.getItem('fiat_repo_view');
+      if (savedRepoView && savedRepoView !== 'list') {
+        const rbtns = document.querySelectorAll('.repo-view-btn');
+        for (let i = 0; i < rbtns.length; i++) {
+          if ((rbtns[i].getAttribute('onclick') || '').indexOf("'" + savedRepoView + "'") !== -1) { switchView(savedRepoView, rbtns[i]); break; }
+        }
+      }
     });
 
     // ============================================
@@ -1417,6 +1425,7 @@
 
     function switchView(view, btn) {
       currentView = view;
+      localStorage.setItem('fiat_repo_view', view);
       document.querySelectorAll('.repo-view-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       renderDocumentos();

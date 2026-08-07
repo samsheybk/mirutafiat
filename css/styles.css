@@ -516,6 +516,28 @@ a {
   transform: none;
 }
 
+/* Botones de acción dentro de tablas: compactos, uno al lado del otro */
+.data-table td .btn,
+.data-table td .btn-outline,
+.table td .btn,
+.table td .btn-outline {
+  height: 30px;
+  min-height: 30px;
+  padding: 0 8px;
+  white-space: nowrap;
+}
+.data-table td .btn-sm,
+.table td .btn-sm {
+  height: 30px;
+  min-height: 30px;
+  padding: 0 8px;
+}
+.data-table td .btn i.fi,
+.table td .btn i.fi {
+  font-size: 13px;
+  margin-right: 4px;
+}
+
 /* ===== MODULE LAYOUT (panel + content) ===== */
 .module-layout {
   display: flex;

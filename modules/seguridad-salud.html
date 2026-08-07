@@ -146,17 +146,32 @@
             </div>
 
             <div class="tool-section" id="tool-inv-insumos">
-              <div class="tabla-scroll">
-                <table class="data-table">
-                  <thead><tr><th>Insumo</th><th>Tipo</th><th>Presentación</th><th>Cantidad</th><th>Mínimo</th><th>Lote</th><th>Vencimiento</th><th>Ubicación</th><th>Estado</th><th style="width:150px;">Acciones</th></tr></thead>
-                  <tbody id="invInsumosBody">
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                  </tbody>
-                </table>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+                <button class="btn btn-sm ins-tab" data-itab="inventario" onclick="insSwitchView('inventario',this)" style="background:var(--module-seguridad);color:#fff;border:0;border-radius:4px;padding:6px 16px;">Inventario</button>
+                <button class="btn btn-sm ins-tab" data-itab="movimientos" onclick="insSwitchView('movimientos',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Movimientos</button>
+              </div>
+              <div id="insInventarioView">
+                <div class="tabla-scroll">
+                  <table class="data-table">
+                    <thead><tr><th>Insumo</th><th>Tipo</th><th>Presentación</th><th>Cantidad</th><th>Mínimo</th><th>Lote</th><th>Vencimiento</th><th>Ubicación</th><th>Estado</th><th style="width:200px;">Acciones</th></tr></thead>
+                    <tbody id="invInsumosBody">
+                      <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                      <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                      <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                      <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                      <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div id="insMovimientosView" style="display:none;">
+                <div class="ss-hint">Historial de todas las entradas y salidas del inventario. Haz clic en un movimiento para ver el detalle.</div>
+                <div class="tabla-scroll">
+                  <table class="data-table">
+                    <thead><tr><th>Fecha</th><th>Insumo</th><th>Tipo</th><th>Concepto</th><th>Trabajador</th><th>Cantidad</th><th>Lote</th><th>Vencimiento</th><th>Observaciones</th></tr></thead>
+                    <tbody id="movimientosGlobalBody"></tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
@@ -361,6 +376,109 @@
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="ssHideModal('modalInvInsumo')">Cancelar</button>
         <button class="btn btn-seguridad" onclick="saveInvInsumo()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Salida de Insumo (con concepto de asignación) -->
+  <div class="modal-overlay" id="modalSalidaInsumo">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalSalidaInsumoTitle">Registrar salida de insumo</h3><button class="modal-close" onclick="ssHideModal('modalSalidaInsumo')">&times;</button></div>
+      <div class="modal-body">
+        <div class="ss-pac-info" id="salInsumoInfo" style="display:none;"></div>
+        <form id="formSalidaInsumo">
+          <div class="form-row">
+            <div class="form-group"><label>Cantidad</label><input type="number" min="1" class="form-input" id="sal_cantidad" value="1" required></div>
+            <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="sal_fecha" required></div>
+          </div>
+          <div class="form-group"><label>Concepto de salida</label>
+            <select class="form-select" id="sal_concepto" onchange="onSalidaConceptoChange()">
+              <option value="Entrega a trabajador">Entrega a trabajador</option>
+              <option value="Vencimiento">Vencimiento</option>
+              <option value="Donación">Donación</option>
+              <option value="Ajuste">Ajuste / merma</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group" id="sal_sel_trabajador">
+            <label>Trabajador que recibe</label>
+            <select class="form-select" id="sal_trabajador_id"></select>
+          </div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="sal_observaciones" rows="2" placeholder="Detalle adicional del destino de la salida"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="ssHideModal('modalSalidaInsumo')">Cancelar</button>
+        <button class="btn btn-seguridad" onclick="saveSalidaInsumo()">Registrar salida</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Movimientos de Insumo -->
+  <div class="modal-overlay" id="modalMovimientosInsumo">
+    <div class="modal" style="max-width:840px;">
+      <div class="modal-header"><h3 id="modalMovimientosInsumoTitle">Movimientos del insumo</h3><button class="modal-close" onclick="ssHideModal('modalMovimientosInsumo')">&times;</button></div>
+      <div class="modal-body">
+        <div class="tabla-scroll" style="max-height:55vh;overflow-y:auto;">
+          <table class="data-table">
+            <thead><tr><th>Fecha</th><th>Tipo</th><th>Concepto</th><th>Destino</th><th>Lote</th><th>Vencimiento</th><th>Cantidad</th><th>Observaciones</th></tr></thead>
+            <tbody id="movimientosInsumoBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="ssHideModal('modalMovimientosInsumo')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Detalle de Insumo (clic en el nombre) -->
+  <div class="modal-overlay" id="modalDetalleInsumo">
+    <div class="modal" style="max-width:640px;">
+      <div class="modal-header"><h3 id="modalDetalleInsumoTitle">Detalle del insumo</h3><button class="modal-close" onclick="ssHideModal('modalDetalleInsumo')">&times;</button></div>
+      <div class="modal-body">
+        <div class="ss-pac-info" id="detalleInsumoInfo" style="display:none;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-seguridad" onclick="openEntradaInsumo(detalleInsumoId)">Entrada</button>
+        <button class="btn btn-seguridad" onclick="openSalidaInsumo(detalleInsumoId)">Salida</button>
+        <button class="btn btn-outline" onclick="openMovimientosInsumo(detalleInsumoId)">Movimientos</button>
+        <button class="btn btn-outline" onclick="openModalInvInsumo(detalleInsumoId)">Editar</button>
+        <button class="btn btn-outline" style="color:#dc2626;border-color:#dc2626;" onclick="deleteInvInsumo(detalleInsumoId)">Eliminar</button>
+        <button class="btn btn-outline" onclick="ssHideModal('modalDetalleInsumo')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Entrada de Insumo (con lote y vencimiento para rotación FEFO) -->
+  <div class="modal-overlay" id="modalEntradaInsumo">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalEntradaInsumoTitle">Registrar entrada de insumo</h3><button class="modal-close" onclick="ssHideModal('modalEntradaInsumo')">&times;</button></div>
+      <div class="modal-body">
+        <div class="ss-pac-info" id="entInsumoInfo" style="display:none;"></div>
+        <form id="formEntradaInsumo">
+          <div class="form-row">
+            <div class="form-group"><label>Cantidad</label><input type="number" min="1" class="form-input" id="ent_cantidad" value="1" required></div>
+            <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="ent_fecha" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Número de lote *</label><input type="text" class="form-input" id="ent_lote" placeholder="Ej: PAR26-118" required></div>
+            <div class="form-group"><label>Fecha de vencimiento *</label><input type="date" class="form-input" id="ent_fecha_vencimiento" required></div>
+          </div>
+          <div class="form-group"><label>Concepto de entrada</label>
+            <select class="form-select" id="ent_concepto">
+              <option value="Compra">Compra</option>
+              <option value="Donación">Donación</option>
+              <option value="Ajuste">Ajuste / sobrante</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="ent_observaciones" rows="2" placeholder="Detalle adicional de la entrada"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="ssHideModal('modalEntradaInsumo')">Cancelar</button>
+        <button class="btn btn-seguridad" onclick="saveEntradaInsumo()">Registrar entrada</button>
       </div>
     </div>
   </div>
@@ -1114,7 +1232,7 @@
       }
       tbody.innerHTML = seguridadInvInsumos.map(function(i) {
         return '<tr>'
-          + '<td><span style="font-weight:600;">' + ssEscape(i.nombre) + '</span></td>'
+          + '<td><a href="javascript:void(0)" onclick="openDetalleInsumo(' + i.id + ')" style="font-weight:600;color:var(--module-seguridad);text-decoration:none;cursor:pointer;">' + ssEscape(i.nombre) + '</a></td>'
           + '<td>' + ssEscape(i.tipo || '-') + '</td>'
           + '<td>' + ssEscape(i.presentacion || '-') + '</td>'
           + '<td style="text-align:center;font-weight:700;">' + i.cantidad + '</td>'
@@ -1123,29 +1241,245 @@
           + '<td>' + (i.fecha_vencimiento || '-') + '</td>'
           + '<td>' + ssEscape(i.ubicacion || '-') + '</td>'
           + '<td><span class="badge ' + getBadgeClass(i.estado) + '">' + ssEscape(i.estado) + '</span></td>'
-          + '<td>'
-          + '<button class="btn btn-sm btn-outline" title="Entrada (+1)" onclick="ajustarStockInsumo(' + i.id + ', 1)"><i class="fi fi-sr-plus" style="font-size:14px;line-height:1;pointer-events:none;"></i></button> '
-          + '<button class="btn btn-sm btn-outline" title="Salida (-1)" onclick="ajustarStockInsumo(' + i.id + ', -1)"><i class="fi fi-sr-minus" style="font-size:14px;line-height:1;pointer-events:none;"></i></button> '
-          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalInvInsumo(' + i.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
-          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteInvInsumo(' + i.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '<td style="white-space:nowrap;">'
+          + '<button class="btn btn-sm" title="Registrar entrada de stock" onclick="openEntradaInsumo(' + i.id + ')" style="background:#059669;color:#fff;border:0;border-radius:4px;padding:3px 10px;font-size:12px;">Entrada</button> '
+          + '<button class="btn btn-sm" title="Registrar salida / asignación" onclick="openSalidaInsumo(' + i.id + ')" style="background:#dc2626;color:#fff;border:0;border-radius:4px;padding:3px 10px;font-size:12px;">Salida</button>'
           + '</td>'
           + '</tr>';
       }).join('');
       uiFadeIn(tbody);
     }
 
-    async function ajustarStockInsumo(id, delta) {
+    var detalleInsumoId = null;
+
+    function openDetalleInsumo(id) {
       var i = seguridadInvInsumos.find(function(x) { return x.id === id; });
       if (!i) return;
-      var nuevaCantidad = Math.max(0, (i.cantidad || 0) + delta);
+      detalleInsumoId = id;
+      document.getElementById('modalDetalleInsumoTitle').textContent = i.nombre;
+      document.getElementById('detalleInsumoInfo').style.display = 'grid';
+      document.getElementById('detalleInsumoInfo').innerHTML =
+        '<div class="form-group"><label>Nombre</label><div style="font-weight:600;">' + ssEscape(i.nombre) + '</div></div>'
+        + '<div class="form-group"><label>Tipo</label><div>' + ssEscape(i.tipo || '-') + '</div></div>'
+        + '<div class="form-group"><label>Presentación</label><div>' + ssEscape(i.presentacion || '-') + '</div></div>'
+        + '<div class="form-group"><label>Cantidad en stock</label><div style="font-weight:700;">' + i.cantidad + ' <span style="color:#999;font-weight:400;">(mínimo: ' + i.cantidad_minima + ')</span></div></div>'
+        + '<div class="form-group"><label>Lote</label><div>' + ssEscape(i.lote || '-') + '</div></div>'
+        + '<div class="form-group"><label>Fecha de vencimiento</label><div>' + (i.fecha_vencimiento || '-') + '</div></div>'
+        + '<div class="form-group"><label>Ubicación</label><div>' + ssEscape(i.ubicacion || '-') + '</div></div>'
+        + '<div class="form-group"><label>Estado</label><div><span class="badge ' + getBadgeClass(i.estado) + '">' + ssEscape(i.estado) + '</span></div></div>'
+        + '<div class="form-group"><label>Observaciones</label><div>' + (i.observaciones ? ssEscape(i.observaciones) : '-') + '</div></div>';
+      ssShowModal('modalDetalleInsumo');
+    }
+
+    var entradaInsumoId = null;
+
+    function openEntradaInsumo(id) {
+      entradaInsumoId = id;
+      var i = seguridadInvInsumos.find(function(x) { return x.id === id; });
+      if (!i) return;
+      var info = document.getElementById('entInsumoInfo');
+      info.style.display = 'grid';
+      info.innerHTML =
+        '<div class="form-group"><label>Insumo</label><div style="font-weight:600;">' + ssEscape(i.nombre) + '</div></div>'
+        + '<div class="form-group"><label>Presentación</label><div>' + ssEscape(i.presentacion || '-') + '</div></div>'
+        + '<div class="form-group"><label>Stock actual</label><div style="font-weight:700;">' + i.cantidad + '</div></div>'
+        + '<div class="form-group"><label>Lote actual</label><div>' + ssEscape(i.lote || '-') + '</div></div>';
+      document.getElementById('formEntradaInsumo').reset();
+      document.getElementById('ent_cantidad').value = 1;
+      document.getElementById('ent_fecha').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('ent_concepto').value = 'Compra';
+      ssShowModal('modalEntradaInsumo');
+    }
+
+    async function saveEntradaInsumo() {
+      var cantidad = parseInt(document.getElementById('ent_cantidad').value, 10) || 0;
+      var fecha = document.getElementById('ent_fecha').value;
+      var lote = document.getElementById('ent_lote').value.trim();
+      var fechaVencimiento = document.getElementById('ent_fecha_vencimiento').value;
+      var concepto = document.getElementById('ent_concepto').value;
+      var observaciones = document.getElementById('ent_observaciones').value.trim() || null;
+      if (cantidad <= 0) {
+        showAlert('Indica una cantidad válida', 'warning');
+        return;
+      }
+      if (!fecha) {
+        showAlert('La fecha es obligatoria', 'warning');
+        return;
+      }
+      if (!lote) {
+        showAlert('El número de lote es obligatorio en las entradas', 'warning');
+        return;
+      }
+      if (!fechaVencimiento) {
+        showAlert('La fecha de vencimiento es obligatoria en las entradas', 'warning');
+        return;
+      }
+      var i = seguridadInvInsumos.find(function(x) { return x.id === entradaInsumoId; });
+      if (!i) return;
+      var nuevaCantidad = i.cantidad + cantidad;
+      var estado = estadoAutoInsumo({ cantidad: nuevaCantidad, cantidad_minima: i.cantidad_minima, fecha_vencimiento: fechaVencimiento });
+      try {
+        var { error } = await supabaseClient.from('seguridad_inventario_insumos')
+          .update({ cantidad: nuevaCantidad, lote: lote, fecha_vencimiento: fechaVencimiento, estado: estado }).eq('id', i.id);
+        if (error) throw error;
+        var { error: errMov } = await supabaseClient.from('seguridad_inventario_movimientos')
+          .insert([{
+            insumo_id: i.id,
+            tipo: 'Entrada',
+            concepto: concepto,
+            cantidad: cantidad,
+            fecha: fecha,
+            lote: lote,
+            fecha_vencimiento: fechaVencimiento,
+            observaciones: observaciones
+          }]);
+        if (errMov) throw errMov;
+        ssHideModal('modalEntradaInsumo');
+        ssHideModal('modalDetalleInsumo');
+        loadInvInsumos();
+        loadMovimientosGlobales();
+        showAlert('Entrada registrada (' + concepto + ')', 'success');
+      } catch (err) {
+        showAlert('Error al registrar la entrada: ' + err.message, 'error');
+      }
+    }
+
+    var salidaInsumoId = null;
+    var salidaInsumoTrabajadores = [];
+
+    async function loadSalidaTrabajadores() {
+      try {
+        var { data, error } = await supabaseClient.from('plantilla_trabajadores').select('id, nombres, apellidos, cedula').eq('estado', 'Activo').order('apellidos');
+        if (error) throw error;
+        salidaInsumoTrabajadores = data || [];
+        var sel = document.getElementById('sal_trabajador_id');
+        sel.innerHTML = '<option value="">— Selecciona —</option>';
+        salidaInsumoTrabajadores.forEach(function(t) {
+          sel.innerHTML += '<option value="' + t.id + '">' + ssEscape(t.nombres + ' ' + t.apellidos) + ' (' + ssEscape(t.cedula) + ')</option>';
+        });
+      } catch (err) {
+        showAlert('Error al cargar trabajadores: ' + err.message, 'error');
+      }
+    }
+
+    function openSalidaInsumo(id) {
+      salidaInsumoId = id;
+      var i = seguridadInvInsumos.find(function(x) { return x.id === id; });
+      if (!i) return;
+      var info = document.getElementById('salInsumoInfo');
+      info.style.display = 'grid';
+      info.innerHTML =
+        '<div class="form-group"><label>Insumo</label><div style="font-weight:600;">' + ssEscape(i.nombre) + '</div></div>'
+        + '<div class="form-group"><label>Tipo</label><div>' + ssEscape(i.tipo || '-') + '</div></div>'
+        + '<div class="form-group"><label>Stock actual</label><div style="font-weight:700;">' + i.cantidad + '</div></div>';
+      document.getElementById('formSalidaInsumo').reset();
+      document.getElementById('sal_cantidad').value = 1;
+      document.getElementById('sal_fecha').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('sal_concepto').value = 'Entrega a trabajador';
+      onSalidaConceptoChange();
+      ssShowModal('modalSalidaInsumo');
+      if (!salidaInsumoTrabajadores.length) loadSalidaTrabajadores();
+    }
+
+    function onSalidaConceptoChange() {
+      var c = document.getElementById('sal_concepto').value;
+      document.getElementById('sal_sel_trabajador').style.display = c === 'Entrega a trabajador' ? 'block' : 'none';
+    }
+
+    async function saveSalidaInsumo() {
+      var trabajadorId = document.getElementById('sal_trabajador_id').value;
+      var concepto = document.getElementById('sal_concepto').value;
+      var cantidad = parseInt(document.getElementById('sal_cantidad').value, 10) || 0;
+      var fecha = document.getElementById('sal_fecha').value;
+      var observaciones = document.getElementById('sal_observaciones').value.trim() || null;
+      if (!fecha) {
+        showAlert('La fecha es obligatoria', 'warning');
+        return;
+      }
+      if (cantidad <= 0) {
+        showAlert('Indica una cantidad válida', 'warning');
+        return;
+      }
+      var i = seguridadInvInsumos.find(function(x) { return x.id === salidaInsumoId; });
+      if (!i) return;
+      if (cantidad > i.cantidad) {
+        showAlert('Stock insuficiente: solo hay ' + i.cantidad + ' disponible(s)', 'warning');
+        return;
+      }
+      if (concepto === 'Entrega a trabajador' && !trabajadorId) {
+        showAlert('Selecciona el trabajador que recibe el insumo', 'warning');
+        return;
+      }
+      var nuevaCantidad = i.cantidad - cantidad;
       var estado = estadoAutoInsumo({ cantidad: nuevaCantidad, cantidad_minima: i.cantidad_minima, fecha_vencimiento: i.fecha_vencimiento });
       try {
         var { error } = await supabaseClient.from('seguridad_inventario_insumos')
-          .update({ cantidad: nuevaCantidad, estado: estado }).eq('id', id);
+          .update({ cantidad: nuevaCantidad, estado: estado }).eq('id', i.id);
         if (error) throw error;
+        var { error: errMov } = await supabaseClient.from('seguridad_inventario_movimientos')
+          .insert([{
+            insumo_id: i.id,
+            tipo: 'Salida',
+            concepto: concepto,
+            trabajador_id: concepto === 'Entrega a trabajador' ? trabajadorId : null,
+            cantidad: cantidad,
+            fecha: fecha,
+            lote: i.lote || null,
+            fecha_vencimiento: i.fecha_vencimiento || null,
+            observaciones: observaciones
+          }]);
+        if (errMov) throw errMov;
+        ssHideModal('modalSalidaInsumo');
+        ssHideModal('modalDetalleInsumo');
         loadInvInsumos();
+        loadMovimientosGlobales();
+        showAlert('Salida registrada (' + concepto + ')', 'success');
       } catch (err) {
-        showAlert('Error al actualizar stock: ' + err.message, 'error');
+        showAlert('Error al registrar la salida: ' + err.message, 'error');
+      }
+    }
+
+    async function openMovimientosInsumo(id) {
+      var i = seguridadInvInsumos.find(function(x) { return x.id === id; });
+      if (!i) return;
+      document.getElementById('modalMovimientosInsumoTitle').textContent = 'Movimientos · ' + i.nombre;
+      var tbody = document.getElementById('movimientosInsumoBody');
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:#999;">Cargando...</td></tr>';
+      ssShowModal('modalMovimientosInsumo');
+      try {
+        var [resMov, resTrab] = await Promise.all([
+          supabaseClient.from('seguridad_inventario_movimientos').select('*').eq('insumo_id', id).order('fecha', { ascending: false }),
+          supabaseClient.from('plantilla_trabajadores').select('id, nombres, apellidos').order('apellidos')
+        ]);
+        if (resMov.error) throw resMov.error;
+        if (resTrab.error) throw resTrab.error;
+        var movs = resMov.data || [];
+        var trabajadores = resTrab.data || [];
+        function nombreTrabajador(tid) {
+          if (!tid) return '-';
+          var t = trabajadores.find(function(x) { return x.id === tid; });
+          return t ? t.nombres + ' ' + t.apellidos : 'Trabajador retirado';
+        }
+        if (!movs.length) {
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:#999;">Sin movimientos registrados</td></tr>';
+          return;
+        }
+        tbody.innerHTML = movs.map(function(m) {
+          var tipoCls = m.tipo === 'Entrada' ? 'badge-active' : 'badge-pending';
+          var cantColor = m.tipo === 'Entrada' ? '#059669' : '#dc2626';
+          return '<tr>'
+            + '<td>' + (m.fecha || '-') + '</td>'
+            + '<td><span class="badge ' + tipoCls + '">' + ssEscape(m.tipo) + '</span></td>'
+            + '<td>' + ssEscape(m.concepto || '-') + '</td>'
+            + '<td>' + (m.tipo === 'Salida' && m.concepto === 'Entrega a trabajador' ? ssEscape(nombreTrabajador(m.trabajador_id)) : '-') + '</td>'
+            + '<td>' + ssEscape(m.lote || '-') + '</td>'
+            + '<td>' + (m.fecha_vencimiento || '-') + '</td>'
+            + '<td style="text-align:center;font-weight:700;color:' + cantColor + ';">' + (m.tipo === 'Entrada' ? '+' : '-') + m.cantidad + '</td>'
+            + '<td>' + ssEscape(m.observaciones || '-') + '</td>'
+            + '</tr>';
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:30px;color:#dc2626;">Error al cargar movimientos: ' + ssEscape(err.message) + '</td></tr>';
       }
     }
 
@@ -1221,6 +1555,67 @@
       }
     }
 
+    function insSwitchView(view, btn) {
+      localStorage.setItem('fiat_seguridad_insumos_view', view);
+      document.getElementById('insInventarioView').style.display = view === 'inventario' ? '' : 'none';
+      document.getElementById('insMovimientosView').style.display = view === 'movimientos' ? '' : 'none';
+      document.querySelectorAll('.ins-tab').forEach(function(t) {
+        var on = t.getAttribute('data-itab') === view;
+        t.style.background = on ? 'var(--module-seguridad)' : 'transparent';
+        t.style.color = on ? '#fff' : 'var(--color-text)';
+        t.style.border = on ? '0' : '1px solid var(--border-color)';
+      });
+      if (view === 'movimientos') loadMovimientosGlobales();
+    }
+
+    async function loadMovimientosGlobales() {
+      var tbody = document.getElementById('movimientosGlobalBody');
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:30px;color:#999;">Cargando movimientos...</td></tr>';
+      try {
+        var [resMov, resIns, resTrab] = await Promise.all([
+          supabaseClient.from('seguridad_inventario_movimientos').select('*').order('fecha', { ascending: false }),
+          supabaseClient.from('seguridad_inventario_insumos').select('id, nombre'),
+          supabaseClient.from('plantilla_trabajadores').select('id, nombres, apellidos').order('apellidos')
+        ]);
+        if (resMov.error) throw resMov.error;
+        if (resIns.error) throw resIns.error;
+        if (resTrab.error) throw resTrab.error;
+        var movs = resMov.data || [];
+        var insumos = resIns.data || [];
+        var trabajadores = resTrab.data || [];
+        function nombreInsumo(iid) {
+          var x = insumos.find(function(i) { return i.id === iid; });
+          return x ? x.nombre : 'Insumo eliminado';
+        }
+        function nombreTrabajador(tid) {
+          if (!tid) return '-';
+          var t = trabajadores.find(function(x) { return x.id === tid; });
+          return t ? t.nombres + ' ' + t.apellidos : 'Trabajador retirado';
+        }
+        if (!movs.length) {
+          tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#999;">Aún no hay movimientos registrados</td></tr>';
+          return;
+        }
+        tbody.innerHTML = movs.map(function(m) {
+          var tipoCls = m.tipo === 'Entrada' ? 'badge-active' : 'badge-pending';
+          var cantColor = m.tipo === 'Entrada' ? '#059669' : '#dc2626';
+          return '<tr>'
+            + '<td>' + (m.fecha || '-') + '</td>'
+            + '<td><a href="javascript:void(0)" onclick="openDetalleInsumo(' + m.insumo_id + ')" style="color:var(--module-seguridad);text-decoration:none;cursor:pointer;">' + ssEscape(nombreInsumo(m.insumo_id)) + '</a></td>'
+            + '<td><span class="badge ' + tipoCls + '">' + ssEscape(m.tipo) + '</span></td>'
+            + '<td>' + ssEscape(m.concepto || '-') + '</td>'
+            + '<td>' + (m.tipo === 'Salida' && m.concepto === 'Entrega a trabajador' ? ssEscape(nombreTrabajador(m.trabajador_id)) : '-') + '</td>'
+            + '<td style="text-align:center;font-weight:700;color:' + cantColor + ';">' + (m.tipo === 'Entrada' ? '+' : '-') + m.cantidad + '</td>'
+            + '<td>' + ssEscape(m.lote || '-') + '</td>'
+            + '<td>' + (m.fecha_vencimiento || '-') + '</td>'
+            + '<td>' + ssEscape(m.observaciones || '-') + '</td>'
+            + '</tr>';
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar movimientos: ' + ssEscape(err.message) + '</td></tr>';
+      }
+    }
+
     /* ===== INICIALIZACIÓN ===== */
     document.addEventListener('DOMContentLoaded', function() {
       restoreTool();
@@ -1229,6 +1624,9 @@
       loadServicioMedico();
       loadInvEquipos();
       loadInvInsumos();
+      var savedInsView = localStorage.getItem('fiat_seguridad_insumos_view');
+      var insBtn = document.querySelector('.ins-tab[data-itab="' + savedInsView + '"]');
+      if (insBtn) insSwitchView(savedInsView, insBtn);
     });
   </script>
 

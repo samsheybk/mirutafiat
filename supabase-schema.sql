@@ -296,6 +296,7 @@ CREATE TABLE IF NOT EXISTS rl_actas (
   tema TEXT NOT NULL,
   fecha DATE NOT NULL DEFAULT CURRENT_DATE,
   participantes TEXT,
+  participantes_ids UUID[] DEFAULT '{}',
   estado TEXT NOT NULL DEFAULT 'Programada' CHECK (estado IN ('Programada','Realizada','Pendiente','Cancelada')),
   descripcion TEXT,
   acuerdos TEXT,
@@ -312,6 +313,28 @@ CREATE TABLE IF NOT EXISTS rl_acta_acuerdos (
 );
 
 CREATE INDEX IF NOT EXISTS idx_rl_acta_acuerdos_acta_id ON rl_acta_acuerdos (acta_id);
+
+ALTER TABLE rl_actas ADD COLUMN IF NOT EXISTS participantes_ids UUID[] DEFAULT '{}';
+
+-- ============================================
+-- ALERTAS DE COMPROMISOS DE ACTAS (campana global)
+-- Cada alerta apunta al trabajador responsable (trabajador_id).
+-- El RLS la empareja con el usuario autenticado por correo del trabajador.
+-- ============================================
+CREATE TABLE IF NOT EXISTS rl_acta_alertas (
+  id BIGSERIAL PRIMARY KEY,
+  acta_id BIGINT NOT NULL REFERENCES rl_actas(id) ON DELETE CASCADE,
+  acuerdo_id BIGINT REFERENCES rl_acta_acuerdos(id) ON DELETE CASCADE,
+  trabajador_id UUID REFERENCES plantilla_trabajadores(id) ON DELETE CASCADE,
+  tipo TEXT NOT NULL CHECK (tipo IN ('acuerdo_creado', 'acuerdo_por_vencer', 'acuerdo_vencido')),
+  mensaje TEXT NOT NULL,
+  fecha_tope DATE,
+  leido BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_rl_acta_alertas_trabajador ON rl_acta_alertas (trabajador_id, leido);
+CREATE INDEX IF NOT EXISTS idx_rl_acta_alertas_acta ON rl_acta_alertas (acta_id);
 
 ALTER TABLE relaciones_registros ADD COLUMN IF NOT EXISTS trabajador_id UUID REFERENCES plantilla_trabajadores(id) ON DELETE SET NULL;
 ALTER TABLE relaciones_registros ADD COLUMN IF NOT EXISTS concepto_id BIGINT REFERENCES rl_conceptos(id) ON DELETE SET NULL;
@@ -452,6 +475,7 @@ ALTER TABLE rl_asignaciones ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rl_info_sensible ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rl_actas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE rl_acta_acuerdos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE rl_acta_alertas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE repo_categorias ENABLE ROW LEVEL SECURITY;
 ALTER TABLE repo_subcategorias ENABLE ROW LEVEL SECURITY;
 ALTER TABLE repo_documentos ENABLE ROW LEVEL SECURITY;
@@ -559,6 +583,33 @@ CREATE POLICY "Usuarios autenticados pueden actualizar acuerdos de actas"
 DROP POLICY IF EXISTS "Usuarios autenticados pueden eliminar acuerdos de actas" ON rl_acta_acuerdos;
 CREATE POLICY "Usuarios autenticados pueden eliminar acuerdos de actas"
   ON rl_acta_acuerdos FOR DELETE TO authenticated USING (true);
+
+-- RLS de alertas de actas: el trabajador ve/actualiza SOLO sus propias
+-- alertas, emparejado por el correo del trabajador activo con auth.email().
+DROP POLICY IF EXISTS "Trabajadores ven sus alertas de actas" ON rl_acta_alertas;
+CREATE POLICY "Trabajadores ven sus alertas de actas"
+  ON rl_acta_alertas FOR SELECT TO authenticated
+  USING (
+    trabajador_id IN (
+      SELECT id FROM plantilla_trabajadores
+      WHERE estado = 'Activo' AND lower(correo) = lower(auth.jwt() ->> 'email')
+    )
+  );
+DROP POLICY IF EXISTS "Autenticados crean alertas de actas" ON rl_acta_alertas;
+CREATE POLICY "Autenticados crean alertas de actas"
+  ON rl_acta_alertas FOR INSERT TO authenticated WITH CHECK (true);
+DROP POLICY IF EXISTS "Trabajadores actualizan sus alertas de actas" ON rl_acta_alertas;
+CREATE POLICY "Trabajadores actualizan sus alertas de actas"
+  ON rl_acta_alertas FOR UPDATE TO authenticated
+  USING (
+    trabajador_id IN (
+      SELECT id FROM plantilla_trabajadores
+      WHERE estado = 'Activo' AND lower(correo) = lower(auth.jwt() ->> 'email')
+    )
+  );
+DROP POLICY IF EXISTS "Autenticados eliminan alertas de actas" ON rl_acta_alertas;
+CREATE POLICY "Autenticados eliminan alertas de actas"
+  ON rl_acta_alertas FOR DELETE TO authenticated USING (true);
 
 DROP POLICY IF EXISTS "Usuarios autenticados pueden leer capacitacion" ON capacitacion_cursos;
 CREATE POLICY "Usuarios autenticados pueden leer capacitacion"
@@ -2082,6 +2133,55 @@ DROP TRIGGER IF EXISTS update_usuario_accesos_updated_at ON usuario_accesos;
 CREATE TRIGGER update_usuario_accesos_updated_at
   BEFORE UPDATE ON usuario_accesos
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- ============================================
+-- ALERTAS DE COMPROMISOS: genera alertas por vencer y vencidas.
+-- Idempotente: solo inserta si no existe una alerta equivalente.
+-- Lo invoca la campana global (js/alertas.js) para "disparar" los
+-- recordatorios por fecha tope.
+-- ============================================
+CREATE OR REPLACE FUNCTION generar_alertas_actas()
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  -- Compromisos por vencer (hoy o dentro de los próximos 3 días)
+  INSERT INTO rl_acta_alertas (acta_id, acuerdo_id, trabajador_id, tipo, mensaje, fecha_tope)
+  SELECT a.id, ac.id, t.id, 'acuerdo_por_vencer',
+         'Compromiso por vencer en la acta "' || COALESCE(a.tema, '') || '": "' || ac.descripcion || '" (tope: ' || to_char(ac.fecha_tope, 'DD/MM/YYYY') || ')',
+         ac.fecha_tope
+  FROM rl_acta_acuerdos ac
+  JOIN rl_actas a ON a.id = ac.acta_id
+  CROSS JOIN LATERAL unnest(COALESCE(a.participantes_ids, '{}')) AS t(id)
+  WHERE ac.fecha_tope IS NOT NULL
+    AND ac.fecha_tope <= CURRENT_DATE + 3
+    AND NOT EXISTS (
+      SELECT 1 FROM rl_acta_alertas al
+      WHERE al.acuerdo_id = ac.id AND al.trabajador_id = t.id
+        AND al.tipo IN ('acuerdo_por_vencer', 'acuerdo_vencido')
+    );
+
+  -- Compromisos vencidos
+  INSERT INTO rl_acta_alertas (acta_id, acuerdo_id, trabajador_id, tipo, mensaje, fecha_tope)
+  SELECT a.id, ac.id, t.id, 'acuerdo_vencido',
+         'Compromiso VENCIDO en la acta "' || COALESCE(a.tema, '') || '": "' || ac.descripcion || '" (el tope era: ' || to_char(ac.fecha_tope, 'DD/MM/YYYY') || ')',
+         ac.fecha_tope
+  FROM rl_acta_acuerdos ac
+  JOIN rl_actas a ON a.id = ac.acta_id
+  CROSS JOIN LATERAL unnest(COALESCE(a.participantes_ids, '{}')) AS t(id)
+  WHERE ac.fecha_tope IS NOT NULL
+    AND ac.fecha_tope < CURRENT_DATE
+    AND NOT EXISTS (
+      SELECT 1 FROM rl_acta_alertas al
+      WHERE al.acuerdo_id = ac.id AND al.trabajador_id = t.id
+        AND al.tipo = 'acuerdo_vencido'
+    );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION generar_alertas_actas() TO authenticated;
 
 -- ============================================
 -- FIN DEL ESQUEMA COMPLETO

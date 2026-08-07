@@ -534,5 +534,16 @@
     }
   }, true);
 
+  /* Carga la campana global de alertas de compromisos (js/alertas.js)
+     en todas las páginas que incluyen module-help.js. */
+  function injectAlertasScript() {
+    var src = (inModules ? '../js/alertas.js' : 'js/alertas.js');
+    var s = document.createElement('script');
+    s.src = src;
+    s.async = false;
+    document.body.appendChild(s);
+  }
+
   document.addEventListener('DOMContentLoaded', injectNavHelp);
+  document.addEventListener('DOMContentLoaded', injectAlertasScript);
 })();

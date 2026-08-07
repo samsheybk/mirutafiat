@@ -217,7 +217,12 @@
                   </div>
                   <div class="form-group" style="grid-column:span 2;">
                     <label>Participantes</label>
-                    <input type="text" class="form-input upper" id="acta_participantes" placeholder="Nombres separados por coma" oninput="renderPreview()">
+                    <div style="display:flex;gap:8px;align-items:center;">
+                      <input type="text" class="form-input upper" id="acta_participantes" placeholder="Nombres separados por coma" oninput="renderPreview()" style="flex:1;">
+                      <button type="button" class="btn btn-relaciones btn-sm" onclick="abrirSelectorTrabajadores()" style="flex-shrink:0;">Seleccionar trabajadores</button>
+                    </div>
+                    <input type="hidden" id="acta_participantes_ids" value="[]">
+                    <div style="font-size:11px;color:#64748b;margin-top:4px;">Selecciona trabajadores para notificarles automáticamente los compromisos de esta acta.</div>
                   </div>
                   <div class="form-group">
                     <label>Estado</label>
@@ -260,6 +265,23 @@
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="rlActaTrabajadoresModal" style="display:none;">
+    <div class="modal" style="max-width:560px;">
+      <div class="modal-header">
+        <h3>Seleccionar trabajadores</h3>
+        <button class="modal-close" onclick="cerrarSelectorTrabajadores()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="text" class="form-input" id="rlActaTrabBuscar" placeholder="Buscar por nombre o cédula..." oninput="filtrarTrabajadoresSelector()">
+        <div id="rlActaTrabLista" style="max-height:340px;overflow:auto;margin-top:10px;display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;border-top:1px solid var(--border-color,#e2e8f0);">
+        <button class="btn btn-outline" onclick="cerrarSelectorTrabajadores()">Cancelar</button>
+        <button class="btn btn-relaciones" onclick="aplicarSelectorTrabajadores()">Aplicar selección</button>
       </div>
     </div>
   </div>
@@ -336,6 +358,103 @@
       return v.split(/[,;\n]/).map(function(x) { return x.trim().toUpperCase(); }).filter(Boolean);
     }
 
+    var trabajadoresCache = null;
+    var seleccionTrabajadores = [];
+
+    function cargarTrabajadoresSelector() {
+      if (trabajadoresCache) return Promise.resolve(trabajadoresCache);
+      return supabaseClient.from('plantilla_trabajadores')
+        .select('id, cedula, nombres, apellidos')
+        .eq('estado', 'Activo')
+        .order('nombres')
+        .then(function(res) {
+          if (res.error) throw res.error;
+          trabajadoresCache = (res.data || []).map(function(t) {
+            var nombre = [t.nombres, t.apellidos].filter(Boolean).join(' ').trim().toUpperCase() || 'SIN NOMBRE';
+            return {
+              id: String(t.id),
+              nombre: nombre,
+              cedula: t.cedula || '',
+              busqueda: (nombre + ' ' + (t.cedula || '') + ' ' + (t.nombres || '') + ' ' + (t.apellidos || '')).toLowerCase()
+            };
+          });
+          return trabajadoresCache;
+        });
+    }
+
+    function leerParticipantesSeleccionados() {
+      var arr = [];
+      try {
+        var raw = JSON.parse(document.getElementById('acta_participantes_ids').value || '[]') || [];
+        raw.forEach(function(id) {
+          var w = (trabajadoresCache || []).filter(function(t) { return String(t.id) === String(id); })[0];
+          if (w && !arr.some(function(s) { return String(s.id) === String(id); })) arr.push({ id: String(w.id), nombre: w.nombre });
+        });
+      } catch (e) {}
+      return arr;
+    }
+
+    function pintarListaTrabajadores() {
+      var q = (document.getElementById('rlActaTrabBuscar').value || '').toLowerCase().trim();
+      var cont = document.getElementById('rlActaTrabLista');
+      cont.innerHTML = '';
+      var filtrados = (trabajadoresCache || []).filter(function(t) { return !q || t.busqueda.indexOf(q) !== -1; });
+      if (!filtrados.length) {
+        cont.innerHTML = '<div style="padding:16px;text-align:center;color:#64748b;">Sin coincidencias</div>';
+        return;
+      }
+      filtrados.forEach(function(t) {
+        var marcado = seleccionTrabajadores.some(function(s) { return String(s.id) === String(t.id); });
+        var row = document.createElement('label');
+        row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border-color,#e2e8f0);border-radius:6px;cursor:pointer;background:#fff;';
+        row.innerHTML =
+          '<input type="checkbox" ' + (marcado ? 'checked' : '') + ' data-id="' + escapeHtml(t.id) + '" style="accent-color:var(--module-relaciones,#059669);width:16px;height:16px;flex-shrink:0;">'
+          + '<span style="font-weight:600;font-size:13px;">' + escapeHtml(t.nombre) + '</span>'
+          + '<span style="margin-left:auto;font-size:12px;color:#64748b;flex-shrink:0;">' + escapeHtml(t.cedula) + '</span>';
+        row.querySelector('input').addEventListener('change', function(e) {
+          var id = e.target.getAttribute('data-id');
+          if (e.target.checked) {
+            var w = (trabajadoresCache || []).filter(function(x) { return String(x.id) === id; })[0];
+            if (w && !seleccionTrabajadores.some(function(s) { return String(s.id) === id; })) {
+              seleccionTrabajadores.push({ id: id, nombre: w.nombre });
+            }
+          } else {
+            seleccionTrabajadores = seleccionTrabajadores.filter(function(s) { return String(s.id) !== id; });
+          }
+        });
+        cont.appendChild(row);
+      });
+    }
+
+    function filtrarTrabajadoresSelector() {
+      pintarListaTrabajadores();
+    }
+
+    function abrirSelectorTrabajadores() {
+      cargarTrabajadoresSelector().then(function() {
+        seleccionTrabajadores = leerParticipantesSeleccionados();
+        document.getElementById('rlActaTrabBuscar').value = '';
+        pintarListaTrabajadores();
+        document.getElementById('rlActaTrabajadoresModal').style.display = 'flex';
+        document.getElementById('rlActaTrabBuscar').focus();
+      }).catch(function(err) {
+        showAlert('Error al cargar trabajadores: ' + err.message, 'error');
+      });
+    }
+
+    function cerrarSelectorTrabajadores() {
+      document.getElementById('rlActaTrabajadoresModal').style.display = 'none';
+    }
+
+    function aplicarSelectorTrabajadores() {
+      document.getElementById('acta_participantes_ids').value = JSON.stringify(seleccionTrabajadores.map(function(s) { return s.id; }));
+      var nombres = seleccionTrabajadores.map(function(s) { return s.nombre; }).join(', ');
+      document.getElementById('acta_participantes').value = nombres;
+      cerrarSelectorTrabajadores();
+      renderPreview();
+      showAlert('Participantes actualizados', 'success');
+    }
+
     function ricaTexto(id) {
       var el = document.getElementById(id);
       return (el && el.innerHTML || '').replace(/^<br\s*\/?>$/i, '').trim();
@@ -407,6 +526,7 @@
           document.getElementById('acta_tema').value = a.tema || '';
           document.getElementById('acta_fecha').value = a.fecha || '';
           document.getElementById('acta_participantes').value = a.participantes || '';
+          document.getElementById('acta_participantes_ids').value = JSON.stringify(a.participantes_ids || []);
           document.getElementById('acta_estado').value = a.estado || 'Programada';
           document.getElementById('acta_descripcion').innerHTML = a.descripcion || '';
           document.getElementById('actaTitulo').textContent = a.tema;
@@ -451,6 +571,12 @@
         tema: tema,
         fecha: fecha,
         participantes: document.getElementById('acta_participantes').value.trim().toUpperCase() || null,
+        participantes_ids: (function() {
+          try {
+            var arr = JSON.parse(document.getElementById('acta_participantes_ids').value || '[]');
+            return Array.isArray(arr) && arr.length ? arr : null;
+          } catch (e) { return null; }
+        })(),
         estado: document.getElementById('acta_estado').value,
         descripcion: ricaTexto('acta_descripcion') || null
       };
@@ -476,11 +602,45 @@
           var ins = await supabaseClient.from('rl_acta_acuerdos').insert(filas);
           if (ins.error) throw ins.error;
         }
+        await regenerarAlertasActa(tema, actaId);
         document.getElementById('actaTitulo').textContent = tema;
         actualizarBadge();
         showAlert('Acta guardada', 'success');
       } catch (err) {
         showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function regenerarAlertasActa(tema, actaId) {
+      var del = await supabaseClient.from('rl_acta_alertas').delete().eq('acta_id', actaId);
+      if (del.error) throw del.error;
+      var idsParticipantes = [];
+      try {
+        var arr = JSON.parse(document.getElementById('acta_participantes_ids').value || '[]');
+        if (Array.isArray(arr)) idsParticipantes = arr;
+      } catch (e) {}
+      if (!idsParticipantes.length) return;
+      var selAc = await supabaseClient.from('rl_acta_acuerdos').select('id, descripcion, fecha_tope').eq('acta_id', actaId).order('id');
+      if (selAc.error) throw selAc.error;
+      var alertas = [];
+      (selAc.data || []).forEach(function(ac) {
+        if (!(ac.descripcion || '').trim()) return;
+        var ft = aFecha(ac.fecha_tope) || null;
+        var sufijo = ft ? ' (tope: ' + fechaCorta(ft) + ')' : '';
+        idsParticipantes.forEach(function(tid) {
+          alertas.push({
+            acta_id: actaId,
+            acuerdo_id: ac.id,
+            trabajador_id: tid,
+            tipo: 'acuerdo_creado',
+            mensaje: 'Nuevo compromiso en la acta "' + tema + '": ' + ac.descripcion.trim() + sufijo,
+            fecha_tope: ft
+          });
+        });
+      });
+      if (alertas.length) {
+        var al = await supabaseClient.from('rl_acta_alertas').insert(alertas);
+        if (al.error) throw al.error;
       }
     }
 

@@ -111,7 +111,8 @@ a {
 }
 
 .login-circle {
-  width: 240px;
+  width: 100%;
+  max-width: 360px;
   height: 94px;
   margin: 0 auto;
   background: transparent url('../icons/braindev_logo.svg') center / contain no-repeat;

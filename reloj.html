@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reloj biométrico - FIAT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: radial-gradient(1200px 800px at 50% -10%, #17324d 0%, #0b1a2b 55%, #07111d 100%);
+      color: #fff;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .reloj-home {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 26px;
+      padding: 24px;
+    }
+    .reloj-logo {
+      height: 120px;
+      width: auto;
+    }
+    .reloj-clock { font-size: clamp(56px, 16vw, 120px); font-weight: 800; letter-spacing: 2px; line-height: 1; font-variant-numeric: tabular-nums; }
+    .reloj-date { font-size: clamp(16px, 3.2vw, 24px); color: #9fb6cc; font-weight: 600; text-transform: capitalize; }
+    .reloj-scan-btn {
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #14b8a6, #0d9488);
+      color: #fff;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 0 0 12px rgba(20, 184, 166, 0.18), 0 18px 50px rgba(0, 0, 0, 0.5);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      animation: pulse 2.4s ease-in-out infinite;
+    }
+    .reloj-scan-btn:hover { transform: scale(1.05); }
+    .reloj-scan-btn:active { transform: scale(0.97); }
+    .reloj-scan-btn svg { width: 52px; height: 52px; }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 12px rgba(20, 184, 166, 0.18), 0 18px 50px rgba(0, 0, 0, 0.5); }
+      50% { box-shadow: 0 0 0 22px rgba(20, 184, 166, 0.08), 0 18px 50px rgba(0, 0, 0, 0.5); }
+    }
+    .reloj-note { font-size: 14px; color: #7c93ab; text-align: center; min-height: 20px; }
+    .reloj-note a { color: #14b8a6; }
+
+    .reloj-scan {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .reloj-scan.show { display: flex; }
+    .reloj-scan video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+    .reloj-scan canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      transform: scaleX(-1);
+      pointer-events: none;
+    }
+    .reloj-challenge {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.78);
+      color: #fde047;
+      font-weight: 800;
+      font-size: clamp(18px, 4vw, 30px);
+      letter-spacing: 1px;
+      padding: 14px 30px;
+      border-radius: 999px;
+      text-align: center;
+      white-space: nowrap;
+      max-width: 94%;
+    }
+    .reloj-scan-status {
+      position: absolute;
+      top: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      color: #dbeafe;
+      font-size: clamp(14px, 3vw, 20px);
+      font-weight: 600;
+      padding: 10px 22px;
+      border-radius: 999px;
+      text-align: center;
+      max-width: 94%;
+    }
+    .reloj-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      background: rgba(0, 0, 0, 0.45);
+      color: #fff;
+      font-size: 26px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .reloj-msg {
+      position: fixed;
+      inset: 0;
+      background: #fff;
+      color: #0f172a;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 30px;
+      text-align: center;
+      padding: 30px;
+      z-index: 50;
+    }
+    .reloj-msg.show { display: flex; }
+    .reloj-msg img { height: 110px; width: auto; }
+    .reloj-msg-text { font-size: clamp(34px, 8vw, 64px); font-weight: 800; line-height: 1.15; }
+    .reloj-msg.entrada .reloj-msg-text { color: #0d9488; }
+    .reloj-msg.salida .reloj-msg-text { color: #2563eb; }
+    .reloj-msg-sub { font-size: clamp(16px, 3.5vw, 26px); color: #64748b; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="reloj-home" id="relojHome">
+    <img class="reloj-logo" src="icons/logo FIAT.webp" alt="FIAT">
+    <div class="reloj-clock" id="relojClock">--:--:--</div>
+    <div class="reloj-date" id="relojDate"></div>
+    <button class="reloj-scan-btn" id="relojScanBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+      ESCANEAR
+    </button>
+    <div class="reloj-note" id="relojNote"></div>
+  </div>
+
+  <div class="reloj-scan" id="relojScan">
+    <video id="relojVideo" autoplay muted playsinline></video>
+    <canvas id="relojOverlay"></canvas>
+    <div class="reloj-scan-status" id="relojScanStatus">Iniciando cámara...</div>
+    <div class="reloj-challenge" id="relojChallenge" style="display:none;"></div>
+    <button class="reloj-close" id="relojClose">✕</button>
+  </div>
+
+  <div class="reloj-msg" id="relojMsg">
+    <img src="icons/logo FIAT.webp" alt="FIAT">
+    <div class="reloj-msg-text" id="relojMsgText"></div>
+    <div class="reloj-msg-sub" id="relojMsgSub"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      var MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights';
+      var DIST = 0.55;
+
+      var st = {
+        video: null,
+        stream: null,
+        timer: null,
+        ticking: false,
+        models: null,
+        state: 'idle',
+        profile: null,
+        streak: 0,
+        lastId: null,
+        challenge: null,
+        chal: null,
+        profiles: [],
+        names: {},
+        marcajes: []
+      };
+
+      var DIAS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+      var MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+      function $(id) { return document.getElementById(id); }
+
+      function esc(s) {
+        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+
+      function nameOf(id) {
+        var t = st.names[id];
+        return t ? ((t.nombres || '') + ' ' + (t.apellidos || '')).trim() : 'Trabajador';
+      }
+
+      function localDateStr(iso) {
+        if (!iso) return '';
+        var d = new Date(iso);
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      }
+      function todayISO() { return localDateStr(new Date().toISOString()); }
+
+      function tickClock() {
+        var d = new Date();
+        var hh = String(d.getHours()).padStart(2, '0');
+        var mm = String(d.getMinutes()).padStart(2, '0');
+        var ss = String(d.getSeconds()).padStart(2, '0');
+        $('relojClock').textContent = hh + ':' + mm + ':' + ss;
+        $('relojDate').textContent = DIAS[d.getDay()] + ', ' + d.getDate() + ' de ' + MESES[d.getMonth()] + ' de ' + d.getFullYear();
+      }
+
+      function loadModels() {
+        if (!st.models) {
+          st.models = Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+            faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+            faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+            faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL)
+          ]);
+        }
+        return st.models;
+      }
+
+      async function loadDatos() {
+        var pl = await supabaseClient.from('plantilla_trabajadores').select('id, nombres, apellidos, cedula').eq('estado', 'Activo');
+        if (!pl.error) {
+          st.names = {};
+          (pl.data || []).forEach(function (t) { st.names[t.id] = t; });
+        }
+        var pRes = await supabaseClient.from('comp_biometria_perfiles').select('*').eq('activo', true);
+        var mRes = await supabaseClient.from('comp_marcajes').select('*').order('fecha_hora', { ascending: false }).limit(300);
+        st.profiles = (pRes.data || []).filter(function (p) { return st.names[p.trabajador_id]; });
+        st.marcajes = mRes.data || [];
+      }
+
+      async function startScan() {
+        if (st.state === 'scanning' || st.state === 'challenge' || st.state === 'success') return;
+        if (!st.stream) {
+          try {
+            st.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false });
+            st.video.srcObject = st.stream;
+            await st.video.play();
+          } catch (e) {
+            setStatus('No se pudo acceder a la cámara. Permite el acceso e inténtalo de nuevo.', 'err');
+            return;
+          }
+        }
+        $('relojHome').style.display = 'none';
+        $('relojScan').classList.add('show');
+        st.state = 'scanning';
+        setStatus('Mantén tu rostro frente a la cámara', 'info');
+        setChallenge('');
+        if (!st.timer) st.timer = setInterval(tick, 180);
+      }
+
+      function stopScan() {
+        if (st.timer) { clearInterval(st.timer); st.timer = null; }
+        if (st.stream) { st.stream.getTracks().forEach(function (t) { t.stop(); }); st.stream = null; }
+        if (st.video) st.video.srcObject = null;
+        st.state = 'idle';
+        st.profile = null; st.streak = 0; st.lastId = null;
+        setChallenge('');
+        $('relojScan').classList.remove('show');
+        $('relojHome').style.display = '';
+      }
+
+      async function tick() {
+        if (st.ticking || st.state === 'success') return;
+        if (!st.video || st.video.readyState < 2) return;
+        st.ticking = true;
+        try {
+          var dets = await faceapi.detectAllFaces(st.video, new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.45 }))
+            .withFaceLandmarks().withFaceDescriptors().withFaceExpressions();
+          if (st.state === 'scanning') processDetect(dets);
+          else if (st.state === 'challenge') processChallenge(dets);
+          drawOverlay(dets[0]);
+        } catch (e) { drawOverlay(null); }
+        st.ticking = false;
+      }
+
+      function matchFace(desc) {
+        var best = null;
+        for (var i = 0; i < st.profiles.length; i++) {
+          var list = st.profiles[i].descriptor;
+          if (!Array.isArray(list) || !list.length) continue;
+          if (typeof list[0] === 'number') list = [list];
+          var min = Infinity;
+          for (var j = 0; j < list.length; j++) {
+            var d = faceapi.euclideanDistance(desc, Float32Array.from(list[j]));
+            if (d < min) min = d;
+          }
+          if (!best || min < best.d) best = { p: st.profiles[i], d: min };
+        }
+        return best && best.d <= DIST ? best : null;
+      }
+
+      function processDetect(dets) {
+        if (!dets.length) { st.streak = 0; st.lastId = null; setStatus('Mantén tu rostro frente a la cámara', 'info'); return; }
+        if (dets.length > 1) { st.streak = 0; st.lastId = null; setStatus('Solo puede marcarse una persona a la vez', 'warn'); return; }
+        var m = matchFace(dets[0].descriptor);
+        if (!m) { st.streak = 0; st.lastId = null; setStatus('Rostro no registrado. Pide al administrador el enrolamiento.', 'warn'); return; }
+        if (st.lastId === m.p.trabajador_id) st.streak += 1; else { st.streak = 1; st.lastId = m.p.trabajador_id; }
+        setStatus(nameOf(m.p.trabajador_id) + ' · confianza ' + Math.max(0, Math.min(100, Math.round((1 - m.d) * 100))) + '%', 'ok');
+        if (st.streak >= 5) startChallenge(m.p);
+      }
+
+      var CHALLENGES = [
+        { label: 'PARPADEA', check: checkBlink },
+        { label: 'GIRA LA CABEZA A LA IZQUIERDA', check: checkLeft },
+        { label: 'GIRA LA CABEZA A LA DERECHA', check: checkRight },
+        { label: 'SONRÍE', check: checkSmile }
+      ];
+
+      function startChallenge(profile) {
+        st.profile = profile;
+        st.challenge = CHALLENGES[Math.floor(Math.random() * CHALLENGES.length)];
+        st.chal = { blinks: 0, wasClosed: false, sustained: 0 };
+        st.state = 'challenge';
+        setStatus('Verificación de vida · ' + nameOf(profile.trabajador_id), 'ok');
+        setChallenge(st.challenge.label);
+      }
+
+      function dist2(p1, p2) { return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2)); }
+      function ear(lm) {
+        var l = (dist2(lm[37], lm[41]) + dist2(lm[38], lm[40])) / (2 * dist2(lm[36], lm[39]) || 1);
+        var r = (dist2(lm[43], lm[47]) + dist2(lm[44], lm[46])) / (2 * dist2(lm[42], lm[45]) || 1);
+        return (l + r) / 2;
+      }
+      function yaw(lm) {
+        var l = lm[1], r = lm[15], nose = lm[30];
+        var cx = (l.x + r.x) / 2;
+        var fw = Math.max(dist2(l, r), 1);
+        return (nose.x - cx) / fw;
+      }
+      function sustain(cond, n) {
+        if (cond) st.chal.sustained += 1; else st.chal.sustained = 0;
+        return st.chal.sustained >= n;
+      }
+      function checkBlink(lm) {
+        var open = ear(lm) >= 0.22;
+        if (!open) st.chal.wasClosed = true;
+        else if (st.chal.wasClosed) { st.chal.blinks += 1; st.chal.wasClosed = false; }
+        return st.chal.blinks >= 1;
+      }
+      function checkLeft(lm) { return sustain(yaw(lm) > 0.15, 4); }
+      function checkRight(lm) { return sustain(yaw(lm) < -0.15, 4); }
+      function checkSmile(lm, det) {
+        if (!det || !det.expressions) return false;
+        return sustain(det.expressions.smiling > 0.5, 4);
+      }
+
+      function processChallenge(dets) {
+        if (!dets.length || dets.length > 1) { st.chal.sustained = 0; setStatus('Mantén tu rostro frente a la cámara', 'warn'); return; }
+        var m = matchFace(dets[0].descriptor);
+        if (!m || m.p.trabajador_id !== st.profile.trabajador_id) {
+          st.chal.sustained = 0;
+          setStatus('Rostro no verificado. Inténtalo de nuevo.', 'warn');
+          return;
+        }
+        if (st.challenge.check(dets[0].landmarks.positions, dets[0])) chalOk();
+      }
+
+      async function chalOk() {
+        st.state = 'success';
+        setChallenge('');
+        setStatus('Verificado. Registrando...', 'ok');
+        try {
+          var hoy = todayISO();
+          var lista = st.marcajes.filter(function (m) { return m.trabajador_id === st.profile.trabajador_id && localDateStr(m.fecha_hora) === hoy; });
+          var tipo = lista.length % 2 === 0 ? 'Entrada' : 'Salida';
+          var ins = await supabaseClient.from('comp_marcajes').insert([{ trabajador_id: st.profile.trabajador_id, tipo: tipo, fecha_hora: new Date().toISOString(), fuente: 'biometria' }]);
+          if (ins.error) throw ins.error;
+          await loadDatos();
+          showGreeting(nameOf(st.profile.trabajador_id), tipo);
+        } catch (err) {
+          setStatus('Error al guardar el marcaje: ' + (err.message || 'error'), 'err');
+          setTimeout(function () { stopScan(); }, 3000);
+        }
+      }
+
+      function showGreeting(nombre, tipo) {
+        var msg = $('relojMsg');
+        $('relojMsgText').textContent = (tipo === 'Entrada' ? '¡Bienvenido, ' : '¡Hasta luego, ') + nombre + '!';
+        $('relojMsgSub').textContent = tipo === 'Entrada' ? 'Que tengas un excelente día' : 'Nos vemos pronto';
+        msg.className = 'reloj-msg show ' + (tipo === 'Entrada' ? 'entrada' : 'salida');
+        setTimeout(function () {
+          msg.classList.remove('show');
+          msg.className = 'reloj-msg';
+          stopScan();
+        }, 4000);
+      }
+
+      function drawOverlay(d) {
+        var cv = $('relojOverlay');
+        if (!cv) return;
+        var ctx = cv.getContext('2d');
+        if (!d) { ctx.clearRect(0, 0, cv.width, cv.height); return; }
+        if (cv.width !== st.video.videoWidth || cv.height !== st.video.videoHeight) {
+          cv.width = st.video.videoWidth; cv.height = st.video.videoHeight;
+        }
+        ctx.clearRect(0, 0, cv.width, cv.height);
+        var box = d.detection.box;
+        ctx.strokeStyle = st.state === 'challenge' ? '#f59e0b' : '#10b981';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(box.x, box.y, box.width, box.height);
+        if (d.landmarks) {
+          d.landmarks.positions.forEach(function (p) { ctx.fillRect(p.x, p.y, 3, 3); });
+        }
+      }
+
+      function setStatus(text, type) {
+        var el = $('relojScanStatus');
+        el.textContent = text;
+        el.style.color = type === 'err' ? '#f87171' : type === 'warn' ? '#fbbf24' : type === 'ok' ? '#4ade80' : '#dbeafe';
+      }
+      function setChallenge(text) {
+        var el = $('relojChallenge');
+        el.style.display = text ? 'block' : 'none';
+        el.textContent = text;
+      }
+
+      $('relojScanBtn').addEventListener('click', function () { startScan(); });
+      $('relojClose').addEventListener('click', function () { stopScan(); });
+
+      document.addEventListener('DOMContentLoaded', function () {
+        st.video = $('relojVideo');
+        tickClock();
+        setInterval(tickClock, 1000);
+
+        supabaseClient.auth.getSession().then(function (s) {
+          if (!(s && s.data && s.data.session)) {
+            $('relojNote').innerHTML = 'Sesión no activa en este dispositivo. <a href="index.html">Inicia sesión una vez</a> para habilitar el reloj.';
+            return;
+          }
+          loadDatos().catch(function () {});
+          loadModels().catch(function () {});
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

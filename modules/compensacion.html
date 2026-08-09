@@ -12,9 +12,7 @@
   <style>
     :root { --module-color: var(--module-compensacion); }
 
-    .bio-layout { display: grid; grid-template-columns: minmax(320px, 430px) 1fr; gap: 16px; }
-    @media (max-width: 960px) { .bio-layout { grid-template-columns: 1fr; } }
-    .bio-cam-card, .bio-regs-card {
+    .bio-regs-card {
       background: var(--color-surface);
       border: 1px solid var(--color-border);
       border-radius: var(--radius-md);
@@ -22,31 +20,6 @@
     }
     .bio-regs-card h3 { margin: 0 0 10px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
     .bio-regs-card h3 i.fi { color: var(--module-compensacion); }
-    .bio-cam-wrap {
-      position: relative;
-      border-radius: var(--radius-md);
-      overflow: hidden;
-      background: #0f172a;
-      aspect-ratio: 4 / 3;
-    }
-    .bio-cam-video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); display: block; }
-    .bio-cam-overlay { position: absolute; inset: 0; width: 100%; height: 100%; transform: scaleX(-1); pointer-events: none; }
-    .bio-challenge {
-      position: absolute;
-      bottom: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.75);
-      color: #fde047;
-      font-weight: 700;
-      font-size: 17px;
-      letter-spacing: 1px;
-      padding: 8px 18px;
-      border-radius: 999px;
-      text-align: center;
-      max-width: 92%;
-      white-space: nowrap;
-    }
     .bio-status { margin-top: 10px; font-size: 13px; min-height: 18px; text-align: center; }
     .bio-status.ok { color: #16a34a; font-weight: 600; }
     .bio-status.warn { color: #d97706; }
@@ -63,7 +36,6 @@
     .bio-today-item span { display: block; font-size: 11px; color: var(--color-text-secondary); }
     .bio-today-item strong { font-size: 15px; }
     .bio-mini { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; }
-    .bio-photo-thumb { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; }
     .bio-enroll-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     @media (max-width: 560px) { .bio-enroll-wrap { grid-template-columns: 1fr; } }
     .bio-enroll-wrap video {
@@ -74,20 +46,33 @@
       background: #0f172a;
       transform: scaleX(-1);
     }
-    .bio-enroll-preview {
-      min-height: 150px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .bio-enroll-slots { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start; }
+    .bio-enroll-slot {
+      position: relative;
+      aspect-ratio: 4 / 3;
       border: 1px dashed var(--color-border);
       border-radius: var(--radius-sm);
       background: var(--color-bg);
-      color: var(--color-text-secondary);
-      font-size: 12px;
-      text-align: center;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .bio-enroll-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .bio-enroll-slot.done { border-style: solid; border-color: #16a34a; }
+    .bio-enroll-slot img { width: 100%; height: 100%; object-fit: cover; }
+    .bio-enroll-slot .slot-label {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+    .bio-enroll-slot.done .slot-label { background: #16a34a; }
+    .bio-enroll-slot .slot-empty { color: var(--color-text-secondary); font-size: 11px; }
     .bio-enroll-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
   </style>
 </head>
@@ -183,32 +168,25 @@
 
           <div class="tool-section" id="tool-biometria">
             <div class="tool-section-header">
-              <h2 style="color:var(--module-compensacion);">Biometría · Reloj de marcaje facial</h2>
+              <h2 style="color:var(--module-compensacion);">Biometría · Registro y marcajes</h2>
               <button class="btn btn-compensacion" onclick="openModalBiometria()"><i class="fi fi-sr-id-badge"></i> Enrolar trabajador</button>
             </div>
 
-            <div class="bio-layout">
-              <div class="bio-cam-card">
-                <div class="bio-cam-wrap">
-                  <video id="bioVideo" class="bio-cam-video" playsinline muted autoplay></video>
-                  <canvas id="bioOverlay" class="bio-cam-overlay"></canvas>
-                  <div id="bioChallenge" class="bio-challenge" style="display:none;"></div>
-                </div>
-                <div id="bioStatus" class="bio-status">Preparando la cámara...</div>
-                <div class="bio-today">
-                  <div class="bio-today-item"><span>Entradas hoy</span><strong id="bioHoyEntradas">—</strong></div>
-                  <div class="bio-today-item"><span>Salidas hoy</span><strong id="bioHoySalidas">—</strong></div>
-                  <div class="bio-today-item"><span>Marcajes hoy</span><strong id="bioHoyTotal">—</strong></div>
-                  <div class="bio-today-item"><span>Personas hoy</span><strong id="bioHoyPersonas">—</strong></div>
-                </div>
-              </div>
+            <div class="bio-today">
+              <div class="bio-today-item"><span>Entradas hoy</span><strong id="bioHoyEntradas">—</strong></div>
+              <div class="bio-today-item"><span>Salidas hoy</span><strong id="bioHoySalidas">—</strong></div>
+              <div class="bio-today-item"><span>Marcajes hoy</span><strong id="bioHoyTotal">—</strong></div>
+              <div class="bio-today-item"><span>Personas hoy</span><strong id="bioHoyPersonas">—</strong></div>
+            </div>
 
-              <div class="bio-regs-card">
-                <h3><i class="fi fi-sr-alarm-clock"></i> Marcajes de hoy</h3>
-                <div class="tabla-scroll"><table class="table" id="bioMarcajesTable"></table></div>
-                <h3 style="margin-top:18px;"><i class="fi fi-sr-clock"></i> Horas de hoy por trabajador</h3>
-                <div class="tabla-scroll"><table class="table" id="bioHorasTable"></table></div>
-              </div>
+            <div class="bio-regs-card" style="margin-top:16px;">
+              <h3><i class="fi fi-sr-alarm-clock"></i> Historial de marcajes (últimos 100)</h3>
+              <div class="tabla-scroll"><table class="table" id="bioMarcajesTable"></table></div>
+            </div>
+
+            <div class="bio-regs-card" style="margin-top:16px;">
+              <h3><i class="fi fi-sr-clock"></i> Horas de hoy por trabajador</h3>
+              <div class="tabla-scroll"><table class="table" id="bioHorasTable"></table></div>
             </div>
           </div>
         </div>
@@ -251,11 +229,11 @@
         </div>
         <div class="bio-enroll-wrap">
           <video id="bioEnrollVideo" class="bio-cam-video" playsinline muted autoplay></video>
-          <div class="bio-enroll-preview" id="bioEnrollPreview"><span>Esperando captura del rostro...</span></div>
+          <div class="bio-enroll-slots" id="bioEnrollSlots"></div>
         </div>
-        <div id="bioEnrollMsg" class="bio-status">Selecciona al trabajador y captura su rostro mirando a la cámara.</div>
+        <div id="bioEnrollMsg" class="bio-status">Selecciona al trabajador y captura las 4 poses: frente, sonriendo, mirando a la izquierda y a la derecha.</div>
         <div class="bio-enroll-actions">
-          <button class="btn btn-outline" onclick="bioCaptureEnroll()">Capturar rostro</button>
+          <button class="btn btn-outline" id="bioCaptureBtn" onclick="bioCaptureEnroll()">Capturar: Frente</button>
           <button class="btn btn-compensacion" id="bioGuardarBtn" onclick="bioSaveEnroll()" disabled>Guardar perfil facial</button>
         </div>
         <h3 style="margin-top:18px;font-size:14px;"><i class="fi fi-sr-face-viewfinder"></i> Perfiles faciales registrados</h3>
@@ -279,20 +257,10 @@
       'use strict';
 
       var BIO_MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights';
-      var BIO_DIST = 0.55;
 
       var bio = {
-        video: null,
-        stream: null,
-        ticking: false,
-        timer: null,
+        enrollStream: null,
         modelsReady: null,
-        state: 'idle',
-        profile: null,
-        streak: 0,
-        lastId: null,
-        challenge: null,
-        chal: null,
         plantilla: [],
         names: {},
         profiles: [],
@@ -346,203 +314,36 @@
         bioRenderEnrolled();
       }
 
-      async function bioStartCamera() {
-        if (bio.stream) return bio.stream;
+      async function bioEnsureModels() {
+        try { await bioLoadModels(); }
+        catch (e) { bioEnrollMsg('Error al cargar los modelos de IA: ' + (e && e.message ? e.message : e), 'err'); }
+      }
+
+      async function bioStartEnrollCam() {
+        var ev = document.getElementById('bioEnrollVideo');
+        if (!ev) return;
+        if (bio.enrollStream) { ev.srcObject = bio.enrollStream; ev.play().catch(function () {}); return; }
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-          bioSetStatus('La cámara no está disponible en este dispositivo o navegador.', 'err');
-          return null;
+          bioEnrollMsg('La cámara no está disponible en este dispositivo o navegador.', 'err');
+          return;
         }
         try {
-          bio.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false });
-          bio.video.srcObject = bio.stream;
-          await bio.video.play();
-          return bio.stream;
+          bio.enrollStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false });
+          ev.srcObject = bio.enrollStream;
+          await ev.play();
         } catch (e) {
           var msg = (e && e.message) || 'error';
           if (msg.indexOf('NotAllowed') !== -1) msg = 'Permiso denegado. Habilita el acceso a la cámara para este sitio.';
-          bioSetStatus('No se pudo acceder a la cámara: ' + msg, 'err');
-          return null;
+          bioEnrollMsg('No se pudo acceder a la cámara: ' + msg, 'err');
         }
       }
-      function bioStopCamera() {
-        if (bio.stream) { bio.stream.getTracks().forEach(function (t) { t.stop(); }); bio.stream = null; }
-        if (bio.video) bio.video.srcObject = null;
+
+      function bioStopEnrollCam() {
+        if (bio.enrollStream) { bio.enrollStream.getTracks().forEach(function (t) { t.stop(); }); bio.enrollStream = null; }
         var ev = document.getElementById('bioEnrollVideo');
         if (ev) ev.srcObject = null;
       }
 
-      function bioStartTicks() { if (!bio.timer) bio.timer = setInterval(bioTick, 180); }
-      function bioStopTicks() { if (bio.timer) { clearInterval(bio.timer); bio.timer = null; } }
-
-      async function bioTick() {
-        if (bio.ticking || bio.state === 'success' || bio.state === 'enroll' || bio.state === 'idle') return;
-        if (!bio.video || bio.video.readyState < 2) return;
-        bio.ticking = true;
-        try {
-          var dets = await faceapi.detectAllFaces(bio.video, new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.45 }))
-            .withFaceLandmarks().withFaceDescriptors().withFaceExpressions();
-          if (bio.state === 'detect') bioProcessDetect(dets);
-          else if (bio.state === 'challenge') bioProcessChallenge(dets);
-          bioDrawOverlay(dets[0]);
-        } catch (e) { bioDrawOverlay(null); }
-        bio.ticking = false;
-      }
-
-      function bioMatch(desc) {
-        var best = null;
-        for (var i = 0; i < bio.profiles.length; i++) {
-          var d = faceapi.euclideanDistance(desc, Float32Array.from(bio.profiles[i].descriptor));
-          if (!best || d < best.d) best = { p: bio.profiles[i], d: d };
-        }
-        return best && best.d <= BIO_DIST ? best : null;
-      }
-
-      function bioProcessDetect(dets) {
-        if (!dets.length) {
-          bio.streak = 0; bio.lastId = null;
-          bioSetStatus('Colócate frente a la cámara, mirando hacia ella.', 'info');
-          bioSetChallenge('');
-          return;
-        }
-        if (dets.length > 1) {
-          bio.streak = 0; bio.lastId = null;
-          bioSetStatus('Se detectan varias personas. Debe marcarse una a la vez.', 'warn');
-          bioSetChallenge('');
-          return;
-        }
-        var m = bioMatch(dets[0].descriptor);
-        if (!m) {
-          bio.streak = 0; bio.lastId = null;
-          bioSetStatus('Rostro no registrado. Pide al administrador que te enrolle.', 'warn');
-          bioSetChallenge('');
-          return;
-        }
-        if (bio.lastId === m.p.trabajador_id) bio.streak += 1; else { bio.streak = 1; bio.lastId = m.p.trabajador_id; }
-        var conf = Math.max(0, Math.min(100, Math.round((1 - m.d) * 100)));
-        bioSetStatus('Identificado: ' + bioName(m.p.trabajador_id) + ' · confianza ' + conf + '%', 'ok');
-        if (bio.streak >= 5) bioStartChallenge(m.p);
-      }
-
-      var CHALLENGES = [
-        { key: 'blink', label: 'PARPADEA', check: bioCheckBlink },
-        { key: 'left', label: 'GIRA LA CABEZA A LA IZQUIERDA', check: bioCheckLeft },
-        { key: 'right', label: 'GIRA LA CABEZA A LA DERECHA', check: bioCheckRight },
-        { key: 'smile', label: 'SONRÍE', check: bioCheckSmile }
-      ];
-
-      function bioStartChallenge(profile) {
-        bio.profile = profile;
-        bio.challenge = CHALLENGES[Math.floor(Math.random() * CHALLENGES.length)];
-        bio.chal = { blinks: 0, wasClosed: false, sustained: 0 };
-        bio.state = 'challenge';
-        bioSetStatus('Verificación de vida para ' + bioName(profile.trabajador_id) + '. Realiza la acción pedida.', 'ok');
-        bioSetChallenge(bio.challenge.label);
-      }
-
-      function bioDist(p1, p2) { return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2)); }
-      function bioEAR(lm) {
-        var left = (bioDist(lm[37], lm[41]) + bioDist(lm[38], lm[40])) / (2 * bioDist(lm[36], lm[39]) || 1);
-        var right = (bioDist(lm[43], lm[47]) + bioDist(lm[44], lm[46])) / (2 * bioDist(lm[42], lm[45]) || 1);
-        return (left + right) / 2;
-      }
-      function bioYaw(lm) {
-        var l = lm[1], r = lm[15], nose = lm[30];
-        var cx = (l.x + r.x) / 2;
-        var fw = Math.max(bioDist(l, r), 1);
-        return (nose.x - cx) / fw;
-      }
-      function bioSustain(cond, n) {
-        if (cond) bio.chal.sustained += 1; else bio.chal.sustained = 0;
-        return bio.chal.sustained >= n;
-      }
-      function bioCheckBlink(lm) {
-        var open = bioEAR(lm) >= 0.22;
-        if (!open) bio.chal.wasClosed = true;
-        else if (bio.chal.wasClosed) { bio.chal.blinks += 1; bio.chal.wasClosed = false; }
-        return bio.chal.blinks >= 1;
-      }
-      function bioCheckLeft(lm) { return bioSustain(bioYaw(lm) > 0.15, 4); }
-      function bioCheckRight(lm) { return bioSustain(bioYaw(lm) < -0.15, 4); }
-      function bioCheckSmile(lm, det) {
-        if (!det || !det.expressions) return false;
-        return bioSustain(det.expressions.smiling > 0.5, 4);
-      }
-
-      function bioProcessChallenge(dets) {
-        if (!dets.length || dets.length > 1) {
-          bio.chal.sustained = 0;
-          bioSetStatus('Mantén tu rostro dentro del recuadro y solo.', 'warn');
-          return;
-        }
-        var m = bioMatch(dets[0].descriptor);
-        if (!m || m.p.trabajador_id !== bio.profile.trabajador_id) {
-          bio.chal.sustained = 0;
-          bioSetStatus('El rostro no corresponde a ' + bioName(bio.profile.trabajador_id) + '. Reiniciando verificación.', 'warn');
-          return;
-        }
-        if (bio.challenge.check(dets[0].landmarks.positions, dets[0])) bioChalOk();
-      }
-
-      async function bioChalOk() {
-        bio.state = 'success';
-        bioSetChallenge('');
-        bioSetStatus('Identidad y vida verificadas. Registrando marcaje...', 'ok');
-        try {
-          var tipo = await bioNextTipo();
-          var foto = bioSnapshot();
-          var ins = await supabaseClient.from('comp_marcajes').insert([{ trabajador_id: bio.profile.trabajador_id, tipo: tipo, fecha_hora: new Date().toISOString(), foto: foto, fuente: 'biometria' }]);
-          if (ins.error) throw ins.error;
-          bioSetStatus(bioName(bio.profile.trabajador_id) + ' · ' + tipo + ' registrada a las ' + bioHora(new Date().toISOString()), 'ok');
-          bio.profile = null; bio.streak = 0; bio.lastId = null;
-          await bioLoadDatos();
-        } catch (err) {
-          bioSetStatus('Error al guardar el marcaje: ' + (err.message || 'error'), 'err');
-        }
-        setTimeout(function () {
-          if (bio.state === 'success') { bio.state = 'detect'; bioSetStatus('Colócate frente a la cámara...', 'info'); }
-        }, 3500);
-      }
-
-      async function bioNextTipo() {
-        var hoy = bioTodayISO();
-        var lista = bio.marcajes.filter(function (m) { return m.trabajador_id === bio.profile.trabajador_id && bioLocalDateStr(m.fecha_hora) === hoy; });
-        return lista.length % 2 === 0 ? 'Entrada' : 'Salida';
-      }
-
-      function bioSnapshot() {
-        if (!bio.video || bio.video.videoWidth === 0) return null;
-        var cv = document.createElement('canvas');
-        cv.width = bio.video.videoWidth; cv.height = bio.video.videoHeight;
-        cv.getContext('2d').drawImage(bio.video, 0, 0);
-        return cv.toDataURL('image/jpeg', 0.75);
-      }
-
-      function bioDrawOverlay(d) {
-        var cv = document.getElementById('bioOverlay');
-        if (!cv) return;
-        var ctx = cv.getContext('2d');
-        if (!d) { ctx.clearRect(0, 0, cv.width, cv.height); return; }
-        if (cv.width !== bio.video.videoWidth || cv.height !== bio.video.videoHeight) {
-          cv.width = bio.video.videoWidth; cv.height = bio.video.videoHeight;
-        }
-        ctx.clearRect(0, 0, cv.width, cv.height);
-        var box = d.detection.box;
-        ctx.strokeStyle = bio.state === 'challenge' ? '#f59e0b' : '#10b981';
-        ctx.lineWidth = 3;
-        ctx.strokeRect(box.x, box.y, box.width, box.height);
-        ctx.fillStyle = 'rgba(255,255,255,0.85)';
-        ctx.font = '12px Inter, sans-serif';
-        ctx.fillText(bio.state === 'challenge' ? 'Verificando...' : 'Mira a la cámara', box.x, Math.max(box.y - 8, 14));
-      }
-
-      function bioSetStatus(text, type) {
-        var el = document.getElementById('bioStatus');
-        if (el) { el.textContent = text; el.className = 'bio-status ' + (type || 'info'); }
-      }
-      function bioSetChallenge(text) {
-        var el = document.getElementById('bioChallenge');
-        if (el) { el.style.display = text ? 'block' : 'none'; el.textContent = text; }
-      }
       function bioEnrollMsg(text, type) {
         var el = document.getElementById('bioEnrollMsg');
         if (el) { el.textContent = text; el.className = 'bio-status ' + (type || 'info'); }
@@ -565,16 +366,15 @@
       function bioRenderMarcajes() {
         var tb = document.getElementById('bioMarcajesTable');
         if (!tb) return;
-        var hoy = bioTodayISO();
-        var lista = bio.marcajes.filter(function (m) { return bioLocalDateStr(m.fecha_hora) === hoy; }).slice(0, 80);
+        var lista = bio.marcajes.slice(0, 100);
         if (!lista.length) {
-          tb.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:30px;color:#999;">Aún no hay marcajes hoy</td></tr>';
+          tb.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:30px;color:#999;">Aún no hay marcajes registrados</td></tr>';
           return;
         }
-        tb.innerHTML = '<thead><tr><th>Trabajador</th><th>Tipo</th><th>Hora</th><th>Foto</th></tr></thead><tbody>' +
+        tb.innerHTML = '<thead><tr><th>Trabajador</th><th>Tipo</th><th>Fecha</th><th>Hora</th></tr></thead><tbody>' +
           lista.map(function (m) {
             var badge = m.tipo === 'Entrada' ? 'badge-active' : 'badge-inactive';
-            return '<tr><td>' + bioEsc(bioName(m.trabajador_id)) + '</td><td><span class="badge ' + badge + '">' + bioEsc(m.tipo) + '</span></td><td>' + bioHora(m.fecha_hora) + '</td><td>' + (m.foto ? '<img class="bio-photo-thumb" src="' + m.foto + '" alt="">' : '—') + '</td></tr>';
+            return '<tr><td>' + bioEsc(bioName(m.trabajador_id)) + '</td><td><span class="badge ' + badge + '">' + bioEsc(m.tipo) + '</span></td><td>' + bioLocalDateStr(m.fecha_hora) + '</td><td>' + bioHora(m.fecha_hora) + '</td></tr>';
           }).join('') + '</tbody>';
       }
 
@@ -625,7 +425,34 @@
           }).join('') + '</tbody>';
       }
 
-      var bioEnrollTmp = null;
+      var BIO_POSES = [
+        { key: 'frente', label: 'Frente' },
+        { key: 'sonrisa', label: 'Sonriendo' },
+        { key: 'izquierda', label: 'Mira a la izquierda' },
+        { key: 'derecha', label: 'Mira a la derecha' }
+      ];
+      var bioEnrollTmp = { descs: [], fotos: [] };
+
+      function bioRenderSlots() {
+        var slots = document.getElementById('bioEnrollSlots');
+        if (!slots) return;
+        slots.innerHTML = BIO_POSES.map(function (pose, i) {
+          var done = i < bioEnrollTmp.descs.length;
+          var foto = done ? bioEnrollTmp.fotos[i] : null;
+          return '<div class="bio-enroll-slot' + (done ? ' done' : '') + '">' +
+            '<span class="slot-label">' + pose.label + '</span>' +
+            (foto ? '<img src="' + foto + '" alt="' + pose.label + '">' : '<span class="slot-empty">Pendiente</span>') +
+            '</div>';
+        }).join('');
+        var btn = document.getElementById('bioCaptureBtn');
+        var gb = document.getElementById('bioGuardarBtn');
+        var next = bioEnrollTmp.descs.length;
+        if (btn) {
+          btn.disabled = next >= BIO_POSES.length;
+          btn.textContent = next >= BIO_POSES.length ? 'Capturas completas' : 'Capturar: ' + BIO_POSES[next].label;
+        }
+        if (gb) gb.disabled = next < BIO_POSES.length;
+      }
 
       function openModalBiometria() {
         var sel = document.getElementById('bio_trabajador');
@@ -635,35 +462,28 @@
             return '<option value="' + t.id + '">' + bioEsc(bioName(t.id)) + ' · ' + bioEsc(t.cedula || '') + (ya ? ' (enrolado)' : '') + '</option>';
           }).join('');
         }
-        bioEnrollTmp = null;
-        var gb = document.getElementById('bioGuardarBtn');
-        if (gb) gb.disabled = true;
-        var pv = document.getElementById('bioEnrollPreview');
-        if (pv) pv.innerHTML = '<span>Esperando captura del rostro...</span>';
-        bioEnrollMsg('Selecciona al trabajador y captura su rostro mirando a la cámara.', 'info');
-        bio.state = 'enroll';
+        bioEnrollTmp = { descs: [], fotos: [] };
+        bioRenderSlots();
+        bioEnrollMsg('Selecciona al trabajador y captura las 4 poses: frente, sonriendo, mirando a la izquierda y a la derecha.', 'info');
         document.getElementById('modalBiometria').classList.add('show');
-        var ev = document.getElementById('bioEnrollVideo');
-        if (bio.stream) ev.srcObject = bio.stream;
-        ev.play().catch(function () {});
+        bioEnsureModels();
+        bioStartEnrollCam();
       }
 
       function closeModalBiometria() {
         document.getElementById('modalBiometria').classList.remove('show');
-        var ev = document.getElementById('bioEnrollVideo');
-        if (ev) ev.srcObject = null;
-        bio.state = 'detect';
-        bioSetStatus('Colócate frente a la cámara...', 'info');
+        bioStopEnrollCam();
       }
 
       async function bioCaptureEnroll() {
         var id = document.getElementById('bio_trabajador').value;
         if (!id) { bioEnrollMsg('Selecciona primero al trabajador.', 'warn'); return; }
+        if (bioEnrollTmp.descs.length >= BIO_POSES.length) return;
         var ev = document.getElementById('bioEnrollVideo');
         if (!ev || ev.readyState < 2) { bioEnrollMsg('La cámara aún no está lista. Espera un segundo.', 'warn'); return; }
         try {
           var dets = await faceapi.detectAllFaces(ev, new faceapi.TinyFaceDetectorOptions({ inputSize: 416, scoreThreshold: 0.5 })).withFaceLandmarks().withFaceDescriptors();
-          if (!dets.length) { bioEnrollMsg('No se detectó ningún rostro. Acércate y mira a la cámara.', 'err'); return; }
+          if (!dets.length) { bioEnrollMsg('No se detectó ningún rostro. Acércate y realiza la pose pedida.', 'err'); return; }
           if (dets.length > 1) { bioEnrollMsg('Se detectaron varios rostros. Asegúrate de estar solo.', 'err'); return; }
           var cv = document.createElement('canvas');
           var vw = ev.videoWidth, vh = ev.videoHeight;
@@ -672,10 +492,15 @@
           ctx.translate(vw, 0); ctx.scale(-1, 1);
           ctx.drawImage(ev, 0, 0, vw, vh);
           var foto = cv.toDataURL('image/jpeg', 0.82);
-          bioEnrollTmp = { descriptor: Array.from(dets[0].descriptor), foto: foto };
-          document.getElementById('bioEnrollPreview').innerHTML = '<img src="' + foto + '" alt="Captura">';
-          document.getElementById('bioGuardarBtn').disabled = false;
-          bioEnrollMsg('Rostro capturado. Revisa la foto y guarda el perfil.', 'ok');
+          bioEnrollTmp.descs.push(Array.from(dets[0].descriptor));
+          bioEnrollTmp.fotos.push(foto);
+          bioRenderSlots();
+          var idx = bioEnrollTmp.descs.length - 1;
+          var pose = BIO_POSES[idx];
+          var msg = 'Pose "' + pose.label + '" capturada.';
+          if (bioEnrollTmp.descs.length < BIO_POSES.length) msg += ' Ahora: ' + BIO_POSES[bioEnrollTmp.descs.length].label;
+          else msg += ' Perfil completo, listo para guardar.';
+          bioEnrollMsg(msg, 'ok');
         } catch (e) {
           bioEnrollMsg('No se pudo analizar el rostro: ' + (e.message || 'error'), 'err');
         }
@@ -683,15 +508,14 @@
 
       async function bioSaveEnroll() {
         var id = document.getElementById('bio_trabajador').value;
-        if (!id || !bioEnrollTmp) return;
+        if (!id || bioEnrollTmp.descs.length < BIO_POSES.length) return;
         try {
           var res = await supabaseClient.from('comp_biometria_perfiles')
-            .upsert({ trabajador_id: id, descriptor: bioEnrollTmp.descriptor, foto: bioEnrollTmp.foto, activo: true }, { onConflict: 'trabajador_id' });
+            .upsert({ trabajador_id: id, descriptor: bioEnrollTmp.descs, foto: bioEnrollTmp.fotos[0] || null, activo: true }, { onConflict: 'trabajador_id' });
           if (res.error) throw res.error;
-          bioEnrollTmp = null;
-          document.getElementById('bioGuardarBtn').disabled = true;
-          document.getElementById('bioEnrollPreview').innerHTML = '<span>Perfil guardado.</span>';
-          bioEnrollMsg('Perfil facial guardado correctamente.', 'ok');
+          bioEnrollTmp = { descs: [], fotos: [] };
+          bioRenderSlots();
+          bioEnrollMsg('Perfil facial guardado correctamente (4 poses).', 'ok');
           await bioLoadDatos();
         } catch (err) {
           bioEnrollMsg('No se pudo guardar: ' + (err.message || 'error'), 'err');
@@ -711,24 +535,14 @@
       }
 
       async function bioInitTool() {
-        bioLoadModels().catch(function (e) {
-          bioSetStatus('Error al cargar los modelos de IA: ' + (e && e.message ? e.message : e), 'err');
-        });
-        try { await bioLoadDatos(); } catch (e) { bioSetStatus('Error al cargar datos: ' + (e.message || e), 'err'); }
-        var s = await bioStartCamera();
-        if (!s) return;
-        bio.state = 'detect';
-        bioSetStatus('Colócate frente a la cámara...', 'info');
-        bioStartTicks();
+        try { await bioLoadDatos(); }
+        catch (e) { console.warn('Biometría: error al cargar datos', e); }
       }
 
       function bioStopAll() {
-        bioStopTicks();
-        bioStopCamera();
-        bio.state = 'idle';
+        bioStopEnrollCam();
         var modal = document.getElementById('modalBiometria');
         if (modal) modal.classList.remove('show');
-        bioSetChallenge('');
       }
 
       window.openModalBiometria = openModalBiometria;
@@ -738,8 +552,6 @@
       window.bioDeleteEnroll = bioDeleteEnroll;
 
       document.addEventListener('DOMContentLoaded', function () {
-        bio.video = document.getElementById('bioVideo');
-        if (!bio.video) return;
         if (document.getElementById('tool-biometria').classList.contains('active')) bioInitTool();
         var orig = window.switchTool;
         window.switchTool = function (name) {

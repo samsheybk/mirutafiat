@@ -131,17 +131,32 @@
             </div>
 
             <div class="tool-section" id="tool-inv-equipos">
-              <div class="tabla-scroll">
-                <table class="data-table">
-                  <thead><tr><th>Equipo</th><th>Tipo</th><th>Marca / Modelo</th><th>Cantidad</th><th>Mínimo</th><th>Ubicación</th><th>Vencimiento</th><th>Estado</th><th style="width:150px;">Acciones</th></tr></thead>
-                  <tbody id="invEquiposBody">
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
-                  </tbody>
-                </table>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+                <button class="btn btn-sm eqp-tab" data-etab="inventario" onclick="eqpSwitchView('inventario',this)" style="background:var(--module-seguridad);color:#fff;border:0;border-radius:4px;padding:6px 16px;">Inventario</button>
+                <button class="btn btn-sm eqp-tab" data-etab="movimientos" onclick="eqpSwitchView('movimientos',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Movimientos</button>
+              </div>
+              <div id="eqpInventarioView">
+                <div class="tabla-scroll">
+                  <table class="data-table">
+                    <thead><tr><th>Equipo</th><th>Tipo</th><th>Marca / Modelo</th><th>Cantidad</th><th>Mínimo</th><th>Ubicación</th><th>Vencimiento</th><th>Estado</th><th style="width:170px;">Acciones</th></tr></thead>
+                    <tbody id="invEquiposBody">
+                      <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                      <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                      <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                      <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                      <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div id="eqpMovimientosView" style="display:none;">
+                <div class="ss-hint">Historial de todas las entradas y salidas de equipos. Las salidas se asignan a ubicaciones.</div>
+                <div class="tabla-scroll">
+                  <table class="data-table">
+                    <thead><tr><th>Fecha</th><th>Equipo</th><th>Tipo</th><th>Concepto</th><th>Ubicación destino</th><th>Cantidad</th><th>Lote</th><th>Vencimiento</th><th>Observaciones</th></tr></thead>
+                    <tbody id="movimientosEquiposBody"></tbody>
+                  </table>
+                </div>
               </div>
             </div>
 
@@ -479,6 +494,73 @@
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="ssHideModal('modalEntradaInsumo')">Cancelar</button>
         <button class="btn btn-seguridad" onclick="saveEntradaInsumo()">Registrar entrada</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Entrada de Equipo (lote y vencimiento opcionales) -->
+  <div class="modal-overlay" id="modalEntradaEquipo">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalEntradaEquipoTitle">Registrar entrada de equipo</h3><button class="modal-close" onclick="ssHideModal('modalEntradaEquipo')">&times;</button></div>
+      <div class="modal-body">
+        <div class="ss-pac-info" id="entEquipoInfo" style="display:none;"></div>
+        <form id="formEntradaEquipo">
+          <div class="form-row">
+            <div class="form-group"><label>Cantidad</label><input type="number" min="1" class="form-input" id="enteq_cantidad" value="1" required></div>
+            <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="enteq_fecha" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Número de lote (si aplica)</label><input type="text" class="form-input" id="enteq_lote" placeholder="Ej: L-2601"></div>
+            <div class="form-group"><label>Fecha de vencimiento (si aplica)</label><input type="date" class="form-input" id="enteq_fecha_vencimiento"></div>
+          </div>
+          <div class="form-group"><label>Concepto de entrada</label>
+            <select class="form-select" id="enteq_concepto">
+              <option value="Compra">Compra</option>
+              <option value="Donación">Donación</option>
+              <option value="Ajuste">Ajuste / sobrante</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="enteq_observaciones" rows="2" placeholder="Detalle adicional de la entrada"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="ssHideModal('modalEntradaEquipo')">Cancelar</button>
+        <button class="btn btn-seguridad" onclick="saveEntradaEquipo()">Registrar entrada</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Salida de Equipo (asignación a ubicación) -->
+  <div class="modal-overlay" id="modalSalidaEquipo">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalSalidaEquipoTitle">Registrar salida de equipo</h3><button class="modal-close" onclick="ssHideModal('modalSalidaEquipo')">&times;</button></div>
+      <div class="modal-body">
+        <div class="ss-pac-info" id="salEquipoInfo" style="display:none;"></div>
+        <form id="formSalidaEquipo">
+          <div class="form-row">
+            <div class="form-group"><label>Cantidad</label><input type="number" min="1" class="form-input" id="saleq_cantidad" value="1" required></div>
+            <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="saleq_fecha" required></div>
+          </div>
+          <div class="form-group"><label>Concepto de salida</label>
+            <select class="form-select" id="saleq_concepto" onchange="onSalidaEquipoConceptoChange()">
+              <option value="Asignación a ubicación">Asignación a ubicación</option>
+              <option value="Vencimiento">Vencimiento</option>
+              <option value="Donación">Donación</option>
+              <option value="Ajuste">Ajuste / merma</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group" id="saleq_sel_ubicacion">
+            <label>Ubicación destino *</label>
+            <input type="text" class="form-input" id="saleq_ubicacion" placeholder="Ej: Patio de recepción, Taller de mantenimiento, Almacén de repuestos">
+          </div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="saleq_observaciones" rows="2" placeholder="Detalle adicional del destino de la salida"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="ssHideModal('modalSalidaEquipo')">Cancelar</button>
+        <button class="btn btn-seguridad" onclick="saveSalidaEquipo()">Registrar salida</button>
       </div>
     </div>
   </div>
@@ -1091,30 +1173,15 @@
           + '<td>' + ssEscape(e.ubicacion || '-') + '</td>'
           + '<td>' + (e.fecha_vencimiento || '-') + '</td>'
           + '<td><span class="badge ' + getBadgeClass(e.estado) + '">' + ssEscape(e.estado) + '</span></td>'
-          + '<td>'
-          + '<button class="btn btn-sm btn-outline" title="Entrada (+1)" onclick="ajustarStockEquipo(' + e.id + ', 1)"><i class="fi fi-sr-plus" style="font-size:14px;line-height:1;pointer-events:none;"></i></button> '
-          + '<button class="btn btn-sm btn-outline" title="Salida (-1)" onclick="ajustarStockEquipo(' + e.id + ', -1)"><i class="fi fi-sr-minus" style="font-size:14px;line-height:1;pointer-events:none;"></i></button> '
+          + '<td style="white-space:nowrap;">'
+          + '<button class="btn btn-sm" title="Registrar entrada de stock" onclick="openEntradaEquipo(' + e.id + ')" style="background:#059669;color:#fff;border:0;border-radius:4px;padding:3px 10px;font-size:12px;">Entrada</button> '
+          + '<button class="btn btn-sm" title="Registrar salida / asignación a ubicación" onclick="openSalidaEquipo(' + e.id + ')" style="background:#dc2626;color:#fff;border:0;border-radius:4px;padding:3px 10px;font-size:12px;">Salida</button> '
           + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalInvEquipo(' + e.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
           + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteInvEquipo(' + e.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
           + '</td>'
           + '</tr>';
       }).join('');
       uiFadeIn(tbody);
-    }
-
-    async function ajustarStockEquipo(id, delta) {
-      var e = seguridadInvEquipos.find(function(x) { return x.id === id; });
-      if (!e) return;
-      var nuevaCantidad = Math.max(0, (e.cantidad || 0) + delta);
-      var estado = estadoAutoEquipo({ cantidad: nuevaCantidad, cantidad_minima: e.cantidad_minima, fecha_vencimiento: e.fecha_vencimiento });
-      try {
-        var { error } = await supabaseClient.from('seguridad_inventario_equipos')
-          .update({ cantidad: nuevaCantidad, estado: estado }).eq('id', id);
-        if (error) throw error;
-        loadInvEquipos();
-      } catch (err) {
-        showAlert('Error al actualizar stock: ' + err.message, 'error');
-      }
     }
 
     function openModalInvEquipo(id) {
@@ -1192,6 +1259,198 @@
         showAlert('Equipo eliminado', 'success');
       } catch (err) {
         showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    function eqpSwitchView(view, btn) {
+      localStorage.setItem('fiat_seguridad_equipos_view', view);
+      document.getElementById('eqpInventarioView').style.display = view === 'inventario' ? '' : 'none';
+      document.getElementById('eqpMovimientosView').style.display = view === 'movimientos' ? '' : 'none';
+      document.querySelectorAll('.eqp-tab').forEach(function(t) {
+        var on = t.getAttribute('data-etab') === view;
+        t.style.background = on ? 'var(--module-seguridad)' : 'transparent';
+        t.style.color = on ? '#fff' : 'var(--color-text)';
+        t.style.border = on ? '0' : '1px solid var(--border-color)';
+      });
+      if (view === 'movimientos') loadMovimientosEquipos();
+    }
+
+    async function loadMovimientosEquipos() {
+      var tbody = document.getElementById('movimientosEquiposBody');
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:30px;color:#999;">Cargando movimientos...</td></tr>';
+      try {
+        var [resMov, resEq] = await Promise.all([
+          supabaseClient.from('seguridad_inventario_equipo_movimientos').select('*').order('fecha', { ascending: false }),
+          supabaseClient.from('seguridad_inventario_equipos').select('id, nombre')
+        ]);
+        if (resMov.error) throw resMov.error;
+        if (resEq.error) throw resEq.error;
+        var movs = resMov.data || [];
+        var equipos = resEq.data || [];
+        function nombreEquipo(eid) {
+          var x = equipos.find(function(e) { return e.id === eid; });
+          return x ? x.nombre : 'Equipo eliminado';
+        }
+        if (!movs.length) {
+          tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#999;">Aún no hay movimientos registrados</td></tr>';
+          return;
+        }
+        tbody.innerHTML = movs.map(function(m) {
+          var tipoCls = m.tipo === 'Entrada' ? 'badge-active' : 'badge-pending';
+          var cantColor = m.tipo === 'Entrada' ? '#059669' : '#dc2626';
+          return '<tr>'
+            + '<td>' + (m.fecha || '-') + '</td>'
+            + '<td style="font-weight:600;">' + ssEscape(nombreEquipo(m.equipo_id)) + '</td>'
+            + '<td><span class="badge ' + tipoCls + '">' + ssEscape(m.tipo) + '</span></td>'
+            + '<td>' + ssEscape(m.concepto || '-') + '</td>'
+            + '<td>' + (m.concepto === 'Asignación a ubicación' && m.ubicacion ? ssEscape(m.ubicacion) : '-') + '</td>'
+            + '<td style="text-align:center;font-weight:700;color:' + cantColor + ';">' + (m.tipo === 'Entrada' ? '+' : '-') + m.cantidad + '</td>'
+            + '<td>' + ssEscape(m.lote || '-') + '</td>'
+            + '<td>' + (m.fecha_vencimiento || '-') + '</td>'
+            + '<td>' + ssEscape(m.observaciones || '-') + '</td>'
+            + '</tr>';
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar movimientos: ' + ssEscape(err.message) + '</td></tr>';
+      }
+    }
+
+    var entradaEquipoId = null;
+
+    function openEntradaEquipo(id) {
+      entradaEquipoId = id;
+      var e = seguridadInvEquipos.find(function(x) { return x.id === id; });
+      if (!e) return;
+      var info = document.getElementById('entEquipoInfo');
+      info.style.display = 'grid';
+      info.innerHTML =
+        '<div class="form-group"><label>Equipo</label><div style="font-weight:600;">' + ssEscape(e.nombre) + '</div></div>'
+        + '<div class="form-group"><label>Tipo</label><div>' + ssEscape(e.tipo || '-') + '</div></div>'
+        + '<div class="form-group"><label>Stock actual</label><div style="font-weight:700;">' + e.cantidad + '</div></div>';
+      document.getElementById('formEntradaEquipo').reset();
+      document.getElementById('enteq_cantidad').value = 1;
+      document.getElementById('enteq_fecha').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('enteq_concepto').value = 'Compra';
+      ssShowModal('modalEntradaEquipo');
+    }
+
+    async function saveEntradaEquipo() {
+      var cantidad = parseInt(document.getElementById('enteq_cantidad').value, 10) || 0;
+      var fecha = document.getElementById('enteq_fecha').value;
+      var lote = document.getElementById('enteq_lote').value.trim() || null;
+      var fechaVencimiento = document.getElementById('enteq_fecha_vencimiento').value || null;
+      var concepto = document.getElementById('enteq_concepto').value;
+      var observaciones = document.getElementById('enteq_observaciones').value.trim() || null;
+      if (cantidad <= 0) {
+        showAlert('Indica una cantidad válida', 'warning');
+        return;
+      }
+      if (!fecha) {
+        showAlert('La fecha es obligatoria', 'warning');
+        return;
+      }
+      var e = seguridadInvEquipos.find(function(x) { return x.id === entradaEquipoId; });
+      if (!e) return;
+      var nuevaCantidad = e.cantidad + cantidad;
+      var nuevoVencimiento = fechaVencimiento || e.fecha_vencimiento;
+      var estado = estadoAutoEquipo({ cantidad: nuevaCantidad, cantidad_minima: e.cantidad_minima, fecha_vencimiento: nuevoVencimiento });
+      try {
+        var { error } = await supabaseClient.from('seguridad_inventario_equipos')
+          .update({ cantidad: nuevaCantidad, fecha_vencimiento: nuevoVencimiento, estado: estado }).eq('id', e.id);
+        if (error) throw error;
+        var { error: errMov } = await supabaseClient.from('seguridad_inventario_equipo_movimientos')
+          .insert([{
+            equipo_id: e.id,
+            tipo: 'Entrada',
+            concepto: concepto,
+            cantidad: cantidad,
+            fecha: fecha,
+            lote: lote,
+            fecha_vencimiento: fechaVencimiento,
+            observaciones: observaciones
+          }]);
+        if (errMov) throw errMov;
+        ssHideModal('modalEntradaEquipo');
+        loadInvEquipos();
+        showAlert('Entrada registrada (' + concepto + ')', 'success');
+      } catch (err) {
+        showAlert('Error al registrar la entrada: ' + err.message, 'error');
+      }
+    }
+
+    var salidaEquipoId = null;
+
+    function openSalidaEquipo(id) {
+      salidaEquipoId = id;
+      var e = seguridadInvEquipos.find(function(x) { return x.id === id; });
+      if (!e) return;
+      var info = document.getElementById('salEquipoInfo');
+      info.style.display = 'grid';
+      info.innerHTML =
+        '<div class="form-group"><label>Equipo</label><div style="font-weight:600;">' + ssEscape(e.nombre) + '</div></div>'
+        + '<div class="form-group"><label>Tipo</label><div>' + ssEscape(e.tipo || '-') + '</div></div>'
+        + '<div class="form-group"><label>Stock actual</label><div style="font-weight:700;">' + e.cantidad + '</div></div>';
+      document.getElementById('formSalidaEquipo').reset();
+      document.getElementById('saleq_cantidad').value = 1;
+      document.getElementById('saleq_fecha').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('saleq_concepto').value = 'Asignación a ubicación';
+      onSalidaEquipoConceptoChange();
+      ssShowModal('modalSalidaEquipo');
+    }
+
+    function onSalidaEquipoConceptoChange() {
+      var c = document.getElementById('saleq_concepto').value;
+      document.getElementById('saleq_sel_ubicacion').style.display = c === 'Asignación a ubicación' ? 'block' : 'none';
+    }
+
+    async function saveSalidaEquipo() {
+      var concepto = document.getElementById('saleq_concepto').value;
+      var cantidad = parseInt(document.getElementById('saleq_cantidad').value, 10) || 0;
+      var fecha = document.getElementById('saleq_fecha').value;
+      var ubicacion = document.getElementById('saleq_ubicacion').value.trim() || null;
+      var observaciones = document.getElementById('saleq_observaciones').value.trim() || null;
+      if (!fecha) {
+        showAlert('La fecha es obligatoria', 'warning');
+        return;
+      }
+      if (cantidad <= 0) {
+        showAlert('Indica una cantidad válida', 'warning');
+        return;
+      }
+      var e = seguridadInvEquipos.find(function(x) { return x.id === salidaEquipoId; });
+      if (!e) return;
+      if (cantidad > e.cantidad) {
+        showAlert('Stock insuficiente: solo hay ' + e.cantidad + ' disponible(s)', 'warning');
+        return;
+      }
+      if (concepto === 'Asignación a ubicación' && !ubicacion) {
+        showAlert('Indica la ubicación destino del equipo', 'warning');
+        return;
+      }
+      var nuevaCantidad = e.cantidad - cantidad;
+      var estado = estadoAutoEquipo({ cantidad: nuevaCantidad, cantidad_minima: e.cantidad_minima, fecha_vencimiento: e.fecha_vencimiento });
+      try {
+        var { error } = await supabaseClient.from('seguridad_inventario_equipos')
+          .update({ cantidad: nuevaCantidad, estado: estado }).eq('id', e.id);
+        if (error) throw error;
+        var { error: errMov } = await supabaseClient.from('seguridad_inventario_equipo_movimientos')
+          .insert([{
+            equipo_id: e.id,
+            tipo: 'Salida',
+            concepto: concepto,
+            ubicacion: ubicacion,
+            cantidad: cantidad,
+            fecha: fecha,
+            lote: null,
+            fecha_vencimiento: e.fecha_vencimiento || null,
+            observaciones: observaciones
+          }]);
+        if (errMov) throw errMov;
+        ssHideModal('modalSalidaEquipo');
+        loadInvEquipos();
+        showAlert('Salida registrada (' + concepto + ')', 'success');
+      } catch (err) {
+        showAlert('Error al registrar la salida: ' + err.message, 'error');
       }
     }
 
@@ -1627,6 +1886,9 @@
       var savedInsView = localStorage.getItem('fiat_seguridad_insumos_view');
       var insBtn = document.querySelector('.ins-tab[data-itab="' + savedInsView + '"]');
       if (insBtn) insSwitchView(savedInsView, insBtn);
+      var savedEqpView = localStorage.getItem('fiat_seguridad_equipos_view');
+      var eqpBtn = document.querySelector('.eqp-tab[data-etab="' + savedEqpView + '"]');
+      if (eqpBtn) eqpSwitchView(savedEqpView, eqpBtn);
     });
   </script>
 

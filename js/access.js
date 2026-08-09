@@ -53,7 +53,7 @@
       { key: 'inv-insumos', name: 'Inventario de insumos' }
     ]},
     { key: 'compensacion.html', name: 'Compensación', tools: [
-      { key: 'salarial', name: 'Estructura salarial' },
+      { key: 'salarial', name: 'Estructura salarial por cargo' },
       { key: 'bonificaciones', name: 'Bonificaciones' },
       { key: 'beneficios', name: 'Beneficios económicos' },
       { key: 'reportes', name: 'Reportes' },

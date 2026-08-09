@@ -74,6 +74,59 @@
     .bio-enroll-slot.done .slot-label { background: #16a34a; }
     .bio-enroll-slot .slot-empty { color: var(--color-text-secondary); font-size: 11px; }
     .bio-enroll-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .bio-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .bio-card-head h3 { margin: 0; }
+    .bio-tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--color-border); margin-top: 16px; }
+    .bio-tab {
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .bio-tab:hover { color: #0f172a; }
+    .bio-tab.active { color: var(--module-compensacion); border-bottom-color: var(--module-compensacion); }
+    .bio-tab-panel { display: none; margin-top: 16px; }
+    .bio-tab-panel.active { display: block; }
+    .bio-dias { display: flex; flex-wrap: wrap; gap: 10px; }
+    .bio-dia { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; cursor: pointer; }
+
+    .es-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .es-tasa-bar {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      margin-bottom: 14px;
+    }
+    .es-tasa-bar.ok { color: #16a34a; border-color: #bbf7d0; background: #f0fdf4; }
+    .es-tasa-bar.err { color: #dc2626; border-color: #fecaca; background: #fef2f2; }
+    .es-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+    .es-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+    }
+    .es-card span { display: block; font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
+    .es-card strong { font-size: 16px; }
+    .es-msg { margin-top: 10px; font-size: 13px; min-height: 18px; }
+    .es-msg.err { color: #dc2626; }
+    @media (max-width: 720px) { .es-cards { grid-template-columns: 1fr 1fr; } }
+
+    .li-calc { margin-top: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
+    .li-calc table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .li-calc th, .li-calc td { padding: 8px 10px; text-align: right; border-bottom: 1px solid #f1f5f9; }
+    .li-calc th:first-child, .li-calc td:first-child { text-align: left; }
+    .li-calc thead th { background: var(--color-bg); color: var(--color-text-secondary); font-weight: 600; font-size: 12px; }
+    .li-calc .li-total td { background: #f0fdf4; color: #16a34a; font-weight: 700; border-bottom: none; }
+    .li-info { font-size: 12px; color: var(--color-text-secondary); margin-top: 8px; }
   </style>
 </head>
 <body>
@@ -105,6 +158,8 @@
         <div class="module-panel">
           <div class="panel-item active" data-tool="salarial" onclick="switchTool('salarial')" title="Estructura salarial"><span class="panel-item-indicator bg-compensacion"></span><i class="fi fi-sr-money-check" style="font-size:24px;pointer-events:none;"></i>
           </div>
+          <div class="panel-item" data-tool="liquidaciones" onclick="switchTool('liquidaciones')" title="Liquidaciones"><span class="panel-item-indicator bg-compensacion"></span><i class="fi fi-sr-calculator" style="font-size:24px;pointer-events:none;"></i>
+          </div>
           <div class="panel-item" data-tool="bonificaciones" onclick="switchTool('bonificaciones')" title="Bonificaciones"><span class="panel-item-indicator bg-compensacion"></span><i class="fi fi-sr-badge-dollar" style="font-size:24px;pointer-events:none;"></i>
           </div>
           <div class="panel-item" data-tool="beneficios" onclick="switchTool('beneficios')" title="Beneficios económicos"><span class="panel-item-indicator bg-compensacion"></span><i class="fi fi-sr-hand-holding-usd" style="font-size:24px;pointer-events:none;"></i>
@@ -118,19 +173,48 @@
         <div class="module-body">
           <header class="topbar">
             <div><h1>Compensación</h1><div class="topbar-breadcrumb">Inicio / Compensación</div></div>
+            <button class="btn btn-compensacion" id="btnEnrolarTopbar" onclick="openModalBiometria()" style="display:none;"><i class="fi fi-sr-id-badge"></i> Enrolar trabajador</button>
           </header>
 
           <div class="module-content">
           <div class="tool-section active" id="tool-salarial">
             <div class="tool-section-header">
-              <h2 style="color:var(--module-compensacion);">Estructura salarial</h2>
-              <button class="btn btn-compensacion" onclick="openModal()">+ Nuevo registro</button>
+              <h2 style="color:var(--module-compensacion);">Estructura salarial por cargo</h2>
+              <div class="es-actions">
+                <button class="btn btn-outline" onclick="esConsultarTasa(true)"><i class="fi fi-sr-refresh"></i> Consultar tasa BCV</button>
+                <button class="btn btn-compensacion" onclick="esOpen()"><i class="fi fi-sr-money-check"></i> + Nueva estructura</button>
+              </div>
+            </div>
+            <div id="esTasaBar" class="es-tasa-bar">Consultando la tasa BCV...</div>
+            <div class="es-cards">
+              <div class="es-card"><span>Cargos con estructura</span><strong id="esCount">—</strong></div>
+              <div class="es-card"><span>Sueldos base Bs / mes</span><strong id="esTotalBs">—</strong></div>
+              <div class="es-card"><span>Complementos USD / mes</span><strong id="esTotalUsd">—</strong></div>
+              <div class="es-card"><span>Cargos activos</span><strong id="esActivos">—</strong></div>
             </div>
             <table class="data-table">
-              <thead><tr><th>Trabajador</th><th>Cargo</th><th>Salario base</th><th>Bonificación</th><th>Estado</th></tr></thead>
-              <tbody id="moduleTableBody">
-                <tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">No hay registros salariales</td></tr>
-              </tbody>
+              <thead><tr><th>Cargo</th><th>Unidad</th><th>Sueldo base USD</th><th>Tasa BCV</th><th>Sueldo base Bs</th><th>Complemento USD</th><th>Total USD</th><th>Total Bs</th><th>Estado</th><th></th></tr></thead>
+              <tbody id="esTableBody"><tr><td colspan="10" style="text-align:center;padding:40px;color:#999;">Cargando...</td></tr></tbody>
+            </table>
+          </div>
+
+          <div class="tool-section" id="tool-liquidaciones">
+            <div class="tool-section-header">
+              <h2 style="color:var(--module-compensacion);">Liquidaciones de prestaciones sociales</h2>
+              <div class="es-actions">
+                <button class="btn btn-outline" onclick="liExportExcel()"><i class="fi fi-sr-file-excel"></i> Exportar Excel</button>
+                <button class="btn btn-compensacion" onclick="liOpen()"><i class="fi fi-sr-calculator"></i> + Nueva liquidación</button>
+              </div>
+            </div>
+            <div class="es-cards">
+              <div class="es-card"><span>Liquidaciones</span><strong id="liCount">—</strong></div>
+              <div class="es-card"><span>Total liquidado (Bs.)</span><strong id="liTotal">—</strong></div>
+              <div class="es-card"><span>Pendientes</span><strong id="liPendientes">—</strong></div>
+              <div class="es-card"><span>Pagadas</span><strong id="liPagadas">—</strong></div>
+            </div>
+            <table class="data-table">
+              <thead><tr><th>Trabajador</th><th>Cargo</th><th>Ingreso</th><th>Egreso</th><th>Motivo</th><th>Salario diario</th><th>Total Bs.</th><th>Estado</th><th></th></tr></thead>
+              <tbody id="liTableBody"><tr><td colspan="9" style="text-align:center;padding:40px;color:#999;">Cargando...</td></tr></tbody>
             </table>
           </div>
 
@@ -167,11 +251,6 @@
           </div>
 
           <div class="tool-section" id="tool-biometria">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-compensacion);">Biometría · Registro y marcajes</h2>
-              <button class="btn btn-compensacion" onclick="openModalBiometria()"><i class="fi fi-sr-id-badge"></i> Enrolar trabajador</button>
-            </div>
-
             <div class="bio-today">
               <div class="bio-today-item"><span>Entradas hoy</span><strong id="bioHoyEntradas">—</strong></div>
               <div class="bio-today-item"><span>Salidas hoy</span><strong id="bioHoySalidas">—</strong></div>
@@ -179,14 +258,62 @@
               <div class="bio-today-item"><span>Personas hoy</span><strong id="bioHoyPersonas">—</strong></div>
             </div>
 
-            <div class="bio-regs-card" style="margin-top:16px;">
-              <h3><i class="fi fi-sr-alarm-clock"></i> Historial de marcajes (últimos 100)</h3>
-              <div class="tabla-scroll"><table class="table" id="bioMarcajesTable"></table></div>
+            <div class="bio-tabs">
+              <button class="bio-tab active" data-tab="historial" onclick="bioSwitchTab('historial')">Historial</button>
+              <button class="bio-tab" data-tab="horas" onclick="bioSwitchTab('horas')">Horas por trabajador</button>
+              <button class="bio-tab" data-tab="config" onclick="bioSwitchTab('config')">Configuración</button>
             </div>
 
-            <div class="bio-regs-card" style="margin-top:16px;">
-              <h3><i class="fi fi-sr-clock"></i> Horas de hoy por trabajador</h3>
-              <div class="tabla-scroll"><table class="table" id="bioHorasTable"></table></div>
+            <div class="bio-tab-panel active" id="tab-historial">
+              <div class="bio-regs-card">
+                <h3><i class="fi fi-sr-alarm-clock"></i> Historial de marcajes (últimos 100)</h3>
+                <div class="tabla-scroll"><table class="table" id="bioMarcajesTable"></table></div>
+              </div>
+            </div>
+
+            <div class="bio-tab-panel" id="tab-horas">
+              <div class="bio-regs-card">
+                <div class="bio-card-head">
+                  <h3><i class="fi fi-sr-clock"></i> Horas por trabajador</h3>
+                  <button class="btn btn-compensacion btn-sm" onclick="bioExportarExcel()"><i class="fi fi-sr-file-csv"></i> Exportar Excel</button>
+                </div>
+                <div class="form-group" style="max-width:220px;">
+                  <label><i class="fi fi-sr-calendar"></i> Día a consultar</label>
+                  <input type="date" class="form-input" id="bioFecha" onchange="bioRenderHoras()">
+                </div>
+                <div class="tabla-scroll"><table class="table" id="bioHorasTable"></table></div>
+              </div>
+            </div>
+
+            <div class="bio-tab-panel" id="tab-config">
+              <div class="bio-regs-card">
+                <h3><i class="fi fi-sr-settings"></i> Configuración de jornada laboral</h3>
+                <div class="form-row">
+                  <div class="form-group"><label>Hora de inicio de jornada</label><input type="time" class="form-input" id="cfgHoraInicio"></div>
+                  <div class="form-group"><label>Hora de fin de jornada</label><input type="time" class="form-input" id="cfgHoraFin"></div>
+                </div>
+                <div class="form-group">
+                  <label>Días de trabajo</label>
+                  <div class="bio-dias" id="cfgDias">
+                    <label class="bio-dia"><input type="checkbox" value="1"> Lun</label>
+                    <label class="bio-dia"><input type="checkbox" value="2"> Mar</label>
+                    <label class="bio-dia"><input type="checkbox" value="3"> Mié</label>
+                    <label class="bio-dia"><input type="checkbox" value="4"> Jue</label>
+                    <label class="bio-dia"><input type="checkbox" value="5"> Vie</label>
+                    <label class="bio-dia"><input type="checkbox" value="6"> Sáb</label>
+                    <label class="bio-dia"><input type="checkbox" value="0"> Dom</label>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group"><label>Precio hora extra (Bs.)</label><input type="number" min="0" step="0.01" class="form-input" id="cfgPrecioExtra"></div>
+                  <div class="form-group"><label>Precio feriado / fin de semana (Bs.)</label><input type="number" min="0" step="0.01" class="form-input" id="cfgPrecioFeriado"></div>
+                </div>
+                <div class="bio-enroll-actions">
+                  <button class="btn btn-compensacion" onclick="bioSaveConfig()"><i class="fi fi-sr-disk"></i> Guardar configuración</button>
+                  <button class="btn btn-outline" onclick="bioResetConfig()">Restablecer valores</button>
+                </div>
+                <div id="cfgMsg" class="bio-status">Las horas fuera del rango configurado se consideran horas extra. Sábado y domingo se valoran con el precio de feriado / fin de semana.</div>
+              </div>
             </div>
           </div>
         </div>
@@ -197,24 +324,30 @@
 
   <div class="modal-overlay" id="modal">
     <div class="modal">
-      <div class="modal-header"><h3>Nuevo registro salarial</h3><button class="modal-close" onclick="closeModal()">&times;</button></div>
+      <div class="modal-header"><h3 id="esModalTitle">Estructura salarial por cargo</h3><button class="modal-close" onclick="esClose()">&times;</button></div>
       <div class="modal-body">
-        <form id="moduleForm">
-          <div class="form-group"><label>Trabajador</label><input type="text" class="form-input" id="trabajador" required></div>
-          <div class="form-group"><label>Cargo</label><input type="text" class="form-input" id="cargo" required></div>
-          <div class="form-row">
-            <div class="form-group"><label>Salario base (Bs.)</label><input type="number" class="form-input" id="salario_base" min="0" step="0.01" required></div>
-            <div class="form-group"><label>Bonificación (Bs.)</label><input type="number" class="form-input" id="bonificacion" min="0" step="0.01" value="0"></div>
-          </div>
+        <div class="form-group">
+          <label>Cargo (organigrama)</label>
+          <select class="form-select" id="esCargo"></select>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Sueldo base (USD)</label><input type="number" class="form-input" id="esSueldoUsd" min="0" step="0.01" oninput="esCalcular()"></div>
+          <div class="form-group"><label>Tasa BCV (Bs/USD)</label><input type="number" class="form-input" id="esTasaBcv" min="0" step="0.0001" oninput="esCalcular()"></div>
+        </div>
+        <div class="form-group"><label>Sueldo base en Bs (calculado)</label><input type="text" class="form-input" id="esSueldoBs" readonly></div>
+        <div class="form-row">
+          <div class="form-group"><label>Complemento (USD efectivo)</label><input type="number" class="form-input" id="esComplementoUsd" min="0" step="0.01"></div>
           <div class="form-group"><label>Estado</label>
-            <select class="form-select" id="estado"><option value="Activo">Activo</option><option value="Inactivo">Inactivo</option></select>
+            <select class="form-select" id="esEstado"><option value="Activo">Activo</option><option value="Inactivo">Inactivo</option></select>
           </div>
-          <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="observaciones" rows="3"></textarea></div>
-        </form>
+        </div>
+        <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="esObservaciones" rows="3"></textarea></div>
+        <div id="esMsg" class="es-msg"></div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-outline" onclick="closeModal()">Cancelar</button>
-        <button class="btn btn-compensacion" onclick="saveModule()">Guardar</button>
+        <button class="btn btn-outline" onclick="esClose()">Cancelar</button>
+        <button class="btn btn-outline" onclick="esConsultarTasa(true)"><i class="fi fi-sr-refresh"></i> Consultar tasa BCV</button>
+        <button class="btn btn-compensacion" onclick="esGuardar()">Guardar</button>
       </div>
     </div>
   </div>
@@ -244,14 +377,235 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+  <script src="../js/vendor/xlsx.full.min.js"></script>
   <script src="../js/supabase-config.js"></script>
   <script src="../js/ui.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/modules.js"></script>
-  <script>initModule('compensacion', 'compensacion_registros', ['trabajador','cargo','salario_base','bonificacion','estado','observaciones']);</script>
-
-<script src="../js/module-help.js"></script>
+  <script src="../js/module-help.js"></script>
     <script src="../js/access.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      var es = { cargos: [], unidades: {}, registros: [], tasa: null, editando: null };
+
+      function esEsc(s) {
+        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+      function esFmtUsd(v) { return '$ ' + Number(v || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+      function esFmtBs(v) { return 'Bs. ' + Number(v || 0).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+      function esFmtTasa(v) { return 'Bs. ' + Number(v || 0).toLocaleString('es-VE', { minimumFractionDigits: 4, maximumFractionDigits: 4 }); }
+
+      async function esFetchTasa() {
+        try {
+          var res = await fetch('https://ve.dolarapi.com/v1/dolares/oficial');
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          var d = await res.json();
+          var t = parseFloat(d.promedio);
+          if (!(t > 0)) throw new Error('Tasa inválida');
+          return t;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      async function esConsultarTasa(mostrarMensaje) {
+        var bar = document.getElementById('esTasaBar');
+        if (bar) { bar.textContent = 'Consultando la tasa BCV...'; bar.className = 'es-tasa-bar'; }
+        var t = await esFetchTasa();
+        var input = document.getElementById('esTasaBcv');
+        if (t) {
+          es.tasa = t;
+          if (bar) {
+            bar.textContent = 'Tasa BCV (dólar oficial): ' + esFmtTasa(t) + ' por USD 1. Se usa como referencia para nuevos registros.';
+            bar.className = 'es-tasa-bar ok';
+          }
+          if (input && !input.value) input.value = t.toFixed(4);
+          if (mostrarMensaje) showAlert('Tasa BCV actualizada: ' + esFmtTasa(t), 'success');
+        } else {
+          es.tasa = null;
+          if (bar) {
+            bar.textContent = 'No se pudo consultar la tasa BCV. Verifica la conexión o ingrésala manualmente en el registro.';
+            bar.className = 'es-tasa-bar err';
+          }
+          if (mostrarMensaje) showAlert('No se pudo consultar la tasa BCV.', 'error');
+        }
+      }
+
+      function esNombreUnidad(id) { return es.unidades[id] || '—'; }
+      function esCargoDe(id) {
+        for (var i = 0; i < es.cargos.length; i++) if (es.cargos[i].id === id) return es.cargos[i];
+        return null;
+      }
+      function esTituloCargo(id) { var c = esCargoDe(id); return c ? c.titulo : 'Cargo sin nombre'; }
+
+      async function esLoad() {
+        var cRes = await supabaseClient.from('est_cargos').select('id, titulo, unidad_id').order('titulo');
+        es.cargos = cRes.data || [];
+        var uRes = await supabaseClient.from('est_unidades').select('id, nombre');
+        es.unidades = {};
+        (uRes.data || []).forEach(function (u) { es.unidades[u.id] = u.nombre; });
+        var rRes = await supabaseClient.from('comp_estructura_salarial').select('*');
+        es.registros = rRes.data || [];
+        esRender();
+        if (!es.tasa) esConsultarTasa(false);
+      }
+
+      function esRender() {
+        var tb = document.getElementById('esTableBody');
+        if (!tb) return;
+        var activos = es.registros.filter(function (r) { return r.estado === 'Activo'; });
+        var totalBs = activos.reduce(function (s, r) { return s + (+r.sueldo_base_bs || 0); }, 0);
+        var totalUsd = activos.reduce(function (s, r) { return s + (+r.complemento_usd || 0); }, 0);
+        document.getElementById('esCount').textContent = es.registros.length;
+        document.getElementById('esActivos').textContent = activos.length;
+        document.getElementById('esTotalBs').textContent = esFmtBs(totalBs);
+        document.getElementById('esTotalUsd').textContent = esFmtUsd(totalUsd);
+        if (!es.registros.length) {
+          tb.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:#999;">No hay estructuras salariales. Crea la primera por cargo del organigrama.</td></tr>';
+          return;
+        }
+        tb.innerHTML = es.registros.map(function (r) {
+          var c = esCargoDe(r.cargo_id);
+          var totalUsdR = (+r.sueldo_base_usd || 0) + (+r.complemento_usd || 0);
+          var totalBsR = (+r.sueldo_base_bs || 0) + ((+r.complemento_usd || 0) * (+r.tasa_bcv || 0));
+          return '<tr>' +
+            '<td>' + esEsc(esTituloCargo(r.cargo_id)) + '</td>' +
+            '<td>' + esEsc(c ? esNombreUnidad(c.unidad_id) : '—') + '</td>' +
+            '<td>' + esFmtUsd(r.sueldo_base_usd) + '</td>' +
+            '<td>' + esFmtTasa(r.tasa_bcv) + '</td>' +
+            '<td>' + esFmtBs(r.sueldo_base_bs) + '</td>' +
+            '<td>' + esFmtUsd(r.complemento_usd) + '</td>' +
+            '<td>' + esFmtUsd(totalUsdR) + '</td>' +
+            '<td>' + esFmtBs(totalBsR) + '</td>' +
+            '<td><span class="badge ' + (r.estado === 'Activo' ? 'badge-active' : 'badge-inactive') + '">' + esEsc(r.estado) + '</span></td>' +
+            '<td style="text-align:right;white-space:nowrap;">' +
+            '<button class="btn btn-outline" style="height:32px;padding:0 10px;font-size:12px;" onclick="esEditar(' + r.id + ')"><i class="fi fi-sr-pen"></i> Editar</button> ' +
+            '<button class="btn btn-outline" style="height:32px;padding:0 10px;font-size:12px;color:#dc2626;" onclick="esEliminar(' + r.id + ')"><i class="fi fi-sr-trash"></i></button>' +
+            '</td></tr>';
+        }).join('');
+      }
+
+      function esRellenarCargos(selId) {
+        var sel = document.getElementById(selId);
+        if (!sel) return;
+        sel.innerHTML = es.cargos.map(function (c) {
+          var ya = es.registros.some(function (r) { return r.cargo_id === c.id; });
+          return '<option value="' + c.id + '">' + esEsc(c.titulo) + ' · ' + esEsc(esNombreUnidad(c.unidad_id)) + (ya ? ' (ya tiene estructura)' : '') + '</option>';
+        }).join('');
+      }
+
+      function esOpen() {
+        es.editando = null;
+        document.getElementById('esModalTitle').textContent = 'Nueva estructura salarial';
+        esRellenarCargos('esCargo');
+        document.getElementById('esCargo').value = '';
+        document.getElementById('esSueldoUsd').value = '';
+        document.getElementById('esTasaBcv').value = es.tasa ? es.tasa.toFixed(4) : '';
+        document.getElementById('esComplementoUsd').value = '';
+        document.getElementById('esEstado').value = 'Activo';
+        document.getElementById('esObservaciones').value = '';
+        esCalcular();
+        esMsg('');
+        document.getElementById('modal').classList.add('show');
+      }
+
+      function esEditar(id) {
+        var r = null;
+        for (var i = 0; i < es.registros.length; i++) if (es.registros[i].id === id) { r = es.registros[i]; break; }
+        if (!r) return;
+        es.editando = id;
+        document.getElementById('esModalTitle').textContent = 'Editar estructura salarial';
+        var sel = document.getElementById('esCargo');
+        sel.innerHTML = es.cargos.map(function (c) {
+          return '<option value="' + c.id + '"' + (c.id === r.cargo_id ? ' selected' : '') + '>' + esEsc(c.titulo) + ' · ' + esEsc(esNombreUnidad(c.unidad_id)) + '</option>';
+        }).join('');
+        document.getElementById('esSueldoUsd').value = r.sueldo_base_usd;
+        document.getElementById('esTasaBcv').value = r.tasa_bcv;
+        document.getElementById('esComplementoUsd').value = r.complemento_usd;
+        document.getElementById('esEstado').value = r.estado;
+        document.getElementById('esObservaciones').value = r.observaciones || '';
+        esCalcular();
+        esMsg('');
+        document.getElementById('modal').classList.add('show');
+      }
+
+      function esClose() { document.getElementById('modal').classList.remove('show'); }
+
+      function esCalcular() {
+        var usd = parseFloat(document.getElementById('esSueldoUsd').value) || 0;
+        var tasa = parseFloat(document.getElementById('esTasaBcv').value) || 0;
+        var bs = usd * tasa;
+        document.getElementById('esSueldoBs').value = 'Bs. ' + bs.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      function esMsg(text) {
+        var el = document.getElementById('esMsg');
+        if (el) { el.textContent = text || ''; el.className = 'es-msg' + (text ? ' err' : ''); }
+      }
+
+      async function esGuardar() {
+        var cargoId = document.getElementById('esCargo').value;
+        var sueldoUsd = parseFloat(document.getElementById('esSueldoUsd').value);
+        var tasa = parseFloat(document.getElementById('esTasaBcv').value);
+        var complemento = parseFloat(document.getElementById('esComplementoUsd').value) || 0;
+        if (!cargoId) { esMsg('Selecciona el cargo del organigrama.'); return; }
+        if (!(sueldoUsd > 0)) { esMsg('Indica el sueldo base en USD.'); return; }
+        if (!(tasa > 0)) { esMsg('Indica la tasa BCV o consúltala con el botón.'); return; }
+        if (!es.editando && es.registros.some(function (r) { return r.cargo_id === cargoId; })) { esMsg('Ese cargo ya tiene estructura salarial.'); return; }
+        var payload = {
+          cargo_id: cargoId,
+          sueldo_base_usd: Math.round(sueldoUsd * 100) / 100,
+          tasa_bcv: Math.round(tasa * 10000) / 10000,
+          sueldo_base_bs: Math.round(sueldoUsd * tasa * 100) / 100,
+          complemento_usd: Math.round(complemento * 100) / 100,
+          estado: document.getElementById('esEstado').value,
+          observaciones: document.getElementById('esObservaciones').value.trim() || null
+        };
+        try {
+          var res;
+          if (es.editando) res = await supabaseClient.from('comp_estructura_salarial').update(payload).eq('id', es.editando);
+          else res = await supabaseClient.from('comp_estructura_salarial').insert([payload]);
+          if (res.error) throw res.error;
+          esClose();
+          await esLoad();
+        } catch (e) {
+          esMsg('No se pudo guardar: ' + (e.message || 'error'));
+        }
+      }
+
+      async function esEliminar(id) {
+        var ok = typeof showConfirm === 'function' ? await showConfirm('¿Eliminar la estructura salarial de este cargo?') : true;
+        if (!ok) return;
+        try {
+          var res = await supabaseClient.from('comp_estructura_salarial').delete().eq('id', id);
+          if (res.error) throw res.error;
+          await esLoad();
+        } catch (e) {
+          alert('No se pudo eliminar: ' + (e.message || 'error'));
+        }
+      }
+
+      window.esOpen = esOpen;
+      window.esEditar = esEditar;
+      window.esClose = esClose;
+      window.esGuardar = esGuardar;
+      window.esEliminar = esEliminar;
+      window.esCalcular = esCalcular;
+      window.esConsultarTasa = esConsultarTasa;
+
+      document.addEventListener('DOMContentLoaded', function () {
+        esLoad().catch(function (e) { console.warn('Estructura salarial: error al cargar', e); });
+        if (typeof restoreTool === 'function') restoreTool();
+        var orig = window.switchTool;
+        window.switchTool = function (name) {
+          if (name === 'salarial') esLoad();
+          if (orig) orig(name);
+        };
+      });
+    })();
+  </script>
   <script>
     (function () {
       'use strict';
@@ -261,11 +615,16 @@
       var bio = {
         enrollStream: null,
         modelsReady: null,
+        config: null,
         plantilla: [],
         names: {},
         profiles: [],
         marcajes: []
       };
+
+      function bioDefaultConfig() {
+        return { hora_inicio: '08:00', hora_fin: '17:00', dias_trabajo: [1, 2, 3, 4, 5], precio_hora_extra: 0, precio_feriado_fin_semana: 0 };
+      }
 
       function bioEsc(s) {
         return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -304,14 +663,20 @@
           bio.names = {};
           bio.plantilla.forEach(function (t) { bio.names[t.id] = t; });
         }
+        var cRes = await supabaseClient.from('comp_biometria_config').select('*').eq('id', 1).maybeSingle();
+        var def = bioDefaultConfig();
+        bio.config = (!cRes.error && cRes.data) ? Object.assign(def, cRes.data) : def;
         var pRes = await supabaseClient.from('comp_biometria_perfiles').select('*').eq('activo', true);
         var mRes = await supabaseClient.from('comp_marcajes').select('*').order('fecha_hora', { ascending: false }).limit(300);
         bio.profiles = (pRes.data || []).filter(function (p) { return bio.names[p.trabajador_id]; });
         bio.marcajes = mRes.data || [];
+        var bf = document.getElementById('bioFecha');
+        if (bf && !bf.value) bf.value = bioTodayISO();
         bioRenderCards();
         bioRenderMarcajes();
         bioRenderHoras();
         bioRenderEnrolled();
+        bioRenderConfig();
       }
 
       async function bioEnsureModels() {
@@ -378,37 +743,178 @@
           }).join('') + '</tbody>';
       }
 
+      function bioParseHM(hhmm) {
+        var p = String(hhmm || '0').split(':');
+        return (+p[0]) * 60 + (+p[1]);
+      }
+      function bioIsWeekend(d) { var w = d.getDay(); return w === 0 || w === 6; }
+      function bioMinStr(min) {
+        var h = Math.floor(min / 60), m = Math.round(min % 60);
+        return h + 'h ' + m + 'm';
+      }
+
+      function bioCalcDia(lista) {
+        var res = { normal: 0, extra: 0, weekend: 0 };
+        var pairs = [];
+        for (var i = 0; i < lista.length; i++) {
+          if (lista[i].tipo === 'Entrada' && i + 1 < lista.length && lista[i + 1].tipo === 'Salida') {
+            pairs.push({ in: new Date(lista[i].fecha_hora), out: new Date(lista[i + 1].fecha_hora) });
+            i++;
+          }
+        }
+        pairs.forEach(function (pr) {
+          var tIn = pr.in.getTime(), tOut = pr.out.getTime();
+          if (tOut <= tIn) return;
+          var day = new Date(pr.in); day.setHours(0, 0, 0, 0);
+          var lastDay = new Date(pr.out); lastDay.setHours(0, 0, 0, 0);
+          while (day <= lastDay) {
+            var dayStart = day.getTime();
+            var dayEnd = dayStart + 86400000;
+            var segStart = Math.max(tIn, dayStart);
+            var segEnd = Math.min(tOut, dayEnd);
+            if (segEnd > segStart) {
+              var segMins = (segEnd - segStart) / 60000;
+              if (bioIsWeekend(day)) {
+                res.weekend += segMins;
+              } else {
+                var workStart = dayStart + bioParseHM(bio.config.hora_inicio) * 60000;
+                var workEnd = dayStart + bioParseHM(bio.config.hora_fin) * 60000;
+                var norm = (Math.min(segEnd, workEnd) - Math.max(segStart, workStart)) / 60000;
+                if (norm < 0) norm = 0;
+                res.normal += norm;
+                res.extra += segMins - norm;
+              }
+            }
+            day = new Date(dayStart + 86400000);
+          }
+        });
+        return res;
+      }
+
       function bioRenderHoras() {
         var tb = document.getElementById('bioHorasTable');
         if (!tb) return;
-        var hoy = bioTodayISO();
+        var fechaEl = document.getElementById('bioFecha');
+        var dia = fechaEl && fechaEl.value ? fechaEl.value : bioTodayISO();
         var byW = {};
         bio.marcajes.forEach(function (m) {
-          if (bioLocalDateStr(m.fecha_hora) !== hoy) return;
+          if (bioLocalDateStr(m.fecha_hora) !== dia) return;
           (byW[m.trabajador_id] = byW[m.trabajador_id] || []).push(m);
         });
         var rows = [];
         Object.keys(byW).forEach(function (id) {
           var lista = byW[id].sort(function (a, b) { return new Date(a.fecha_hora) - new Date(b.fecha_hora); });
-          var totalMin = 0;
-          for (var i = 0; i + 1 < lista.length; i += 2) {
-            if (lista[i].tipo === 'Entrada' && lista[i + 1].tipo === 'Salida') {
-              totalMin += (new Date(lista[i + 1].fecha_hora) - new Date(lista[i].fecha_hora)) / 60000;
-            }
-          }
+          var res = bioCalcDia(lista);
           var primera = null, ultima = null;
-          for (var j = 0; j < lista.length; j++) {
-            if (lista[j].tipo === 'Entrada' && !primera) primera = lista[j];
-            ultima = lista[j];
-          }
+          lista.forEach(function (m) { if (m.tipo === 'Entrada' && !primera) primera = m; ultima = m; });
           var enCurso = ultima && ultima.tipo === 'Entrada';
-          var h = Math.floor(totalMin / 60), min = Math.round(totalMin % 60);
-          var txt = enCurso ? (h + 'h ' + min + 'm (en curso)') : (h + 'h ' + min + 'm');
-          rows.push('<tr><td>' + bioEsc(bioName(id)) + '</td><td>' + (primera ? bioHora(primera.fecha_hora) : '—') + '</td><td>' + (ultima && ultima.tipo === 'Salida' ? bioHora(ultima.fecha_hora) : '—') + '</td><td>' + txt + '</td></tr>');
+          var valor = (res.extra / 60) * (bio.config.precio_hora_extra || 0) + (res.weekend / 60) * (bio.config.precio_feriado_fin_semana || 0);
+          rows.push('<tr><td>' + bioEsc(bioName(id)) + '</td><td>' + (primera ? bioHora(primera.fecha_hora) : '—') + '</td><td>' + (ultima && ultima.tipo === 'Salida' ? bioHora(ultima.fecha_hora) : '—') + '</td><td>' + bioMinStr(res.normal) + '</td><td>' + bioMinStr(res.extra) + (enCurso ? ' (en curso)' : '') + '</td><td>' + bioMinStr(res.weekend) + '</td><td>Bs. ' + valor.toFixed(2) + '</td></tr>');
         });
         tb.innerHTML = rows.length
-          ? '<thead><tr><th>Trabajador</th><th>Entrada</th><th>Salida</th><th>Horas</th></tr></thead><tbody>' + rows.join('') + '</tbody>'
-          : '<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">Sin marcajes completos hoy</td></tr>';
+          ? '<thead><tr><th>Trabajador</th><th>Entrada</th><th>Salida</th><th>Normales</th><th>Extra</th><th>Feriado/FDS</th><th>Valor (Bs.)</th></tr></thead><tbody>' + rows.join('') + '</tbody>'
+          : '<tr><td colspan="7" style="text-align:center;padding:20px;color:#999;">Sin marcajes completos el día seleccionado</td></tr>';
+      }
+
+      function bioRenderConfig() {
+        var cfg = bio.config || bioDefaultConfig();
+        var ci = document.getElementById('cfgHoraInicio'), cf = document.getElementById('cfgHoraFin');
+        if (ci) ci.value = cfg.hora_inicio || '';
+        if (cf) cf.value = cfg.hora_fin || '';
+        var dias = cfg.dias_trabajo || [];
+        document.querySelectorAll('#cfgDias input[type=checkbox]').forEach(function (cb) {
+          cb.checked = dias.indexOf(+cb.value) !== -1;
+        });
+        var pe = document.getElementById('cfgPrecioExtra'), pf = document.getElementById('cfgPrecioFeriado');
+        if (pe) pe.value = cfg.precio_hora_extra;
+        if (pf) pf.value = cfg.precio_feriado_fin_semana;
+      }
+
+      async function bioSaveConfig() {
+        var cfg = {
+          id: 1,
+          hora_inicio: document.getElementById('cfgHoraInicio').value || '08:00',
+          hora_fin: document.getElementById('cfgHoraFin').value || '17:00',
+          dias_trabajo: Array.prototype.map.call(document.querySelectorAll('#cfgDias input[type=checkbox]:checked'), function (cb) { return +cb.value; }),
+          precio_hora_extra: parseFloat(document.getElementById('cfgPrecioExtra').value) || 0,
+          precio_feriado_fin_semana: parseFloat(document.getElementById('cfgPrecioFeriado').value) || 0
+        };
+        if (!cfg.dias_trabajo.length) { bioCfgMsg('Selecciona al menos un día de trabajo.', 'warn'); return; }
+        try {
+          var res = await supabaseClient.from('comp_biometria_config').upsert(cfg, { onConflict: 'id' });
+          if (res.error) throw res.error;
+          bio.config = cfg;
+          bioCfgMsg('Configuración guardada correctamente.', 'ok');
+          bioRenderHoras();
+        } catch (e) {
+          bioCfgMsg('No se pudo guardar: ' + (e.message || 'error'), 'err');
+        }
+      }
+
+      function bioResetConfig() {
+        bio.config = bioDefaultConfig();
+        bioRenderConfig();
+        bioCfgMsg('Valores restablecidos. Pulsa "Guardar configuración" para aplicarlos.', 'info');
+      }
+
+      function bioCfgMsg(text, type) {
+        var el = document.getElementById('cfgMsg');
+        if (el) { el.textContent = text; el.className = 'bio-status ' + (type || 'info'); }
+      }
+
+      function bioExportarExcel() {
+        try {
+          var fechaEl = document.getElementById('bioFecha');
+          var dia = fechaEl && fechaEl.value ? fechaEl.value : bioTodayISO();
+          var cfg = bio.config || bioDefaultConfig();
+          var byW = {};
+          bio.marcajes.forEach(function (m) {
+            if (bioLocalDateStr(m.fecha_hora) !== dia) return;
+            (byW[m.trabajador_id] = byW[m.trabajador_id] || []).push(m);
+          });
+          var aoa = [
+            ['REPORTE DE HORAS TRABAJADAS'],
+            ['Fecha', dia],
+            ['Jornada', cfg.hora_inicio + ' - ' + cfg.hora_fin],
+            ['Precio hora extra (Bs.)', cfg.precio_hora_extra],
+            ['Precio feriado / fin de semana (Bs.)', cfg.precio_feriado_fin_semana],
+            [],
+            ['Trabajador', 'Entrada', 'Salida', 'Horas normales', 'Horas extra', 'Feriado / Fin de semana', 'Valor extra (Bs.)']
+          ];
+          Object.keys(byW).forEach(function (id) {
+            var lista = byW[id].sort(function (a, b) { return new Date(a.fecha_hora) - new Date(b.fecha_hora); });
+            var res = bioCalcDia(lista);
+            var primera = null, ultima = null;
+            lista.forEach(function (m) { if (m.tipo === 'Entrada' && !primera) primera = m; ultima = m; });
+            var valor = (res.extra / 60) * (cfg.precio_hora_extra || 0) + (res.weekend / 60) * (cfg.precio_feriado_fin_semana || 0);
+            aoa.push([
+              bioName(id),
+              primera ? bioHora(primera.fecha_hora) : '',
+              ultima && ultima.tipo === 'Salida' ? bioHora(ultima.fecha_hora) : '',
+              Math.round((res.normal / 60) * 100) / 100,
+              Math.round((res.extra / 60) * 100) / 100,
+              Math.round((res.weekend / 60) * 100) / 100,
+              Math.round(valor * 100) / 100
+            ]);
+          });
+          if (aoa.length === 7) aoa.push(['Sin marcajes en la fecha seleccionada']);
+          var ws = XLSX.utils.aoa_to_sheet(aoa);
+          ws['!cols'] = [{ wch: 32 }, { wch: 10 }, { wch: 10 }, { wch: 14 }, { wch: 12 }, { wch: 22 }, { wch: 16 }];
+          var wb = { SheetNames: ['Horas'], Sheets: { 'Horas': ws } };
+          XLSX.writeFile(wb, 'horas-trabajadas-' + dia + '.xlsx');
+        } catch (err) {
+          alert('Error al exportar: ' + (err.message || 'error'));
+        }
+      }
+
+      function bioSwitchTab(name) {
+        document.querySelectorAll('#tool-biometria .bio-tab').forEach(function (b) {
+          b.classList.toggle('active', b.getAttribute('data-tab') === name);
+        });
+        document.querySelectorAll('#tool-biometria .bio-tab-panel').forEach(function (p) {
+          p.classList.toggle('active', p.id === 'tab-' + name);
+        });
+        if (name === 'horas') bioRenderHoras();
       }
 
       function bioRenderEnrolled() {
@@ -550,14 +1056,25 @@
       window.bioCaptureEnroll = bioCaptureEnroll;
       window.bioSaveEnroll = bioSaveEnroll;
       window.bioDeleteEnroll = bioDeleteEnroll;
+      window.bioSwitchTab = bioSwitchTab;
+      window.bioRenderHoras = bioRenderHoras;
+      window.bioExportarExcel = bioExportarExcel;
+      window.bioSaveConfig = bioSaveConfig;
+      window.bioResetConfig = bioResetConfig;
 
       document.addEventListener('DOMContentLoaded', function () {
-        if (document.getElementById('tool-biometria').classList.contains('active')) bioInitTool();
+        if (document.getElementById('tool-biometria').classList.contains('active')) {
+          bioInitTool();
+          var btn = document.getElementById('btnEnrolarTopbar');
+          if (btn) btn.style.display = '';
+        }
         var orig = window.switchTool;
         window.switchTool = function (name) {
           if (name !== 'biometria') bioStopAll();
           if (orig) orig(name);
           if (name === 'biometria') bioInitTool();
+          var btn = document.getElementById('btnEnrolarTopbar');
+          if (btn) btn.style.display = name === 'biometria' ? '' : 'none';
         };
       });
     })();

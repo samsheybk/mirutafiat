@@ -36,9 +36,9 @@ async function loadModuleCounts() {
 
   try {
     const { count: compensacionCount } = await supabaseClient
-      .from('compensacion_registros')
+      .from('comp_estructura_salarial')
       .select('*', { count: 'exact', head: true });
-    document.getElementById('count-compensacion').textContent = (compensacionCount || 0) + ' registros';
+    document.getElementById('count-compensacion').textContent = (compensacionCount || 0) + ' estructuras';
   } catch (_) {}
 
   try {

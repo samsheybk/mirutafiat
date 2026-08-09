@@ -91,7 +91,8 @@
         { icon: 'fi-sr-money-check', name: 'Estructura salarial', desc: 'Definición de rangos y estructura salarial por cargo y unidad de la empresa.' },
         { icon: 'fi-sr-badge-dollar', name: 'Bonificaciones', desc: 'Registro de bonificaciones y pagos adicionales por trabajador.' },
         { icon: 'fi-sr-hand-holding-usd', name: 'Beneficios económicos', desc: 'Gestión de beneficios económicos y apoyos otorgados a los trabajadores.' },
-        { icon: 'fi-sr-receipt', name: 'Reportes', desc: 'Reportes consolidados de compensación, bonificaciones y beneficios.' }
+        { icon: 'fi-sr-receipt', name: 'Reportes', desc: 'Reportes consolidados de compensación, bonificaciones y beneficios.' },
+        { icon: 'fi-sr-face-viewfinder', name: 'Biometría', desc: 'Reloj de marcaje por reconocimiento facial con detección de vida (parpadeo, giro de cabeza y sonrisa) y registro de entradas/salidas.' }
       ]
     },
     'finanzas.html': {

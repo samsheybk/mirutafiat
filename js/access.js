@@ -56,7 +56,8 @@
       { key: 'salarial', name: 'Estructura salarial' },
       { key: 'bonificaciones', name: 'Bonificaciones' },
       { key: 'beneficios', name: 'Beneficios económicos' },
-      { key: 'reportes', name: 'Reportes' }
+      { key: 'reportes', name: 'Reportes' },
+      { key: 'biometria', name: 'Biometría' }
     ]},
     { key: 'finanzas.html', name: 'Finanzas', tools: [
       { key: 'movimientos', name: 'Registro de movimientos' },

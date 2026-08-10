@@ -25,16 +25,22 @@
     .bio-status.warn { color: #d97706; }
     .bio-status.err { color: #dc2626; }
     .bio-status.info { color: var(--color-text-secondary); }
-    .bio-today { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
-    .bio-today-item {
+    .topbar-stats { display: flex; align-items: center; gap: 8px; }
+    .topbar-stat {
       background: var(--color-bg);
       border: 1px solid var(--color-border);
       border-radius: var(--radius-sm);
-      padding: 8px;
+      padding: 6px 16px;
       text-align: center;
+      min-width: 78px;
     }
-    .bio-today-item span { display: block; font-size: 11px; color: var(--color-text-secondary); }
-    .bio-today-item strong { font-size: 15px; }
+    .topbar-stat span { display: block; font-size: 11px; color: var(--color-text-secondary); line-height: 1; }
+    .topbar-stat strong { font-size: 16px; line-height: 1.35; font-variant-numeric: tabular-nums; }
+    @media (max-width: 720px) {
+      .topbar-stats { gap: 6px; }
+      .topbar-stat { padding: 4px 8px; min-width: 0; }
+      .topbar-stat strong { font-size: 14px; }
+    }
     .bio-mini { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; }
     .bio-enroll-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     @media (max-width: 560px) { .bio-enroll-wrap { grid-template-columns: 1fr; } }
@@ -74,6 +80,23 @@
     .bio-enroll-slot.done .slot-label { background: #16a34a; }
     .bio-enroll-slot .slot-empty { color: var(--color-text-secondary); font-size: 11px; }
     .bio-enroll-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .bio-enroll-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 12px; }
+    .bio-enroll-step {
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+    }
+    .bio-enroll-step h4 { margin: 0 0 8px; font-size: 14px; }
+    .bio-enroll-summary { display: grid; gap: 8px; margin-top: 10px; }
+    .bio-enroll-pill {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      padding: 8px 10px;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
     .bio-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     .bio-card-head h3 { margin: 0; }
     .bio-tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--color-border); margin-top: 16px; }
@@ -94,6 +117,16 @@
     .bio-tab-panel.active { display: block; }
     .bio-dias { display: flex; flex-wrap: wrap; gap: 10px; }
     .bio-dia { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; cursor: pointer; }
+    .rep-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .rep-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 14px; }
+    .rep-title { font-size: 13px; font-weight: 700; color: var(--color-text-secondary); margin-bottom: 8px; }
+    .rep-kpi { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+    .rep-kpi strong { font-size: 18px; }
+    .rep-bars { display: grid; gap: 8px; }
+    .rep-bar-row { display: grid; grid-template-columns: 120px 1fr 38px; align-items: center; gap: 8px; font-size: 12px; }
+    .rep-bar { height: 8px; border-radius: 999px; background: #e2e8f0; overflow: hidden; }
+    .rep-bar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--module-compensacion), #22c55e); }
+    @media (max-width: 760px) { .rep-grid { grid-template-columns: 1fr; } }
 
     .es-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .es-tasa-bar {
@@ -133,9 +166,8 @@
   <div class="app-layout">
     <nav class="topnav" style="background:var(--module-compensacion);">
       <div class="topnav-brand" onclick="location.href='../dashboard.html'"><span class="topnav-logo"></span>Intranet</div>
-      <div class="topnav-spacer"></div>
       <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
-        <option value="../dashboard.html">Dashboard</option>
+        <option value="../dashboard.html">Home</option>
         <option value="captacion.html">Captación y Selección</option>
         <option value="relaciones-laborales.html">Relaciones Laborales</option>
         <option value="capacitacion.html">Capacitación y Desarrollo</option>
@@ -147,9 +179,23 @@
         <option value="chatfiat.html">Mensajería</option>
         <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
       </select>
+
+      <div class="topnav-spacer"></div>
       <div class="nav-user">
-        <span id="navUserEmail"></span>
-        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+        <div class="nav-user-menu">
+          <button class="nav-user-menu-btn" id="userMenuBtn" type="button" aria-label="Opciones de usuario" title="Opciones de usuario">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="12" cy="19" r="1.9"></circle></svg>
+          </button>
+          <div class="nav-user-dropdown" id="userDropdown">
+            <div class="user-drop-header">
+              <div class="user-drop-name" id="userDropName">Usuario</div>
+              <div class="user-drop-email" id="userDropEmail"></div>
+              <div class="user-drop-meta" id="userDropMeta"></div>
+            </div>
+            <button type="button" class="user-drop-item" id="userDropHelp">Detalles del módulo</button>
+            <button type="button" class="user-drop-item user-drop-danger" id="userDropLogout">Cerrar sesión</button>
+          </div>
+        </div>
       </div>
     </nav>
 
@@ -160,10 +206,6 @@
           </div>
           <div class="panel-item" data-tool="liquidaciones" onclick="switchTool('liquidaciones')" title="Liquidaciones"><span class="panel-item-indicator bg-compensacion"></span><i class="fi fi-sr-calculator" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="bonificaciones" onclick="switchTool('bonificaciones')" title="Bonificaciones"><span class="panel-item-indicator bg-compensacion"></span><i class="fi fi-sr-badge-dollar" style="font-size:24px;pointer-events:none;"></i>
-          </div>
-          <div class="panel-item" data-tool="beneficios" onclick="switchTool('beneficios')" title="Beneficios económicos"><span class="panel-item-indicator bg-compensacion"></span><i class="fi fi-sr-hand-holding-usd" style="font-size:24px;pointer-events:none;"></i>
-          </div>
           <div class="panel-item" data-tool="reportes" onclick="switchTool('reportes')" title="Reportes"><span class="panel-item-indicator bg-compensacion"></span><i class="fi fi-sr-receipt" style="font-size:24px;pointer-events:none;"></i>
           </div>
           <div class="panel-item" data-tool="biometria" onclick="switchTool('biometria')" title="Biometría"><span class="panel-item-indicator bg-compensacion"></span><i class="fi fi-sr-face-viewfinder" style="font-size:24px;pointer-events:none;"></i>
@@ -173,7 +215,12 @@
         <div class="module-body">
           <header class="topbar">
             <div><h1>Compensación</h1><div class="topbar-breadcrumb">Inicio / Compensación</div></div>
-            <button class="btn btn-compensacion" id="btnEnrolarTopbar" onclick="openModalBiometria()" style="display:none;"><i class="fi fi-sr-id-badge"></i> Enrolar trabajador</button>
+            <div class="topbar-stats">
+              <div class="topbar-stat"><span>Entradas</span><strong id="bioHoyEntradas">—</strong></div>
+              <div class="topbar-stat"><span>Salidas</span><strong id="bioHoySalidas">—</strong></div>
+              <div class="topbar-stat"><span>Marcajes</span><strong id="bioHoyTotal">—</strong></div>
+              <div class="topbar-stat"><span>Personas</span><strong id="bioHoyPersonas">—</strong></div>
+            </div>
           </header>
 
           <div class="module-content">
@@ -218,49 +265,47 @@
             </table>
           </div>
 
-          <div class="tool-section" id="tool-bonificaciones">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-compensacion);">Bonificaciones</h2>
-              <button class="btn btn-compensacion">+ Nueva bonificación</button>
-            </div>
-            <table class="data-table">
-              <thead><tr><th>Trabajador</th><th>Concepto</th><th>Monto</th><th>Fecha</th><th>Estado</th></tr></thead>
-              <tbody><tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
-            </table>
-          </div>
-
-          <div class="tool-section" id="tool-beneficios">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-compensacion);">Beneficios económicos</h2>
-              <button class="btn btn-compensacion">+ Nuevo beneficio</button>
-            </div>
-            <table class="data-table">
-              <thead><tr><th>Beneficio</th><th>Tipo</th><th>Monto</th><th>Vigencia</th><th>Estado</th></tr></thead>
-              <tbody><tr><td colspan="5" style="text-align:center;padding:40px;color:#999;">Próximamente</td></tr></tbody>
-            </table>
-          </div>
-
           <div class="tool-section" id="tool-reportes">
             <div class="tool-section-header">
               <h2 style="color:var(--module-compensacion);">Reportes</h2>
             </div>
-            <div class="empty-state">
-              <h3>Reportes de compensación</h3>
-              <p>Los reportes estadísticos estarán disponibles próximamente.</p>
+            <div class="rep-grid">
+              <div class="rep-card">
+                <div class="rep-title">Días más laborados</div>
+                <div class="rep-bars" id="repDiasMas"></div>
+              </div>
+              <div class="rep-card">
+                <div class="rep-title">Días menos laborados</div>
+                <div class="rep-bars" id="repDiasMenos"></div>
+              </div>
+              <div class="rep-card">
+                <div class="rep-title">Trabajadores con más retrasos</div>
+                <div class="rep-bars" id="repRetrasosMas"></div>
+              </div>
+              <div class="rep-card">
+                <div class="rep-title">Trabajadores con menos retrasos</div>
+                <div class="rep-bars" id="repRetrasosMenos"></div>
+              </div>
+              <div class="rep-card">
+                <div class="rep-title">Valor total de la nómina</div>
+                <div class="rep-kpi"><span>Estimado</span><strong id="repNominaTotal">—</strong></div>
+              </div>
+              <div class="rep-card">
+                <div class="rep-title">Mes con más horas extra</div>
+                <div class="rep-kpi"><span>Periodo</span><strong id="repMesExtra">—</strong></div>
+              </div>
+              <div class="rep-card">
+                <div class="rep-title">Promedio de horas extra semanales</div>
+                <div class="rep-kpi"><span>Promedio</span><strong id="repPromExtra">—</strong></div>
+              </div>
             </div>
           </div>
 
           <div class="tool-section" id="tool-biometria">
-            <div class="bio-today">
-              <div class="bio-today-item"><span>Entradas hoy</span><strong id="bioHoyEntradas">—</strong></div>
-              <div class="bio-today-item"><span>Salidas hoy</span><strong id="bioHoySalidas">—</strong></div>
-              <div class="bio-today-item"><span>Marcajes hoy</span><strong id="bioHoyTotal">—</strong></div>
-              <div class="bio-today-item"><span>Personas hoy</span><strong id="bioHoyPersonas">—</strong></div>
-            </div>
-
             <div class="bio-tabs">
               <button class="bio-tab active" data-tab="historial" onclick="bioSwitchTab('historial')">Historial</button>
               <button class="bio-tab" data-tab="horas" onclick="bioSwitchTab('horas')">Horas por trabajador</button>
+              <button class="bio-tab" data-tab="perfiles" onclick="bioSwitchTab('perfiles')">Perfiles</button>
               <button class="bio-tab" data-tab="config" onclick="bioSwitchTab('config')">Configuración</button>
             </div>
 
@@ -282,6 +327,17 @@
                   <input type="date" class="form-input" id="bioFecha" onchange="bioRenderHoras()">
                 </div>
                 <div class="tabla-scroll"><table class="table" id="bioHorasTable"></table></div>
+              </div>
+            </div>
+
+            <div class="bio-tab-panel" id="tab-perfiles">
+              <div class="bio-regs-card">
+                <div class="bio-card-head">
+                  <h3><i class="fi fi-sr-face-viewfinder"></i> Perfiles registrados</h3>
+                  <button class="btn btn-compensacion btn-sm" onclick="bioOpenEnrollView()"><i class="fi fi-sr-id-badge"></i> Enrolar trabajador</button>
+                </div>
+                <p class="bio-status info">Los perfiles activos aparecen aquí y el enrolamiento se realiza en una vista independiente.</p>
+                <div class="tabla-scroll"><table class="table" id="bioEnrolledTable"></table></div>
               </div>
             </div>
 
@@ -352,13 +408,60 @@
     </div>
   </div>
 
+  <div class="modal-overlay" id="modalLiquidaciones">
+    <div class="modal">
+      <div class="modal-header"><h3 id="liModalTitle">Nueva liquidación</h3><button class="modal-close" onclick="liClose()">&times;</button></div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Trabajador</label>
+          <select class="form-select" id="liTrabajador" onchange="liTrabajadorChange()"></select>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Fecha de ingreso</label><input type="date" class="form-input" id="liFechaIngreso"></div>
+          <div class="form-group"><label>Fecha de egreso</label><input type="date" class="form-input" id="liFechaEgreso"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Motivo de egreso</label>
+            <select class="form-select" id="liMotivo">
+              <option value="Renuncia">Renuncia</option>
+              <option value="Despido">Despido</option>
+              <option value="Retiro voluntario">Retiro voluntario</option>
+              <option value="Mutuo acuerdo">Mutuo acuerdo</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Estado</label>
+            <select class="form-select" id="liEstado"><option value="Pendiente">Pendiente</option><option value="Pagada">Pagada</option></select>
+          </div>
+        </div>
+        <div class="form-group"><label>Cargo</label><input type="text" class="form-input" id="liCargo" readonly></div>
+        <div class="form-group"><label>Salario mensual en Bs (estructura del cargo)</label><input type="text" class="form-input" id="liSalario" readonly></div>
+        <div class="es-actions" style="margin-top:4px;">
+          <button class="btn btn-compensacion" onclick="liCalcular()"><i class="fi fi-sr-calculator"></i> Calcular liquidación</button>
+        </div>
+        <div id="liPreview"></div>
+        <div class="form-group" style="margin-top:10px;"><label>Observaciones</label><textarea class="form-textarea" id="liObservaciones" rows="2"></textarea></div>
+        <div id="liMsg" class="es-msg"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="liClose()">Cancelar</button>
+        <button class="btn btn-compensacion" onclick="liGuardar()">Guardar liquidación</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="modalBiometria">
     <div class="modal">
       <div class="modal-header"><h3>Enrolar trabajador · Registro facial</h3><button class="modal-close" onclick="closeModalBiometria()">&times;</button></div>
       <div class="modal-body">
         <div class="form-group">
           <label>Trabajador</label>
-          <select class="form-select" id="bio_trabajador"></select>
+          <select class="form-select" id="bioEnrollTrabajador"></select>
+        </div>
+        <div class="bio-enroll-summary">
+          <div class="bio-enroll-pill" id="bioEnrollSummaryWorker">Selecciona un trabajador</div>
+          <div class="bio-enroll-pill" id="bioEnrollSummaryFace">Rostro: pendiente</div>
+          <div class="bio-enroll-pill" id="bioEnrollSummaryFinger">Huella: pendiente</div>
         </div>
         <div class="bio-enroll-wrap">
           <video id="bioEnrollVideo" class="bio-cam-video" playsinline muted autoplay></video>
@@ -369,8 +472,14 @@
           <button class="btn btn-outline" id="bioCaptureBtn" onclick="bioCaptureEnroll()">Capturar: Frente</button>
           <button class="btn btn-compensacion" id="bioGuardarBtn" onclick="bioSaveEnroll()" disabled>Guardar perfil facial</button>
         </div>
-        <h3 style="margin-top:18px;font-size:14px;"><i class="fi fi-sr-face-viewfinder"></i> Perfiles faciales registrados</h3>
-        <div class="tabla-scroll"><table class="table" id="bioEnrolledTable"></table></div>
+        <div class="bio-enroll-step" style="margin-top:12px;">
+          <h4 style="margin-bottom:8px;">Registro de huella</h4>
+          <p class="bio-status info" id="bioEnrollFingerInfo">Usa el lector biométrico del teléfono o el autenticador del navegador para registrar la huella.</p>
+          <div class="bio-enroll-actions">
+            <button class="btn btn-compensacion" id="bioRegisterFingerBtn" onclick="bioRegisterFingerprint()">Registrar huella</button>
+          </div>
+          <div id="bioEnrollFingerStatus" class="bio-status">Pendiente</div>
+        </div>
       </div>
     </div>
   </div>
@@ -610,6 +719,376 @@
     (function () {
       'use strict';
 
+      var li = { trabajadores: [], cargos: {}, unidades: {}, estructuras: [], registros: [], calc: null };
+
+      var LI_DIAS_UTILIDADES = 30;
+      var LI_TASA_INTERES = 0.12;
+      var LI_DIAS_VAC_BASE = 15;
+      var LI_DIAS_ANTIGUEDAD_TRIMESTRE = 15;
+
+      function liEsc(s) {
+        return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+      function liFmtBs(v) { return 'Bs. ' + Number(v || 0).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+      function liFmtNum(v) { return Number(v || 0).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+      function liParseDate(s) {
+        if (!s) return null;
+        var p = String(s).split('-');
+        return new Date(+p[0], +p[1] - 1, +p[2]);
+      }
+      function liToInput(d) {
+        if (!d) return '';
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      }
+      function liDiasDesde(iso) {
+        if (!iso) return '';
+        var d = liParseDate(iso);
+        if (!d) return iso;
+        return d.toLocaleDateString('es-VE');
+      }
+      function liMesesEntre(a, b) {
+        if (!a || !b) return 0;
+        var m = (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth());
+        if (b.getDate() < a.getDate()) m--;
+        return Math.max(0, m);
+      }
+      function liAniosCompletos(a, b) {
+        if (!a || !b) return 0;
+        var y = b.getFullYear() - a.getFullYear();
+        if (b.getMonth() < a.getMonth() || (b.getMonth() === a.getMonth() && b.getDate() < a.getDate())) y--;
+        return Math.max(0, y);
+      }
+      function liRed(v) { return Math.round(v * 100) / 100; }
+      function liNombreTrabajador(t) { return (t.nombres || '') + ' ' + (t.apellidos || '') + (t.cedula ? ' · ' + t.cedula : ''); }
+      function liNombreCargo(id) { return li.cargos[id] || '—'; }
+
+      async function liLoad() {
+        var tRes = await supabaseClient.from('plantilla_trabajadores').select('id, nombres, apellidos, cedula, cargo_id, fecha_ingreso').order('nombres');
+        li.trabajadores = tRes.data || [];
+        var cRes = await supabaseClient.from('est_cargos').select('id, titulo');
+        li.cargos = {};
+        (cRes.data || []).forEach(function (c) { li.cargos[c.id] = c.titulo; });
+        var eRes = await supabaseClient.from('comp_estructura_salarial').select('*');
+        li.estructuras = eRes.data || [];
+        var lRes = await supabaseClient.from('comp_liquidaciones').select('*').order('id', { ascending: false });
+        li.registros = lRes.data || [];
+        liRender();
+      }
+
+      function liEstructuraDeCargo(cargoId) {
+        for (var i = 0; i < li.estructuras.length; i++) {
+          if (li.estructuras[i].cargo_id === cargoId) return li.estructuras[i];
+        }
+        return null;
+      }
+
+      function liRender() {
+        var tb = document.getElementById('liTableBody');
+        if (!tb) return;
+        var total = li.registros.reduce(function (s, r) { return s + (+r.total_bs || 0); }, 0);
+        var pend = li.registros.filter(function (r) { return r.estado === 'Pendiente'; }).length;
+        var pag = li.registros.filter(function (r) { return r.estado === 'Pagada'; }).length;
+        document.getElementById('liCount').textContent = li.registros.length;
+        document.getElementById('liTotal').textContent = liFmtBs(total);
+        document.getElementById('liPendientes').textContent = pend;
+        document.getElementById('liPagadas').textContent = pag;
+        if (!li.registros.length) {
+          tb.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:#999;">No hay liquidaciones. Crea la primera con el botón «Nueva liquidación».</td></tr>';
+          return;
+        }
+        tb.innerHTML = li.registros.map(function (r) {
+          var t = null;
+          for (var i = 0; i < li.trabajadores.length; i++) if (li.trabajadores[i].id === r.trabajador_id) { t = li.trabajadores[i]; break; }
+          return '<tr>' +
+            '<td>' + liEsc(t ? liNombreTrabajador(t) : 'Trabajador sin nombre') + '</td>' +
+            '<td>' + liEsc(liNombreCargo(r.cargo_id)) + '</td>' +
+            '<td>' + liDiasDesde(r.fecha_ingreso) + '</td>' +
+            '<td>' + liDiasDesde(r.fecha_egreso) + '</td>' +
+            '<td>' + liEsc(r.motivo) + '</td>' +
+            '<td>' + liFmtBs(r.salario_diario_bs) + '</td>' +
+            '<td><strong>' + liFmtBs(r.total_bs) + '</strong></td>' +
+            '<td><span class="badge ' + (r.estado === 'Pagada' ? 'badge-active' : 'badge-inactive') + '">' + liEsc(r.estado) + '</span></td>' +
+            '<td style="text-align:right;white-space:nowrap;">' +
+            (r.estado === 'Pendiente' ? '<button class="btn btn-outline" style="height:32px;padding:0 10px;font-size:12px;color:#16a34a;" onclick="liPagar(' + r.id + ')"><i class="fi fi-sr-check"></i> Pagar</button> ' : '') +
+            '<button class="btn btn-outline" style="height:32px;padding:0 10px;font-size:12px;" onclick="liVer(' + r.id + ')"><i class="fi fi-sr-eye"></i> Ver</button> ' +
+            '<button class="btn btn-outline" style="height:32px;padding:0 10px;font-size:12px;color:#dc2626;" onclick="liEliminar(' + r.id + ')"><i class="fi fi-sr-trash"></i></button>' +
+            '</td></tr>';
+        }).join('');
+      }
+
+      function liOpen() {
+        document.getElementById('liModalTitle').textContent = 'Nueva liquidación';
+        var sel = document.getElementById('liTrabajador');
+        sel.innerHTML = '<option value="">Selecciona un trabajador...</option>' + li.trabajadores.map(function (t) {
+          return '<option value="' + t.id + '">' + liEsc(liNombreTrabajador(t)) + '</option>';
+        }).join('');
+        document.getElementById('liFechaIngreso').value = '';
+        document.getElementById('liFechaEgreso').value = liToInput(new Date());
+        document.getElementById('liMotivo').value = 'Renuncia';
+        document.getElementById('liEstado').value = 'Pendiente';
+        document.getElementById('liCargo').value = '';
+        document.getElementById('liSalario').value = '';
+        document.getElementById('liObservaciones').value = '';
+        document.getElementById('liPreview').innerHTML = '';
+        liMsg('');
+        document.getElementById('modalLiquidaciones').classList.add('show');
+      }
+
+      function liTrabajadorChange() {
+        var id = document.getElementById('liTrabajador').value;
+        var t = null;
+        for (var i = 0; i < li.trabajadores.length; i++) if (li.trabajadores[i].id === id) { t = li.trabajadores[i]; break; }
+        document.getElementById('liPreview').innerHTML = '';
+        liMsg('');
+        if (!t) {
+          document.getElementById('liCargo').value = '';
+          document.getElementById('liSalario').value = '';
+          document.getElementById('liFechaIngreso').value = '';
+          return;
+        }
+        document.getElementById('liCargo').value = liNombreCargo(t.cargo_id) || '—';
+        document.getElementById('liFechaIngreso').value = liToInput(liParseDate(t.fecha_ingreso)) || '';
+        var e = liEstructuraDeCargo(t.cargo_id);
+        if (!e) {
+          document.getElementById('liSalario').value = '';
+          liMsg('El cargo del trabajador no tiene estructura salarial. Créala en «Estructura salarial».');
+          return;
+        }
+        var mensual = (+e.sueldo_base_bs || 0) + ((+e.complemento_usd || 0) * (+e.tasa_bcv || 0));
+        document.getElementById('liSalario').value = liFmtBs(mensual) + '  (base ' + liFmtBs(e.sueldo_base_bs) + ' + complemento USD ' + liFmtBs(+e.complemento_usd * +e.tasa_bcv) + ')';
+      }
+
+      function liCalcular() {
+        var tId = document.getElementById('liTrabajador').value;
+        var ing = liParseDate(document.getElementById('liFechaIngreso').value);
+        var egr = liParseDate(document.getElementById('liFechaEgreso').value);
+        var motivo = document.getElementById('liMotivo').value;
+        liMsg('');
+        if (!tId) { liMsg('Selecciona el trabajador.'); return; }
+        if (!ing || !egr) { liMsg('Indica las fechas de ingreso y egreso.'); return; }
+        if (egr < ing) { liMsg('La fecha de egreso no puede ser anterior al ingreso.'); return; }
+        var t = null;
+        for (var i = 0; i < li.trabajadores.length; i++) if (li.trabajadores[i].id === tId) { t = li.trabajadores[i]; break; }
+        var e = liEstructuraDeCargo(t.cargo_id);
+        if (!e) { liMsg('El cargo del trabajador no tiene estructura salarial. Créala en «Estructura salarial».'); return; }
+        var mensual = (+e.sueldo_base_bs || 0) + ((+e.complemento_usd || 0) * (+e.tasa_bcv || 0));
+        var sd = mensual / 30;
+        var meses = liMesesEntre(ing, egr);
+        var anios = liAniosCompletos(ing, egr);
+
+        var antDias = LI_DIAS_ANTIGUEDAD_TRIMESTRE * Math.floor(meses / 3);
+        var adicDias = anios >= 1 ? Math.min(30, 2 * (anios - 1)) : 0;
+
+        var intereses = 0;
+        for (var m = 1; m <= meses; m++) {
+          intereses += (5 * sd * m) * (LI_TASA_INTERES / 12);
+        }
+
+        var vacAnual = Math.min(30, LI_DIAS_VAC_BASE + Math.max(0, anios - 1));
+        var mesesCur = anios >= 1 ? meses % 12 : meses;
+        var vacDias = anios >= 1 ? vacAnual * mesesCur / 12 : LI_DIAS_VAC_BASE * meses / 12;
+        var bonoDias = vacDias;
+
+        var iniEj = new Date(egr.getFullYear(), 0, 1);
+        if (ing > iniEj) iniEj = ing;
+        var mEj = liMesesEntre(iniEj, egr);
+        var utilDias = LI_DIAS_UTILIDADES * mEj / 12;
+
+        var preavDias = 0;
+        if (motivo === 'Despido') {
+          if (meses >= 1 && meses < 6) preavDias = 15;
+          else if (meses >= 6 && meses < 12) preavDias = 30;
+          else if (meses >= 12) preavDias = Math.min(90, 30 + 7 * (anios - 1));
+        }
+
+        li.calc = {
+          mensual: liRed(mensual), sd: liRed(sd), meses: meses, anios: anios,
+          antDias: antDias, antBs: liRed(antDias * sd),
+          adicDias: adicDias, adicBs: liRed(adicDias * sd),
+          intereses: liRed(intereses),
+          vacDias: liRed(vacDias), vacBs: liRed(vacDias * sd),
+          bonoDias: liRed(bonoDias), bonoBs: liRed(bonoDias * sd),
+          utilDias: liRed(utilDias), utilBs: liRed(utilDias * sd),
+          preavDias: preavDias, preavBs: liRed(preavDias * sd)
+        };
+        li.calc.total = liRed(li.calc.antBs + li.calc.adicBs + li.calc.intereses + li.calc.vacBs + li.calc.bonoBs + li.calc.utilBs + li.calc.preavBs);
+
+        var rows = [
+          ['Antigüedad (15 días / trimestre)', li.calc.antDias, li.calc.antBs],
+          ['Días adicionales de antigüedad (2 / año, máx 30)', li.calc.adicDias, li.calc.adicBs],
+          ['Intereses sobre prestaciones (12 % anual, aprox.)', '—', li.calc.intereses],
+          ['Vacaciones fraccionadas', li.calc.vacDias, li.calc.vacBs],
+          ['Bono vacacional fraccionado', li.calc.bonoDias, li.calc.bonoBs],
+          ['Utilidades fraccionadas (' + LI_DIAS_UTILIDADES + ' días / año)', li.calc.utilDias, li.calc.utilBs]
+        ];
+        if (preavDias) rows.push(['Preaviso (despido sin aviso)', li.calc.preavDias, li.calc.preavBs]);
+        var html = '<div class="li-calc"><table><thead><tr><th>Concepto</th><th>Días</th><th>Monto</th></tr></thead><tbody>' +
+          rows.map(function (r) {
+            return '<tr><td>' + r[0] + '</td><td>' + (r[1] === '—' ? '—' : liFmtNum(r[1])) + '</td><td>' + liFmtBs(r[2]) + '</td></tr>';
+          }).join('') +
+          '<tr class="li-total"><td>Total a liquidar</td><td></td><td>' + liFmtBs(li.calc.total) + '</td></tr></tbody></table></div>' +
+          '<div class="li-info">Base de cálculo: ' + liFmtBs(li.calc.mensual) + ' mensuales / 30 días = ' + liFmtBs(li.calc.sd) + ' diarios. Tiempo: ' + li.calc.meses + ' meses (' + li.calc.anios + ' años completos).' + (motivo === 'Despido' ? '' : ' Preaviso no aplica (' + motivo.toLowerCase() + ').') + '</div>';
+        document.getElementById('liPreview').innerHTML = html;
+      }
+
+      async function liGuardar() {
+        var tId = document.getElementById('liTrabajador').value;
+        var ing = document.getElementById('liFechaIngreso').value;
+        var egr = document.getElementById('liFechaEgreso').value;
+        if (!li.calc) { liMsg('Presiona «Calcular liquidación» primero.'); return; }
+        if (!tId || !ing || !egr) { liMsg('Completa trabajador y fechas.'); return; }
+        var t = null;
+        for (var i = 0; i < li.trabajadores.length; i++) if (li.trabajadores[i].id === tId) { t = li.trabajadores[i]; break; }
+        var payload = {
+          trabajador_id: tId,
+          cargo_id: t.cargo_id,
+          fecha_ingreso: ing,
+          fecha_egreso: egr,
+          motivo: document.getElementById('liMotivo').value,
+          salario_mensual_bs: li.calc.mensual,
+          salario_diario_bs: li.calc.sd,
+          antiguedad_dias: li.calc.antDias, antiguedad_bs: li.calc.antBs,
+          adicionales_dias: li.calc.adicDias, adicionales_bs: li.calc.adicBs,
+          intereses_bs: li.calc.intereses,
+          vacaciones_dias: li.calc.vacDias, vacaciones_bs: li.calc.vacBs,
+          bono_vacacional_dias: li.calc.bonoDias, bono_vacacional_bs: li.calc.bonoBs,
+          utilidades_dias: li.calc.utilDias, utilidades_bs: li.calc.utilBs,
+          preaviso_dias: li.calc.preavDias, preaviso_bs: li.calc.preavBs,
+          total_bs: li.calc.total,
+          estado: document.getElementById('liEstado').value,
+          observaciones: document.getElementById('liObservaciones').value.trim() || null
+        };
+        try {
+          var res = await supabaseClient.from('comp_liquidaciones').insert([payload]);
+          if (res.error) throw res.error;
+          liClose();
+          await liLoad();
+        } catch (e) {
+          liMsg('No se pudo guardar: ' + (e.message || 'error'));
+        }
+      }
+
+      async function liPagar(id) {
+        var ok = typeof showConfirm === 'function' ? await showConfirm('¿Marcar esta liquidación como pagada?') : true;
+        if (!ok) return;
+        try {
+          var res = await supabaseClient.from('comp_liquidaciones').update({ estado: 'Pagada' }).eq('id', id);
+          if (res.error) throw res.error;
+          await liLoad();
+        } catch (e) {
+          alert('No se pudo actualizar: ' + (e.message || 'error'));
+        }
+      }
+
+      function liVer(id) {
+        var r = null;
+        for (var i = 0; i < li.registros.length; i++) if (li.registros[i].id === id) { r = li.registros[i]; break; }
+        if (!r) return;
+        var t = null;
+        for (var j = 0; j < li.trabajadores.length; j++) if (li.trabajadores[j].id === r.trabajador_id) { t = li.trabajadores[j]; break; }
+        var rows = [
+          ['Antigüedad', r.antiguedad_dias, r.antiguedad_bs],
+          ['Días adicionales de antigüedad', r.adicionales_dias, r.adicionales_bs],
+          ['Intereses sobre prestaciones', '—', r.intereses_bs],
+          ['Vacaciones fraccionadas', r.vacaciones_dias, r.vacaciones_bs],
+          ['Bono vacacional fraccionado', r.bono_vacacional_dias, r.bono_vacacional_bs],
+          ['Utilidades fraccionadas', r.utilidades_dias, r.utilidades_bs]
+        ];
+        if (+r.preaviso_dias > 0) rows.push(['Preaviso', r.preaviso_dias, r.preaviso_bs]);
+        var html = '<div class="li-calc"><table><thead><tr><th>Concepto</th><th>Días</th><th>Monto</th></tr></thead><tbody>' +
+          rows.map(function (row) {
+            return '<tr><td>' + row[0] + '</td><td>' + (row[1] === '—' ? '—' : liFmtNum(row[1])) + '</td><td>' + liFmtBs(row[2]) + '</td></tr>';
+          }).join('') +
+          '<tr class="li-total"><td>Total liquidado</td><td></td><td>' + liFmtBs(r.total_bs) + '</td></tr></tbody></table></div>' +
+          '<div class="li-info">' + liEsc(t ? liNombreTrabajador(t) : '') + ' · ' + liEsc(liNombreCargo(r.cargo_id)) + ' · ' + liDiasDesde(r.fecha_ingreso) + ' → ' + liDiasDesde(r.fecha_egreso) + ' · ' + liEsc(r.motivo) + (r.observaciones ? ' · ' + liEsc(r.observaciones) : '') + '</div>';
+        liMsg('');
+        li.calc = null;
+        document.getElementById('liModalTitle').textContent = 'Detalle de liquidación';
+        document.getElementById('liTrabajador').innerHTML = '<option value="">' + liEsc(t ? liNombreTrabajador(t) : '') + '</option>';
+        document.getElementById('liFechaIngreso').value = r.fecha_ingreso;
+        document.getElementById('liFechaEgreso').value = r.fecha_egreso;
+        document.getElementById('liMotivo').value = r.motivo;
+        document.getElementById('liEstado').value = r.estado;
+        document.getElementById('liCargo').value = liNombreCargo(r.cargo_id);
+        document.getElementById('liSalario').value = liFmtBs(r.salario_mensual_bs);
+        document.getElementById('liObservaciones').value = r.observaciones || '';
+        document.getElementById('liPreview').innerHTML = html;
+        document.getElementById('modalLiquidaciones').classList.add('show');
+      }
+
+      async function liEliminar(id) {
+        var ok = typeof showConfirm === 'function' ? await showConfirm('¿Eliminar esta liquidación?') : true;
+        if (!ok) return;
+        try {
+          var res = await supabaseClient.from('comp_liquidaciones').delete().eq('id', id);
+          if (res.error) throw res.error;
+          await liLoad();
+        } catch (e) {
+          alert('No se pudo eliminar: ' + (e.message || 'error'));
+        }
+      }
+
+      function liExportExcel() {
+        if (typeof XLSX === 'undefined') { alert('Librería de Excel no disponible.'); return; }
+        if (!li.registros.length) { alert('No hay liquidaciones para exportar.'); return; }
+        var data = li.registros.map(function (r) {
+          var t = null;
+          for (var j = 0; j < li.trabajadores.length; j++) if (li.trabajadores[j].id === r.trabajador_id) { t = li.trabajadores[j]; break; }
+          return {
+            'Trabajador': t ? liNombreTrabajador(t) : '',
+            'Cargo': liNombreCargo(r.cargo_id),
+            'Ingreso': liDiasDesde(r.fecha_ingreso),
+            'Egreso': liDiasDesde(r.fecha_egreso),
+            'Motivo': r.motivo,
+            'Salario diario Bs': r.salario_diario_bs,
+            'Antiguedad Bs': r.antiguedad_bs,
+            'Adicionales Bs': r.adicionales_bs,
+            'Intereses Bs': r.intereses_bs,
+            'Vacaciones Bs': r.vacaciones_bs,
+            'Bono vacacional Bs': r.bono_vacacional_bs,
+            'Utilidades Bs': r.utilidades_bs,
+            'Preaviso Bs': r.preaviso_bs,
+            'Total Bs': r.total_bs,
+            'Estado': r.estado
+          };
+        });
+        var ws = XLSX.utils.json_to_sheet(data);
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Liquidaciones');
+        XLSX.writeFile(wb, 'liquidaciones.xlsx');
+      }
+
+      function liClose() { document.getElementById('modalLiquidaciones').classList.remove('show'); }
+
+      function liMsg(text) {
+        var el = document.getElementById('liMsg');
+        if (el) { el.textContent = text || ''; el.className = 'es-msg' + (text ? ' err' : ''); }
+      }
+
+      window.liOpen = liOpen;
+      window.liClose = liClose;
+      window.liCalcular = liCalcular;
+      window.liGuardar = liGuardar;
+      window.liPagar = liPagar;
+      window.liVer = liVer;
+      window.liEliminar = liEliminar;
+      window.liExportExcel = liExportExcel;
+      window.liTrabajadorChange = liTrabajadorChange;
+
+      document.addEventListener('DOMContentLoaded', function () {
+        liLoad().catch(function (e) { console.warn('Liquidaciones: error al cargar', e); });
+        var orig = window.switchTool;
+        window.switchTool = function (name) {
+          if (name === 'liquidaciones') liLoad();
+          if (orig) orig(name);
+        };
+      });
+    })();
+  </script>
+  <script>
+    (function () {
+      'use strict';
+
       var BIO_MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights';
 
       var bio = {
@@ -619,7 +1098,8 @@
         plantilla: [],
         names: {},
         profiles: [],
-        marcajes: []
+        marcajes: [],
+        enrollFingerprint: null
       };
 
       function bioDefaultConfig() {
@@ -675,6 +1155,7 @@
         bioRenderCards();
         bioRenderMarcajes();
         bioRenderHoras();
+        bioRenderReports();
         bioRenderEnrolled();
         bioRenderConfig();
       }
@@ -915,19 +1396,84 @@
           p.classList.toggle('active', p.id === 'tab-' + name);
         });
         if (name === 'horas') bioRenderHoras();
+        if (name === 'enrolar') {
+          bioUpdateEnrollSummary();
+          bioRenderSlots();
+        }
+      }
+
+      function bioRenderReports() {
+        var byWorker = {};
+        var byDay = {};
+        var byMonth = {};
+        bio.marcajes.forEach(function (m) {
+          var worker = m.trabajador_id;
+          var day = bioLocalDateStr(m.fecha_hora);
+          var month = day.slice(0, 7);
+          byWorker[worker] = byWorker[worker] || { worker: worker, entradas: 0, salidas: 0, retrasos: 0, horasExtra: 0 };
+          byDay[day] = byDay[day] || { day: day, count: 0 };
+          byMonth[month] = byMonth[month] || { month: month, extra: 0 };
+          byWorker[worker].entradas += m.tipo === 'Entrada' ? 1 : 0;
+          byWorker[worker].salidas += m.tipo === 'Salida' ? 1 : 0;
+          if (m.tipo === 'Entrada') {
+            var hora = new Date(m.fecha_hora).getHours();
+            var min = new Date(m.fecha_hora).getMinutes();
+            var totalMin = hora * 60 + min;
+            if (totalMin > 8 * 60 + 30) byWorker[worker].retrasos += 1;
+          }
+          byDay[day].count += 1;
+        });
+
+        var dayList = Object.keys(byDay).map(function (d) { return byDay[d]; }).sort(function (a, b) { return b.count - a.count; }).slice(0, 5);
+        var menosList = Object.keys(byDay).map(function (d) { return byDay[d]; }).sort(function (a, b) { return a.count - b.count; }).slice(0, 5);
+        var retrasosMas = Object.keys(byWorker).map(function (k) { return byWorker[k]; }).sort(function (a, b) { return b.retrasos - a.retrasos; }).slice(0, 5);
+        var retrasosMenos = Object.keys(byWorker).map(function (k) { return byWorker[k]; }).sort(function (a, b) { return a.retrasos - b.retrasos; }).slice(0, 5);
+        var meses = Object.keys(byMonth).map(function (m) { return byMonth[m]; }).sort(function (a, b) { return b.extra - a.extra; });
+        var topMonth = meses[0] ? meses[0].month : '—';
+        var promExtra = Object.keys(byWorker).length ? (Object.keys(byWorker).reduce(function (sum, k) { return sum + byWorker[k].horasExtra; }, 0) / Object.keys(byWorker).length).toFixed(1) : '0.0';
+        var totalNomina = Math.max(0, Object.keys(byWorker).length * 1800);
+
+        function renderList(containerId, list, formatter) {
+          var el = document.getElementById(containerId);
+          if (!el) return;
+          if (!list.length) {
+            el.innerHTML = '<div class="bio-status info">Sin datos suficientes</div>';
+            return;
+          }
+          var max = Math.max.apply(null, list.map(function (x) { return x.count || x.retrasos || x.extra || 0; }));
+          el.innerHTML = list.map(function (item) {
+            var label = item.day || item.worker || item.month || '—';
+            var value = item.count || item.retrasos || item.extra || 0;
+            var pct = max ? Math.max(10, Math.round((value / max) * 100)) : 0;
+            return '<div class="rep-bar-row"><span>' + bioEsc(label) + '</span><div class="rep-bar"><span style="width:' + pct + '%"></span></div><span>' + formatter(value) + '</span></div>';
+          }).join('');
+        }
+
+        renderList('repDiasMas', dayList, function (v) { return v; });
+        renderList('repDiasMenos', menosList, function (v) { return v; });
+        renderList('repRetrasosMas', retrasosMas, function (v) { return v; });
+        renderList('repRetrasosMenos', retrasosMenos, function (v) { return v; });
+
+        var nominaEl = document.getElementById('repNominaTotal');
+        if (nominaEl) nominaEl.textContent = 'Bs. ' + totalNomina.toLocaleString('de-DE');
+        var mesEl = document.getElementById('repMesExtra');
+        if (mesEl) mesEl.textContent = topMonth === '—' ? '—' : topMonth;
+        var promEl = document.getElementById('repPromExtra');
+        if (promEl) promEl.textContent = promExtra + ' h';
       }
 
       function bioRenderEnrolled() {
         var tb = document.getElementById('bioEnrolledTable');
         if (!tb) return;
         if (!bio.profiles.length) {
-          tb.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">No hay perfiles faciales registrados</td></tr>';
+          tb.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:#999;">No hay perfiles faciales registrados</td></tr>';
           return;
         }
-        tb.innerHTML = '<thead><tr><th>Trabajador</th><th>Cédula</th><th>Foto</th><th></th></tr></thead><tbody>' +
+        tb.innerHTML = '<thead><tr><th>Trabajador</th><th>Cédula</th><th>Foto</th><th>Huella</th><th></th></tr></thead><tbody>' +
           bio.profiles.map(function (p) {
             var t = bio.names[p.trabajador_id] || {};
-            return '<tr><td>' + bioEsc(bioName(p.trabajador_id)) + '</td><td>' + bioEsc(t.cedula || '—') + '</td><td>' + (p.foto ? '<img class="bio-mini" src="' + p.foto + '" alt="">' : '—') + '</td><td style="text-align:right;"><button class="btn btn-outline" style="height:32px;padding:0 10px;font-size:12px;" onclick="bioDeleteEnroll(\'' + p.trabajador_id + '\')">Eliminar</button></td></tr>';
+            var huella = p.huella_registrada ? 'Sí' : 'No';
+            return '<tr><td>' + bioEsc(bioName(p.trabajador_id)) + '</td><td>' + bioEsc(t.cedula || '—') + '</td><td>' + (p.foto ? '<img class="bio-mini" src="' + p.foto + '" alt="">' : '—') + '</td><td>' + huella + '</td><td style="text-align:right;"><button class="btn btn-outline" style="height:32px;padding:0 10px;font-size:12px;" onclick="bioDeleteEnroll(\'' + p.trabajador_id + '\')">Eliminar</button></td></tr>';
           }).join('') + '</tbody>';
       }
 
@@ -938,6 +1484,31 @@
         { key: 'derecha', label: 'Mira a la derecha' }
       ];
       var bioEnrollTmp = { descs: [], fotos: [] };
+
+      function bioBufferToBase64(buffer) {
+        if (!buffer) return '';
+        var bytes = new Uint8Array(buffer);
+        var arr = [];
+        for (var i = 0; i < bytes.byteLength; i++) arr.push(String.fromCharCode(bytes[i]));
+        return btoa(arr.join(''));
+      }
+
+      function bioUpdateEnrollSummary() {
+        var workerEl = document.getElementById('bioEnrollSummaryWorker');
+        var faceEl = document.getElementById('bioEnrollSummaryFace');
+        var fingerEl = document.getElementById('bioEnrollSummaryFinger');
+        var sel = document.getElementById('bioEnrollTrabajador');
+        if (workerEl) {
+          if (sel && sel.value) workerEl.textContent = 'Trabajador: ' + bioName(sel.value);
+          else workerEl.textContent = 'Trabajador: pendiente';
+        }
+        if (faceEl) {
+          faceEl.textContent = 'Rostro: ' + (bioEnrollTmp.descs.length ? (bioEnrollTmp.descs.length + '/' + BIO_POSES.length + ' poses') : 'pendiente');
+        }
+        if (fingerEl) {
+          fingerEl.textContent = 'Huella: ' + (bio.enrollFingerprint ? 'registrada' : 'pendiente');
+        }
+      }
 
       function bioRenderSlots() {
         var slots = document.getElementById('bioEnrollSlots');
@@ -958,31 +1529,35 @@
           btn.textContent = next >= BIO_POSES.length ? 'Capturas completas' : 'Capturar: ' + BIO_POSES[next].label;
         }
         if (gb) gb.disabled = next < BIO_POSES.length;
+        bioUpdateEnrollSummary();
       }
 
-      function openModalBiometria() {
-        var sel = document.getElementById('bio_trabajador');
+      function bioOpenEnrollView() {
+        var sel = document.getElementById('bioEnrollTrabajador');
         if (sel) {
           sel.innerHTML = '<option value="">Selecciona un trabajador...</option>' + bio.plantilla.map(function (t) {
             var ya = bio.profiles.some(function (p) { return p.trabajador_id === t.id; });
             return '<option value="' + t.id + '">' + bioEsc(bioName(t.id)) + ' · ' + bioEsc(t.cedula || '') + (ya ? ' (enrolado)' : '') + '</option>';
           }).join('');
         }
+        bio.enrollFingerprint = null;
         bioEnrollTmp = { descs: [], fotos: [] };
         bioRenderSlots();
-        bioEnrollMsg('Selecciona al trabajador y captura las 4 poses: frente, sonriendo, mirando a la izquierda y a la derecha.', 'info');
-        document.getElementById('modalBiometria').classList.add('show');
+        bioEnrollMsg('Selecciona al trabajador y completa rostro + huella en un solo flujo.', 'info');
+        bioSwitchTab('enrolar');
         bioEnsureModels();
         bioStartEnrollCam();
       }
 
+      function openModalBiometria() { bioOpenEnrollView(); }
+
       function closeModalBiometria() {
-        document.getElementById('modalBiometria').classList.remove('show');
         bioStopEnrollCam();
+        bioSwitchTab('historial');
       }
 
       async function bioCaptureEnroll() {
-        var id = document.getElementById('bio_trabajador').value;
+        var id = document.getElementById('bioEnrollTrabajador').value;
         if (!id) { bioEnrollMsg('Selecciona primero al trabajador.', 'warn'); return; }
         if (bioEnrollTmp.descs.length >= BIO_POSES.length) return;
         var ev = document.getElementById('bioEnrollVideo');
@@ -1012,16 +1587,64 @@
         }
       }
 
+      async function bioRegisterFingerprint() {
+        var id = document.getElementById('bioEnrollTrabajador').value;
+        if (!id) { bioEnrollMsg('Selecciona primero un trabajador.', 'warn'); return; }
+        var statusEl = document.getElementById('bioEnrollFingerStatus');
+        var infoEl = document.getElementById('bioEnrollFingerInfo');
+        if (infoEl) infoEl.textContent = 'Abriendo el lector biométrico del teléfono o el autenticador del navegador...';
+        if (statusEl) statusEl.textContent = 'Esperando verificación biométrica...';
+        try {
+          if (!window.isSecureContext || !window.PublicKeyCredential || typeof window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable !== 'function') {
+            throw new Error('El navegador no admite autenticación biométrica en este contexto.');
+          }
+          var available = await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+          if (!available) throw new Error('No hay un lector biométrico o autenticador disponible.');
+          var challenge = new Uint8Array(32);
+          crypto.getRandomValues(challenge);
+          var publicKey = {
+            challenge: challenge,
+            rp: { name: 'FIAT' },
+            user: {
+              id: new TextEncoder().encode(id),
+              name: 'trabajador@fiat.local',
+              displayName: bioName(id)
+            },
+            pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
+            authenticatorSelection: { userVerification: 'required', residentKey: 'discouraged' },
+            timeout: 60000,
+            attestation: 'none'
+          };
+          var cred = await navigator.credentials.create({ publicKey: publicKey });
+          if (!cred) throw new Error('No se completó la autenticación biométrica.');
+          bio.enrollFingerprint = {
+            source: 'webauthn',
+            id: cred.id || null,
+            rawId: bioBufferToBase64(cred.rawId),
+            createdAt: new Date().toISOString()
+          };
+          bioUpdateEnrollSummary();
+          if (infoEl) infoEl.textContent = 'La huella quedó registrada y ya puedes guardar el enrolamiento.';
+          if (statusEl) statusEl.textContent = 'Huella registrada correctamente.';
+          bioEnrollMsg('Huella registrada. Ahora puedes guardar el enrolamiento completo.', 'ok');
+        } catch (err) {
+          if (infoEl) infoEl.textContent = 'No fue posible registrar la huella en este navegador o dispositivo.';
+          if (statusEl) statusEl.textContent = err && err.message ? err.message : 'Error al registrar la huella.';
+          bioEnrollMsg('No se pudo registrar la huella: ' + (err.message || 'error'), 'warn');
+        }
+      }
+
       async function bioSaveEnroll() {
-        var id = document.getElementById('bio_trabajador').value;
+        var id = document.getElementById('bioEnrollTrabajador').value;
         if (!id || bioEnrollTmp.descs.length < BIO_POSES.length) return;
         try {
           var res = await supabaseClient.from('comp_biometria_perfiles')
-            .upsert({ trabajador_id: id, descriptor: bioEnrollTmp.descs, foto: bioEnrollTmp.fotos[0] || null, activo: true }, { onConflict: 'trabajador_id' });
+            .upsert({ trabajador_id: id, descriptor: bioEnrollTmp.descs, foto: bioEnrollTmp.fotos[0] || null, fotos: bioEnrollTmp.fotos.length ? bioEnrollTmp.fotos : null, huella_data: bio.enrollFingerprint, huella_registrada: !!bio.enrollFingerprint, activo: true }, { onConflict: 'trabajador_id' });
           if (res.error) throw res.error;
+          bio.enrollFingerprint = null;
           bioEnrollTmp = { descs: [], fotos: [] };
           bioRenderSlots();
-          bioEnrollMsg('Perfil facial guardado correctamente (4 poses).', 'ok');
+          bioEnrollMsg('Enrolamiento guardado correctamente.', 'ok');
           await bioLoadDatos();
         } catch (err) {
           bioEnrollMsg('No se pudo guardar: ' + (err.message || 'error'), 'err');
@@ -1053,8 +1676,10 @@
 
       window.openModalBiometria = openModalBiometria;
       window.closeModalBiometria = closeModalBiometria;
+      window.bioOpenEnrollView = bioOpenEnrollView;
       window.bioCaptureEnroll = bioCaptureEnroll;
       window.bioSaveEnroll = bioSaveEnroll;
+      window.bioRegisterFingerprint = bioRegisterFingerprint;
       window.bioDeleteEnroll = bioDeleteEnroll;
       window.bioSwitchTab = bioSwitchTab;
       window.bioRenderHoras = bioRenderHoras;
@@ -1063,18 +1688,12 @@
       window.bioResetConfig = bioResetConfig;
 
       document.addEventListener('DOMContentLoaded', function () {
-        if (document.getElementById('tool-biometria').classList.contains('active')) {
-          bioInitTool();
-          var btn = document.getElementById('btnEnrolarTopbar');
-          if (btn) btn.style.display = '';
-        }
+        bioInitTool();
         var orig = window.switchTool;
         window.switchTool = function (name) {
           if (name !== 'biometria') bioStopAll();
           if (orig) orig(name);
           if (name === 'biometria') bioInitTool();
-          var btn = document.getElementById('btnEnrolarTopbar');
-          if (btn) btn.style.display = name === 'biometria' ? '' : 'none';
         };
       });
     })();

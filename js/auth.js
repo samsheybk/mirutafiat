@@ -28,6 +28,31 @@ async function getCurrentUser() {
   return data.user;
 }
 
+async function cargarInfoUsuario(user) {
+  const email = String((user && user.email) || '').trim().toLowerCase();
+  const res = { nombre: email.split('@')[0] || 'Usuario', email: email, rol: '', cargo: '' };
+  try {
+    if (window.fiatAccess && window.fiatAccess.buildState) {
+      await window.fiatAccess.buildState(email);
+      const st = window.fiatAccess.state;
+      if (st && st.worker) {
+        const n = ((st.worker.nombres || '') + ' ' + (st.worker.apellidos || '')).trim();
+        if (n) res.nombre = n;
+        if (st.worker.cargo_id) {
+          const c = await supabaseClient
+            .from('est_cargos')
+            .select('titulo')
+            .eq('id', st.worker.cargo_id)
+            .maybeSingle();
+          if (c && c.data && c.data.titulo) res.cargo = c.data.titulo;
+        }
+      }
+      if (st && st.role) res.rol = st.role;
+    }
+  } catch (e) {}
+  return res;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
   const loginForm = document.getElementById('loginForm');
   if (loginForm) {
@@ -89,8 +114,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  const logoutBtn = document.getElementById('logoutBtn');
-  if (logoutBtn) {
+  const userMenuBtn = document.getElementById('userMenuBtn');
+  if (userMenuBtn) {
     const session = await getSession();
     if (!session) {
       window.location.href = '/index.html';
@@ -98,21 +123,55 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const user = await getCurrentUser();
-    const emailEl = document.getElementById('navUserEmail');
-    if (emailEl) {
-      emailEl.textContent = user.email || '';
-      emailEl.className = 'nav-user-email';
-      emailEl.title = 'Ver mi perfil';
-      emailEl.addEventListener('click', function () {
-        var path = window.location.pathname || '';
-        window.location.href = (path.indexOf('/modules/') !== -1 ? '../' : '') + 'perfil.html';
+    const info = await cargarInfoUsuario(user);
+
+    const nameEl = document.getElementById('userDropName');
+    if (nameEl) nameEl.textContent = info.nombre;
+    const emailEl = document.getElementById('userDropEmail');
+    if (emailEl) emailEl.textContent = info.email;
+    const metaEl = document.getElementById('userDropMeta');
+    if (metaEl) {
+      metaEl.innerHTML = '';
+      [info.rol, info.cargo].forEach(function (v) {
+        if (!v) return;
+        const s = document.createElement('span');
+        s.textContent = v;
+        metaEl.appendChild(s);
       });
     }
 
-    logoutBtn.addEventListener('click', async () => {
-      if (!(await showConfirm('¿Estás seguro de cerrar tu sesión?'))) return;
-      await handleLogout();
-      window.location.href = '/index.html';
+    const dd = document.getElementById('userDropdown');
+    function setOpen(force) {
+      const open = force !== undefined ? !!force : !dd.classList.contains('open');
+      dd.classList.toggle('open', open);
+    }
+    userMenuBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setOpen();
     });
+    document.addEventListener('click', function (e) {
+      if (!dd.contains(e.target) && !userMenuBtn.contains(e.target)) setOpen(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+
+    const helpItem = document.getElementById('userDropHelp');
+    if (helpItem) {
+      helpItem.addEventListener('click', function () {
+        setOpen(false);
+        if (typeof window.openHelp === 'function') window.openHelp();
+      });
+    }
+
+    const logoutItem = document.getElementById('userDropLogout');
+    if (logoutItem) {
+      logoutItem.addEventListener('click', async () => {
+        setOpen(false);
+        if (!(await showConfirm('¿Estás seguro de cerrar tu sesión?'))) return;
+        await handleLogout();
+        window.location.href = '/index.html';
+      });
+    }
   }
 });

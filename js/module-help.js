@@ -6,11 +6,11 @@
 
   var CATALOG = {
     'dashboard.html': {
-      title: 'Dashboard',
-      subtitle: 'Panel de control de la intranet: acceso rápido a todos los módulos con contadores en tiempo real de cada área.',
-      accent: '#0f172a',
+      title: 'Home',
+      subtitle: 'Pantalla de bienvenida de la intranet: saludo personalizado y frases motivadoras para comenzar el día.',
+      accent: '#0d9488',
       tools: [
-        { icon: 'fi-sr-house-building', name: 'Panel general', desc: 'Resumen de la intranet con acceso directo a cada módulo: procesos de captación, plantilla activa, cursos, incidentes, movimientos financieros y más.' }
+        { icon: 'fi-sr-house-building', name: 'Inicio', desc: 'Bienvenida con frases motivadoras en carrusel. Usa el menú superior para navegar por los módulos de la intranet.' }
       ]
     },
     'perfil.html': {
@@ -89,9 +89,8 @@
       accent: '#7c3aed',
       tools: [
         { icon: 'fi-sr-money-check', name: 'Estructura salarial por cargo', desc: 'Estructura salarial por cargo del organigrama, con tasa BCV automática y complemento en USD.' },
-        { icon: 'fi-sr-badge-dollar', name: 'Bonificaciones', desc: 'Registro de bonificaciones y pagos adicionales por trabajador.' },
-        { icon: 'fi-sr-hand-holding-usd', name: 'Beneficios económicos', desc: 'Gestión de beneficios económicos y apoyos otorgados a los trabajadores.' },
-        { icon: 'fi-sr-receipt', name: 'Reportes', desc: 'Reportes consolidados de compensación, bonificaciones y beneficios.' },
+        { icon: 'fi-sr-calculator', name: 'Liquidaciones', desc: 'Cálculo y registro de liquidaciones de prestaciones sociales (LOTTT): antigüedad, intereses, vacaciones, bono vacacional, utilidades y preaviso.' },
+        { icon: 'fi-sr-receipt', name: 'Reportes', desc: 'Reportes consolidados de compensación y pagos.' },
         { icon: 'fi-sr-face-viewfinder', name: 'Biometría', desc: 'Reloj de marcaje por reconocimiento facial con detección de vida (parpadeo, giro de cabeza y sonrisa) y registro de entradas/salidas.' }
       ]
     },
@@ -173,30 +172,18 @@
     var sel = document.getElementById('navSelect');
     if (!sel) return;
 
-    var btn = document.createElement('button');
-    btn.id = 'navHelpBtn';
-    btn.className = 'nav-help-btn';
-    btn.type = 'button';
-    btn.title = 'Ver presentación del módulo';
-    btn.innerHTML = '?';
-    btn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      openHelp();
-    });
-    sel.parentNode.insertBefore(btn, sel.nextSibling);
-
     var splashBtn = document.createElement('button');
     splashBtn.id = 'navSplashBtn';
     splashBtn.className = 'nav-splash-btn';
     splashBtn.type = 'button';
     splashBtn.title = 'Ver el anuncio activo';
     splashBtn.style.display = 'none';
-    splashBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-7v16L3 13v-2z"></path><path d="M7 13v6"></path></svg> Anuncio<span id="navSplashCount" class="nav-splash-count"></span>';
+    splashBtn.innerHTML = '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-7v16L3 13v-2z"></path><path d="M7 13v6"></path></svg><span id="navSplashCount" class="nav-splash-count"></span>';
     splashBtn.addEventListener('click', function (e) {
       e.stopPropagation();
       openSplashFromNav();
     });
-    btn.parentNode.insertBefore(splashBtn, btn.nextSibling);
+    sel.parentNode.insertBefore(splashBtn, sel.nextSibling);
     refreshSplashNav();
 
     var opt = document.createElement('option');
@@ -547,4 +534,5 @@
 
   document.addEventListener('DOMContentLoaded', injectNavHelp);
   document.addEventListener('DOMContentLoaded', injectAlertasScript);
+  window.openHelp = openHelp;
 })();

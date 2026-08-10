@@ -54,8 +54,7 @@
     ]},
     { key: 'compensacion.html', name: 'Compensación', tools: [
       { key: 'salarial', name: 'Estructura salarial por cargo' },
-      { key: 'bonificaciones', name: 'Bonificaciones' },
-      { key: 'beneficios', name: 'Beneficios económicos' },
+      { key: 'liquidaciones', name: 'Liquidaciones' },
       { key: 'reportes', name: 'Reportes' },
       { key: 'biometria', name: 'Biometría' }
     ]},

@@ -3,19 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Intranet</title>
+  <title>Home - Intranet</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <style>
+    .home-area { display: flex; align-items: center; justify-content: center; }
+    .home-welcome { max-width: 760px; text-align: center; padding: 40px 24px; }
+    .home-hello { font-size: clamp(28px, 5vw, 44px); font-weight: 800; letter-spacing: -1px; color: var(--color-text); }
+    .home-hello strong { color: #0d9488; }
+    .home-sub { margin-top: 10px; color: var(--color-text-secondary); font-size: 15px; }
+    .home-carousel { margin-top: 48px; min-height: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .home-phrase { font-size: clamp(20px, 3.2vw, 30px); line-height: 1.45; font-weight: 600; color: #334155; max-width: 640px; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .home-phrase.show { opacity: 1; transform: translateY(0); }
+    .home-dots { margin-top: 28px; display: flex; gap: 8px; }
+    .home-dot { width: 9px; height: 9px; border-radius: 50%; border: none; padding: 0; cursor: pointer; background: var(--color-border); transition: background 0.3s ease, transform 0.3s ease; }
+    .home-dot.active { background: #0d9488; transform: scale(1.35); }
+    .home-hint { margin-top: 44px; font-size: 13px; color: var(--color-text-secondary); }
+  </style>
 </head>
 <body>
   <div class="app-layout">
     <nav class="topnav">
       <div class="topnav-brand" onclick="location.href='dashboard.html'"><span class="topnav-logo"></span>Intranet</div>
-      <div class="topnav-spacer"></div>
       <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
-        <option value="dashboard.html">Dashboard</option>
+        <option value="dashboard.html">Home</option>
         <option value="modules/captacion.html">Captación y Selección</option>
         <option value="modules/relaciones-laborales.html">Relaciones Laborales</option>
         <option value="modules/capacitacion.html">Capacitación y Desarrollo</option>
@@ -27,106 +40,43 @@
         <option value="modules/chatfiat.html">Mensajería</option>
         <option value="modules/desarrollo-organizacional.html">Desarrollo organizacional</option>
       </select>
+
+      <div class="topnav-spacer"></div>
       <div class="nav-user">
-        <span id="navUserEmail"></span>
-        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+        <div class="nav-user-menu">
+          <button class="nav-user-menu-btn" id="userMenuBtn" type="button" aria-label="Opciones de usuario" title="Opciones de usuario">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="12" cy="19" r="1.9"></circle></svg>
+          </button>
+          <div class="nav-user-dropdown" id="userDropdown">
+            <div class="user-drop-header">
+              <div class="user-drop-name" id="userDropName">Usuario</div>
+              <div class="user-drop-email" id="userDropEmail"></div>
+              <div class="user-drop-meta" id="userDropMeta"></div>
+            </div>
+            <button type="button" class="user-drop-item" id="userDropHelp">Detalles del módulo</button>
+            <button type="button" class="user-drop-item user-drop-danger" id="userDropLogout">Cerrar sesión</button>
+          </div>
+        </div>
       </div>
     </nav>
 
     <div class="main-content">
       <header class="topbar">
         <div>
-          <h1>Dashboard</h1>
-          <div class="topbar-breadcrumb">Inicio / Dashboard</div>
+          <h1>Home</h1>
+          <div class="topbar-breadcrumb">Inicio / Home</div>
         </div>
       </header>
 
-      <div class="content-area">
-        <div class="module-grid">
-          <div class="module-card" onclick="location.href='modules/captacion.html'">
-            <div class="module-card-accent bg-captacion"></div>
-            <div class="module-icon text-captacion">CS</div>
-            <h3>Captación y Selección</h3>
-            <p>Gestión de reclutamiento, entrevistas y selección de personal</p>
-            <div class="module-count" id="count-captacion">0 procesos activos</div>
+      <div class="content-area home-area">
+        <div class="home-welcome">
+          <div class="home-hello">¡Hola, <strong id="homeName">bienvenido</strong>!</div>
+          <div class="home-sub">Nos alegra verte de nuevo en la intranet FIAT</div>
+          <div class="home-carousel">
+            <div class="home-phrase" id="homePhrase"></div>
+            <div class="home-dots" id="homeDots"></div>
           </div>
-          <div class="module-card" onclick="location.href='modules/relaciones-laborales.html'">
-            <div class="module-card-accent bg-relaciones"></div>
-            <div class="module-icon text-relaciones">RL</div>
-            <h3>Relaciones Laborales</h3>
-            <p>Contratos colectivos, nóminas y relaciones sindicales</p>
-            <div class="module-count" id="count-relaciones">0 registros</div>
-          </div>
-          <div class="module-card" onclick="location.href='modules/capacitacion.html'">
-            <div class="module-card-accent bg-capacitacion"></div>
-            <div class="module-icon text-capacitacion">CD</div>
-            <h3>Capacitación y Desarrollo</h3>
-            <p>Planes de formación, talleres y evaluación de competencias</p>
-            <div class="module-count" id="count-capacitacion">0 cursos</div>
-          </div>
-          <div class="module-card" onclick="location.href='modules/bienestar-social.html'">
-            <div class="module-card-accent bg-bienestar"></div>
-            <div class="module-icon text-bienestar">BS</div>
-            <h3>Bienestar Social</h3>
-            <p>Programas sociales, actividades recreativas y beneficios</p>
-            <div class="module-count" id="count-bienestar">0 programas</div>
-          </div>
-          <div class="module-card" onclick="location.href='modules/seguridad-salud.html'">
-            <div class="module-card-accent bg-seguridad"></div>
-            <div class="module-icon text-seguridad">SL</div>
-            <h3>Seguridad y Salud Laboral</h3>
-            <p>Incidentes, evaluaciones de riesgo e inspecciones</p>
-            <div class="module-count" id="count-seguridad">0 incidentes</div>
-          </div>
-          <div class="module-card" onclick="location.href='modules/compensacion.html'">
-            <div class="module-card-accent bg-compensacion"></div>
-            <div class="module-icon text-compensacion">CM</div>
-            <h3>Compensación</h3>
-            <p>Estructura salarial, bonificaciones y beneficios económicos</p>
-            <div class="module-count" id="count-compensacion">0 registros</div>
-          </div>
-          <div class="module-card" onclick="location.href='modules/finanzas.html'">
-            <div class="module-card-accent bg-finanzas"></div>
-            <div class="module-icon text-finanzas">FN</div>
-            <h3>Finanzas</h3>
-            <p>Registro de gastos, ingresos y reportes financieros</p>
-            <div class="module-count" id="count-finanzas">0 movimientos</div>
-          </div>
-          <div class="module-card" onclick="location.href='modules/repositorio.html'">
-            <div class="module-card-accent bg-repositorio"></div>
-            <div class="module-icon text-repositorio">RP</div>
-            <h3>Repositorio</h3>
-            <p>Documentos, formatos, manuales y material de apoyo</p>
-            <div class="module-count" id="count-repositorio">0 documentos</div>
-          </div>
-          <div class="module-card" onclick="location.href='modules/chatfiat.html'">
-            <div class="module-card-accent bg-chatfiat"></div>
-            <div class="module-icon text-chatfiat">CF</div>
-            <h3>Mensajería</h3>
-            <p>La red social interna</p>
-            <div class="module-count">Próximamente</div>
-          </div>
-          <div class="module-card" onclick="location.href='modules/desarrollo-organizacional.html'">
-            <div class="module-card-accent bg-desarrollo"></div>
-            <div class="module-icon text-desarrollo">DO</div>
-            <h3>Desarrollo organizacional</h3>
-            <p>Indicadores de gestión por plaza de empleo</p>
-            <div class="module-count">Próximamente</div>
-          </div>
-          <div class="module-card" onclick="location.href='modules/gestion-usuarios.html'">
-            <div class="module-card-accent bg-usuarios"></div>
-            <div class="module-icon text-usuarios">GU</div>
-            <h3>Gestión de usuarios</h3>
-            <p>Accesos y permisos de los trabajadores a la intranet</p>
-            <div class="module-count" id="count-usuarios">0 usuarios configurados</div>
-          </div>
-          <div class="module-card" onclick="location.href='modules/oportunidades.html'">
-            <div class="module-card-accent bg-oportunidades"></div>
-            <div class="module-icon text-oportunidades">OA</div>
-            <h3>Oportunidades de acción</h3>
-            <p>Cómo la intranet puede crecer para cubrir nuevas áreas</p>
-            <div class="module-count">Propuestas</div>
-          </div>
+          <div class="home-hint">Usa el menú superior para navegar por los módulos</div>
         </div>
       </div>
     </div>

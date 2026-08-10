@@ -30,39 +30,88 @@
     .reloj-logo {
       height: 120px;
       width: auto;
+      filter: brightness(0) invert(1);
     }
     .reloj-clock { font-size: clamp(56px, 16vw, 120px); font-weight: 800; letter-spacing: 2px; line-height: 1; font-variant-numeric: tabular-nums; }
     .reloj-date { font-size: clamp(16px, 3.2vw, 24px); color: #9fb6cc; font-weight: 600; text-transform: capitalize; }
-    .reloj-scan-btn {
-      width: 170px;
-      height: 170px;
-      border-radius: 50%;
-      border: none;
-      background: linear-gradient(135deg, #14b8a6, #0d9488);
-      color: #fff;
-      cursor: pointer;
-      font-family: inherit;
-      font-size: 20px;
-      font-weight: 700;
-      letter-spacing: 1px;
+    .reloj-note { font-size: 14px; color: #7c93ab; text-align: center; min-height: 20px; }
+    .reloj-note a { color: #14b8a6; }
+
+    .reloj-mode-switch {
       display: flex;
+      gap: 28px;
+      justify-content: center;
+      margin-top: 12px;
+    }
+    .reloj-mode-button {
+      width: 132px;
+      height: 132px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.06);
+      color: #f8fafc;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+    .reloj-mode-button svg { width: 64px; height: 64px; }
+    .reloj-mode-button.active,
+    .reloj-mode-button:hover {
+      border-color: #22c55e;
+      background: rgba(34, 197, 94, 0.16);
+      color: #d9f99d;
+    }
+    .reloj-fingerprint {
+      position: absolute;
+      inset: 0;
+      display: none;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      box-shadow: 0 0 0 12px rgba(20, 184, 166, 0.18), 0 18px 50px rgba(0, 0, 0, 0.5);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-      animation: pulse 2.4s ease-in-out infinite;
+      gap: 20px;
+      pointer-events: none;
+      z-index: 2;
     }
-    .reloj-scan-btn:hover { transform: scale(1.05); }
-    .reloj-scan-btn:active { transform: scale(0.97); }
-    .reloj-scan-btn svg { width: 52px; height: 52px; }
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 0 12px rgba(20, 184, 166, 0.18), 0 18px 50px rgba(0, 0, 0, 0.5); }
-      50% { box-shadow: 0 0 0 22px rgba(20, 184, 166, 0.08), 0 18px 50px rgba(0, 0, 0, 0.5); }
+    .reloj-fingerprint.show {
+      display: flex;
+      pointer-events: auto;
     }
-    .reloj-note { font-size: 14px; color: #7c93ab; text-align: center; min-height: 20px; }
-    .reloj-note a { color: #14b8a6; }
+    .reloj-fingerprint-icon {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: rgba(34, 197, 94, 0.14);
+      border: 2px solid rgba(34, 197, 94, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      color: #22c55e;
+      box-shadow: 0 0 40px rgba(34, 197, 94, 0.16);
+    }
+    .reloj-fingerprint-text {
+      color: #dbeafe;
+      font-size: clamp(16px, 3vw, 20px);
+      text-align: center;
+      max-width: 380px;
+      line-height: 1.4;
+    }
+    .reloj-fingerprint-btn {
+      padding: 14px 28px;
+      border: none;
+      border-radius: 999px;
+      background: #16a34a;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 14px 28px rgba(22, 163, 74, 0.24);
+    }
+    .reloj-fingerprint-btn:disabled {
+      opacity: 0.7;
+      cursor: wait;
+    }
 
     .reloj-scan {
       position: fixed;
@@ -149,7 +198,7 @@
       z-index: 50;
     }
     .reloj-msg.show { display: flex; }
-    .reloj-msg img { height: 110px; width: auto; }
+    .reloj-msg img { height: 110px; width: auto; filter: brightness(0) invert(1); }
     .reloj-msg-text { font-size: clamp(34px, 8vw, 64px); font-weight: 800; line-height: 1.15; }
     .reloj-msg.entrada .reloj-msg-text { color: #0d9488; }
     .reloj-msg.salida .reloj-msg-text { color: #2563eb; }
@@ -158,26 +207,35 @@
 </head>
 <body>
   <div class="reloj-home" id="relojHome">
-    <img class="reloj-logo" src="icons/logo FIAT.webp" alt="FIAT">
+    <img class="reloj-logo" src="icons/braindev_logo.svg" alt="FIAT">
     <div class="reloj-clock" id="relojClock">--:--:--</div>
     <div class="reloj-date" id="relojDate"></div>
-    <button class="reloj-scan-btn" id="relojScanBtn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
-      ESCANEAR
-    </button>
     <div class="reloj-note" id="relojNote"></div>
+    <div class="reloj-mode-switch">
+      <button class="reloj-mode-button active" id="relojModeFace" title="Rostro" aria-label="Escaneo facial">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="11" r="3"/><path d="M7.5 16.5c.9 1.3 2.7 2 4.5 2s3.6-.7 4.5-2"/></svg>
+      </button>
+      <button class="reloj-mode-button" id="relojModeFinger" title="Huella" aria-label="Huella dactilar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4"/><path d="M14 13.12c0 2.38 0 6.38-1 8.88"/><path d="M17.29 21.02c.12-.6.43-2.3.5-3.02"/><path d="M2 12a10 10 0 0 1 18-6"/><path d="M2 16h.01"/><path d="M21.8 16c.2-2 .131-5.354 0-6"/><path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2"/><path d="M8.65 22c.21-.66.45-1.32.57-2"/><path d="M9 6.8a6 6 0 0 1 9 5.2v2"/></svg>
+      </button>
+    </div>
   </div>
 
   <div class="reloj-scan" id="relojScan">
     <video id="relojVideo" autoplay muted playsinline></video>
     <canvas id="relojOverlay"></canvas>
+    <div class="reloj-fingerprint" id="relojFingerprint">
+      <div class="reloj-fingerprint-icon">🔐</div>
+      <div class="reloj-fingerprint-text" id="relojFingerprintText">Selecciona el modo Huella y presiona el botón para abrir el lector biométrico del teléfono.</div>
+      <button class="reloj-fingerprint-btn" id="relojFingerprintBtn">Usar lector del teléfono</button>
+    </div>
     <div class="reloj-scan-status" id="relojScanStatus">Iniciando cámara...</div>
     <div class="reloj-challenge" id="relojChallenge" style="display:none;"></div>
     <button class="reloj-close" id="relojClose">✕</button>
   </div>
 
   <div class="reloj-msg" id="relojMsg">
-    <img src="icons/logo FIAT.webp" alt="FIAT">
+    <img src="icons/braindev_logo.svg" alt="FIAT">
     <div class="reloj-msg-text" id="relojMsgText"></div>
     <div class="reloj-msg-sub" id="relojMsgSub"></div>
   </div>
@@ -199,6 +257,8 @@
         ticking: false,
         models: null,
         state: 'idle',
+        mode: 'face',
+        fingerprintPending: false,
         profile: null,
         streak: 0,
         lastId: null,
@@ -265,21 +325,32 @@
 
       async function startScan() {
         if (st.state === 'scanning' || st.state === 'challenge' || st.state === 'success') return;
-        if (!st.stream) {
-          try {
-            st.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false });
-            st.video.srcObject = st.stream;
-            await st.video.play();
-          } catch (e) {
-            setStatus('No se pudo acceder a la cámara. Permite el acceso e inténtalo de nuevo.', 'err');
-            return;
+        if (st.mode === 'face') {
+          if (!st.stream) {
+            try {
+              st.stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }, audio: false });
+              st.video.srcObject = st.stream;
+              await st.video.play();
+            } catch (e) {
+              setStatus('No se pudo acceder a la cámara. Permite el acceso e inténtalo de nuevo.', 'err');
+              return;
+            }
           }
+          st.state = 'scanning';
+          setStatus('Mantén tu rostro frente a la cámara', 'info');
+        } else {
+          if (st.stream) {
+            st.stream.getTracks().forEach(function (t) { t.stop(); });
+            st.stream = null;
+            st.video.srcObject = null;
+          }
+          st.state = 'fingerprint';
+          setStatus('Huella seleccionada: coloca tu dedo en el lector y presiona verificar.', 'info');
         }
         $('relojHome').style.display = 'none';
         $('relojScan').classList.add('show');
-        st.state = 'scanning';
-        setStatus('Mantén tu rostro frente a la cámara', 'info');
         setChallenge('');
+        updateScanUI();
         if (!st.timer) st.timer = setInterval(tick, 180);
       }
 
@@ -294,8 +365,82 @@
         $('relojHome').style.display = '';
       }
 
+      function setScanMode(mode) {
+        st.mode = mode;
+        $('relojModeFace').classList.toggle('active', mode === 'face');
+        $('relojModeFinger').classList.toggle('active', mode === 'fingerprint');
+        updateScanUI();
+        if (mode === 'face') {
+          setStatus('Escaneo facial iniciado. Mantén tu rostro frente a la cámara.', 'info');
+        } else {
+          setStatus('Modo Huella seleccionado. Pulsa Verificar para usar el lector del dispositivo.', 'info');
+        }
+      }
+
+      function updateScanUI() {
+        var video = $('relojVideo');
+        var fingerprint = $('relojFingerprint');
+        if (st.mode === 'face') {
+          video.style.display = 'block';
+          fingerprint.classList.remove('show');
+        } else {
+          video.style.display = 'none';
+          fingerprint.classList.add('show');
+        }
+      }
+
+      async function verifyFingerprint() {
+        if (st.mode !== 'fingerprint' || st.fingerprintPending) return;
+        st.fingerprintPending = true;
+        $('relojFingerprintBtn').disabled = true;
+        setStatus('Abriendo el lector biométrico del teléfono...', 'ok');
+        $('relojFingerprintText').textContent = 'Espera a que el sistema te solicite usar tu huella o Face ID/biometría del dispositivo.';
+        try {
+          if (!window.isSecureContext || !window.PublicKeyCredential || typeof window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable !== 'function') {
+            throw new Error('Este navegador no admite autenticación biométrica en este contexto.');
+          }
+
+          var available = await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+          if (!available) {
+            throw new Error('El dispositivo no tiene un autenticador biométrico disponible.');
+          }
+
+          var challenge = new Uint8Array(32);
+          crypto.getRandomValues(challenge);
+          var publicKey = {
+            challenge: challenge,
+            rpId: window.location.hostname,
+            allowCredentials: [],
+            userVerification: 'required',
+            timeout: 60000
+          };
+
+          var cred = await navigator.credentials.get({ publicKey: publicKey });
+          if (!cred) {
+            throw new Error('No se completó la autenticación biométrica.');
+          }
+
+          setStatus('Huella verificada con éxito desde el teléfono.', 'ok');
+          $('relojFingerprintText').textContent = 'La verificación biométrica quedó completa. Ya puedes continuar con el marcaje.';
+        } catch (err) {
+          var msg = 'No fue posible abrir el lector del teléfono. Revisa permisos, HTTPS o compatibilidad del navegador.';
+          if (err && err.message) {
+            msg = err.message;
+          }
+          setStatus(msg, 'warn');
+          $('relojFingerprintText').textContent = 'Si el lector no aparece, usa un navegador compatible con WebAuthn en HTTPS o localhost.';
+        } finally {
+          st.fingerprintPending = false;
+          $('relojFingerprintBtn').disabled = false;
+        }
+      }
+
       async function tick() {
         if (st.ticking || st.state === 'success') return;
+        if (st.mode === 'fingerprint') {
+          drawOverlay(null);
+          return;
+        }
         if (!st.video || st.video.readyState < 2) return;
         st.ticking = true;
         try {
@@ -304,7 +449,9 @@
           if (st.state === 'scanning') processDetect(dets);
           else if (st.state === 'challenge') processChallenge(dets);
           drawOverlay(dets[0]);
-        } catch (e) { drawOverlay(null); }
+        } catch (e) {
+          drawOverlay(null);
+        }
         st.ticking = false;
       }
 
@@ -424,17 +571,88 @@
         var cv = $('relojOverlay');
         if (!cv) return;
         var ctx = cv.getContext('2d');
-        if (!d) { ctx.clearRect(0, 0, cv.width, cv.height); return; }
         if (cv.width !== st.video.videoWidth || cv.height !== st.video.videoHeight) {
-          cv.width = st.video.videoWidth; cv.height = st.video.videoHeight;
+          cv.width = st.video.videoWidth;
+          cv.height = st.video.videoHeight;
         }
         ctx.clearRect(0, 0, cv.width, cv.height);
+
+        var cx = cv.width / 2;
+        var cy = cv.height / 2;
+        var radius = Math.min(cv.width, cv.height) * 0.28;
+
+        // Fondo semi-transparente fuera del círculo
+        ctx.save();
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+        ctx.fillRect(0, 0, cv.width, cv.height);
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // Cuadrícula transparente sobre toda la pantalla
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
+        ctx.lineWidth = 1;
+        var spacing = Math.max(18, Math.round(Math.min(cv.width, cv.height) / 24));
+        for (var x = 0; x <= cv.width; x += spacing) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, cv.height);
+          ctx.stroke();
+        }
+        for (var y = 0; y <= cv.height; y += spacing) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(cv.width, y);
+          ctx.stroke();
+        }
+        ctx.restore();
+
+        // Círculo guía para el rostro
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = '#22c55e';
+        ctx.shadowColor = 'rgba(34, 197, 94, 0.45)';
+        ctx.shadowBlur = 18;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Texto guía dentro del círculo
+        ctx.font = '700 ' + Math.round(radius * 0.16) + 'px Inter, system-ui, sans-serif';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('Coloca tu rostro aquí', cx, cy);
+
+        // Indicadores en los bordes del círculo
+        ctx.strokeStyle = '#22c55e';
+        ctx.lineWidth = 4;
+        var len = radius * 0.18;
+        ctx.beginPath();
+        ctx.moveTo(cx - radius, cy);
+        ctx.lineTo(cx - radius + len, cy);
+        ctx.moveTo(cx + radius, cy);
+        ctx.lineTo(cx + radius - len, cy);
+        ctx.moveTo(cx, cy - radius);
+        ctx.lineTo(cx, cy - radius + len);
+        ctx.moveTo(cx, cy + radius);
+        ctx.lineTo(cx, cy + radius - len);
+        ctx.stroke();
+
+        if (!d) return;
+
         var box = d.detection.box;
         ctx.strokeStyle = st.state === 'challenge' ? '#f59e0b' : '#10b981';
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 3;
+        ctx.setLineDash([6, 10]);
         ctx.strokeRect(box.x, box.y, box.width, box.height);
+        ctx.setLineDash([]);
         if (d.landmarks) {
-          d.landmarks.positions.forEach(function (p) { ctx.fillRect(p.x, p.y, 3, 3); });
+          ctx.fillStyle = '#22c55e';
+          d.landmarks.positions.forEach(function (p) { ctx.fillRect(p.x - 1, p.y - 1, 4, 4); });
         }
       }
 
@@ -449,7 +667,9 @@
         el.textContent = text;
       }
 
-      $('relojScanBtn').addEventListener('click', function () { startScan(); });
+      $('relojModeFace').addEventListener('click', function () { setScanMode('face'); startScan(); });
+      $('relojModeFinger').addEventListener('click', function () { setScanMode('fingerprint'); startScan(); });
+      $('relojFingerprintBtn').addEventListener('click', verifyFingerprint);
       $('relojClose').addEventListener('click', function () { stopScan(); });
 
       document.addEventListener('DOMContentLoaded', function () {

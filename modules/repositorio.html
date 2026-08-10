@@ -360,9 +360,8 @@
   <div class="app-layout">
     <nav class="topnav" style="background:var(--module-repositorio);">
       <div class="topnav-brand" onclick="location.href='../dashboard.html'"><span class="topnav-logo"></span>Intranet</div>
-      <div class="topnav-spacer"></div>
       <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
-        <option value="../dashboard.html">Dashboard</option>
+        <option value="../dashboard.html">Home</option>
         <option value="captacion.html">Captación y Selección</option>
         <option value="relaciones-laborales.html">Relaciones Laborales</option>
         <option value="capacitacion.html">Capacitación y Desarrollo</option>
@@ -374,9 +373,23 @@
         <option value="chatfiat.html">Mensajería</option>
         <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
       </select>
+
+      <div class="topnav-spacer"></div>
       <div class="nav-user">
-        <span id="navUserEmail"></span>
-        <button class="btn-nav-logout" id="logoutBtn">Cerrar sesión</button>
+        <div class="nav-user-menu">
+          <button class="nav-user-menu-btn" id="userMenuBtn" type="button" aria-label="Opciones de usuario" title="Opciones de usuario">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="12" cy="19" r="1.9"></circle></svg>
+          </button>
+          <div class="nav-user-dropdown" id="userDropdown">
+            <div class="user-drop-header">
+              <div class="user-drop-name" id="userDropName">Usuario</div>
+              <div class="user-drop-email" id="userDropEmail"></div>
+              <div class="user-drop-meta" id="userDropMeta"></div>
+            </div>
+            <button type="button" class="user-drop-item" id="userDropHelp">Detalles del módulo</button>
+            <button type="button" class="user-drop-item user-drop-danger" id="userDropLogout">Cerrar sesión</button>
+          </div>
+        </div>
       </div>
     </nav>
 

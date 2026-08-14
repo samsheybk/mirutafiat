@@ -117,16 +117,6 @@
     .bio-tab-panel.active { display: block; }
     .bio-dias { display: flex; flex-wrap: wrap; gap: 10px; }
     .bio-dia { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; cursor: pointer; }
-    .rep-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .rep-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 14px; }
-    .rep-title { font-size: 13px; font-weight: 700; color: var(--color-text-secondary); margin-bottom: 8px; }
-    .rep-kpi { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
-    .rep-kpi strong { font-size: 18px; }
-    .rep-bars { display: grid; gap: 8px; }
-    .rep-bar-row { display: grid; grid-template-columns: 120px 1fr 38px; align-items: center; gap: 8px; font-size: 12px; }
-    .rep-bar { height: 8px; border-radius: 999px; background: #e2e8f0; overflow: hidden; }
-    .rep-bar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--module-compensacion), #22c55e); }
-    @media (max-width: 760px) { .rep-grid { grid-template-columns: 1fr; } }
 
     .es-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .es-tasa-bar {
@@ -151,6 +141,20 @@
     .es-card strong { font-size: 16px; }
     .es-msg { margin-top: 10px; font-size: 13px; min-height: 18px; }
     .es-msg.err { color: #dc2626; }
+    .es-vista { display: inline-flex; gap: 4px; padding: 3px; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
+    .es-vista-btn {
+      border: 0; background: transparent; padding: 6px 12px; font-size: 12px; font-weight: 600;
+      border-radius: var(--radius-sm); color: var(--color-text-secondary); cursor: pointer;
+    }
+    .es-vista-btn.active { background: var(--module-compensacion, #7c3aed); color: #fff; }
+    .es-vista-btn:not(.active):hover { background: var(--color-border); color: var(--color-text); }
+    .es-preview {
+      margin-top: 10px; display: grid; grid-template-columns: 1fr; gap: 6px;
+      border: 1px dashed var(--color-border); border-radius: var(--radius-sm); padding: 10px 12px;
+    }
+    .es-preview div { display: flex; justify-content: space-between; gap: 10px; font-size: 12px; }
+    .es-preview span { color: var(--color-text-secondary); }
+    .es-preview strong { font-variant-numeric: tabular-nums; }
     @media (max-width: 720px) { .es-cards { grid-template-columns: 1fr 1fr; } }
 
     .li-calc { margin-top: 12px; border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
@@ -206,20 +210,37 @@
           </div>
           <div class="panel-item" data-tool="liquidaciones" onclick="switchTool('liquidaciones')" title="Liquidaciones"><span class="panel-item-indicator bg-compensacion"></span><i class="fi fi-sr-calculator" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="reportes" onclick="switchTool('reportes')" title="Reportes"><span class="panel-item-indicator bg-compensacion"></span><i class="fi fi-sr-receipt" style="font-size:24px;pointer-events:none;"></i>
-          </div>
           <div class="panel-item" data-tool="biometria" onclick="switchTool('biometria')" title="Biometría"><span class="panel-item-indicator bg-compensacion"></span><i class="fi fi-sr-face-viewfinder" style="font-size:24px;pointer-events:none;"></i>
           </div>
         </div>
 
         <div class="module-body">
           <header class="topbar">
-            <div><h1>Compensación</h1><div class="topbar-breadcrumb">Inicio / Compensación</div></div>
-            <div class="topbar-stats">
-              <div class="topbar-stat"><span>Entradas</span><strong id="bioHoyEntradas">—</strong></div>
-              <div class="topbar-stat"><span>Salidas</span><strong id="bioHoySalidas">—</strong></div>
-              <div class="topbar-stat"><span>Marcajes</span><strong id="bioHoyTotal">—</strong></div>
-              <div class="topbar-stat"><span>Personas</span><strong id="bioHoyPersonas">—</strong></div>
+            <div class="toolbar-content" data-toolbar="salarial" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;width:100%;">
+              <span style="font-size:13px;color:var(--color-text-secondary);white-space:nowrap;">Tasa Bs/USD:</span>
+              <input type="number" class="form-input" id="esTasaTool" min="0" step="0.0001" placeholder="0.0000" style="width:130px;height:36px;" oninput="esTasaToolSync()" title="Digita la tasa manualmente (si la API BCV no está disponible) o consúltala automáticamente.">
+              <button class="btn btn-outline" onclick="esAplicarManual()"><i class="fi fi-sr-check-double"></i> Aplicar a toda la estructura</button>
+              <button class="btn btn-outline" onclick="esConsultarTasa(true)"><i class="fi fi-sr-refresh"></i> Consultar tasa BCV</button>
+              <button class="btn btn-compensacion" onclick="esOpen()"><i class="fi fi-sr-money-check"></i> + Nueva estructura</button>
+              <span class="topnav-spacer" style="flex:1;"></span>
+              <div class="es-vista" id="esVista" title="Forma de ver la estructura salarial">
+                <button type="button" class="es-vista-btn active" data-vista="completa" onclick="esSetVista('completa')">Completa (Bs + USD)</button>
+                <button type="button" class="es-vista-btn" data-vista="bs" onclick="esSetVista('bs')">Solo Bs</button>
+                <button type="button" class="es-vista-btn" data-vista="usd" onclick="esSetVista('usd')">Solo USD</button>
+              </div>
+            </div>
+            <div class="toolbar-content" data-toolbar="liquidaciones" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;width:100%;">
+              <button class="btn btn-outline" onclick="liExportExcel()"><i class="fi fi-sr-file-excel"></i> Exportar Excel</button>
+              <button class="btn btn-compensacion" onclick="liOpen()"><i class="fi fi-sr-calculator"></i> + Nueva liquidación</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="biometria" style="display:none;align-items:center;gap:6px;flex-wrap:wrap;width:100%;">
+              <div class="bio-tabs" style="margin-top:0;border-bottom:0;">
+                <button class="bio-tab active" data-tab="historial" onclick="bioSwitchTab('historial')">Historial</button>
+                <button class="bio-tab" data-tab="horas" onclick="bioSwitchTab('horas')">Horas por trabajador</button>
+                <button class="bio-tab" data-tab="perfiles" onclick="bioSwitchTab('perfiles')">Perfiles</button>
+                <button class="bio-tab" data-tab="enrolar" onclick="bioSwitchTab('enrolar')">Enrolar trabajador</button>
+                <button class="bio-tab" data-tab="config" onclick="bioSwitchTab('config')">Configuración</button>
+              </div>
             </div>
           </header>
 
@@ -227,31 +248,23 @@
           <div class="tool-section active" id="tool-salarial">
             <div class="tool-section-header">
               <h2 style="color:var(--module-compensacion);">Estructura salarial por cargo</h2>
-              <div class="es-actions">
-                <button class="btn btn-outline" onclick="esConsultarTasa(true)"><i class="fi fi-sr-refresh"></i> Consultar tasa BCV</button>
-                <button class="btn btn-compensacion" onclick="esOpen()"><i class="fi fi-sr-money-check"></i> + Nueva estructura</button>
-              </div>
             </div>
             <div id="esTasaBar" class="es-tasa-bar">Consultando la tasa BCV...</div>
             <div class="es-cards">
               <div class="es-card"><span>Cargos con estructura</span><strong id="esCount">—</strong></div>
-              <div class="es-card"><span>Sueldos base Bs / mes</span><strong id="esTotalBs">—</strong></div>
-              <div class="es-card"><span>Complementos USD / mes</span><strong id="esTotalUsd">—</strong></div>
+              <div class="es-card"><span id="esCard2Label">Parte en Bs / mes</span><strong id="esTotalBs">—</strong></div>
+              <div class="es-card"><span id="esCard3Label">Parte en USD / mes</span><strong id="esTotalUsd">—</strong></div>
               <div class="es-card"><span>Cargos activos</span><strong id="esActivos">—</strong></div>
             </div>
             <table class="data-table">
-              <thead><tr><th>Cargo</th><th>Unidad</th><th>Sueldo base USD</th><th>Tasa BCV</th><th>Sueldo base Bs</th><th>Complemento USD</th><th>Total USD</th><th>Total Bs</th><th>Estado</th><th></th></tr></thead>
-              <tbody id="esTableBody"><tr><td colspan="10" style="text-align:center;padding:40px;color:#999;">Cargando...</td></tr></tbody>
+              <thead id="esTableHead"></thead>
+              <tbody id="esTableBody"><tr><td colspan="8" style="text-align:center;padding:40px;color:#999;">Cargando...</td></tr></tbody>
             </table>
           </div>
 
           <div class="tool-section" id="tool-liquidaciones">
             <div class="tool-section-header">
               <h2 style="color:var(--module-compensacion);">Liquidaciones de prestaciones sociales</h2>
-              <div class="es-actions">
-                <button class="btn btn-outline" onclick="liExportExcel()"><i class="fi fi-sr-file-excel"></i> Exportar Excel</button>
-                <button class="btn btn-compensacion" onclick="liOpen()"><i class="fi fi-sr-calculator"></i> + Nueva liquidación</button>
-              </div>
             </div>
             <div class="es-cards">
               <div class="es-card"><span>Liquidaciones</span><strong id="liCount">—</strong></div>
@@ -265,54 +278,22 @@
             </table>
           </div>
 
-          <div class="tool-section" id="tool-reportes">
-            <div class="tool-section-header">
-              <h2 style="color:var(--module-compensacion);">Reportes</h2>
-            </div>
-            <div class="rep-grid">
-              <div class="rep-card">
-                <div class="rep-title">Días más laborados</div>
-                <div class="rep-bars" id="repDiasMas"></div>
-              </div>
-              <div class="rep-card">
-                <div class="rep-title">Días menos laborados</div>
-                <div class="rep-bars" id="repDiasMenos"></div>
-              </div>
-              <div class="rep-card">
-                <div class="rep-title">Trabajadores con más retrasos</div>
-                <div class="rep-bars" id="repRetrasosMas"></div>
-              </div>
-              <div class="rep-card">
-                <div class="rep-title">Trabajadores con menos retrasos</div>
-                <div class="rep-bars" id="repRetrasosMenos"></div>
-              </div>
-              <div class="rep-card">
-                <div class="rep-title">Valor total de la nómina</div>
-                <div class="rep-kpi"><span>Estimado</span><strong id="repNominaTotal">—</strong></div>
-              </div>
-              <div class="rep-card">
-                <div class="rep-title">Mes con más horas extra</div>
-                <div class="rep-kpi"><span>Periodo</span><strong id="repMesExtra">—</strong></div>
-              </div>
-              <div class="rep-card">
-                <div class="rep-title">Promedio de horas extra semanales</div>
-                <div class="rep-kpi"><span>Promedio</span><strong id="repPromExtra">—</strong></div>
-              </div>
-            </div>
-          </div>
-
           <div class="tool-section" id="tool-biometria">
-            <div class="bio-tabs">
-              <button class="bio-tab active" data-tab="historial" onclick="bioSwitchTab('historial')">Historial</button>
-              <button class="bio-tab" data-tab="horas" onclick="bioSwitchTab('horas')">Horas por trabajador</button>
-              <button class="bio-tab" data-tab="perfiles" onclick="bioSwitchTab('perfiles')">Perfiles</button>
-              <button class="bio-tab" data-tab="config" onclick="bioSwitchTab('config')">Configuración</button>
-            </div>
-
             <div class="bio-tab-panel active" id="tab-historial">
               <div class="bio-regs-card">
-                <h3><i class="fi fi-sr-alarm-clock"></i> Historial de marcajes (últimos 100)</h3>
+                <div class="bio-card-head">
+                  <h3><i class="fi fi-sr-alarm-clock"></i> Historial de marcajes (últimos 100)</h3>
+                  <button class="btn btn-compensacion btn-sm" onclick="bioImportarCsv()"><i class="fi fi-sr-file-csv"></i> Importar CSV</button>
+                  <input type="file" id="bioCsvInput" accept=".csv,text/csv" style="display:none;" onchange="bioProcesarCsv(this)">
+                </div>
                 <div class="tabla-scroll"><table class="table" id="bioMarcajesTable"></table></div>
+              </div>
+              <div class="bio-regs-card" id="bioCsvCard" style="display:none;">
+                <div class="bio-card-head">
+                  <h3><i class="fi fi-sr-file-csv"></i> Marcajes importados <span id="bioCsvCount"></span></h3>
+                  <button class="btn btn-outline btn-sm" onclick="bioLimpiarCsv()">Cerrar</button>
+                </div>
+                <div class="tabla-scroll"><table class="table" id="bioCsvTable"></table></div>
               </div>
             </div>
 
@@ -322,9 +303,22 @@
                   <h3><i class="fi fi-sr-clock"></i> Horas por trabajador</h3>
                   <button class="btn btn-compensacion btn-sm" onclick="bioExportarExcel()"><i class="fi fi-sr-file-csv"></i> Exportar Excel</button>
                 </div>
-                <div class="form-group" style="max-width:220px;">
-                  <label><i class="fi fi-sr-calendar"></i> Día a consultar</label>
-                  <input type="date" class="form-input" id="bioFecha" onchange="bioRenderHoras()">
+                <div class="form-row" style="align-items:flex-end;margin-bottom:12px;">
+                  <div class="form-group" style="max-width:170px;margin-bottom:0;">
+                    <label><i class="fi fi-sr-calendar"></i> Desde</label>
+                    <input type="date" class="form-input" id="bioFechaDesde" onchange="bioRenderHoras()">
+                  </div>
+                  <div class="form-group" style="max-width:170px;margin-bottom:0;">
+                    <label><i class="fi fi-sr-calendar"></i> Hasta</label>
+                    <input type="date" class="form-input" id="bioFechaHasta" onchange="bioRenderHoras()">
+                  </div>
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label>Forma de ver / exportar</label>
+                    <div class="es-vista" id="bioModo" title="Consolidado: totales por trabajador en el rango. Detallado: una línea por cada entrada-salida.">
+                      <button type="button" class="es-vista-btn active" data-modo="consolidado" onclick="bioSetModo('consolidado')">Consolidado</button>
+                      <button type="button" class="es-vista-btn" data-modo="detallado" onclick="bioSetModo('detallado')">Detallado</button>
+                    </div>
+                  </div>
                 </div>
                 <div class="tabla-scroll"><table class="table" id="bioHorasTable"></table></div>
               </div>
@@ -361,14 +355,49 @@
                   </div>
                 </div>
                 <div class="form-row">
-                  <div class="form-group"><label>Precio hora extra (Bs.)</label><input type="number" min="0" step="0.01" class="form-input" id="cfgPrecioExtra"></div>
-                  <div class="form-group"><label>Precio feriado / fin de semana (Bs.)</label><input type="number" min="0" step="0.01" class="form-input" id="cfgPrecioFeriado"></div>
+                  <div class="form-group"><label>Valor del día (Bs.)</label><input type="number" min="0" step="0.01" class="form-input" id="cfgValorDia" title="Valor en Bs. de una jornada completa. Se divide entre las horas de la jornada para obtener el valor por hora."></div>
+                  <div class="form-group"><label>Factor hora extra (×)</label><input type="number" min="0" step="0.1" class="form-input" id="cfgFactorExtra" title="Multiplicador para horas extra en días de trabajo (ej. 1.5)."></div>
+                  <div class="form-group"><label>Factor feriado / fin de semana (×)</label><input type="number" min="0" step="0.1" class="form-input" id="cfgFactorFeriado" title="Multiplicador para sábados, domingos y feriados (ej. 1.8)."></div>
                 </div>
                 <div class="bio-enroll-actions">
                   <button class="btn btn-compensacion" onclick="bioSaveConfig()"><i class="fi fi-sr-disk"></i> Guardar configuración</button>
                   <button class="btn btn-outline" onclick="bioResetConfig()">Restablecer valores</button>
                 </div>
-                <div id="cfgMsg" class="bio-status">Las horas fuera del rango configurado se consideran horas extra. Sábado y domingo se valoran con el precio de feriado / fin de semana.</div>
+                <div id="cfgMsg" class="bio-status">Las horas fuera del rango configurado se consideran horas extra. El valor por hora se calcula como (valor del día ÷ horas de la jornada) y se multiplica por el factor: hora extra (ej. 1.5) o feriado / fin de semana (ej. 1.8).</div>
+              </div>
+            </div>
+
+            <div class="bio-tab-panel" id="tab-enrolar">
+              <div class="bio-regs-card">
+                <div class="bio-card-head">
+                  <h3><i class="fi fi-sr-id-badge"></i> Enrolar trabajador · Registro facial</h3>
+                </div>
+                <div class="form-group">
+                  <label>Trabajador</label>
+                  <select class="form-select" id="bioEnrollTrabajador"></select>
+                </div>
+                <div class="bio-enroll-summary">
+                  <div class="bio-enroll-pill" id="bioEnrollSummaryWorker">Selecciona un trabajador</div>
+                  <div class="bio-enroll-pill" id="bioEnrollSummaryFace">Rostro: pendiente</div>
+                  <div class="bio-enroll-pill" id="bioEnrollSummaryFinger">Huella: pendiente</div>
+                </div>
+                <div class="bio-enroll-wrap">
+                  <video id="bioEnrollVideo" class="bio-cam-video" playsinline muted autoplay></video>
+                  <div class="bio-enroll-slots" id="bioEnrollSlots"></div>
+                </div>
+                <div id="bioEnrollMsg" class="bio-status">Selecciona al trabajador y captura las 4 poses: frente, sonriendo, mirando a la izquierda y a la derecha.</div>
+                <div class="bio-enroll-actions">
+                  <button class="btn btn-outline" id="bioCaptureBtn" onclick="bioCaptureEnroll()">Capturar: Frente</button>
+                  <button class="btn btn-compensacion" id="bioGuardarBtn" onclick="bioSaveEnroll()" disabled>Guardar perfil facial</button>
+                </div>
+                <div class="bio-enroll-step" style="margin-top:12px;">
+                  <h4 style="margin-bottom:8px;">Registro de huella</h4>
+                  <p class="bio-status info" id="bioEnrollFingerInfo">Usa el lector biométrico del teléfono o el autenticador del navegador para registrar la huella.</p>
+                  <div class="bio-enroll-actions">
+                    <button class="btn btn-compensacion" id="bioRegisterFingerBtn" onclick="bioRegisterFingerprint()">Registrar huella</button>
+                  </div>
+                  <div id="bioEnrollFingerStatus" class="bio-status">Pendiente</div>
+                </div>
               </div>
             </div>
           </div>
@@ -387,15 +416,17 @@
           <select class="form-select" id="esCargo"></select>
         </div>
         <div class="form-row">
-          <div class="form-group"><label>Sueldo base (USD)</label><input type="number" class="form-input" id="esSueldoUsd" min="0" step="0.01" oninput="esCalcular()"></div>
-          <div class="form-group"><label>Tasa BCV (Bs/USD)</label><input type="number" class="form-input" id="esTasaBcv" min="0" step="0.0001" oninput="esCalcular()"></div>
+          <div class="form-group"><label>Parte en Bs (USD)</label><input type="number" class="form-input" id="esParteBs" min="0" step="0.01" placeholder="0.00" oninput="esCalcular()" title="Monto del paquete en USD que se pagará en bolívares. Al calcular se convierte a la tasa del día."></div>
+          <div class="form-group"><label>Parte en USD (USD)</label><input type="number" class="form-input" id="esParteUsd" min="0" step="0.01" placeholder="0.00" oninput="esCalcular()" title="Parte del paquete salarial pagada en dólares (efectivo)."></div>
+          <div class="form-group"><label>Tasa BCV (Bs/USD)</label><input type="number" class="form-input" id="esTasaBcv" min="0" step="0.0001" oninput="esCalcular()" title="Automática con el botón BCV o manual si la API no está disponible. Para aplicar a toda la estructura usa el botón 'Aplicar tasa'."></div>
         </div>
-        <div class="form-group"><label>Sueldo base en Bs (calculado)</label><input type="text" class="form-input" id="esSueldoBs" readonly></div>
-        <div class="form-row">
-          <div class="form-group"><label>Complemento (USD efectivo)</label><input type="number" class="form-input" id="esComplementoUsd" min="0" step="0.01"></div>
-          <div class="form-group"><label>Estado</label>
-            <select class="form-select" id="esEstado"><option value="Activo">Activo</option><option value="Inactivo">Inactivo</option></select>
-          </div>
+        <div class="es-preview">
+          <div><span>Completa (Bs + USD)</span><strong id="esPrevCompleta">—</strong></div>
+          <div><span>Solo Bs (a tasa BCV)</span><strong id="esPrevBs">—</strong></div>
+          <div><span>Solo USD efectivo</span><strong id="esPrevUsd">—</strong></div>
+        </div>
+        <div class="form-group" style="margin-top:10px;"><label>Estado</label>
+          <select class="form-select" id="esEstado"><option value="Activo">Activo</option><option value="Inactivo">Inactivo</option></select>
         </div>
         <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="esObservaciones" rows="3"></textarea></div>
         <div id="esMsg" class="es-msg"></div>
@@ -450,40 +481,6 @@
     </div>
   </div>
 
-  <div class="modal-overlay" id="modalBiometria">
-    <div class="modal">
-      <div class="modal-header"><h3>Enrolar trabajador · Registro facial</h3><button class="modal-close" onclick="closeModalBiometria()">&times;</button></div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Trabajador</label>
-          <select class="form-select" id="bioEnrollTrabajador"></select>
-        </div>
-        <div class="bio-enroll-summary">
-          <div class="bio-enroll-pill" id="bioEnrollSummaryWorker">Selecciona un trabajador</div>
-          <div class="bio-enroll-pill" id="bioEnrollSummaryFace">Rostro: pendiente</div>
-          <div class="bio-enroll-pill" id="bioEnrollSummaryFinger">Huella: pendiente</div>
-        </div>
-        <div class="bio-enroll-wrap">
-          <video id="bioEnrollVideo" class="bio-cam-video" playsinline muted autoplay></video>
-          <div class="bio-enroll-slots" id="bioEnrollSlots"></div>
-        </div>
-        <div id="bioEnrollMsg" class="bio-status">Selecciona al trabajador y captura las 4 poses: frente, sonriendo, mirando a la izquierda y a la derecha.</div>
-        <div class="bio-enroll-actions">
-          <button class="btn btn-outline" id="bioCaptureBtn" onclick="bioCaptureEnroll()">Capturar: Frente</button>
-          <button class="btn btn-compensacion" id="bioGuardarBtn" onclick="bioSaveEnroll()" disabled>Guardar perfil facial</button>
-        </div>
-        <div class="bio-enroll-step" style="margin-top:12px;">
-          <h4 style="margin-bottom:8px;">Registro de huella</h4>
-          <p class="bio-status info" id="bioEnrollFingerInfo">Usa el lector biométrico del teléfono o el autenticador del navegador para registrar la huella.</p>
-          <div class="bio-enroll-actions">
-            <button class="btn btn-compensacion" id="bioRegisterFingerBtn" onclick="bioRegisterFingerprint()">Registrar huella</button>
-          </div>
-          <div id="bioEnrollFingerStatus" class="bio-status">Pendiente</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
   <script src="../js/vendor/xlsx.full.min.js"></script>
@@ -526,16 +523,29 @@
         var input = document.getElementById('esTasaBcv');
         if (t) {
           es.tasa = t;
-          if (bar) {
-            bar.textContent = 'Tasa BCV (dólar oficial): ' + esFmtTasa(t) + ' por USD 1. Se usa como referencia para nuevos registros.';
-            bar.className = 'es-tasa-bar ok';
+          var tTool = document.getElementById('esTasaTool');
+          if (input) input.value = t.toFixed(4);
+          if (tTool) tTool.value = t.toFixed(4);
+          try {
+            var actualizados = await esAplicarTasaDiaria(t);
+            esRender();
+            if (bar) {
+              bar.textContent = 'Tasa BCV (dólar oficial): ' + esFmtTasa(t) + ' por USD 1. La estructura salarial se actualizó según la tasa del día' +
+                (actualizados ? ' (' + actualizados + ' registro' + (actualizados > 1 ? 's' : '') + ' actualizado' + (actualizados > 1 ? 's' : '') + ').' : ' (ya estaba al día).');
+              bar.className = 'es-tasa-bar ok';
+            }
+            if (mostrarMensaje) showAlert('Tasa BCV actualizada y estructura salarial ajustada a la tasa del día.', 'success');
+          } catch (e) {
+            if (bar) {
+              bar.textContent = 'Tasa BCV consultada (' + esFmtTasa(t) + ') pero no se pudo actualizar la estructura: ' + (e.message || 'error');
+              bar.className = 'es-tasa-bar err';
+            }
+            if (mostrarMensaje) showAlert('Tasa BCV consultada pero hubo un error al actualizar la estructura.', 'error');
           }
-          if (input && !input.value) input.value = t.toFixed(4);
-          if (mostrarMensaje) showAlert('Tasa BCV actualizada: ' + esFmtTasa(t), 'success');
         } else {
           es.tasa = null;
           if (bar) {
-            bar.textContent = 'No se pudo consultar la tasa BCV. Verifica la conexión o ingrésala manualmente en el registro.';
+            bar.textContent = 'No se pudo consultar la tasa BCV. Ingresa la tasa manualmente y usa el botón "Aplicar tasa a toda la estructura".';
             bar.className = 'es-tasa-bar err';
           }
           if (mostrarMensaje) showAlert('No se pudo consultar la tasa BCV.', 'error');
@@ -543,11 +553,68 @@
       }
 
       function esNombreUnidad(id) { return es.unidades[id] || '—'; }
+
+      function esTasaToolSync() {
+        var tool = document.getElementById('esTasaTool');
+        var modal = document.getElementById('esTasaBcv');
+        if (tool && modal) modal.value = tool.value;
+        esCalcular();
+      }
+
+      async function esAplicarManual() {
+        var input = document.getElementById('esTasaTool') || document.getElementById('esTasaBcv');
+        var t = input ? parseFloat(input.value) : 0;
+        var bar = document.getElementById('esTasaBar');
+        if (!(t > 0)) {
+          if (bar) { bar.textContent = 'Digita la tasa en el campo Tasa Bs/USD antes de aplicarla a toda la estructura.'; bar.className = 'es-tasa-bar err'; }
+          if (typeof showAlert === 'function') showAlert('Digita la tasa (manual o consultada) antes de aplicarla.', 'warning');
+          return;
+        }
+        es.tasa = t;
+        var tool = document.getElementById('esTasaTool');
+        var modal = document.getElementById('esTasaBcv');
+        if (tool) tool.value = t.toFixed(4);
+        if (modal) modal.value = t.toFixed(4);
+        try {
+          var actualizados = await esAplicarTasaDiaria(t);
+          esRender();
+          if (bar) {
+            bar.textContent = 'Tasa aplicada: ' + esFmtTasa(t) + ' por USD 1. La estructura salarial se actualizó a esa tasa' +
+              (actualizados ? ' (' + actualizados + ' registro' + (actualizados > 1 ? 's' : '') + ').' : ' (ya estaba a esa tasa).');
+            bar.className = 'es-tasa-bar ok';
+          }
+          if (typeof showAlert === 'function') showAlert('Estructura salarial actualizada a la tasa ' + esFmtTasa(t) + '.', 'success');
+        } catch (e) {
+          if (bar) {
+            bar.textContent = 'No se pudo actualizar la estructura: ' + (e.message || 'error');
+            bar.className = 'es-tasa-bar err';
+          }
+          if (typeof showAlert === 'function') showAlert('No se pudo actualizar la estructura.', 'error');
+        }
+      }
       function esCargoDe(id) {
         for (var i = 0; i < es.cargos.length; i++) if (es.cargos[i].id === id) return es.cargos[i];
         return null;
       }
       function esTituloCargo(id) { var c = esCargoDe(id); return c ? c.titulo : 'Cargo sin nombre'; }
+
+      async function esAplicarTasaDiaria(t) {
+        if (!(t > 0)) return 0;
+        var tasaRed = Math.round(t * 10000) / 10000;
+        var cambios = es.registros
+          .filter(function (r) { return Math.abs((+r.tasa_bcv || 0) - t) > 0.00005; })
+          .map(function (r) { return { id: r.id, tasa_bcv: tasaRed }; });
+        if (!cambios.length) return 0;
+        for (var i = 0; i < cambios.length; i++) {
+          var c = cambios[i];
+          var res = await supabaseClient.from('comp_estructura_salarial').update({ tasa_bcv: c.tasa_bcv }).eq('id', c.id);
+          if (res.error) throw res.error;
+          for (var j = 0; j < es.registros.length; j++) {
+            if (es.registros[j].id === c.id) es.registros[j].tasa_bcv = c.tasa_bcv;
+          }
+        }
+        return cambios.length;
+      }
 
       async function esLoad() {
         var cRes = await supabaseClient.from('est_cargos').select('id, titulo, unidad_id').order('titulo');
@@ -556,38 +623,86 @@
         es.unidades = {};
         (uRes.data || []).forEach(function (u) { es.unidades[u.id] = u.nombre; });
         var rRes = await supabaseClient.from('comp_estructura_salarial').select('*');
-        es.registros = rRes.data || [];
+        es.registros = (rRes.data || []).map(function (r) {
+          if (r.parte_bs == null) r.parte_bs = (+r.sueldo_base_bs || 0);
+          if (r.parte_usd == null) r.parte_usd = (+r.sueldo_base_usd || 0) + (+r.complemento_usd || 0);
+          return r;
+        });
         esRender();
-        if (!es.tasa) esConsultarTasa(false);
+        esConsultarTasa(false);
+      }
+
+      function esParteBs(r) { return +r.parte_bs || 0; }
+      function esParteUsd(r) { return +r.parte_usd || 0; }
+      function esTasaDe(r) { return +r.tasa_bcv || 0; }
+      function esTotalBs(r) { var t = esTasaDe(r); return (esParteBs(r) + esParteUsd(r)) * t; }
+      function esTotalUsd(r) { return esParteBs(r) + esParteUsd(r); }
+
+      function esSetVista(v) {
+        es.vista = v;
+        var btns = document.querySelectorAll('#esVista .es-vista-btn');
+        for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('active', btns[i].getAttribute('data-vista') === v);
+        esRender();
       }
 
       function esRender() {
         var tb = document.getElementById('esTableBody');
+        var th = document.getElementById('esTableHead');
         if (!tb) return;
+        var vista = es.vista || 'completa';
         var activos = es.registros.filter(function (r) { return r.estado === 'Activo'; });
-        var totalBs = activos.reduce(function (s, r) { return s + (+r.sueldo_base_bs || 0); }, 0);
-        var totalUsd = activos.reduce(function (s, r) { return s + (+r.complemento_usd || 0); }, 0);
+        var totalBs = activos.reduce(function (s, r) { return s + esParteBs(r); }, 0);
+        var totalUsd = activos.reduce(function (s, r) { return s + esParteUsd(r); }, 0);
+        var totalBsTasa = activos.reduce(function (s, r) { return s + esTotalBs(r); }, 0);
+        var totalUsdEfec = activos.reduce(function (s, r) { return s + esTotalUsd(r); }, 0);
         document.getElementById('esCount').textContent = es.registros.length;
         document.getElementById('esActivos').textContent = activos.length;
-        document.getElementById('esTotalBs').textContent = esFmtBs(totalBs);
-        document.getElementById('esTotalUsd').textContent = esFmtUsd(totalUsd);
+        var l2 = document.getElementById('esCard2Label');
+        var l3 = document.getElementById('esCard3Label');
+        var c2 = document.getElementById('esTotalBs');
+        var c3 = document.getElementById('esTotalUsd');
+        if (vista === 'usd') {
+          if (l2) l2.textContent = 'Total USD efectivo / mes';
+          if (l3) l3.textContent = 'Parte en Bs / mes';
+          if (c2) c2.textContent = esFmtUsd(totalUsdEfec);
+          if (c3) c3.textContent = esFmtUsd(totalBs);
+        } else if (vista === 'bs') {
+          if (l2) l2.textContent = 'Total Bs / mes (a tasa BCV)';
+          if (l3) l3.textContent = 'Parte en USD / mes';
+          if (c2) c2.textContent = esFmtBs(totalBsTasa);
+          if (c3) c3.textContent = esFmtUsd(totalUsd);
+        } else {
+          if (l2) l2.textContent = 'Parte en Bs / mes';
+          if (l3) l3.textContent = 'Parte en USD / mes';
+          if (c2) c2.textContent = esFmtUsd(totalBs);
+          if (c3) c3.textContent = esFmtUsd(totalUsd);
+        }
+        var heads = {
+          completa: ['Cargo', 'Unidad', 'Parte en Bs (USD)', 'Parte en USD', 'Tasa BCV', 'Paquete total (Bs + USD)', 'Estado', ''],
+          bs: ['Cargo', 'Unidad', 'Parte en Bs (a tasa)', 'USD a Bs (× tasa)', 'Tasa BCV', 'Total en Bs', 'Estado', ''],
+          usd: ['Cargo', 'Unidad', 'Parte en Bs (USD)', 'Parte en USD', 'Tasa BCV', 'Total USD efectivo', 'Estado', '']
+        };
+        if (th) th.innerHTML = '<tr>' + heads[vista].map(function (h) { return '<th>' + h + '</th>'; }).join('') + '</tr>';
         if (!es.registros.length) {
-          tb.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:#999;">No hay estructuras salariales. Crea la primera por cargo del organigrama.</td></tr>';
+          tb.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#999;">No hay estructuras salariales. Crea la primera por cargo del organigrama.</td></tr>';
           return;
         }
         tb.innerHTML = es.registros.map(function (r) {
           var c = esCargoDe(r.cargo_id);
-          var totalUsdR = (+r.sueldo_base_usd || 0) + (+r.complemento_usd || 0);
-          var totalBsR = (+r.sueldo_base_bs || 0) + ((+r.complemento_usd || 0) * (+r.tasa_bcv || 0));
+          var t = esTasaDe(r);
+          var bs = esParteBs(r), usd = esParteUsd(r);
+          var celdas;
+          if (vista === 'usd') {
+            celdas = '<td>' + esFmtUsd(bs) + '</td><td>' + esFmtUsd(usd) + '</td><td>' + esFmtTasa(t) + '</td><td>' + esFmtUsd(esTotalUsd(r)) + '</td>';
+          } else if (vista === 'bs') {
+            celdas = '<td>' + esFmtBs(bs * t) + '</td><td>' + esFmtBs(usd * t) + '</td><td>' + esFmtTasa(t) + '</td><td>' + esFmtBs(esTotalBs(r)) + '</td>';
+          } else {
+            celdas = '<td>' + esFmtUsd(bs) + '</td><td>' + esFmtUsd(usd) + '</td><td>' + esFmtTasa(t) + '</td><td>' + esFmtBs(bs * t) + ' + ' + esFmtUsd(usd) + '</td>';
+          }
           return '<tr>' +
             '<td>' + esEsc(esTituloCargo(r.cargo_id)) + '</td>' +
             '<td>' + esEsc(c ? esNombreUnidad(c.unidad_id) : '—') + '</td>' +
-            '<td>' + esFmtUsd(r.sueldo_base_usd) + '</td>' +
-            '<td>' + esFmtTasa(r.tasa_bcv) + '</td>' +
-            '<td>' + esFmtBs(r.sueldo_base_bs) + '</td>' +
-            '<td>' + esFmtUsd(r.complemento_usd) + '</td>' +
-            '<td>' + esFmtUsd(totalUsdR) + '</td>' +
-            '<td>' + esFmtBs(totalBsR) + '</td>' +
+            celdas +
             '<td><span class="badge ' + (r.estado === 'Activo' ? 'badge-active' : 'badge-inactive') + '">' + esEsc(r.estado) + '</span></td>' +
             '<td style="text-align:right;white-space:nowrap;">' +
             '<button class="btn btn-outline" style="height:32px;padding:0 10px;font-size:12px;" onclick="esEditar(' + r.id + ')"><i class="fi fi-sr-pen"></i> Editar</button> ' +
@@ -610,9 +725,10 @@
         document.getElementById('esModalTitle').textContent = 'Nueva estructura salarial';
         esRellenarCargos('esCargo');
         document.getElementById('esCargo').value = '';
-        document.getElementById('esSueldoUsd').value = '';
+        document.getElementById('esParteBs').value = '';
+        document.getElementById('esParteUsd').value = '';
         document.getElementById('esTasaBcv').value = es.tasa ? es.tasa.toFixed(4) : '';
-        document.getElementById('esComplementoUsd').value = '';
+        esTasaToolSync();
         document.getElementById('esEstado').value = 'Activo';
         document.getElementById('esObservaciones').value = '';
         esCalcular();
@@ -630,9 +746,10 @@
         sel.innerHTML = es.cargos.map(function (c) {
           return '<option value="' + c.id + '"' + (c.id === r.cargo_id ? ' selected' : '') + '>' + esEsc(c.titulo) + ' · ' + esEsc(esNombreUnidad(c.unidad_id)) + '</option>';
         }).join('');
-        document.getElementById('esSueldoUsd').value = r.sueldo_base_usd;
+        document.getElementById('esParteBs').value = esParteBs(r);
+        document.getElementById('esParteUsd').value = esParteUsd(r);
         document.getElementById('esTasaBcv').value = r.tasa_bcv;
-        document.getElementById('esComplementoUsd').value = r.complemento_usd;
+        esTasaToolSync();
         document.getElementById('esEstado').value = r.estado;
         document.getElementById('esObservaciones').value = r.observaciones || '';
         esCalcular();
@@ -643,10 +760,15 @@
       function esClose() { document.getElementById('modal').classList.remove('show'); }
 
       function esCalcular() {
-        var usd = parseFloat(document.getElementById('esSueldoUsd').value) || 0;
+        var bs = parseFloat(document.getElementById('esParteBs').value) || 0;
+        var usd = parseFloat(document.getElementById('esParteUsd').value) || 0;
         var tasa = parseFloat(document.getElementById('esTasaBcv').value) || 0;
-        var bs = usd * tasa;
-        document.getElementById('esSueldoBs').value = 'Bs. ' + bs.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        var elC = document.getElementById('esPrevCompleta');
+        var elB = document.getElementById('esPrevBs');
+        var elU = document.getElementById('esPrevUsd');
+        if (elC) elC.textContent = esFmtBs(bs * tasa) + ' + ' + esFmtUsd(usd);
+        if (elB) elB.textContent = esFmtBs((bs + usd) * tasa);
+        if (elU) elU.textContent = esFmtUsd(bs + usd);
       }
 
       function esMsg(text) {
@@ -656,19 +778,18 @@
 
       async function esGuardar() {
         var cargoId = document.getElementById('esCargo').value;
-        var sueldoUsd = parseFloat(document.getElementById('esSueldoUsd').value);
+        var parteBs = parseFloat(document.getElementById('esParteBs').value) || 0;
+        var parteUsd = parseFloat(document.getElementById('esParteUsd').value) || 0;
         var tasa = parseFloat(document.getElementById('esTasaBcv').value);
-        var complemento = parseFloat(document.getElementById('esComplementoUsd').value) || 0;
         if (!cargoId) { esMsg('Selecciona el cargo del organigrama.'); return; }
-        if (!(sueldoUsd > 0)) { esMsg('Indica el sueldo base en USD.'); return; }
+        if (!(parteBs > 0) && !(parteUsd > 0)) { esMsg('Define al menos una parte del paquete (Bs o USD).'); return; }
         if (!(tasa > 0)) { esMsg('Indica la tasa BCV o consúltala con el botón.'); return; }
-        if (!es.editando && es.registros.some(function (r) { return r.cargo_id === cargoId; })) { esMsg('Ese cargo ya tiene estructura salarial.'); return; }
+        if (es.registros.some(function (r) { return r.cargo_id === cargoId && r.id !== es.editando; })) { esMsg('Ese cargo ya tiene estructura salarial.'); return; }
         var payload = {
           cargo_id: cargoId,
-          sueldo_base_usd: Math.round(sueldoUsd * 100) / 100,
+          parte_bs: Math.round(parteBs * 100) / 100,
+          parte_usd: Math.round(parteUsd * 100) / 100,
           tasa_bcv: Math.round(tasa * 10000) / 10000,
-          sueldo_base_bs: Math.round(sueldoUsd * tasa * 100) / 100,
-          complemento_usd: Math.round(complemento * 100) / 100,
           estado: document.getElementById('esEstado').value,
           observaciones: document.getElementById('esObservaciones').value.trim() || null
         };
@@ -701,8 +822,11 @@
       window.esClose = esClose;
       window.esGuardar = esGuardar;
       window.esEliminar = esEliminar;
+      window.esSetVista = esSetVista;
       window.esCalcular = esCalcular;
       window.esConsultarTasa = esConsultarTasa;
+      window.esAplicarManual = esAplicarManual;
+      window.esTasaToolSync = esTasaToolSync;
 
       document.addEventListener('DOMContentLoaded', function () {
         esLoad().catch(function (e) { console.warn('Estructura salarial: error al cargar', e); });
@@ -854,8 +978,11 @@
           liMsg('El cargo del trabajador no tiene estructura salarial. Créala en «Estructura salarial».');
           return;
         }
-        var mensual = (+e.sueldo_base_bs || 0) + ((+e.complemento_usd || 0) * (+e.tasa_bcv || 0));
-        document.getElementById('liSalario').value = liFmtBs(mensual) + '  (base ' + liFmtBs(e.sueldo_base_bs) + ' + complemento USD ' + liFmtBs(+e.complemento_usd * +e.tasa_bcv) + ')';
+        var mensual = esTotalBs(e);
+        var partBs = esParteBs(e);
+        var partUsd = esParteUsd(e);
+        var tE = esTasaDe(e);
+        document.getElementById('liSalario').value = liFmtBs(mensual) + '  (Bs ' + liFmtBs(partBs) + ' + USD ' + esFmtUsd(partUsd) + ' × ' + esFmtTasa(tE) + ')';
       }
 
       function liCalcular() {
@@ -871,7 +998,7 @@
         for (var i = 0; i < li.trabajadores.length; i++) if (li.trabajadores[i].id === tId) { t = li.trabajadores[i]; break; }
         var e = liEstructuraDeCargo(t.cargo_id);
         if (!e) { liMsg('El cargo del trabajador no tiene estructura salarial. Créala en «Estructura salarial».'); return; }
-        var mensual = (+e.sueldo_base_bs || 0) + ((+e.complemento_usd || 0) * (+e.tasa_bcv || 0));
+        var mensual = esTotalBs(e);
         var sd = mensual / 30;
         var meses = liMesesEntre(ing, egr);
         var anios = liAniosCompletos(ing, egr);
@@ -1103,7 +1230,7 @@
       };
 
       function bioDefaultConfig() {
-        return { hora_inicio: '08:00', hora_fin: '17:00', dias_trabajo: [1, 2, 3, 4, 5], precio_hora_extra: 0, precio_feriado_fin_semana: 0 };
+        return { hora_inicio: '08:00', hora_fin: '17:00', dias_trabajo: [1, 2, 3, 4, 5], valor_dia_bs: 0, factor_hora_extra: 1.5, factor_feriado_fin_semana: 1.8 };
       }
 
       function bioEsc(s) {
@@ -1150,12 +1277,12 @@
         var mRes = await supabaseClient.from('comp_marcajes').select('*').order('fecha_hora', { ascending: false }).limit(300);
         bio.profiles = (pRes.data || []).filter(function (p) { return bio.names[p.trabajador_id]; });
         bio.marcajes = mRes.data || [];
-        var bf = document.getElementById('bioFecha');
-        if (bf && !bf.value) bf.value = bioTodayISO();
-        bioRenderCards();
+        var bfD = document.getElementById('bioFechaDesde');
+        var bfH = document.getElementById('bioFechaHasta');
+        if (bfD && !bfD.value) bfD.value = bioTodayISO();
+        if (bfH && !bfH.value) bfH.value = bioTodayISO();
         bioRenderMarcajes();
         bioRenderHoras();
-        bioRenderReports();
         bioRenderEnrolled();
         bioRenderConfig();
       }
@@ -1195,20 +1322,6 @@
         if (el) { el.textContent = text; el.className = 'bio-status ' + (type || 'info'); }
       }
 
-      function bioRenderCards() {
-        var hoy = bioTodayISO();
-        var lista = bio.marcajes.filter(function (m) { return bioLocalDateStr(m.fecha_hora) === hoy; });
-        var entradas = lista.filter(function (m) { return m.tipo === 'Entrada'; }).length;
-        var salidas = lista.filter(function (m) { return m.tipo === 'Salida'; }).length;
-        var distintos = {};
-        lista.forEach(function (m) { distintos[m.trabajador_id] = true; });
-        function set(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
-        set('bioHoyEntradas', entradas);
-        set('bioHoySalidas', salidas);
-        set('bioHoyTotal', lista.length);
-        set('bioHoyPersonas', Object.keys(distintos).length);
-      }
-
       function bioRenderMarcajes() {
         var tb = document.getElementById('bioMarcajesTable');
         if (!tb) return;
@@ -1224,6 +1337,172 @@
           }).join('') + '</tbody>';
       }
 
+      function bioParseCsv(text) {
+        var rows = [];
+        var row = [];
+        var cur = '';
+        var inQ = false;
+        text = String(text || '');
+        for (var i = 0; i < text.length; i++) {
+          var ch = text.charAt(i);
+          if (inQ) {
+            if (ch === '"') {
+              if (text.charAt(i + 1) === '"') { cur += '"'; i++; }
+              else inQ = false;
+            } else cur += ch;
+          } else if (ch === '"') {
+            inQ = true;
+          } else if (ch === ',') {
+            row.push(cur); cur = '';
+          } else if (ch === '\n' || ch === '\r') {
+            if (ch === '\r' && text.charAt(i + 1) === '\n') i++;
+            row.push(cur); cur = '';
+            if (row.length && !(row.length === 1 && row[0].trim() === '')) rows.push(row);
+            row = [];
+          } else {
+            cur += ch;
+          }
+        }
+        row.push(cur);
+        if (row.length && !(row.length === 1 && row[0].trim() === '')) rows.push(row);
+        return rows;
+      }
+
+      function bioParseFechaCSV(s) {
+        s = String(s == null ? '' : s).trim();
+        if (!s) return null;
+        var m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+        if (m) {
+          var d0 = new Date(+m[1], +m[2] - 1, +m[3]);
+          return isNaN(d0.getTime()) ? null : d0;
+        }
+        m = s.match(/^(\d{1,2})[/\-.](\d{1,2})[/\-.](\d{2,4})/);
+        if (m) {
+          var dd = +m[1], mm = +m[2], yy = +m[3];
+          if (yy < 100) yy += 2000;
+          var d1 = new Date(yy, mm - 1, dd);
+          return isNaN(d1.getTime()) ? null : d1;
+        }
+        var t = new Date(s);
+        return isNaN(t.getTime()) ? null : t;
+      }
+
+      function bioEasterSunday(y) {
+        var a = y % 19, b = Math.floor(y / 100), c = y % 100;
+        var d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25);
+        var g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30;
+        var i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7;
+        var m = Math.floor((a + 11 * h + 22 * l) / 451);
+        var month = Math.floor((h + l - 7 * m + 114) / 31) - 1;
+        var day = ((h + l - 7 * m + 114) % 31) + 1;
+        return new Date(y, month, day);
+      }
+
+      function bioSumarDias(date, n) {
+        var t = new Date(date.getTime());
+        t.setDate(t.getDate() + n);
+        return t;
+      }
+
+      function bioEsMismaFecha(a, b) {
+        return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+      }
+
+      function bioTipoDia(fechaStr) {
+        var d = bioParseFechaCSV(fechaStr);
+        if (!d) return null;
+        var y = d.getFullYear();
+        var easter = bioEasterSunday(y);
+        var feriados = [
+          new Date(y, 0, 1),
+          bioSumarDias(easter, -48),
+          bioSumarDias(easter, -47),
+          bioSumarDias(easter, -3),
+          bioSumarDias(easter, -2),
+          new Date(y, 3, 19),
+          new Date(y, 4, 1),
+          new Date(y, 5, 24),
+          new Date(y, 6, 5),
+          new Date(y, 6, 24),
+          new Date(y, 9, 12),
+          new Date(y, 11, 24),
+          new Date(y, 11, 25),
+          new Date(y, 11, 31)
+        ];
+        for (var i = 0; i < feriados.length; i++) {
+          if (bioEsMismaFecha(d, feriados[i])) return 'Feriado nacional';
+        }
+        var w = d.getDay();
+        return (w === 0 || w === 6) ? 'Fin de semana' : 'Normal';
+      }
+
+      function bioImportarCsv() {
+        var input = document.getElementById('bioCsvInput');
+        if (input) input.click();
+      }
+
+      function bioLimpiarCsv() {
+        var card = document.getElementById('bioCsvCard');
+        if (card) card.style.display = 'none';
+        var input = document.getElementById('bioCsvInput');
+        if (input) input.value = '';
+      }
+
+      function bioProcesarCsv(input) {
+        var file = input && input.files && input.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          try {
+            var rows = bioParseCsv(String(reader.result || ''));
+            if (!rows.length) { showAlert('El archivo CSV está vacío', 'warning'); return; }
+            var headers = rows[0].map(function (h) { return String(h || '').replace(/^\uFEFF/, '').trim().toLowerCase(); });
+            var ix = {
+              fecha: headers.indexOf('fecha'),
+              nombre: headers.indexOf('nombre'),
+              departamento: headers.indexOf('departamento'),
+              horas: headers.indexOf('horas_trabajadas')
+            };
+            if (ix.fecha === -1) { showAlert('El CSV debe incluir la columna "fecha"', 'warning'); return; }
+
+            var items = [];
+            for (var r = 1; r < rows.length; r++) {
+              var row = rows[r];
+              var fecha = row[ix.fecha];
+              if (fecha === undefined || String(fecha).trim() === '') continue;
+              var tipo = bioTipoDia(fecha);
+              items.push({
+                fecha: String(fecha).trim(),
+                nombre: ix.nombre >= 0 ? String(row[ix.nombre] || '').trim() : '',
+                departamento: ix.departamento >= 0 ? String(row[ix.departamento] || '').trim() : '',
+                horas: ix.horas >= 0 ? String(row[ix.horas] || '').trim() : '',
+                tipo: tipo || '—'
+              });
+            }
+
+            var card = document.getElementById('bioCsvCard');
+            var tb = document.getElementById('bioCsvTable');
+            var count = document.getElementById('bioCsvCount');
+            if (count) count.textContent = '(' + items.length + ' registros)';
+            var badgeMap = { 'Normal': 'badge-active', 'Fin de semana': 'badge-pending', 'Feriado nacional': 'badge-inactive' };
+            var html = '<thead><tr><th>Fecha</th><th>Nombre</th><th>Departamento</th><th>Horas trabajadas</th><th>Tipo de día</th></tr></thead><tbody>';
+            if (items.length) {
+              html += items.map(function (it) {
+                return '<tr><td>' + bioEsc(it.fecha) + '</td><td>' + bioEsc(it.nombre) + '</td><td>' + bioEsc(it.departamento) + '</td><td>' + bioEsc(it.horas) + '</td><td><span class="badge ' + (badgeMap[it.tipo] || '') + '">' + bioEsc(it.tipo) + '</span></td></tr>';
+              }).join('');
+            } else {
+              html += '<tr><td colspan="5" style="text-align:center;padding:30px;color:#999;">No se encontraron filas con fecha válida</td></tr>';
+            }
+            html += '</tbody>';
+            tb.innerHTML = html;
+            if (card) card.style.display = '';
+          } catch (e) {
+            showAlert('No se pudo leer el archivo CSV: ' + (e && e.message ? e.message : 'error'), 'error');
+          }
+        };
+        reader.readAsText(file, 'utf-8');
+      }
+
       function bioParseHM(hhmm) {
         var p = String(hhmm || '0').split(':');
         return (+p[0]) * 60 + (+p[1]);
@@ -1234,67 +1513,185 @@
         return h + 'h ' + m + 'm';
       }
 
+      function bioHoraBase() {
+        var cfg = bio.config || bioDefaultConfig();
+        var mins = bioParseHM(cfg.hora_fin) - bioParseHM(cfg.hora_inicio);
+        if (!(mins > 0)) return 0;
+        return (+cfg.valor_dia_bs || 0) / (mins / 60);
+      }
+
+      function bioValorExtra(res) {
+        var cfg = bio.config || bioDefaultConfig();
+        var base = bioHoraBase();
+        return ((res.extra / 60) * base * (+cfg.factor_hora_extra || 0)) +
+               ((res.weekend / 60) * base * (+cfg.factor_feriado_fin_semana || 0));
+      }
+
+      function bioPairsDe(lista) {
+        var sorted = lista.slice().sort(function (a, b) { return new Date(a.fecha_hora) - new Date(b.fecha_hora); });
+        var pairs = [];
+        var openIn = null;
+        sorted.forEach(function (m) {
+          if (m.tipo === 'Entrada') {
+            if (!openIn) openIn = new Date(m.fecha_hora);
+          } else if (m.tipo === 'Salida' && openIn) {
+            pairs.push({ in: openIn, out: new Date(m.fecha_hora), abierta: false });
+            openIn = null;
+          }
+        });
+        if (openIn) pairs.push({ in: openIn, out: openIn, abierta: true });
+        return pairs;
+      }
+
+      function bioCalcPair(pr) {
+        var res = { normal: 0, extra: 0, weekend: 0 };
+        var tIn = pr.in.getTime(), tOut = pr.out.getTime();
+        if (tOut <= tIn) return res;
+        var day = new Date(pr.in); day.setHours(0, 0, 0, 0);
+        var lastDay = new Date(pr.out); lastDay.setHours(0, 0, 0, 0);
+        while (day <= lastDay) {
+          var dayStart = day.getTime();
+          var dayEnd = dayStart + 86400000;
+          var segStart = Math.max(tIn, dayStart);
+          var segEnd = Math.min(tOut, dayEnd);
+          if (segEnd > segStart) {
+            var segMins = (segEnd - segStart) / 60000;
+            if (bioIsWeekend(day)) {
+              res.weekend += segMins;
+            } else {
+              var workStart = dayStart + bioParseHM(bio.config.hora_inicio) * 60000;
+              var workEnd = dayStart + bioParseHM(bio.config.hora_fin) * 60000;
+              var norm = (Math.min(segEnd, workEnd) - Math.max(segStart, workStart)) / 60000;
+              if (norm < 0) norm = 0;
+              res.normal += norm;
+              res.extra += segMins - norm;
+            }
+          }
+          day = new Date(dayStart + 86400000);
+        }
+        return res;
+      }
+
       function bioCalcDia(lista) {
         var res = { normal: 0, extra: 0, weekend: 0 };
-        var pairs = [];
-        for (var i = 0; i < lista.length; i++) {
-          if (lista[i].tipo === 'Entrada' && i + 1 < lista.length && lista[i + 1].tipo === 'Salida') {
-            pairs.push({ in: new Date(lista[i].fecha_hora), out: new Date(lista[i + 1].fecha_hora) });
-            i++;
-          }
-        }
-        pairs.forEach(function (pr) {
-          var tIn = pr.in.getTime(), tOut = pr.out.getTime();
-          if (tOut <= tIn) return;
-          var day = new Date(pr.in); day.setHours(0, 0, 0, 0);
-          var lastDay = new Date(pr.out); lastDay.setHours(0, 0, 0, 0);
-          while (day <= lastDay) {
-            var dayStart = day.getTime();
-            var dayEnd = dayStart + 86400000;
-            var segStart = Math.max(tIn, dayStart);
-            var segEnd = Math.min(tOut, dayEnd);
-            if (segEnd > segStart) {
-              var segMins = (segEnd - segStart) / 60000;
-              if (bioIsWeekend(day)) {
-                res.weekend += segMins;
-              } else {
-                var workStart = dayStart + bioParseHM(bio.config.hora_inicio) * 60000;
-                var workEnd = dayStart + bioParseHM(bio.config.hora_fin) * 60000;
-                var norm = (Math.min(segEnd, workEnd) - Math.max(segStart, workStart)) / 60000;
-                if (norm < 0) norm = 0;
-                res.normal += norm;
-                res.extra += segMins - norm;
-              }
-            }
-            day = new Date(dayStart + 86400000);
-          }
+        bioPairsDe(lista).forEach(function (pr) {
+          var p = bioCalcPair(pr);
+          res.normal += p.normal;
+          res.extra += p.extra;
+          res.weekend += p.weekend;
         });
         return res;
       }
 
-      function bioRenderHoras() {
-        var tb = document.getElementById('bioHorasTable');
-        if (!tb) return;
-        var fechaEl = document.getElementById('bioFecha');
-        var dia = fechaEl && fechaEl.value ? fechaEl.value : bioTodayISO();
+      function bioRango() {
+        var d = document.getElementById('bioFechaDesde');
+        var h = document.getElementById('bioFechaHasta');
+        var desde = d && d.value ? d.value : bioTodayISO();
+        var hasta = h && h.value ? h.value : desde;
+        if (hasta < desde) { var t = hasta; hasta = desde; desde = t; }
+        return { desde: desde, hasta: hasta };
+      }
+
+      function bioConsolidar() {
+        var rango = bioRango();
         var byW = {};
         bio.marcajes.forEach(function (m) {
-          if (bioLocalDateStr(m.fecha_hora) !== dia) return;
+          var ds = bioLocalDateStr(m.fecha_hora);
+          if (ds < rango.desde || ds > rango.hasta) return;
+          (byW[m.trabajador_id] = byW[m.trabajador_id] || []).push(m);
+        });
+        var out = [];
+        Object.keys(byW).forEach(function (id) {
+          var lista = byW[id].sort(function (a, b) { return new Date(a.fecha_hora) - new Date(b.fecha_hora); });
+          var total = { normal: 0, extra: 0, weekend: 0 };
+          var byDia = {};
+          lista.forEach(function (m) {
+            var ds = bioLocalDateStr(m.fecha_hora);
+            (byDia[ds] = byDia[ds] || []).push(m);
+          });
+          Object.keys(byDia).forEach(function (ds) {
+            var r = bioCalcDia(byDia[ds]);
+            total.normal += r.normal;
+            total.extra += r.extra;
+            total.weekend += r.weekend;
+          });
+          out.push({ id: id, nombre: bioName(id), normal: total.normal, extra: total.extra, weekend: total.weekend, valor: bioValorExtra(total) });
+        });
+        out.sort(function (a, b) { return a.nombre < b.nombre ? -1 : a.nombre > b.nombre ? 1 : 0; });
+        return out;
+      }
+
+      function bioDetalle() {
+        var rango = bioRango();
+        var byW = {};
+        bio.marcajes.forEach(function (m) {
+          var ds = bioLocalDateStr(m.fecha_hora);
+          if (ds < rango.desde || ds > rango.hasta) return;
           (byW[m.trabajador_id] = byW[m.trabajador_id] || []).push(m);
         });
         var rows = [];
         Object.keys(byW).forEach(function (id) {
           var lista = byW[id].sort(function (a, b) { return new Date(a.fecha_hora) - new Date(b.fecha_hora); });
-          var res = bioCalcDia(lista);
-          var primera = null, ultima = null;
-          lista.forEach(function (m) { if (m.tipo === 'Entrada' && !primera) primera = m; ultima = m; });
-          var enCurso = ultima && ultima.tipo === 'Entrada';
-          var valor = (res.extra / 60) * (bio.config.precio_hora_extra || 0) + (res.weekend / 60) * (bio.config.precio_feriado_fin_semana || 0);
-          rows.push('<tr><td>' + bioEsc(bioName(id)) + '</td><td>' + (primera ? bioHora(primera.fecha_hora) : '—') + '</td><td>' + (ultima && ultima.tipo === 'Salida' ? bioHora(ultima.fecha_hora) : '—') + '</td><td>' + bioMinStr(res.normal) + '</td><td>' + bioMinStr(res.extra) + (enCurso ? ' (en curso)' : '') + '</td><td>' + bioMinStr(res.weekend) + '</td><td>Bs. ' + valor.toFixed(2) + '</td></tr>');
+          var byDia = {};
+          lista.forEach(function (m) {
+            var ds = bioLocalDateStr(m.fecha_hora);
+            (byDia[ds] = byDia[ds] || []).push(m);
+          });
+          Object.keys(byDia).sort().forEach(function (ds) {
+            bioPairsDe(byDia[ds]).forEach(function (pr) {
+              var r = bioCalcPair(pr);
+              var total = r.normal + r.extra + r.weekend;
+              rows.push({
+                Trabajador: bioName(id),
+                Fecha: ds,
+                Entrada: bioHora(pr.in.toISOString()),
+                Salida: bioHora(pr.out.toISOString()),
+                'Horas normales': Math.round((r.normal / 60) * 100) / 100,
+                'Horas extra': Math.round((r.extra / 60) * 100) / 100,
+                'Feriado/FDS': Math.round((r.weekend / 60) * 100) / 100,
+                'Total horas': Math.round((total / 60) * 100) / 100,
+                'Sin salida': pr.abierta ? 'Sí' : '',
+                'Valor extra (Bs.)': Math.round(bioValorExtra(r) * 100) / 100
+              });
+            });
+          });
         });
-        tb.innerHTML = rows.length
-          ? '<thead><tr><th>Trabajador</th><th>Entrada</th><th>Salida</th><th>Normales</th><th>Extra</th><th>Feriado/FDS</th><th>Valor (Bs.)</th></tr></thead><tbody>' + rows.join('') + '</tbody>'
-          : '<tr><td colspan="7" style="text-align:center;padding:20px;color:#999;">Sin marcajes completos el día seleccionado</td></tr>';
+        rows.sort(function (a, b) {
+          if (a.Trabajador !== b.Trabajador) return a.Trabajador < b.Trabajador ? -1 : 1;
+          if (a.Fecha !== b.Fecha) return a.Fecha < b.Fecha ? -1 : 1;
+          return a.Entrada < b.Entrada ? -1 : a.Entrada > b.Entrada ? 1 : 0;
+        });
+        return rows;
+      }
+
+      function bioSetModo(m) {
+        bio.modo = m;
+        var btns = document.querySelectorAll('#bioModo .es-vista-btn');
+        for (var i = 0; i < btns.length; i++) btns[i].classList.toggle('active', btns[i].getAttribute('data-modo') === m);
+        bioRenderHoras();
+      }
+
+      function bioRenderHoras() {
+        var tb = document.getElementById('bioHorasTable');
+        if (!tb) return;
+        if ((bio.modo || 'consolidado') === 'detallado') {
+          var rows = bioDetalle();
+          tb.innerHTML = rows.length
+            ? '<thead><tr><th>Trabajador</th><th>Fecha</th><th>Entrada</th><th>Salida</th><th>Normales</th><th>Extra</th><th>Feriado/FDS</th><th>Total (h)</th><th>Sin salida</th><th>Valor (Bs.)</th></tr></thead><tbody>' +
+              rows.map(function (r) {
+                return '<tr><td>' + bioEsc(r.Trabajador) + '</td><td>' + r.Fecha + '</td><td>' + r.Entrada + '</td><td>' + r.Salida + '</td><td>' + r['Horas normales'] + '</td><td>' + r['Horas extra'] + '</td><td>' + r['Feriado/FDS'] + '</td><td>' + r['Total horas'] + '</td><td>' + (r['Sin salida'] ? '<span class="badge badge-inactive">Sin salida</span>' : '') + '</td><td>' + r['Valor extra (Bs.)'].toFixed(2) + '</td></tr>';
+              }).join('') + '</tbody>'
+            : '<tr><td colspan="10" style="text-align:center;padding:20px;color:#999;">Sin marcajes en el rango seleccionado</td></tr>';
+          return;
+        }
+        var cons = bioConsolidar();
+        tb.innerHTML = cons.length
+          ? '<thead><tr><th>Trabajador</th><th>Normales</th><th>Extra</th><th>Feriado/FDS</th><th>Total (h)</th><th>Valor (Bs.)</th></tr></thead><tbody>' +
+              cons.map(function (r) {
+                var total = r.normal + r.extra + r.weekend;
+                return '<tr><td>' + bioEsc(r.nombre) + '</td><td>' + bioMinStr(r.normal) + '</td><td>' + bioMinStr(r.extra) + '</td><td>' + bioMinStr(r.weekend) + '</td><td>' + bioMinStr(total) + '</td><td>Bs. ' + r.valor.toFixed(2) + '</td></tr>';
+              }).join('') + '</tbody>'
+          : '<tr><td colspan="6" style="text-align:center;padding:20px;color:#999;">Sin marcajes en el rango seleccionado</td></tr>';
       }
 
       function bioRenderConfig() {
@@ -1306,9 +1703,10 @@
         document.querySelectorAll('#cfgDias input[type=checkbox]').forEach(function (cb) {
           cb.checked = dias.indexOf(+cb.value) !== -1;
         });
-        var pe = document.getElementById('cfgPrecioExtra'), pf = document.getElementById('cfgPrecioFeriado');
-        if (pe) pe.value = cfg.precio_hora_extra;
-        if (pf) pf.value = cfg.precio_feriado_fin_semana;
+        var vd = document.getElementById('cfgValorDia'), fe = document.getElementById('cfgFactorExtra'), ff = document.getElementById('cfgFactorFeriado');
+        if (vd) vd.value = cfg.valor_dia_bs;
+        if (fe) fe.value = cfg.factor_hora_extra;
+        if (ff) ff.value = cfg.factor_feriado_fin_semana;
       }
 
       async function bioSaveConfig() {
@@ -1317,8 +1715,9 @@
           hora_inicio: document.getElementById('cfgHoraInicio').value || '08:00',
           hora_fin: document.getElementById('cfgHoraFin').value || '17:00',
           dias_trabajo: Array.prototype.map.call(document.querySelectorAll('#cfgDias input[type=checkbox]:checked'), function (cb) { return +cb.value; }),
-          precio_hora_extra: parseFloat(document.getElementById('cfgPrecioExtra').value) || 0,
-          precio_feriado_fin_semana: parseFloat(document.getElementById('cfgPrecioFeriado').value) || 0
+          valor_dia_bs: parseFloat(document.getElementById('cfgValorDia').value) || 0,
+          factor_hora_extra: parseFloat(document.getElementById('cfgFactorExtra').value) || 0,
+          factor_feriado_fin_semana: parseFloat(document.getElementById('cfgFactorFeriado').value) || 0
         };
         if (!cfg.dias_trabajo.length) { bioCfgMsg('Selecciona al menos un día de trabajo.', 'warn'); return; }
         try {
@@ -1345,121 +1744,70 @@
 
       function bioExportarExcel() {
         try {
-          var fechaEl = document.getElementById('bioFecha');
-          var dia = fechaEl && fechaEl.value ? fechaEl.value : bioTodayISO();
+          var rango = bioRango();
           var cfg = bio.config || bioDefaultConfig();
-          var byW = {};
-          bio.marcajes.forEach(function (m) {
-            if (bioLocalDateStr(m.fecha_hora) !== dia) return;
-            (byW[m.trabajador_id] = byW[m.trabajador_id] || []).push(m);
-          });
+          var modo = bio.modo || 'consolidado';
           var aoa = [
-            ['REPORTE DE HORAS TRABAJADAS'],
-            ['Fecha', dia],
+            [modo === 'detallado' ? 'REPORTE DETALLADO DE HORAS TRABAJADAS' : 'REPORTE CONSOLIDADO DE HORAS TRABAJADAS'],
+            ['Desde', rango.desde],
+            ['Hasta', rango.hasta],
             ['Jornada', cfg.hora_inicio + ' - ' + cfg.hora_fin],
-            ['Precio hora extra (Bs.)', cfg.precio_hora_extra],
-            ['Precio feriado / fin de semana (Bs.)', cfg.precio_feriado_fin_semana],
-            [],
-            ['Trabajador', 'Entrada', 'Salida', 'Horas normales', 'Horas extra', 'Feriado / Fin de semana', 'Valor extra (Bs.)']
+            ['Valor del día (Bs.)', cfg.valor_dia_bs],
+            ['Factor hora extra (×)', cfg.factor_hora_extra],
+            ['Factor feriado / fin de semana (×)', cfg.factor_feriado_fin_semana],
+            ['Valor hora base (Bs./h)', Math.round(bioHoraBase() * 100) / 100],
+            []
           ];
-          Object.keys(byW).forEach(function (id) {
-            var lista = byW[id].sort(function (a, b) { return new Date(a.fecha_hora) - new Date(b.fecha_hora); });
-            var res = bioCalcDia(lista);
-            var primera = null, ultima = null;
-            lista.forEach(function (m) { if (m.tipo === 'Entrada' && !primera) primera = m; ultima = m; });
-            var valor = (res.extra / 60) * (cfg.precio_hora_extra || 0) + (res.weekend / 60) * (cfg.precio_feriado_fin_semana || 0);
-            aoa.push([
-              bioName(id),
-              primera ? bioHora(primera.fecha_hora) : '',
-              ultima && ultima.tipo === 'Salida' ? bioHora(ultima.fecha_hora) : '',
-              Math.round((res.normal / 60) * 100) / 100,
-              Math.round((res.extra / 60) * 100) / 100,
-              Math.round((res.weekend / 60) * 100) / 100,
-              Math.round(valor * 100) / 100
-            ]);
+          if (modo === 'detallado') {
+            aoa.push(['Trabajador', 'Fecha', 'Entrada', 'Salida', 'Horas normales', 'Horas extra', 'Feriado / Fin de semana', 'Total horas', 'Sin salida', 'Valor extra (Bs.)']);
+            var det = bioDetalle();
+            det.forEach(function (r) {
+              aoa.push([r.Trabajador, r.Fecha, r.Entrada, r.Salida, r['Horas normales'], r['Horas extra'], r['Feriado/FDS'], r['Total horas'], r['Sin salida'] || '', r['Valor extra (Bs.)']]);
+            });
+            if (!det.length) aoa.push(['Sin marcajes en el rango seleccionado']);
+            var wsD = XLSX.utils.aoa_to_sheet(aoa);
+            wsD['!cols'] = [{ wch: 32 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 14 }, { wch: 12 }, { wch: 22 }, { wch: 12 }, { wch: 12 }, { wch: 16 }];
+            var wbD = { SheetNames: ['Horas'], Sheets: { 'Horas': wsD } };
+            XLSX.writeFile(wbD, 'horas-detalladas-' + rango.desde + '_' + rango.hasta + '.xlsx');
+            return;
+          }
+          aoa.push(['Trabajador', 'Horas normales', 'Horas extra', 'Feriado / Fin de semana', 'Total horas', 'Valor extra (Bs.)']);
+          var cons = bioConsolidar();
+          var sumN = 0, sumE = 0, sumW = 0, sumV = 0;
+          cons.forEach(function (r) {
+            var total = r.normal + r.extra + r.weekend;
+            aoa.push([r.nombre, Math.round((r.normal / 60) * 100) / 100, Math.round((r.extra / 60) * 100) / 100, Math.round((r.weekend / 60) * 100) / 100, Math.round((total / 60) * 100) / 100, Math.round(r.valor * 100) / 100]);
+            sumN += r.normal; sumE += r.extra; sumW += r.weekend; sumV += r.valor;
           });
-          if (aoa.length === 7) aoa.push(['Sin marcajes en la fecha seleccionada']);
+          if (!cons.length) aoa.push(['Sin marcajes en el rango seleccionado']);
+          else aoa.push(['TOTAL', Math.round((sumN / 60) * 100) / 100, Math.round((sumE / 60) * 100) / 100, Math.round((sumW / 60) * 100) / 100, Math.round(((sumN + sumE + sumW) / 60) * 100) / 100, Math.round(sumV * 100) / 100]);
           var ws = XLSX.utils.aoa_to_sheet(aoa);
-          ws['!cols'] = [{ wch: 32 }, { wch: 10 }, { wch: 10 }, { wch: 14 }, { wch: 12 }, { wch: 22 }, { wch: 16 }];
+          ws['!cols'] = [{ wch: 32 }, { wch: 14 }, { wch: 12 }, { wch: 22 }, { wch: 12 }, { wch: 16 }];
           var wb = { SheetNames: ['Horas'], Sheets: { 'Horas': ws } };
-          XLSX.writeFile(wb, 'horas-trabajadas-' + dia + '.xlsx');
+          XLSX.writeFile(wb, 'horas-consolidadas-' + rango.desde + '_' + rango.hasta + '.xlsx');
         } catch (err) {
           alert('Error al exportar: ' + (err.message || 'error'));
         }
       }
 
       function bioSwitchTab(name) {
-        document.querySelectorAll('#tool-biometria .bio-tab').forEach(function (b) {
+        document.querySelectorAll('.bio-tab').forEach(function (b) {
           b.classList.toggle('active', b.getAttribute('data-tab') === name);
         });
-        document.querySelectorAll('#tool-biometria .bio-tab-panel').forEach(function (p) {
+        document.querySelectorAll('.bio-tab-panel').forEach(function (p) {
           p.classList.toggle('active', p.id === 'tab-' + name);
         });
+        localStorage.setItem('fiat_bio_tab', name);
         if (name === 'horas') bioRenderHoras();
+        if (name === 'perfiles') bioRenderEnrolled();
         if (name === 'enrolar') {
           bioUpdateEnrollSummary();
           bioRenderSlots();
+          bioEnsureModels();
+          bioStartEnrollCam();
+        } else {
+          bioStopEnrollCam();
         }
-      }
-
-      function bioRenderReports() {
-        var byWorker = {};
-        var byDay = {};
-        var byMonth = {};
-        bio.marcajes.forEach(function (m) {
-          var worker = m.trabajador_id;
-          var day = bioLocalDateStr(m.fecha_hora);
-          var month = day.slice(0, 7);
-          byWorker[worker] = byWorker[worker] || { worker: worker, entradas: 0, salidas: 0, retrasos: 0, horasExtra: 0 };
-          byDay[day] = byDay[day] || { day: day, count: 0 };
-          byMonth[month] = byMonth[month] || { month: month, extra: 0 };
-          byWorker[worker].entradas += m.tipo === 'Entrada' ? 1 : 0;
-          byWorker[worker].salidas += m.tipo === 'Salida' ? 1 : 0;
-          if (m.tipo === 'Entrada') {
-            var hora = new Date(m.fecha_hora).getHours();
-            var min = new Date(m.fecha_hora).getMinutes();
-            var totalMin = hora * 60 + min;
-            if (totalMin > 8 * 60 + 30) byWorker[worker].retrasos += 1;
-          }
-          byDay[day].count += 1;
-        });
-
-        var dayList = Object.keys(byDay).map(function (d) { return byDay[d]; }).sort(function (a, b) { return b.count - a.count; }).slice(0, 5);
-        var menosList = Object.keys(byDay).map(function (d) { return byDay[d]; }).sort(function (a, b) { return a.count - b.count; }).slice(0, 5);
-        var retrasosMas = Object.keys(byWorker).map(function (k) { return byWorker[k]; }).sort(function (a, b) { return b.retrasos - a.retrasos; }).slice(0, 5);
-        var retrasosMenos = Object.keys(byWorker).map(function (k) { return byWorker[k]; }).sort(function (a, b) { return a.retrasos - b.retrasos; }).slice(0, 5);
-        var meses = Object.keys(byMonth).map(function (m) { return byMonth[m]; }).sort(function (a, b) { return b.extra - a.extra; });
-        var topMonth = meses[0] ? meses[0].month : '—';
-        var promExtra = Object.keys(byWorker).length ? (Object.keys(byWorker).reduce(function (sum, k) { return sum + byWorker[k].horasExtra; }, 0) / Object.keys(byWorker).length).toFixed(1) : '0.0';
-        var totalNomina = Math.max(0, Object.keys(byWorker).length * 1800);
-
-        function renderList(containerId, list, formatter) {
-          var el = document.getElementById(containerId);
-          if (!el) return;
-          if (!list.length) {
-            el.innerHTML = '<div class="bio-status info">Sin datos suficientes</div>';
-            return;
-          }
-          var max = Math.max.apply(null, list.map(function (x) { return x.count || x.retrasos || x.extra || 0; }));
-          el.innerHTML = list.map(function (item) {
-            var label = item.day || item.worker || item.month || '—';
-            var value = item.count || item.retrasos || item.extra || 0;
-            var pct = max ? Math.max(10, Math.round((value / max) * 100)) : 0;
-            return '<div class="rep-bar-row"><span>' + bioEsc(label) + '</span><div class="rep-bar"><span style="width:' + pct + '%"></span></div><span>' + formatter(value) + '</span></div>';
-          }).join('');
-        }
-
-        renderList('repDiasMas', dayList, function (v) { return v; });
-        renderList('repDiasMenos', menosList, function (v) { return v; });
-        renderList('repRetrasosMas', retrasosMas, function (v) { return v; });
-        renderList('repRetrasosMenos', retrasosMenos, function (v) { return v; });
-
-        var nominaEl = document.getElementById('repNominaTotal');
-        if (nominaEl) nominaEl.textContent = 'Bs. ' + totalNomina.toLocaleString('de-DE');
-        var mesEl = document.getElementById('repMesExtra');
-        if (mesEl) mesEl.textContent = topMonth === '—' ? '—' : topMonth;
-        var promEl = document.getElementById('repPromExtra');
-        if (promEl) promEl.textContent = promExtra + ' h';
       }
 
       function bioRenderEnrolled() {
@@ -1553,7 +1901,8 @@
 
       function closeModalBiometria() {
         bioStopEnrollCam();
-        bioSwitchTab('historial');
+        var modal = document.getElementById('modalBiometria');
+        if (modal) modal.classList.remove('show');
       }
 
       async function bioCaptureEnroll() {
@@ -1668,6 +2017,12 @@
         catch (e) { console.warn('Biometría: error al cargar datos', e); }
       }
 
+      function bioRestoreTab() {
+        var savedTab = localStorage.getItem('fiat_bio_tab');
+        if (savedTab === 'enrolar') bioOpenEnrollView();
+        else if (savedTab && document.getElementById('tab-' + savedTab)) bioSwitchTab(savedTab);
+      }
+
       function bioStopAll() {
         bioStopEnrollCam();
         var modal = document.getElementById('modalBiometria');
@@ -1686,17 +2041,24 @@
       window.bioExportarExcel = bioExportarExcel;
       window.bioSaveConfig = bioSaveConfig;
       window.bioResetConfig = bioResetConfig;
+      window.bioImportarCsv = bioImportarCsv;
+      window.bioProcesarCsv = bioProcesarCsv;
+      window.bioLimpiarCsv = bioLimpiarCsv;
+      window.bioSetModo = bioSetModo;
 
       document.addEventListener('DOMContentLoaded', function () {
-        bioInitTool();
+        bioInitTool().then(function () {
+          if (localStorage.getItem('fiat_tool_' + location.pathname) === 'biometria') bioRestoreTab();
+        });
         var orig = window.switchTool;
         window.switchTool = function (name) {
           if (name !== 'biometria') bioStopAll();
           if (orig) orig(name);
-          if (name === 'biometria') bioInitTool();
+          if (name === 'biometria') bioInitTool().then(bioRestoreTab);
         };
       });
     })();
   </script>
+  <script src="../js/indicadores.js"></script>
 </body>
 </html>

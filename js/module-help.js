@@ -31,7 +31,8 @@
         { icon: 'fi-sr-diagram-project', name: 'Estructura organizacional', desc: 'Mapa jerárquico de la empresa por unidades y departamentos, con edición de cargos y puestos de trabajo.' },
         { icon: 'fi-sr-heart', name: 'Psicología', desc: 'Registro de evaluaciones psicológicas de los candidatos y seguimiento de sus resultados por proceso de selección.' },
         { icon: 'fi-sr-file-chart-line', name: 'Requisiciones de personal', desc: 'Solicitudes de nuevo personal por unidad, con estado de aprobación y vinculación al proceso de selección.' },
-        { icon: 'fi-sr-users-gear', name: 'Plantilla activa', desc: 'Listado de trabajadores activos de la empresa con acceso a su ficha completa de expediente.' }
+        { icon: 'fi-sr-users-gear', name: 'Plantilla activa', desc: 'Listado de trabajadores activos de la empresa con acceso a su ficha completa de expediente.' },
+        { icon: 'fi-sr-dashboard', name: 'Indicadores de gestión', desc: 'Panel con los indicadores clave del módulo: candidatos en el proceso, requisiciones, trabajadores activos y estructura organizacional.' }
       ]
     },
     'relaciones-laborales.html': {
@@ -43,7 +44,8 @@
         { icon: 'fi-sr-tags', name: 'Conceptos', desc: 'Catálogo de conceptos utilizados en la gestión de nómina y en los movimientos laborales.' },
         { icon: 'fi-sr-boxes', name: 'Asignación de equipos', desc: 'Registro de equipos, herramientas o activos asignados a cada trabajador de la empresa.' },
         { icon: 'fi-sr-users-gear', name: 'Plantilla activa', desc: 'Listado de trabajadores activos con acceso a la ficha de expediente laboral.' },
-        { icon: 'fi-sr-file-edit', name: 'Actas y reuniones', desc: 'Elaboración de actas de reuniones con acuerdos, asistencia y seguimiento de compromisos.' }
+        { icon: 'fi-sr-file-edit', name: 'Actas y reuniones', desc: 'Elaboración de actas de reuniones con acuerdos, asistencia y seguimiento de compromisos.' },
+        { icon: 'fi-sr-dashboard', name: 'Indicadores de gestión', desc: 'Panel con los indicadores clave del módulo: registros, conceptos, equipos asignados, actas y compromisos pendientes.' }
       ]
     },
     'capacitacion.html': {
@@ -55,7 +57,8 @@
         { icon: 'fi-sr-hammer', name: 'Talleres', desc: 'Programación y registro de talleres prácticos de formación para los trabajadores.' },
         { icon: 'fi-sr-test', name: 'Evaluaciones', desc: 'Aplicación y registro de evaluaciones de conocimiento y competencias por curso o cargo.' },
         { icon: 'fi-sr-book', name: 'Planes de formación', desc: 'Planes anuales o trimestrales de capacitación por unidad o cargo, con control de avance.' },
-        { icon: 'fi-sr-briefcase', name: 'Cargos', desc: 'Catálogo de cargos con perfil del puesto, competencias y formación requerida.' }
+        { icon: 'fi-sr-briefcase', name: 'Cargos', desc: 'Catálogo de cargos con perfil del puesto, competencias y formación requerida.' },
+        { icon: 'fi-sr-dashboard', name: 'Indicadores de gestión', desc: 'Panel con los indicadores clave del módulo: cursos, módulos, cuestionarios, preguntas y formación obligatoria.' }
       ]
     },
     'bienestar-social.html': {
@@ -68,7 +71,8 @@
         { icon: 'fi-sr-shield', name: 'Pólizas', desc: 'Registro de pólizas de seguros de los trabajadores con vigencias y coberturas.' },
         { icon: 'fi-sr-vest', name: 'Inventario de uniformes', desc: 'Control del stock de prendas y tallas, y registro de las entregas de uniformes a los trabajadores con fecha, cantidad y estado.' },
         { icon: 'fi-sr-square-poll-horizontal', name: 'Encuestas', desc: 'Creación y publicación de encuestas con enlace compartible, respuestas y resultados.' },
-        { icon: 'fi-sr-calendar', name: 'Calendario', desc: 'Calendario mensual de eventos y actividades: selecciona un día para ver lo pautado o agregar eventos, con lista de próximos eventos ordenados por fecha. Desde el día seleccionado también se configuran los anuncios (splash) con imágenes que se muestran a todos los usuarios.' }
+        { icon: 'fi-sr-calendar', name: 'Calendario', desc: 'Calendario mensual de eventos y actividades: selecciona un día para ver lo pautado o agregar eventos, con lista de próximos eventos ordenados por fecha. Desde el día seleccionado también se configuran los anuncios (splash) con imágenes que se muestran a todos los usuarios.' },
+        { icon: 'fi-sr-dashboard', name: 'Indicadores de gestión', desc: 'Panel con los indicadores clave del módulo: préstamos, pólizas, ventas de vehículos, uniformes, encuestas y eventos.' }
       ]
     },
     'seguridad-salud.html': {
@@ -80,7 +84,8 @@
         { icon: 'fi-sr-search-alt', name: 'Inspecciones', desc: 'Evaluaciones de campo para detectar condiciones de riesgo en las áreas de trabajo.' },
         { icon: 'fi-sr-stethoscope', name: 'Servicio Médico', desc: 'Atenciones del servicio médico: consultas, atenciones y control de salud ocupacional.' },
         { icon: 'fi-sr-boxes', name: 'Inventario de equipos', desc: 'Control de equipos de seguridad (EPP, extintores, entre otros) con stock y estado.' },
-        { icon: 'fi-sr-pills', name: 'Inventario de insumos', desc: 'Control de insumos y medicamentos del servicio médico.' }
+        { icon: 'fi-sr-pills', name: 'Inventario de insumos', desc: 'Control de insumos y medicamentos del servicio médico.' },
+        { icon: 'fi-sr-dashboard', name: 'Indicadores de gestión', desc: 'Panel con los indicadores clave del módulo: incidentes, inspecciones, atenciones médicas y movimientos de inventario.' }
       ]
     },
     'compensacion.html': {
@@ -90,8 +95,8 @@
       tools: [
         { icon: 'fi-sr-money-check', name: 'Estructura salarial por cargo', desc: 'Estructura salarial por cargo del organigrama, con tasa BCV automática y complemento en USD.' },
         { icon: 'fi-sr-calculator', name: 'Liquidaciones', desc: 'Cálculo y registro de liquidaciones de prestaciones sociales (LOTTT): antigüedad, intereses, vacaciones, bono vacacional, utilidades y preaviso.' },
-        { icon: 'fi-sr-receipt', name: 'Reportes', desc: 'Reportes consolidados de compensación y pagos.' },
-        { icon: 'fi-sr-face-viewfinder', name: 'Biometría', desc: 'Reloj de marcaje por reconocimiento facial con detección de vida (parpadeo, giro de cabeza y sonrisa) y registro de entradas/salidas.' }
+        { icon: 'fi-sr-face-viewfinder', name: 'Biometría', desc: 'Reloj de marcaje por reconocimiento facial con detección de vida (parpadeo, giro de cabeza y sonrisa) y registro de entradas/salidas.' },
+        { icon: 'fi-sr-dashboard', name: 'Indicadores de gestión', desc: 'Panel con los indicadores clave del módulo: estructuras salariales, nómina mensual, liquidaciones, marcajes del día y perfiles biométricos.' }
       ]
     },
     'finanzas.html': {
@@ -100,7 +105,8 @@
       accent: '#b45309',
       tools: [
         { icon: 'fi-sr-receipt', name: 'Registro de movimientos', desc: 'Registro de gastos e ingresos con categorías, montos, conceptos y responsable.' },
-        { icon: 'fi-sr-chart-histogram', name: 'Reportes financieros', desc: 'Reportes consolidados por período y categoría con resúmenes de ingresos y gastos.' }
+        { icon: 'fi-sr-chart-histogram', name: 'Reportes financieros', desc: 'Reportes consolidados por período y categoría con resúmenes de ingresos y gastos.' },
+        { icon: 'fi-sr-dashboard', name: 'Indicadores de gestión', desc: 'Panel con los indicadores clave del módulo: movimientos registrados y totales de gastos e ingresos.' }
       ]
     },
     'repositorio.html': {
@@ -109,7 +115,8 @@
       accent: '#06b6d4',
       tools: [
         { icon: 'fi-sr-folder', name: 'Documentos', desc: 'Repositorio de documentos de la empresa con búsqueda, carga y descarga.' },
-        { icon: 'fi-sr-folder-tree', name: 'Categorías', desc: 'Organización de los documentos por categorías para una localización rápida.' }
+        { icon: 'fi-sr-folder-tree', name: 'Categorías', desc: 'Organización de los documentos por categorías para una localización rápida.' },
+        { icon: 'fi-sr-dashboard', name: 'Indicadores de gestión', desc: 'Panel con los indicadores clave del módulo: documentos, categorías, peso del almacenamiento y avisos pendientes.' }
       ]
     },
     'chatfiat.html': {
@@ -118,7 +125,8 @@
       accent: '#4f46e5',
       tools: [
         { icon: 'fi-sr-house-building', name: 'Inicio', desc: 'Página principal de la red social interna: noticias y publicaciones de la comunidad.' },
-        { icon: 'fi-sr-envelope', name: 'Mensajes', desc: 'Mensajería interna entre los trabajadores de la empresa.' }
+        { icon: 'fi-sr-envelope', name: 'Mensajes', desc: 'Mensajería interna entre los trabajadores de la empresa.' },
+        { icon: 'fi-sr-dashboard', name: 'Indicadores de gestión', desc: 'Indicadores de la red social interna, como los trabajadores activos de la comunidad.' }
       ]
     },
     'desarrollo-organizacional.html': {
@@ -129,7 +137,8 @@
         { icon: 'fi-sr-chart-line-up', name: 'Análisis de KPI por unidades', desc: 'Indicadores clave por unidad para medir la salud y el desempeño organizacional, e indicadores de RRHH: rotación temprana, absentismo, tiempo de cobertura de vacantes y cobertura de capacitación obligatoria.' },
         { icon: 'fi-sr-chart-user', name: 'Rendimiento según KPI', desc: 'Rendimiento de los cargos de acuerdo con los indicadores definidos para cada puesto.' },
         { icon: 'fi-sr-bullseye', name: 'OKR', desc: 'Objetivos y Resultados Clave con seguimiento del avance por trimestre.' },
-        { icon: 'fi-sr-chart-pie', name: 'Estadísticas de salud', desc: 'Estadísticas y tendencias de la salud de las áreas de la empresa.' }
+        { icon: 'fi-sr-chart-pie', name: 'Estadísticas de salud', desc: 'Estadísticas y tendencias de la salud de las áreas de la empresa.' },
+        { icon: 'fi-sr-dashboard', name: 'Indicadores de gestión', desc: 'Panel con los indicadores clave del módulo: KPIs, mediciones, OKRs, ausencias y vacantes.' }
       ]
     },
     'gestion-usuarios.html': {
@@ -138,7 +147,8 @@
       accent: '#0ea5e9',
       tools: [
         { icon: 'fi-sr-users-gear', name: 'Usuarios y accesos', desc: 'Listado de trabajadores activos con su configuración de acceso, rol, estado y opciones para crear, activar o desactivar usuarios.' },
-        { icon: 'fi-sr-shield-check', name: 'Permisos por módulo', desc: 'Asignación de módulos visibles y herramientas permitidas por usuario, con control por módulo y por herramienta individual.' }
+        { icon: 'fi-sr-shield-check', name: 'Permisos por módulo', desc: 'Asignación de módulos visibles y herramientas permitidas por usuario, con control por módulo y por herramienta individual.' },
+        { icon: 'fi-sr-dashboard', name: 'Indicadores de gestión', desc: 'Panel con los indicadores clave del módulo: trabajadores activos y accesos configurados a la intranet.' }
       ]
     },
     'oportunidades.html': {

@@ -1,0 +1,21 @@
+{
+  "name": "fiat-email-server",
+  "version": "1.0.0",
+  "description": "API de correo electronico (IMAP/SMTP) para el modulo de Mensajeria de la intranet. Compatible con cuentas de cPanel, Gmail y cualquier servidor IMAP/SMTP.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "imapflow": "^1.0.164",
+    "mailparser": "^3.7.1",
+    "multer": "^2.0.2",
+    "nodemailer": "^6.9.14"
+  }
+}

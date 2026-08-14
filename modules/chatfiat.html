@@ -10,6 +10,47 @@
   <link rel="stylesheet" href="../css/styles.css">
   <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
   <style>:root { --module-color: var(--module-chatfiat); }</style>
+  <style>
+    .mail-app { display: flex; gap: 12px; height: calc(100vh - 150px); min-height: 400px; }
+    .mail-empty { text-align: center; padding: 60px 20px; color: var(--color-text-secondary); }
+    .mail-pane { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); display: flex; flex-direction: column; overflow: hidden; }
+    .mail-folders { width: 220px; flex-shrink: 0; }
+    .mail-list { flex: 1; min-width: 300px; }
+    .mail-read { flex: 1.4; min-width: 320px; }
+    .mail-pane-head { padding: 10px 12px; font-size: 13px; font-weight: 700; border-bottom: 1px solid var(--color-border); color: var(--color-text); display: flex; align-items: center; justify-content: space-between; }
+    .mail-folder { display: flex; align-items: center; gap: 8px; padding: 9px 12px; cursor: pointer; font-size: 13px; color: var(--color-text); border-left: 3px solid transparent; }
+    .mail-folder:hover { background: var(--color-bg); }
+    .mail-folder.active { background: var(--color-bg); border-left-color: var(--module-color); font-weight: 600; }
+    .mail-folder .mail-unseen { margin-left: auto; background: var(--module-color); color: #fff; font-size: 10px; font-weight: 700; border-radius: 10px; padding: 1px 7px; }
+    .mail-item { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-bottom: 1px solid var(--color-border); cursor: pointer; font-size: 13px; }
+    .mail-item:hover { background: var(--color-bg); }
+    .mail-item.open { background: var(--color-bg); }
+    .mail-item.unread { font-weight: 700; }
+    .mail-item .mi-top { display: flex; justify-content: space-between; gap: 8px; }
+    .mail-item .mi-from { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mail-item .mi-date { color: var(--color-text-secondary); font-size: 11px; flex-shrink: 0; }
+    .mail-item .mi-subj { color: var(--color-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mail-item .mi-prev { color: var(--color-text-secondary); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mail-item .mi-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--module-color); flex-shrink: 0; }
+    .mail-scroll { overflow-y: auto; flex: 1; }
+    .mail-body-actions { display: flex; gap: 6px; padding: 8px 12px; border-top: 1px solid var(--color-border); flex-wrap: wrap; }
+    .mail-read-head { padding: 14px 16px; border-bottom: 1px solid var(--color-border); }
+    .mail-read-subj { font-size: 16px; font-weight: 700; color: var(--color-text); }
+    .mail-read-meta { font-size: 12px; color: var(--color-text-secondary); margin-top: 4px; }
+    .mail-read-content { padding: 16px; font-size: 13px; line-height: 1.6; color: var(--color-text); overflow-y: auto; flex: 1; }
+    .mail-read-content pre, .mail-read-content .mail-plain { white-space: pre-wrap; font-family: inherit; margin: 0; }
+    .mail-attach { display: inline-flex; align-items: center; gap: 6px; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 8px; padding: 6px 10px; font-size: 12px; margin: 4px 6px 0 0; cursor: pointer; color: var(--module-color); }
+    .mail-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .mail-toolbar .spacer { flex: 1; }
+    .mail-loading { text-align: center; padding: 40px; color: var(--color-text-secondary); font-size: 13px; }
+    .mail-compose-body { min-height: 220px; resize: vertical; }
+    .mail-attach-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 12px; color: var(--color-text); }
+    .mail-attach-row .x { cursor: pointer; color: #dc2626; font-weight: 700; }
+    .mail-flag { color: #f59e0b; }
+    .mail-hint { font-size: 11px; color: var(--color-text-secondary); padding: 6px 12px; }
+    .mail-hint.err { color: #dc2626; }
+    .mail-pager { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-top: 1px solid var(--color-border); font-size: 12px; color: var(--color-text-secondary); }
+  </style>
 </head>
 <body>
   <div class="app-layout">
@@ -53,7 +94,7 @@
         <div class="module-panel">
           <div class="panel-item active" data-tool="inicio" onclick="switchTool('inicio')" title="Inicio"><span class="panel-item-indicator bg-chatfiat"></span><i class="fi fi-sr-house-building" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="mensajes" onclick="switchTool('mensajes')" title="Mensajes"><span class="panel-item-indicator bg-chatfiat"></span><i class="fi fi-sr-envelope" style="font-size:24px;pointer-events:none;"></i>
+          <div class="panel-item" data-tool="mensajes" onclick="switchTool('mensajes')" title="Correo electrónico"><span class="panel-item-indicator bg-chatfiat"></span><i class="fi fi-sr-envelope" style="font-size:24px;pointer-events:none;"></i>
           </div>
         </div>
 
@@ -63,7 +104,17 @@
               <h1 style="font-size:18px;font-weight:700;">Mensajería</h1>
             </div>
             <div class="toolbar-content" data-toolbar="mensajes" style="display:none;align-items:center;gap:16px;width:100%;">
-              <h1 style="font-size:18px;font-weight:700;">Mensajes</h1>
+              <h1 style="font-size:18px;font-weight:700;">Correo</h1>
+              <div class="mail-toolbar">
+                <select class="form-input" id="mailAccountSel" style="max-width:220px;" onchange="mailSelectAccount(this.value)"></select>
+                <input type="text" class="form-input" id="mailSearchInput" placeholder="Buscar..." style="max-width:180px;" onkeydown="if(event.key==='Enter')mailSearch()">
+                <button class="btn btn-outline" type="button" onclick="mailSearch()">Buscar</button>
+                <button class="btn btn-outline" type="button" onclick="mailRefresh()"><i class="fi fi-sr-rotate" style="font-size:13px;line-height:1;pointer-events:none;"></i> Actualizar</button>
+                <button class="btn btn-outline" type="button" onclick="mailComposeOpen()"><i class="fi fi-sr-pencil" style="font-size:13px;line-height:1;pointer-events:none;"></i> Redactar</button>
+                <button class="btn btn-outline" type="button" onclick="mailSettingsOpen()"><i class="fi fi-sr-settings" style="font-size:13px;line-height:1;pointer-events:none;"></i> Cuentas</button>
+                <span class="spacer"></span>
+                <span id="mailStatus" style="font-size:12px;color:var(--color-text-secondary);"></span>
+              </div>
             </div>
           </header>
 
@@ -77,13 +128,101 @@
             </div>
 
             <div class="tool-section" id="tool-mensajes">
-              <div class="empty-state">
-                <p style="color:var(--color-text-secondary);">Mensajes</p>
-                <p style="margin-top:4px;font-size:12px;color:#999;">Próximamente.</p>
+              <div class="mail-empty" id="mailEmpty" style="display:none;">
+                <div style="font-size:28px;font-weight:700;color:var(--module-chatfiat);">Correo electrónico</div>
+                <p style="margin-top:8px;">Aún no hay cuentas de correo configuradas.</p>
+                <p style="font-size:12px;color:#999;">Agrega una cuenta IMAP/SMTP (cPanel, Gmail, etc.) para comenzar.</p>
+                <button class="btn btn-outline" style="margin-top:16px;" type="button" onclick="mailSettingsOpen()">Configurar cuenta</button>
+              </div>
+              <div class="mail-app" id="mailApp" style="display:none;">
+                <div class="mail-pane mail-folders">
+                  <div class="mail-pane-head">Bandejas <button class="btn btn-outline" style="padding:2px 8px;font-size:11px;" type="button" onclick="mailRefresh()">⟳</button></div>
+                  <div class="mail-scroll" id="mailFolders"></div>
+                </div>
+                <div class="mail-pane mail-list">
+                  <div class="mail-pane-head"><span id="mailListTitle">Bandeja de entrada</span></div>
+                  <div class="mail-scroll" id="mailList"></div>
+                  <div class="mail-pager">
+                    <button class="btn btn-outline" style="padding:2px 10px;font-size:12px;" type="button" onclick="mailPage(-1)">← Anterior</button>
+                    <span id="mailPageInfo"></span>
+                    <button class="btn btn-outline" style="padding:2px 10px;font-size:12px;" type="button" onclick="mailPage(1)">Siguiente →</button>
+                    <span style="flex:1;"></span>
+                    <button class="btn btn-outline" style="padding:2px 10px;font-size:12px;color:#dc2626;" type="button" onclick="mailDelete()">🗑 Eliminar</button>
+                  </div>
+                </div>
+                <div class="mail-pane mail-read">
+                  <div class="mail-pane-head"><span>Mensaje</span>
+                    <span style="display:flex;gap:6px;">
+                      <button class="btn btn-outline" style="padding:2px 10px;font-size:12px;" type="button" onclick="mailReply()">Responder</button>
+                      <button class="btn btn-outline" style="padding:2px 10px;font-size:12px;" type="button" onclick="mailToggleFlag()">★</button>
+                    </span>
+                  </div>
+                  <div class="mail-scroll" id="mailRead" style="flex:1;display:flex;flex-direction:column;">
+                    <div class="mail-loading">Selecciona un correo para leerlo</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Redactar -->
+  <div class="modal-overlay" id="mailComposeModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Redactar correo</h3>
+        <button class="modal-close" type="button" onclick="mailComposeClose()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group"><label>Para *</label><input type="text" class="form-input" id="mailComposeTo" placeholder="destinatario@dominio.com"></div>
+        <div class="form-group"><label>CC</label><input type="text" class="form-input" id="mailComposeCc" placeholder="copia@dominio.com"></div>
+        <div class="form-group"><label>Asunto</label><input type="text" class="form-input" id="mailComposeSubject"></div>
+        <div class="form-group"><label>Mensaje</label><textarea class="form-input mail-compose-body" id="mailComposeBody"></textarea></div>
+        <div class="form-group">
+          <label>Adjuntos</label>
+          <input type="file" id="mailComposeFiles" multiple onchange="mailComposeFilesChanged()">
+          <div id="mailComposeAttachList"></div>
+        </div>
+        <div class="mail-hint" id="mailComposeMsg"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" type="button" onclick="mailComposeClose()">Cancelar</button>
+        <button class="btn" type="button" onclick="mailSend()">Enviar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Cuentas -->
+  <div class="modal-overlay" id="mailSettingsModal">
+    <div class="modal" style="max-width:640px;">
+      <div class="modal-header">
+        <h3>Cuentas de correo</h3>
+        <button class="modal-close" type="button" onclick="mailSettingsClose()">×</button>
+      </div>
+      <div class="modal-body">
+        <div id="mailSettingsList"></div>
+        <hr style="border:none;border-top:1px solid var(--color-border);margin:14px 0;">
+        <div class="form-group"><label>Nombre de la cuenta</label><input type="text" class="form-input" id="accName" placeholder="RRHH"></div>
+        <div class="form-row" style="display:flex;gap:10px;">
+          <div class="form-group" style="flex:1;"><label>Servidor IMAP *</label><input type="text" class="form-input" id="accImapHost" placeholder="mail.tudominio.com"></div>
+          <div class="form-group" style="width:90px;"><label>Puerto</label><input type="number" class="form-input" id="accImapPort" value="993"></div>
+        </div>
+        <div class="form-row" style="display:flex;gap:10px;">
+          <div class="form-group" style="flex:1;"><label>Servidor SMTP</label><input type="text" class="form-input" id="accSmtpHost" placeholder="mail.tudominio.com"></div>
+          <div class="form-group" style="width:90px;"><label>Puerto</label><input type="number" class="form-input" id="accSmtpPort" value="465"></div>
+        </div>
+        <div class="form-group"><label>Usuario (correo completo) *</label><input type="text" class="form-input" id="accUser" placeholder="usuario@tudominio.com"></div>
+        <div class="form-group"><label>Contraseña *</label><input type="password" class="form-input" id="accPass" placeholder="••••••••"></div>
+        <div class="form-group"><label>Nombre que aparecerá en "De"</label><input type="text" class="form-input" id="accFromName" placeholder="Recursos Humanos"></div>
+        <div class="mail-hint" id="mailSettingsMsg"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" type="button" onclick="mailTestAccount()">Probar conexión</button>
+        <span style="flex:1;"></span>
+        <button class="btn btn-outline" type="button" onclick="mailSaveAccount()">Guardar cuenta</button>
       </div>
     </div>
   </div>
@@ -94,7 +233,363 @@
   <script src="../js/auth.js"></script>
   <script src="../js/modules.js"></script>
 
-<script src="../js/module-help.js"></script>
+  <script>
+    /* ===== Webmail (IMAP/SMTP) ===== */
+    var MAIL_API = 'http://localhost:4000/api'; /* En producción apuntar a la URL del servidor de correo */
+    var mailState = { accounts: [], accountId: '', mailbox: 'INBOX', page: 1, per: 40, q: '', total: 0, messages: [], openUid: null, attachFiles: [] };
+
+    function mailEscape(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    function mailH(uid, mailbox) {
+      return '?account=' + encodeURIComponent(mailState.accountId) + '&mailbox=' + encodeURIComponent(mailbox || mailState.mailbox);
+    }
+    function mailFmtDate(iso) {
+      if (!iso) return '';
+      var d = new Date(iso);
+      var now = new Date();
+      var same = d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+      if (same) return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0');
+      return d.getDate().toString().padStart(2, '0') + '/' + (d.getMonth() + 1).toString().padStart(2, '0') + '/' + d.getFullYear();
+    }
+    function mailStatus(msg, err) {
+      var el = document.getElementById('mailStatus');
+      if (el) { el.textContent = msg || ''; el.style.color = err ? '#dc2626' : 'var(--color-text-secondary)'; }
+    }
+    async function mailFetch(url, opts) {
+      var res = await fetch(MAIL_API + url, opts);
+      if (!res.ok) {
+        var msg = 'Error ' + res.status;
+        try { var j = await res.json(); msg = j.error || msg; } catch (e) {}
+        throw new Error(msg);
+      }
+      return res.json();
+    }
+
+    function mailInit() {
+      mailFetch('/accounts').then(function (accs) {
+        mailState.accounts = accs;
+        mailRenderAccountSelect();
+        if (accs.length) {
+          if (!mailState.accountId || !accs.some(function (a) { return String(a.id) === String(mailState.accountId); })) {
+            mailState.accountId = String(accs[0].id);
+          }
+          document.getElementById('mailApp').style.display = 'flex';
+          document.getElementById('mailEmpty').style.display = 'none';
+          mailLoadMailboxes();
+        } else {
+          document.getElementById('mailApp').style.display = 'none';
+          document.getElementById('mailEmpty').style.display = 'block';
+        }
+      }).catch(function (e) {
+        mailStatus('Servidor de correo no disponible: ' + e.message, true);
+        document.getElementById('mailApp').style.display = 'none';
+        document.getElementById('mailEmpty').style.display = 'block';
+      });
+    }
+
+    function mailRenderAccountSelect() {
+      var sel = document.getElementById('mailAccountSel');
+      if (!sel) return;
+      sel.innerHTML = mailState.accounts.map(function (a) {
+        return '<option value="' + a.id + '"' + (String(a.id) === String(mailState.accountId) ? ' selected' : '') + '>' + mailEscape(a.name || a.user) + '</option>';
+      }).join('') || '<option value="">Sin cuentas</option>';
+    }
+    function mailSelectAccount(id) {
+      mailState.accountId = id;
+      mailState.mailbox = 'INBOX';
+      mailState.page = 1;
+      mailState.q = '';
+      document.getElementById('mailSearchInput').value = '';
+      mailRenderAccountSelect();
+      mailLoadMailboxes();
+    }
+
+    function mailLoadMailboxes() {
+      mailFetch('/mailboxes' + '?account=' + encodeURIComponent(mailState.accountId)).then(function (boxes) {
+        mailState.mailboxes = boxes;
+        var el = document.getElementById('mailFolders');
+        el.innerHTML = boxes.map(function (b) {
+          var icon = b.path === 'INBOX' ? '📥' : (b.name && b.name.toLowerCase() === 'enviados' ? '📤' : '📁');
+          return '<div class="mail-folder' + (b.path === mailState.mailbox ? ' active' : '') + '" onclick="mailOpenFolder(' + JSON.stringify(b.path).replace(/"/g, '&quot;') + ')">' +
+            '<span>' + icon + ' ' + mailEscape(b.name || b.path) + '</span>' +
+            (b.unseen ? '<span class="mail-unseen">' + b.unseen + '</span>' : '') + '</div>';
+        }).join('') || '<div class="mail-loading">Sin bandejas</div>';
+        mailLoadMessages();
+      }).catch(function (e) { mailStatus(e.message, true); });
+    }
+    function mailOpenFolder(path) {
+      mailState.mailbox = path;
+      mailState.page = 1;
+      mailState.q = '';
+      document.getElementById('mailSearchInput').value = '';
+      document.getElementById('mailListTitle').textContent = path;
+      mailLoadMailboxes();
+    }
+    function mailPage(delta) {
+      var np = mailState.page + delta;
+      if (np < 1) return;
+      mailState.page = np;
+      mailLoadMessages();
+    }
+    function mailSearch() {
+      mailState.q = document.getElementById('mailSearchInput').value.trim();
+      mailState.page = 1;
+      mailLoadMessages();
+    }
+    function mailRefresh() { mailLoadMailboxes(); }
+
+    function mailLoadMessages() {
+      var list = document.getElementById('mailList');
+      list.innerHTML = '<div class="mail-loading">Cargando...</div>';
+      var url = '/messages?account=' + encodeURIComponent(mailState.accountId) +
+        '&mailbox=' + encodeURIComponent(mailState.mailbox) +
+        '&page=' + mailState.page + '&per=' + mailState.per +
+        (mailState.q ? '&q=' + encodeURIComponent(mailState.q) : '');
+      mailFetch(url).then(function (data) {
+        mailState.messages = data.items;
+        mailState.total = data.total;
+        list.innerHTML = data.items.map(function (m) {
+          return '<div class="mail-item' + (m.uid === mailState.openUid ? ' open' : '') + (m.seen ? '' : ' unread') + '" onclick="mailOpenMessage(' + m.uid + ')">' +
+            '<div class="mi-top"><span class="mi-from">' + (m.seen ? '' : '<span class="mi-dot" style="display:inline-block;margin-right:5px;"></span>') + mailEscape(m.from) + (m.hasAttach ? ' 📎' : '') + '</span><span class="mi-date">' + mailFmtDate(m.date) + '</span></div>' +
+            '<div class="mi-subj">' + mailEscape(m.subject) + (m.flagged ? ' <span class="mail-flag">★</span>' : '') + '</div>' +
+            '</div>';
+        }).join('') || '<div class="mail-loading">Sin mensajes</div>';
+        var pages = Math.max(1, Math.ceil(mailState.total / mailState.per));
+        document.getElementById('mailPageInfo').textContent = mailState.page + ' / ' + pages + ' (' + mailState.total + ' msgs)';
+        mailStatus('');
+      }).catch(function (e) {
+        list.innerHTML = '<div class="mail-loading" style="color:#dc2626;">' + mailEscape(e.message) + '</div>';
+        mailStatus(e.message, true);
+      });
+    }
+
+    function mailOpenMessage(uid) {
+      mailState.openUid = uid;
+      var read = document.getElementById('mailRead');
+      read.innerHTML = '<div class="mail-loading">Cargando mensaje...</div>';
+      mailFetch('/messages/' + uid + mailH(uid)).then(function (m) {
+        mailState.openMail = m;
+        read.innerHTML =
+          '<div class="mail-read-head">' +
+            '<div class="mail-read-subj">' + mailEscape(m.subject) + '</div>' +
+            '<div class="mail-read-meta"><strong>' + mailEscape(m.from) + '</strong>' +
+            (m.to ? '<br>Para: ' + mailEscape(m.to) : '') +
+            (m.cc ? '<br>CC: ' + mailEscape(m.cc) : '') +
+            '<br>' + (m.date ? new Date(m.date).toLocaleString('es-VE') : '') + '</div>' +
+          '</div>' +
+          '<div class="mail-read-content">' + (m.html ? mailSanitizeHtml(m.html) : '<div class="mail-plain">' + mailEscape(m.text || '') + '</div>') + '</div>' +
+          '<div class="mail-body-actions">' +
+            (m.attachments || []).map(function (a) {
+              return '<span class="mail-attach" onclick="mailDownload(' + uid + ',' + a.index + ')">📎 ' + mailEscape(a.filename) + ' (' + mailSize(a.size) + ')</span>';
+            }).join('') +
+          '</div>';
+        mailLoadMessages();
+      }).catch(function (e) {
+        read.innerHTML = '<div class="mail-loading" style="color:#dc2626;">' + mailEscape(e.message) + '</div>';
+      });
+    }
+    function mailSanitizeHtml(html) {
+      var s = String(html || '').replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<iframe[\s\S]*?<\/iframe>/gi, '');
+      return s;
+    }
+    function mailSize(n) {
+      n = Number(n) || 0;
+      if (n >= 1048576) return (n / 1048576).toFixed(1) + ' MB';
+      if (n >= 1024) return Math.round(n / 1024) + ' KB';
+      return n + ' B';
+    }
+    function mailDownload(uid, index) {
+      window.open(MAIL_API + '/messages/' + uid + '/attachment/' + index + mailH(uid), '_blank');
+    }
+    function mailToggleFlag() {
+      if (!mailState.openUid) return;
+      var m = mailState.messages.filter(function (x) { return x.uid === mailState.openUid; })[0];
+      var remove = !!(m && m.flagged);
+      mailFetch('/messages/' + mailState.openUid + '/flags', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ account: mailState.accountId, mailbox: mailState.mailbox, flags: ['\\Flagged'], remove: remove })
+      }).then(function () { mailLoadMessages(); }).catch(function (e) { mailStatus(e.message, true); });
+    }
+    function mailDelete() {
+      if (!mailState.openUid) return;
+      if (!confirm('¿Eliminar este correo?')) return;
+      mailFetch('/messages/' + mailState.openUid + '?account=' + encodeURIComponent(mailState.accountId) + '&mailbox=' + encodeURIComponent(mailState.mailbox), { method: 'DELETE' })
+        .then(function () { mailState.openUid = null; mailLoadMessages(); })
+        .catch(function (e) { mailStatus(e.message, true); });
+    }
+
+    /* Compose */
+    function mailComposeOpen(prefill) {
+      mailState.attachFiles = [];
+      document.getElementById('mailComposeTo').value = (prefill && prefill.to) || '';
+      document.getElementById('mailComposeCc').value = '';
+      document.getElementById('mailComposeSubject').value = (prefill && prefill.subject) || '';
+      document.getElementById('mailComposeBody').value = (prefill && prefill.body) || '';
+      document.getElementById('mailComposeFiles').value = '';
+      document.getElementById('mailComposeAttachList').innerHTML = '';
+      document.getElementById('mailComposeMsg').textContent = '';
+      document.getElementById('mailComposeModal').classList.add('show');
+    }
+    function mailComposeClose() {
+      document.getElementById('mailComposeModal').classList.remove('show');
+    }
+    function mailComposeFilesChanged() {
+      var input = document.getElementById('mailComposeFiles');
+      var names = [];
+      for (var i = 0; i < input.files.length; i++) names.push(input.files[i].name);
+      document.getElementById('mailComposeAttachList').innerHTML = names.map(function (n) {
+        return '<div class="mail-attach-row">' + mailEscape(n) + '<span class="x" onclick="mailRemoveFile(' + JSON.stringify(n) + ')">×</span></div>';
+      }).join('');
+    }
+    function mailRemoveFile(name) {
+      var input = document.getElementById('mailComposeFiles');
+      var dt = new DataTransfer();
+      for (var i = 0; i < input.files.length; i++) {
+        if (input.files[i].name !== name) dt.items.add(input.files[i]);
+      }
+      input.files = dt.files;
+      mailComposeFilesChanged();
+    }
+    function mailReply() {
+      var m = mailState.openMail;
+      if (!m) { mailStatus('Abre un correo para responderlo', true); return; }
+      var body = '> En ' + (m.date ? new Date(m.date).toLocaleString('es-VE') : '') + ' ' + m.from + ' escribió:\n\n' + String(m.text || '').split('\n').map(function (l) { return '> ' + l; }).join('\n');
+      mailComposeOpen({ to: m.fromEmail, subject: /^re:/i.test(m.subject) ? m.subject : 'Re: ' + m.subject, body: body });
+    }
+    function mailSend() {
+      var to = document.getElementById('mailComposeTo').value.trim();
+      if (!to) { document.getElementById('mailComposeMsg').textContent = 'Indica el destinatario.'; return; }
+      var msg = document.getElementById('mailComposeMsg');
+      msg.textContent = 'Enviando...';
+      var fd = new FormData();
+      fd.append('account', mailState.accountId);
+      fd.append('to', to);
+      fd.append('cc', document.getElementById('mailComposeCc').value.trim());
+      fd.append('subject', document.getElementById('mailComposeSubject').value.trim());
+      var text = document.getElementById('mailComposeBody').value;
+      fd.append('text', text);
+      fd.append('html', '<div style="font-family:inherit;font-size:14px;line-height:1.6;white-space:pre-wrap;">' + mailEscape(text).replace(/\n/g, '<br>') + '</div>');
+      var input = document.getElementById('mailComposeFiles');
+      for (var i = 0; i < input.files.length; i++) fd.append('attachments', input.files[i]);
+      fetch(MAIL_API + '/send', { method: 'POST', body: fd })
+        .then(function (res) { if (!res.ok) return res.json().then(function (j) { throw new Error(j.error || 'Error'); }); return res.json(); })
+        .then(function () {
+          msg.textContent = 'Enviado correctamente.';
+          setTimeout(mailComposeClose, 700);
+        })
+        .catch(function (e) { msg.textContent = e.message; });
+    }
+
+    /* Cuentas */
+    function mailSettingsOpen() {
+      mailRenderSettingsList();
+      document.getElementById('mailSettingsMsg').textContent = '';
+      document.getElementById('mailSettingsModal').classList.add('show');
+    }
+    function mailSettingsClose() {
+      document.getElementById('mailSettingsModal').classList.remove('show');
+    }
+    function mailRenderSettingsList() {
+      var el = document.getElementById('mailSettingsList');
+      if (!mailState.accounts.length) { el.innerHTML = '<div class="mail-hint">Sin cuentas configuradas.</div>'; return; }
+      el.innerHTML = mailState.accounts.map(function (a) {
+        return '<div class="mail-hint" style="display:flex;align-items:center;gap:10px;">' +
+          '<span style="flex:1;"><strong>' + mailEscape(a.name || a.user) + '</strong> · ' + mailEscape(a.user) + '</span>' +
+          '<button class="btn btn-outline" style="padding:2px 10px;font-size:12px;" type="button" onclick="mailEditAccount(\'' + a.id + '\')">Editar</button>' +
+          '<button class="btn btn-outline" style="padding:2px 10px;font-size:12px;color:#dc2626;" type="button" onclick="mailDeleteAccount(\'' + a.id + '\')">Eliminar</button>' +
+          '</div>';
+      }).join('');
+    }
+    function mailFormAccount() {
+      return {
+        name: document.getElementById('accName').value.trim(),
+        imapHost: document.getElementById('accImapHost').value.trim(),
+        imapPort: document.getElementById('accImapPort').value,
+        smtpHost: document.getElementById('accSmtpHost').value.trim(),
+        smtpPort: document.getElementById('accSmtpPort').value,
+        user: document.getElementById('accUser').value.trim(),
+        pass: document.getElementById('accPass').value,
+        fromName: document.getElementById('accFromName').value.trim()
+      };
+    }
+    function mailSaveAccount() {
+      var a = mailFormAccount();
+      if (!a.user || !a.pass || !a.imapHost) { document.getElementById('mailSettingsMsg').textContent = 'IMAP, usuario y contraseña son obligatorios.'; return; }
+      var editing = document.getElementById('mailEditingId').value;
+      var url = editing ? '/accounts/' + editing : '/accounts';
+      var method = editing ? 'PUT' : 'POST';
+      mailFetch(url, { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) })
+        .then(function () {
+          document.getElementById('mailSettingsMsg').textContent = 'Cuenta guardada.';
+          return mailFetch('/accounts');
+        }).then(function (accs) {
+          mailState.accounts = accs;
+          if (!mailState.accountId) mailState.accountId = accs[0] ? String(accs[0].id) : '';
+          mailRenderAccountSelect();
+          mailRenderSettingsList();
+          mailInit();
+        }).catch(function (e) { document.getElementById('mailSettingsMsg').textContent = e.message; });
+    }
+    function mailEditAccount(id) {
+      var a = mailState.accounts.filter(function (x) { return String(x.id) === String(id); })[0];
+      if (!a) return;
+      document.getElementById('mailEditingId').value = id;
+      document.getElementById('accName').value = a.name || '';
+      document.getElementById('accImapHost').value = a.imapHost || '';
+      document.getElementById('accImapPort').value = a.imapPort || 993;
+      document.getElementById('accSmtpHost').value = a.smtpHost || '';
+      document.getElementById('accSmtpPort').value = a.smtpPort || 465;
+      document.getElementById('accUser').value = a.user || '';
+      document.getElementById('accPass').value = '';
+      document.getElementById('accFromName').value = a.fromName || '';
+    }
+    function mailDeleteAccount(id) {
+      if (!confirm('¿Eliminar esta cuenta?')) return;
+      mailFetch('/accounts/' + id, { method: 'DELETE' }).then(function () {
+        mailState.accounts = mailState.accounts.filter(function (x) { return String(x.id) !== String(id); });
+        if (String(mailState.accountId) === String(id)) mailState.accountId = '';
+        mailRenderAccountSelect();
+        mailRenderSettingsList();
+        mailInit();
+      }).catch(function (e) { document.getElementById('mailSettingsMsg').textContent = e.message; });
+    }
+    function mailTestAccount() {
+      var a = mailFormAccount();
+      var msg = document.getElementById('mailSettingsMsg');
+      msg.textContent = 'Probando conexión IMAP...';
+      var editing = document.getElementById('mailEditingId').value;
+      if (editing) {
+        mailFetch('/accounts/' + editing, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) })
+          .then(function (acc) { return mailFetch('/accounts/' + acc.id + '/test'); })
+          .then(function (r) { msg.textContent = 'Conexión exitosa: ' + r.mailboxes.length + ' bandejas encontradas.'; })
+          .catch(function (e) { msg.textContent = 'Error: ' + e.message; });
+      } else {
+        mailFetch('/accounts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) })
+          .then(function (acc) { return mailFetch('/accounts/' + acc.id + '/test'); })
+          .then(function (r) { msg.textContent = 'Conexión exitosa: ' + r.mailboxes.length + ' bandejas encontradas.'; })
+          .catch(function (e) { msg.textContent = 'Error: ' + e.message; });
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('mailEditingId') || (function () {
+        var h = document.createElement('input');
+        h.type = 'hidden';
+        h.id = 'mailEditingId';
+        h.value = '';
+        document.getElementById('mailSettingsList').appendChild(h);
+      })();
+      var orig = window.switchTool;
+      window.switchTool = function (name) {
+        if (orig) orig(name);
+        if (name === 'mensajes') mailInit();
+      };
+    });
+  </script>
+  <script src="../js/module-help.js"></script>
     <script src="../js/access.js"></script>
   <script src="../js/indicadores.js"></script>
 </body>

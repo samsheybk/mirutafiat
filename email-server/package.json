@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "demo": "node demo-server.js",
+    "servers": "node run-servers.js"
   },
   "license": "ISC",
   "type": "commonjs",
@@ -16,6 +18,7 @@
     "imapflow": "^1.0.164",
     "mailparser": "^3.7.1",
     "multer": "^2.0.2",
-    "nodemailer": "^6.9.14"
+    "nodemailer": "^6.9.14",
+    "web-push": "^3.6.7"
   }
 }

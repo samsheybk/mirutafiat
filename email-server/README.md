@@ -25,6 +25,44 @@ curl http://localhost:4000/api/status
 # {"ok":true,"accounts":0,"time":"..."}
 ```
 
+## Ver el webmail SIN dominio real (modo demo)
+
+Para ver el módulo de Mensajería **ya configurado con datos de ejemplo** (sin cuentas de correo, sin dominio y sin credenciales):
+
+```bash
+cd email-server
+npm run demo
+```
+
+Luego abre en el navegador:
+
+```
+http://localhost:4001/modules/chatfiat.html?demo=1
+```
+
+Qué incluye la demo (todo en memoria, se reinicia al detener el servidor):
+
+- Cuenta precargada **Recursos Humanos** (`rrhh@fiat-ve.com`) con bandejas INBOX (13 no leídos), Enviados, Borradores, spam y Papelera.
+- ~22 correos de ejemplo (banco, gerencia, compañeros, proveedores, notificaciones del sistema) con HTML, adjuntos descargables y búsqueda.
+- Envío de correos (se guardan en Enviados), responder, marcar importante, eliminar y gestionar cuentas desde **Cuentas → Probar conexión**.
+
+### Interruptor Demo (forma recomendada)
+
+Para alternar **entre el servidor real y los datos demo sin cambiar nada**, levanta **ambos** servidores a la vez:
+
+```bash
+cd email-server
+npm run servers     # real en 4000 + demo en 4001
+```
+
+Luego entra a la intranet como **administrador** (con tu sesión real, ej. `npm run dev` en la raíz) y, dentro del módulo **Mensajería → Correo**, activa el interruptor **Demo** que aparece en la barra de herramientas (solo visible para administradores y en localhost). El webmail carga las cuentas del demo (`rrhh@fiat-ve.com`) y lo puedes apagar para volver a tu servidor real.
+
+El interruptor recuerda la elección en el navegador y, si el servidor seleccionado no está corriendo, se muestra el aviso de "servidor no disponible" en lugar de un error confuso.
+
+El `?demo=1` solo funciona en `localhost`/`127.0.0.1` y solo sirve para previsualizar la interfaz sin sesión; en cualquier otro host no tiene efecto y el acceso normal no cambia.
+
+> Nota: también puedes verlo con tu sesión real de la intranet levantando `npm run dev` (puerto 3000) y el servidor demo en el 4001.
+
 ## Configuración de cuentas
 
 Desde la interfaz: módulo **Mensajería → Correo → Cuentas**. Se pide:

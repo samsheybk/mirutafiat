@@ -121,12 +121,11 @@
     },
     'chatfiat.html': {
       title: 'Mensajería',
-      subtitle: 'La red social interna para comunicar y conectar a los trabajadores.',
+      subtitle: 'Correo electrónico y agenda de actividades de la empresa.',
       accent: '#4f46e5',
       tools: [
-        { icon: 'fi-sr-house-building', name: 'Inicio', desc: 'Página principal de la red social interna: noticias y publicaciones de la comunidad.' },
-        { icon: 'fi-sr-envelope', name: 'Mensajes', desc: 'Mensajería interna entre los trabajadores de la empresa.' },
-        { icon: 'fi-sr-dashboard', name: 'Indicadores de gestión', desc: 'Indicadores de la red social interna, como los trabajadores activos de la comunidad.' }
+        { icon: 'fi-sr-calendar', name: 'Agenda', desc: 'Directorio de contactos: proveedores, clientes y otros, con teléfonos, correos y redes sociales.' },
+        { icon: 'fi-sr-envelope', name: 'Correo electrónico', desc: 'Webmail de la empresa con bandejas, búsqueda, adjuntos y gestión de cuentas IMAP/SMTP.' }
       ]
     },
     'desarrollo-organizacional.html': {

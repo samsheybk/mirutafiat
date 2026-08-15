@@ -233,13 +233,6 @@
         { title: 'Último documento', icon: 'fi-sr-file-edit', table: 'repo_documentos', latest: 'updated_at', format: 'date', hint: 'Fecha de la última actualización' }
       ]
     },
-    'chatfiat.html': {
-      bg: 'bg-chatfiat',
-      subtitle: 'Indicadores de la red social interna de la empresa.',
-      cards: [
-        { title: 'Trabajadores activos', icon: 'fi-sr-users', table: 'plantilla_trabajadores', count: true, filter: { estado: 'Activo' }, hint: 'Miembros de la comunidad' }
-      ]
-    },
     'desarrollo-organizacional.html': {
       bg: 'bg-desarrollo',
       subtitle: 'Indicadores de gestión, objetivos y salud organizacional por unidad y cargo.',

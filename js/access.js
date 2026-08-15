@@ -126,7 +126,9 @@
     var tools = state.modulos[baseModule(page)];
     if (tools === undefined) return false;
     if (Array.isArray(tools) && tools.indexOf('*') !== -1) return true;
-    return Array.isArray(tools) && tools.indexOf(tool) !== -1;
+    if (Array.isArray(tools) && tools.indexOf(tool) !== -1) return true;
+    if (tool === 'agenda' && Array.isArray(tools) && tools.indexOf('inicio') !== -1) return true;
+    return false;
   }
 
   async function buildState(email) {
@@ -237,6 +239,15 @@
 
   async function init() {
     if (document.getElementById('loginForm')) return;
+    // Modo demo/preview: ver todos los módulos y herramientas sin sesión (solo localhost).
+    if (typeof demoPreviewMode === 'function' && demoPreviewMode()) {
+      state.isAdmin = true;
+      state.manage = true;
+      state.role = 'Administrador';
+      applyNav();
+      applyPanelTools();
+      return;
+    }
     var session = await getSession().catch(function () { return null; });
     if (!session) { location.href = '/index.html'; return; }
     var user = await getCurrentUser().catch(function () { return null; });

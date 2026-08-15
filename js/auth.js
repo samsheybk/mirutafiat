@@ -116,6 +116,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const userMenuBtn = document.getElementById('userMenuBtn');
   if (userMenuBtn) {
+    // Modo demo/preview: permite ver el módulo sin sesión, SOLO en localhost.
+    if (typeof demoPreviewMode === 'function' && demoPreviewMode()) return;
     const session = await getSession();
     if (!session) {
       window.location.href = '/index.html';

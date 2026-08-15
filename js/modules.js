@@ -19,7 +19,7 @@ function switchTool(name) {
   document.querySelectorAll('.panel-item').forEach(el => {
     el.classList.remove('active');
     // Reset icon color
-    const icon = el.querySelector('i.fi');
+    const icon = el.querySelector('i.fi, svg');
     if (icon) icon.style.color = '';
   });
   document.querySelectorAll('.tool-section').forEach(el => el.classList.remove('active'));
@@ -35,7 +35,7 @@ function switchTool(name) {
   const topnav = document.querySelector('.topnav');
   if (topnav && item) {
     const moduleColor = topnav.style.background || getComputedStyle(topnav).backgroundColor;
-    const icon = item.querySelector('i.fi');
+    const icon = item.querySelector('i.fi, svg');
     if (icon) {
       icon.style.color = moduleColor;
     }

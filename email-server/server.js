@@ -8,12 +8,122 @@ const { ImapFlow } = require('imapflow');
 const nodemailer = require('nodemailer');
 const { simpleParser } = require('mailparser');
 const multer = require('multer');
+const webpush = require('web-push');
 
 const PORT = process.env.PORT || 4000;
 const DATA_DIR = path.join(__dirname, 'data');
 const ACCOUNTS_FILE = path.join(DATA_DIR, 'accounts.json');
+const PUSH_STATE_FILE = path.join(DATA_DIR, 'push-state.json');
 const TOKEN = process.env.MAIL_API_TOKEN || '';
 const MAX_UPLOAD_MB = parseInt(process.env.MAX_UPLOAD_MB || '25', 10);
+
+/* ---------- Web Push (notificaciones) ---------- */
+const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY || '';
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || '';
+const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:admin@fiat-ve.com';
+if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
+  webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
+}
+function sendPush(subscription, payload) {
+  if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
+    return Promise.reject(new Error('VAPID no configurado en el email-server/.env'));
+  }
+  return webpush.sendNotification(subscription, JSON.stringify(payload));
+}
+
+/* ---------- Aviso push de nuevos correos ----------
+   Cada MAIL_POLL_SECONDS se revisa el INBOX de las cuentas con dueño
+   (owner) y, si hay mensajes nuevos, se notifica a las suscripciones
+   push registradas con el correo del dueño en Supabase. */
+const SUPABASE_URL = process.env.SUPABASE_URL || '';
+const SERVICE_ROLE_KEY = process.env.SERVICE_ROLE_KEY || '';
+const POLL_SECONDS = Math.max(parseInt(process.env.MAIL_POLL_SECONDS || '60', 10), 15);
+
+let pushState = loadJson(PUSH_STATE_FILE, { watermark: {} });
+function loadJson(file, fallback) {
+  try { return JSON.parse(fs.readFileSync(file, 'utf8')); }
+  catch (e) { return fallback; }
+}
+function savePushState() {
+  try {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    fs.writeFileSync(PUSH_STATE_FILE, JSON.stringify(pushState, null, 2));
+  } catch (e) {}
+}
+
+async function subscriptionsForEmail(email) {
+  if (!SUPABASE_URL || !SERVICE_ROLE_KEY || !email) return [];
+  const qs = 'select=endpoint,keys_auth,keys_p256dh&trabajador_email=eq.' + encodeURIComponent(email);
+  const res = await fetch(SUPABASE_URL + '/rest/v1/push_subscriptions?' + qs, {
+    headers: { apikey: SERVICE_ROLE_KEY, Authorization: 'Bearer ' + SERVICE_ROLE_KEY }
+  });
+  if (!res.ok) throw new Error('Supabase push_subscriptions: HTTP ' + res.status);
+  const rows = await res.json();
+  return (rows || []).map(r => ({
+    endpoint: r.endpoint,
+    keys: { auth: r.keys_auth || '', p256dh: r.keys_p256dh || '' }
+  }));
+}
+
+async function notifyNewMail(acc, count, first) {
+  if (!acc.owner) return;
+  const subs = await subscriptionsForEmail(acc.owner);
+  if (!subs.length) return;
+  const title = count > 1 ? count + ' nuevos correos' : 'Nuevo correo';
+  const from = (first && first.from) || acc.user || '';
+  const subject = (first && first.subject) || '';
+  const body = count > 1
+    ? 'En tu bandeja de ' + (acc.name || acc.user)
+    : 'De ' + from + (subject ? ': ' + subject : '');
+  const payload = { title, body, url: '/modules/chatfiat.html', icon: '/icons/icon-192.png' };
+  for (const sub of subs) {
+    try { await sendPush(sub, payload); }
+    catch (e) { console.error('[push] envío fallido (' + acc.user + '): ' + (e.message || e)); }
+  }
+}
+
+async function pollNewMail() {
+  const accounts = loadAccounts().filter(a => a.owner && a.user);
+  for (const acc of accounts) {
+    try {
+      const imap = imapClient(acc);
+      await imap.connect();
+      try {
+        const lock = await imap.getMailboxLock('INBOX');
+        try {
+          const uids = (await imap.search({ all: true }, { uid: true })).sort((a, b) => a - b);
+          if (!uids.length) continue;
+          const key = String(acc.id);
+          const known = Object.prototype.hasOwnProperty.call(pushState.watermark, key);
+          const last = pushState.watermark[key] || 0;
+          const newUids = uids.filter(u => u > last);
+          if (known && newUids.length) {
+            const recent = uids.slice(-20);
+            let first = null;
+            for await (const msg of imap.fetch(recent.join(','), { uid: true, envelope: true })) {
+              if (msg.uid > last) {
+                const env = msg.envelope || {};
+                const from = (env.from || [])[0];
+                first = {
+                  from: from ? ((from.name && from.name.trim()) || from.address || '') : '',
+                  subject: env.subject || ''
+                };
+                break;
+              }
+            }
+            await notifyNewMail(acc, newUids.length, first);
+          }
+          pushState.watermark[key] = uids[uids.length - 1];
+          savePushState();
+        } finally { lock.release(); }
+      } finally { await imap.logout().catch(() => {}); }
+    } catch (e) {
+      console.error('[push] ' + (acc.user || acc.id) + ': ' + (e.message || e));
+    }
+  }
+}
+setTimeout(pollNewMail, 5000);
+setInterval(pollNewMail, POLL_SECONDS * 1000);
 
 const app = express();
 app.use(cors());
@@ -34,6 +144,27 @@ function findAccount(id) {
 }
 function newId() { return crypto.randomBytes(6).toString('hex'); }
 function sanitize(a) { const { pass, ...rest } = a; return rest; }
+
+function escHtml(s) {
+  return String(s || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/* Agrega la firma de la cuenta al final del texto y del HTML */
+function applySignature(acc, text, html) {
+  const sig = String(acc.signature || '').trim();
+  if (!sig) return { text: text || '', html: html || '' };
+  const textSig = '\n\n--\n' + sig;
+  const htmlSig = '<br><br>--<br>' + escHtml(sig).replace(/\n/g, '<br>');
+  const t = (text || '') + textSig;
+  if (html) return { text: t, html: html + htmlSig };
+  const h = '<div style="font-family:inherit;font-size:14px;line-height:1.6;white-space:pre-wrap;">' +
+    escHtml(text || '').replace(/\n/g, '<br>') + htmlSig + '</div>';
+  return { text: t, html: h };
+}
 
 /* ---------- Seguridad opcional (token Bearer) ---------- */
 function requireToken(req, res, next) {
@@ -88,9 +219,26 @@ app.get('/api/status', (req, res) => {
   res.json({ ok: true, accounts: loadAccounts().length, time: new Date().toISOString() });
 });
 
-/* Cuentas */
+/* Cuentas. Una cuenta puede ser:
+   - Privada: tiene `owner` (correo del trabajador); solo su dueño la ve/edita/elimina.
+   - Compartida: sin `owner`; visible para todos y editable por cualquiera (intranet interna).
+   El dueño se identifica con la cabecera x-owner-email enviada por el frontend. */
+function ownerEmailOf(req) {
+  return String(req.get('x-owner-email') || '').trim().toLowerCase();
+}
+function canManage(account, ownerEmail) {
+  const o = String(account.owner || '').toLowerCase();
+  return !o || (ownerEmail && o === ownerEmail);
+}
+
 app.get('/api/accounts', (req, res) => {
-  res.json(loadAccounts().map(sanitize));
+  const ownerEmail = ownerEmailOf(req);
+  const list = loadAccounts().filter(a =>
+    ownerEmail
+      ? (!a.owner || String(a.owner).toLowerCase() === ownerEmail)
+      : !a.owner
+  );
+  res.json(list.map(sanitize));
 });
 
 app.post('/api/accounts', (req, res) => {
@@ -109,7 +257,9 @@ app.post('/api/accounts', (req, res) => {
     smtpSecure: a.smtpSecure !== false,
     user: a.user,
     pass: a.pass,
-    fromName: a.fromName || ''
+    fromName: a.fromName || '',
+    signature: a.signature || '',
+    owner: a.shared ? '' : ownerEmailOf(req)
   };
   const list = loadAccounts();
   list.push(acc);
@@ -123,6 +273,8 @@ app.put('/api/accounts/:id', (req, res) => {
   if (i === -1) return res.status(404).json({ error: 'Cuenta no encontrada' });
   const a = req.body || {};
   const old = list[i];
+  const ownerEmail = ownerEmailOf(req);
+  if (!canManage(old, ownerEmail)) return res.status(403).json({ error: 'Solo el dueño de la cuenta puede modificarla' });
   const acc = {
     id: old.id,
     name: a.name || old.name,
@@ -134,7 +286,9 @@ app.put('/api/accounts/:id', (req, res) => {
     smtpSecure: a.smtpSecure !== undefined ? a.smtpSecure : old.smtpSecure,
     user: a.user || old.user,
     pass: a.pass ? a.pass : old.pass,
-    fromName: a.fromName !== undefined ? a.fromName : old.fromName
+    fromName: a.fromName !== undefined ? a.fromName : old.fromName,
+    signature: a.signature !== undefined ? a.signature : old.signature,
+    owner: a.shared !== undefined ? (a.shared ? '' : ownerEmail) : old.owner
   };
   list[i] = acc;
   saveAccounts(list);
@@ -145,6 +299,7 @@ app.delete('/api/accounts/:id', (req, res) => {
   const list = loadAccounts();
   const i = list.findIndex(x => String(x.id) === String(req.params.id));
   if (i === -1) return res.status(404).json({ error: 'Cuenta no encontrada' });
+  if (!canManage(list[i], ownerEmailOf(req))) return res.status(403).json({ error: 'Solo el dueño de la cuenta puede eliminarla' });
   list.splice(i, 1);
   saveAccounts(list);
   res.json({ ok: true });
@@ -302,15 +457,17 @@ app.post('/api/send', upload.array('attachments', 10), asyncHandler(async (req, 
   const to = (req.body.to || '').toString();
   if (!to) return res.status(400).json({ error: 'El destinatario es obligatorio' });
 
+  const text = (req.body.text || '').toString();
+  const signed = applySignature(acc, text, req.body.html);
   const mail = {
     from: { name: acc.fromName || acc.name || acc.user, address: acc.user },
     to: to,
     cc: (req.body.cc || '').toString() || undefined,
     bcc: (req.body.bcc || '').toString() || undefined,
     subject: (req.body.subject || '').toString(),
-    text: (req.body.text || '').toString()
+    text: signed.text
   };
-  if (req.body.html) mail.html = req.body.html;
+  if (signed.html) mail.html = signed.html;
   if (req.files && req.files.length) {
     mail.attachments = req.files.map(f => ({ filename: f.originalname, content: f.buffer, contentType: f.mimetype }));
   }
@@ -383,6 +540,20 @@ app.post('/api/messages/:uid/move', asyncHandler(async (req, res) => {
   } finally {
     await imap.logout().catch(() => {});
   }
+}));
+
+/* Notificaciones push: prueba enviada por el propio navegador */
+app.post('/api/push/test', asyncHandler(async (req, res) => {
+  const sub = req.body && req.body.subscription;
+  if (!sub || !sub.endpoint) {
+    return res.status(400).json({ error: 'Falta la suscripción push' });
+  }
+  const payload = (req.body && req.body.payload) || {
+    title: 'Intranet FIAT',
+    body: 'Notificación de prueba'
+  };
+  await sendPush({ endpoint: sub.endpoint, keys: sub.keys }, payload);
+  res.json({ ok: true });
 }));
 
 app.listen(PORT, () => {

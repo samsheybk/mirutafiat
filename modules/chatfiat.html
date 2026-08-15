@@ -11,9 +11,9 @@
   <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
   <style>:root { --module-color: var(--module-chatfiat); }</style>
   <style>
-    .mail-app { display: flex; gap: 12px; height: calc(100vh - 150px); min-height: 400px; }
+    .mail-app { display: flex; gap: 0; height: calc(100vh - 150px); min-height: 400px; }
     .mail-empty { text-align: center; padding: 60px 20px; color: var(--color-text-secondary); }
-    .mail-pane { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); display: flex; flex-direction: column; overflow: hidden; }
+    .mail-pane { background: var(--color-surface); border: 1px solid var(--color-border); display: flex; flex-direction: column; overflow: hidden; }
     .mail-folders { width: 220px; flex-shrink: 0; }
     .mail-list { flex: 1; min-width: 300px; }
     .mail-read { flex: 1.4; min-width: 320px; }
@@ -40,8 +40,12 @@
     .mail-read-content { padding: 16px; font-size: 13px; line-height: 1.6; color: var(--color-text); overflow-y: auto; flex: 1; }
     .mail-read-content pre, .mail-read-content .mail-plain { white-space: pre-wrap; font-family: inherit; margin: 0; }
     .mail-attach { display: inline-flex; align-items: center; gap: 6px; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: 8px; padding: 6px 10px; font-size: 12px; margin: 4px 6px 0 0; cursor: pointer; color: var(--module-color); }
-    .mail-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .mail-toolbar { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; white-space: nowrap; }
     .mail-toolbar .spacer { flex: 1; }
+    .mail-toolbar .form-input { height: 30px; padding: 0 10px; font-size: 12px; border-radius: 6px; }
+    .mail-toolbar .btn { height: 30px; padding: 0 10px; font-size: 12px; border-radius: 6px; }
+    .mail-toolbar .btn.mail-btn-icon { width: 32px; padding: 0; justify-content: center; }
+    .module-content { padding: 0; }
     .mail-loading { text-align: center; padding: 40px; color: var(--color-text-secondary); font-size: 13px; }
     .mail-compose-body { min-height: 220px; resize: vertical; }
     .mail-attach-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 12px; color: var(--color-text); }
@@ -50,6 +54,49 @@
     .mail-hint { font-size: 11px; color: var(--color-text-secondary); padding: 6px 12px; }
     .mail-hint.err { color: #dc2626; }
     .mail-pager { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-top: 1px solid var(--color-border); font-size: 12px; color: var(--color-text-secondary); }
+    .mail-switch { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--color-text-secondary); cursor: pointer; user-select: none; }
+    .mail-switch input { display: none; }
+    .mail-switch .mail-switch-track { width: 34px; height: 18px; border-radius: 10px; background: #cbd5e1; position: relative; transition: background .2s; flex: none; }
+    .mail-switch .mail-switch-track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform .2s; box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+    .mail-switch input:checked + .mail-switch-track { background: var(--module-chatfiat); }
+    .mail-switch input:checked + .mail-switch-track::after { transform: translateX(16px); }
+    @keyframes mailSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .mail-refresh-icon.mail-spin { display: inline-block; animation: mailSpin .8s linear infinite; }
+    @keyframes mailFlash { 0% { background-color: rgba(37, 99, 235, 0.18); } 100% { background-color: transparent; } }
+    .mail-flash { animation: mailFlash 1s ease-out; }
+
+    /* Agenda de contactos */
+    .agenda-view { height: 100%; display: flex; flex-direction: column; padding: 16px 20px; min-width: 0; }
+    .agenda-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+    .agenda-bar .form-input { flex: 1; max-width: 300px; height: 34px; }
+    .ag-count { font-size: 12px; color: var(--color-text-secondary); margin-left: auto; }
+    .agenda-grid { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; align-content: start; padding-bottom: 8px; }
+    .ag-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 9px; }
+    .ag-card-top { display: flex; align-items: flex-start; gap: 10px; }
+    .ag-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--module-chatfiat); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; }
+    .ag-name { font-size: 14px; font-weight: 700; color: var(--color-text); line-height: 1.25; }
+    .ag-subname { font-size: 12px; color: var(--color-text-secondary); margin-top: 1px; }
+    .ag-tag { display: inline-block; font-size: 10.5px; padding: 2px 8px; border-radius: 10px; font-weight: 600; margin-top: 4px; }
+    .ag-tag.proveedor { background: rgba(22, 163, 74, .14); color: #16a34a; }
+    .ag-tag.cliente { background: rgba(37, 99, 235, .14); color: #2563eb; }
+    .ag-tag.otro { background: rgba(100, 116, 139, .16); color: #64748b; }
+    .ag-edit-del { display: flex; gap: 4px; }
+    .ag-edit-del .btn { height: 26px; width: 28px; padding: 0; display: flex; align-items: center; justify-content: center; }
+    .ag-line { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--color-text); min-width: 0; }
+    .ag-line .lbl { color: var(--color-text-secondary); font-size: 11px; width: 54px; flex-shrink: 0; }
+    .ag-line a { color: var(--module-chatfiat); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ag-line a:hover { text-decoration: underline; }
+    .ag-socials { display: inline-flex; gap: 10px; flex-wrap: wrap; min-width: 0; }
+    .ag-other { display: inline-flex; flex-wrap: wrap; gap: 8px; align-items: center; min-width: 0; }
+    .ag-other a { white-space: nowrap; }
+    .ag-sep { color: var(--color-text-secondary); }
+    .ag-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+    .ag-actions .btn { height: 28px; padding: 0 10px; font-size: 11.5px; display: inline-flex; align-items: center; gap: 5px; }
+    .ag-wa { background: #25d366; border-color: #25d366; }
+    .ag-wa:hover { background: #1ebe5b; border-color: #1ebe5b; }
+    .ag-copied { background: #16a34a; border-color: #16a34a; color: #fff; }
+    .ag-empty { grid-column: 1 / -1; text-align: center; color: var(--color-text-secondary); padding: 48px 12px; font-size: 13px; }
+    .ag-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
   </style>
 </head>
 <body>
@@ -92,7 +139,7 @@
     <div class="main-content">
       <div class="module-layout">
         <div class="module-panel">
-          <div class="panel-item active" data-tool="inicio" onclick="switchTool('inicio')" title="Inicio"><span class="panel-item-indicator bg-chatfiat"></span><i class="fi fi-sr-house-building" style="font-size:24px;pointer-events:none;"></i>
+          <div class="panel-item active" data-tool="agenda" onclick="switchTool('agenda')" title="Agenda"><span class="panel-item-indicator bg-chatfiat"></span><i class="fi fi-sr-calendar" style="font-size:24px;pointer-events:none;"></i>
           </div>
           <div class="panel-item" data-tool="mensajes" onclick="switchTool('mensajes')" title="Correo electrónico"><span class="panel-item-indicator bg-chatfiat"></span><i class="fi fi-sr-envelope" style="font-size:24px;pointer-events:none;"></i>
           </div>
@@ -100,18 +147,22 @@
 
         <div class="module-body">
           <header class="topbar" style="gap:16px;">
-            <div class="toolbar-content" data-toolbar="inicio" style="display:flex;align-items:center;gap:16px;width:100%;">
-              <h1 style="font-size:18px;font-weight:700;">Mensajería</h1>
+            <div class="toolbar-content" data-toolbar="agenda" style="display:flex;align-items:center;gap:16px;width:100%;">
+              <h1 style="font-size:18px;font-weight:700;">Agenda</h1>
             </div>
-            <div class="toolbar-content" data-toolbar="mensajes" style="display:none;align-items:center;gap:16px;width:100%;">
-              <h1 style="font-size:18px;font-weight:700;">Correo</h1>
+            <div class="toolbar-content" data-toolbar="mensajes" style="display:none;align-items:center;gap:8px;width:100%;">
               <div class="mail-toolbar">
-                <select class="form-input" id="mailAccountSel" style="max-width:220px;" onchange="mailSelectAccount(this.value)"></select>
-                <input type="text" class="form-input" id="mailSearchInput" placeholder="Buscar..." style="max-width:180px;" onkeydown="if(event.key==='Enter')mailSearch()">
-                <button class="btn btn-outline" type="button" onclick="mailSearch()">Buscar</button>
-                <button class="btn btn-outline" type="button" onclick="mailRefresh()"><i class="fi fi-sr-rotate" style="font-size:13px;line-height:1;pointer-events:none;"></i> Actualizar</button>
+                <select class="form-input" id="mailAccountSel" style="max-width:180px;" onchange="mailSelectAccount(this.value)"></select>
+                <input type="text" class="form-input" id="mailSearchInput" placeholder="Buscar..." style="max-width:150px;" onkeydown="if(event.key==='Enter')mailSearch()">
+                <button class="btn btn-outline mail-btn-icon" type="button" onclick="mailSearch()" title="Buscar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;"><circle cx="11.5" cy="11.5" r="8.5"></circle><line x1="18" y1="18" x2="23.5" y2="23.5"></line></svg></button>
                 <button class="btn btn-outline" type="button" onclick="mailComposeOpen()"><i class="fi fi-sr-pencil" style="font-size:13px;line-height:1;pointer-events:none;"></i> Redactar</button>
                 <button class="btn btn-outline" type="button" onclick="mailSettingsOpen()"><i class="fi fi-sr-settings" style="font-size:13px;line-height:1;pointer-events:none;"></i> Cuentas</button>
+                <button class="btn btn-outline" type="button" onclick="mailTestPush()" title="Solicita permiso de notificaciones y envía una notificación de prueba"><i class="fi fi-sr-bell" style="font-size:13px;line-height:1;pointer-events:none;"></i> Probar notificación</button>
+                <label class="mail-switch" id="mailDemoWrap" style="display:none;" title="Mostrar datos de demostración en lugar del servidor de correo real">
+                  <input type="checkbox" id="mailDemoToggle" onchange="mailToggleDemo()">
+                  <span class="mail-switch-track"></span>
+                  <span id="mailDemoLabel">Demo OFF</span>
+                </label>
                 <span class="spacer"></span>
                 <span id="mailStatus" style="font-size:12px;color:var(--color-text-secondary);"></span>
               </div>
@@ -119,11 +170,14 @@
           </header>
 
           <div class="module-content">
-            <div class="tool-section active" id="tool-inicio">
-              <div class="empty-state">
-                <div style="font-size:32px;font-weight:700;color:var(--module-chatfiat);">Mensajería</div>
-                <p style="margin-top:8px;color:var(--color-text-secondary);">La red social interna.</p>
-                <p style="margin-top:4px;font-size:12px;color:#999;">Aquí construiremos las herramientas de publicación y comunidad.</p>
+            <div class="tool-section active" id="tool-agenda">
+              <div class="agenda-view">
+                <div class="agenda-bar">
+                  <input type="text" class="form-input" id="search_contact_field" name="search_contact_field" placeholder="Buscar contacto por nombre o teléfono..." autocomplete="one-time-code" spellcheck="false" data-lpignore="true" data-1p-ignore oninput="agRender()">
+                  <span class="ag-count" id="agCount"></span>
+                  <button class="btn btn-outline" type="button" onclick="agOpenModal()"><i class="fi fi-sr-add" style="font-size:13px;pointer-events:none;"></i> Nuevo contacto</button>
+                </div>
+                <div class="agenda-grid" id="agGrid"></div>
               </div>
             </div>
 
@@ -132,11 +186,12 @@
                 <div style="font-size:28px;font-weight:700;color:var(--module-chatfiat);">Correo electrónico</div>
                 <p style="margin-top:8px;">Aún no hay cuentas de correo configuradas.</p>
                 <p style="font-size:12px;color:#999;">Agrega una cuenta IMAP/SMTP (cPanel, Gmail, etc.) para comenzar.</p>
+                <p style="display:none;margin-top:4px;font-size:12px;color:#999;" id="mailDemoHint">¿Administrador? Enciende el interruptor <b>Demo</b> (arriba) para ver datos de ejemplo. Requiere el servidor de demo en el puerto 4001: <code>npm run servers</code> en la carpeta <code>email-server</code>. Si el interruptor está apagado, se usa el servidor real (puerto 4000) y su lista de cuentas está vacía.</p>
                 <button class="btn btn-outline" style="margin-top:16px;" type="button" onclick="mailSettingsOpen()">Configurar cuenta</button>
               </div>
               <div class="mail-app" id="mailApp" style="display:none;">
                 <div class="mail-pane mail-folders">
-                  <div class="mail-pane-head">Bandejas <button class="btn btn-outline" style="padding:2px 8px;font-size:11px;" type="button" onclick="mailRefresh()">⟳</button></div>
+                  <div class="mail-pane-head">Bandejas <button class="btn btn-outline mail-btn-icon" style="height:24px;width:28px;" type="button" onclick="mailRefresh()" title="Actualizar"><i class="fi fi-sr-refresh mail-refresh-icon" style="font-size:12px;line-height:1;pointer-events:none;"></i></button></div>
                   <div class="mail-scroll" id="mailFolders"></div>
                 </div>
                 <div class="mail-pane mail-list">
@@ -217,6 +272,14 @@
         <div class="form-group"><label>Usuario (correo completo) *</label><input type="text" class="form-input" id="accUser" placeholder="usuario@tudominio.com"></div>
         <div class="form-group"><label>Contraseña *</label><input type="password" class="form-input" id="accPass" placeholder="••••••••"></div>
         <div class="form-group"><label>Nombre que aparecerá en "De"</label><input type="text" class="form-input" id="accFromName" placeholder="Recursos Humanos"></div>
+        <div class="form-group"><label>Firma del correo</label><textarea class="form-input" id="accSignature" rows="4" placeholder="Atentamente,&#10;Nombre Apellido&#10;Cargo | Empresa&#10;Teléfono | Web"></textarea><div class="mail-hint" style="padding:4px 0 0;">Se agrega automáticamente al final de los correos que envíes.</div></div>
+        <div class="form-group" id="accSharedWrap" style="display:none;">
+          <label class="mail-switch" title="Una cuenta compartida es visible y editable por todos. Las privadas solo las ve y modifica su dueño.">
+            <input type="checkbox" id="accShared" onchange="mailUpdateSharedLabel()">
+            <span class="mail-switch-track"></span>
+            <span id="accSharedLabel">Cuenta privada (solo tú)</span>
+          </label>
+        </div>
         <div class="mail-hint" id="mailSettingsMsg"></div>
       </div>
       <div class="modal-footer">
@@ -227,16 +290,94 @@
     </div>
   </div>
 
+  <!-- Modal: Contacto -->
+  <div class="modal-overlay" id="agModal">
+    <div class="modal" style="max-width:560px;">
+      <div class="modal-header">
+        <h3 id="agModalTitle">Nuevo contacto</h3>
+        <button class="modal-close" type="button" onclick="agCloseModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="ag-form-grid">
+          <div class="form-group"><label>Nombres *</label><input type="text" class="form-input" id="agFNombre" placeholder="Juan"></div>
+          <div class="form-group"><label>Apellidos</label><input type="text" class="form-input" id="agFApellidos" placeholder="Pérez"></div>
+          <div class="form-group"><label>Teléfono</label><input type="text" class="form-input" id="agFTelefono" placeholder="0412-555-0000"></div>
+          <div class="form-group"><label>Correo</label><input type="text" class="form-input" id="agFCorreo" placeholder="correo@dominio.com"></div>
+          <div class="form-group"><label>Etiqueta</label>
+            <select class="form-input" id="agFEtiqueta">
+              <option value="Proveedor">Proveedor</option>
+              <option value="Cliente">Cliente</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Instagram</label><input type="text" class="form-input" id="agFInsta" placeholder="@usuario o enlace"></div>
+          <div class="form-group"><label>Facebook</label><input type="text" class="form-input" id="agFFace" placeholder="usuario o enlace"></div>
+          <div class="form-group"><label>Otras redes</label><input type="text" class="form-input" id="agFOtras" placeholder="https://tiktok.com/..., separa con comas"></div>
+        </div>
+        <div class="mail-hint" id="agModalMsg"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" type="button" onclick="agCloseModal()">Cancelar</button>
+        <span style="flex:1;"></span>
+        <button class="btn" type="button" onclick="agSaveModal()">Guardar contacto</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../js/supabase-config.js"></script>
   <script src="../js/ui.js"></script>
   <script src="../js/auth.js"></script>
   <script src="../js/modules.js"></script>
+  <script src="../js/pwa.js"></script>
 
   <script>
     /* ===== Webmail (IMAP/SMTP) ===== */
-    var MAIL_API = 'http://localhost:4000/api'; /* En producción apuntar a la URL del servidor de correo */
-    var mailState = { accounts: [], accountId: '', mailbox: 'INBOX', page: 1, per: 40, q: '', total: 0, messages: [], openUid: null, attachFiles: [] };
+    var MAIL_API_REAL = 'http://localhost:4000/api'; /* Servidor real de correo */
+    var MAIL_API_DEMO = 'http://localhost:4001/api'; /* Servidor con datos de demostración */
+    var mailState = {
+      accounts: [], accountId: '', mailbox: 'INBOX', page: 1, per: 40, q: '', total: 0, messages: [], openUid: null, attachFiles: [], owner: '',
+      demo: (function () {
+        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+          if (location.port === '4001') return true;
+          var saved = null;
+          try { saved = localStorage.getItem('fiat_mail_demo'); } catch (e) {}
+          if (saved !== null) return saved === '1';
+        }
+        return false;
+      })()
+    };
+
+    function mailApiBase() {
+      return mailState.demo ? MAIL_API_DEMO : MAIL_API_REAL;
+    }
+    function mailToggleDemo() {
+      mailState.demo = !mailState.demo;
+      try { localStorage.setItem('fiat_mail_demo', mailState.demo ? '1' : '0'); } catch (e) {}
+      mailRenderDemoToggle();
+      mailInit();
+    }
+    function mailRenderDemoToggle() {
+      var c = document.getElementById('mailDemoToggle');
+      var l = document.getElementById('mailDemoLabel');
+      if (c) c.checked = !!mailState.demo;
+      if (l) l.textContent = 'Demo ' + (mailState.demo ? 'ON' : 'OFF');
+    }
+    function mailShowDemoToggleIfAdmin() {
+      var wrap = document.getElementById('mailDemoWrap');
+      if (!wrap) return;
+      var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+      var fa = window.fiatAccess;
+      var isAdmin = !!(fa && fa.state && fa.state.isAdmin);
+      if (!isLocal || !isAdmin) {
+        var notReady = fa && fa.state && !fa.state.ready && !fa.state.isAdmin && !(typeof demoPreviewMode === 'function' && demoPreviewMode());
+        wrap.style.display = 'none';
+        if (isLocal && notReady) setTimeout(mailShowDemoToggleIfAdmin, 250);
+        return;
+      }
+      wrap.style.display = '';
+      mailRenderDemoToggle();
+    }
 
     function mailEscape(s) {
       return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -258,8 +399,27 @@
       var el = document.getElementById('mailStatus');
       if (el) { el.textContent = msg || ''; el.style.color = err ? '#dc2626' : 'var(--color-text-secondary)'; }
     }
+    function mailTestPush() {
+      if (!window.fiatPush) { mailStatus('Notificaciones no disponibles en este navegador.', true); return; }
+      mailStatus('Enviando notificación de prueba...');
+      window.fiatPush.test().then(function () {
+        mailStatus('Notificación de prueba enviada. Revisa tu equipo.');
+        setTimeout(function () { mailStatus(''); }, 4000);
+      }).catch(function (e) {
+        mailStatus(e.message || 'No se pudo enviar la notificación.', true);
+      });
+    }
+    function mailShowDemoHint() {
+      if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+        var h = document.getElementById('mailDemoHint');
+        if (h) h.style.display = '';
+      }
+    }
     async function mailFetch(url, opts) {
-      var res = await fetch(MAIL_API + url, opts);
+      opts = opts || {};
+      opts.headers = Object.assign({}, opts.headers);
+      if (mailState.owner) opts.headers['x-owner-email'] = mailState.owner;
+      var res = await fetch(mailApiBase() + url, opts);
       if (!res.ok) {
         var msg = 'Error ' + res.status;
         try { var j = await res.json(); msg = j.error || msg; } catch (e) {}
@@ -268,7 +428,30 @@
       return res.json();
     }
 
+    function mailResolveOwner() {
+      if (mailState.owner) return Promise.resolve();
+      var fa = window.fiatAccess;
+      if (fa && fa.state && fa.state.worker && fa.state.worker.correo) {
+        mailState.owner = String(fa.state.worker.correo).trim().toLowerCase();
+        return Promise.resolve();
+      }
+      if (window.supabaseClient) {
+        return supabaseClient.auth.getSession().then(function (res) {
+          var s = res.data && res.data.session;
+          if (s && s.user && s.user.email) mailState.owner = String(s.user.email).trim().toLowerCase();
+        }).catch(function () {});
+      }
+      return Promise.resolve();
+    }
+
     function mailInit() {
+      mailShowDemoToggleIfAdmin();
+      mailRenderDemoToggle();
+      mailResolveOwner().then(function () {
+        mailInitAccounts();
+      });
+    }
+    function mailInitAccounts() {
       mailFetch('/accounts').then(function (accs) {
         mailState.accounts = accs;
         mailRenderAccountSelect();
@@ -282,11 +465,16 @@
         } else {
           document.getElementById('mailApp').style.display = 'none';
           document.getElementById('mailEmpty').style.display = 'block';
+          mailShowDemoHint();
         }
       }).catch(function (e) {
-        mailStatus('Servidor de correo no disponible: ' + e.message, true);
+        var hint = mailState.demo
+          ? 'Modo demo activado pero el servidor de demo (4001) no responde. Ejecuta: npm run servers en la carpeta email-server.'
+          : 'Servidor de correo real (4000) no disponible. Ejecuta: npm run servers en la carpeta email-server.';
+        mailStatus(hint, true);
         document.getElementById('mailApp').style.display = 'none';
         document.getElementById('mailEmpty').style.display = 'block';
+        mailShowDemoHint();
       });
     }
 
@@ -307,18 +495,29 @@
       mailLoadMailboxes();
     }
 
+    function mailFolderIcon(name, path) {
+      var n = String(name || '').toLowerCase();
+      if (path === 'INBOX' || n === 'inbox' || n === 'bandeja de entrada') return 'fi-sr-inbox';
+      if (n.indexOf('enviad') !== -1 || n === 'sent' || n === 'sent items') return 'fi-sr-paper-plane';
+      if (n.indexOf('borrad') !== -1 || n === 'drafts') return 'fi-sr-file-edit';
+      if (n.indexOf('papelera') !== -1 || n.indexOf('elimin') !== -1 || n === 'trash' || n === 'deleted items' || n === 'deleted') return 'fi-sr-trash';
+      if (n.indexOf('spam') !== -1 || n.indexOf('no deseado') !== -1 || n === 'junk') return 'fi-sr-ban';
+      if (n.indexOf('archiv') !== -1 || n === 'archive' || n === 'all mail') return 'fi-sr-archive';
+      return 'fi-sr-folder';
+    }
+
     function mailLoadMailboxes() {
-      mailFetch('/mailboxes' + '?account=' + encodeURIComponent(mailState.accountId)).then(function (boxes) {
+      return mailFetch('/mailboxes' + '?account=' + encodeURIComponent(mailState.accountId)).then(function (boxes) {
         mailState.mailboxes = boxes;
         var el = document.getElementById('mailFolders');
         el.innerHTML = boxes.map(function (b) {
-          var icon = b.path === 'INBOX' ? '📥' : (b.name && b.name.toLowerCase() === 'enviados' ? '📤' : '📁');
+          var icon = '<i class="fi ' + mailFolderIcon(b.name, b.path) + '" style="font-size:14px;pointer-events:none;flex-shrink:0;"></i>';
           return '<div class="mail-folder' + (b.path === mailState.mailbox ? ' active' : '') + '" onclick="mailOpenFolder(' + JSON.stringify(b.path).replace(/"/g, '&quot;') + ')">' +
-            '<span>' + icon + ' ' + mailEscape(b.name || b.path) + '</span>' +
+            '<span style="display:flex;align-items:center;gap:6px;min-width:0;">' + icon + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + mailEscape(b.name || b.path) + '</span></span>' +
             (b.unseen ? '<span class="mail-unseen">' + b.unseen + '</span>' : '') + '</div>';
         }).join('') || '<div class="mail-loading">Sin bandejas</div>';
-        mailLoadMessages();
-      }).catch(function (e) { mailStatus(e.message, true); });
+        return mailLoadMessages();
+      }).catch(function (e) { mailStatus(e.message, true); return false; });
     }
     function mailOpenFolder(path) {
       mailState.mailbox = path;
@@ -339,7 +538,28 @@
       mailState.page = 1;
       mailLoadMessages();
     }
-    function mailRefresh() { mailLoadMailboxes(); }
+    var mailRefreshSeq = 0;
+    function mailRefresh() {
+      var icons = document.querySelectorAll('.mail-refresh-icon');
+      var seq = ++mailRefreshSeq;
+      var t0 = Date.now();
+      icons.forEach(function (i) { i.classList.add('mail-spin'); });
+      Promise.resolve(mailLoadMailboxes()).then(function (ok) {
+        if (seq !== mailRefreshSeq) return;
+        var wait = Math.max(0, 600 - (Date.now() - t0));
+        setTimeout(function () {
+          icons.forEach(function (i) { i.classList.remove('mail-spin'); });
+          if (ok) {
+            ['mailFolders', 'mailList'].forEach(function (id) {
+              var el = document.getElementById(id);
+              if (el) { el.classList.add('mail-flash'); setTimeout(function () { el.classList.remove('mail-flash'); }, 1000); }
+            });
+            mailStatus('Actualizado');
+            setTimeout(function () { mailStatus(''); }, 1500);
+          }
+        }, wait);
+      });
+    }
 
     function mailLoadMessages() {
       var list = document.getElementById('mailList');
@@ -348,7 +568,7 @@
         '&mailbox=' + encodeURIComponent(mailState.mailbox) +
         '&page=' + mailState.page + '&per=' + mailState.per +
         (mailState.q ? '&q=' + encodeURIComponent(mailState.q) : '');
-      mailFetch(url).then(function (data) {
+      return mailFetch(url).then(function (data) {
         mailState.messages = data.items;
         mailState.total = data.total;
         list.innerHTML = data.items.map(function (m) {
@@ -360,9 +580,11 @@
         var pages = Math.max(1, Math.ceil(mailState.total / mailState.per));
         document.getElementById('mailPageInfo').textContent = mailState.page + ' / ' + pages + ' (' + mailState.total + ' msgs)';
         mailStatus('');
+        return true;
       }).catch(function (e) {
         list.innerHTML = '<div class="mail-loading" style="color:#dc2626;">' + mailEscape(e.message) + '</div>';
         mailStatus(e.message, true);
+        return false;
       });
     }
 
@@ -402,7 +624,7 @@
       return n + ' B';
     }
     function mailDownload(uid, index) {
-      window.open(MAIL_API + '/messages/' + uid + '/attachment/' + index + mailH(uid), '_blank');
+      window.open(mailApiBase() + '/messages/' + uid + '/attachment/' + index + mailH(uid), '_blank');
     }
     function mailToggleFlag() {
       if (!mailState.openUid) return;
@@ -474,7 +696,7 @@
       fd.append('html', '<div style="font-family:inherit;font-size:14px;line-height:1.6;white-space:pre-wrap;">' + mailEscape(text).replace(/\n/g, '<br>') + '</div>');
       var input = document.getElementById('mailComposeFiles');
       for (var i = 0; i < input.files.length; i++) fd.append('attachments', input.files[i]);
-      fetch(MAIL_API + '/send', { method: 'POST', body: fd })
+      fetch(mailApiBase() + '/send', { method: 'POST', body: fd })
         .then(function (res) { if (!res.ok) return res.json().then(function (j) { throw new Error(j.error || 'Error'); }); return res.json(); })
         .then(function () {
           msg.textContent = 'Enviado correctamente.';
@@ -484,8 +706,18 @@
     }
 
     /* Cuentas */
+    function mailIsAdmin() {
+      var fa = window.fiatAccess;
+      return !!(fa && fa.state && fa.state.isAdmin);
+    }
+    function mailCanManageAccount(a) {
+      if (!a.owner) return mailIsAdmin() || !mailState.owner;
+      return mailState.owner && String(a.owner).toLowerCase() === mailState.owner;
+    }
     function mailSettingsOpen() {
       mailRenderSettingsList();
+      var sharedWrap = document.getElementById('accSharedWrap');
+      if (sharedWrap) sharedWrap.style.display = mailIsAdmin() ? '' : 'none';
       document.getElementById('mailSettingsMsg').textContent = '';
       document.getElementById('mailSettingsModal').classList.add('show');
     }
@@ -496,14 +728,19 @@
       var el = document.getElementById('mailSettingsList');
       if (!mailState.accounts.length) { el.innerHTML = '<div class="mail-hint">Sin cuentas configuradas.</div>'; return; }
       el.innerHTML = mailState.accounts.map(function (a) {
+        var tag = a.owner
+          ? '<span class="mail-hint" style="font-size:11px;padding:0;color:#475569;">tuya</span>'
+          : '<span class="mail-hint" style="font-size:11px;padding:0;color:#0d9488;">compartida</span>';
+        var btnEdit = mailCanManageAccount(a) ? '<button class="btn btn-outline" style="padding:2px 10px;font-size:12px;" type="button" onclick="mailEditAccount(\'' + a.id + '\')">Editar</button>' : '';
+        var btnDel = mailCanManageAccount(a) ? '<button class="btn btn-outline" style="padding:2px 10px;font-size:12px;color:#dc2626;" type="button" onclick="mailDeleteAccount(\'' + a.id + '\')">Eliminar</button>' : '';
         return '<div class="mail-hint" style="display:flex;align-items:center;gap:10px;">' +
-          '<span style="flex:1;"><strong>' + mailEscape(a.name || a.user) + '</strong> · ' + mailEscape(a.user) + '</span>' +
-          '<button class="btn btn-outline" style="padding:2px 10px;font-size:12px;" type="button" onclick="mailEditAccount(\'' + a.id + '\')">Editar</button>' +
-          '<button class="btn btn-outline" style="padding:2px 10px;font-size:12px;color:#dc2626;" type="button" onclick="mailDeleteAccount(\'' + a.id + '\')">Eliminar</button>' +
+          '<span style="flex:1;"><strong>' + mailEscape(a.name || a.user) + '</strong> · ' + mailEscape(a.user) + ' ' + tag + '</span>' +
+          btnEdit + btnDel +
           '</div>';
       }).join('');
     }
     function mailFormAccount() {
+      var shared = document.getElementById('accShared') && document.getElementById('accShared').checked;
       return {
         name: document.getElementById('accName').value.trim(),
         imapHost: document.getElementById('accImapHost').value.trim(),
@@ -512,7 +749,9 @@
         smtpPort: document.getElementById('accSmtpPort').value,
         user: document.getElementById('accUser').value.trim(),
         pass: document.getElementById('accPass').value,
-        fromName: document.getElementById('accFromName').value.trim()
+        fromName: document.getElementById('accFromName').value.trim(),
+        signature: document.getElementById('accSignature').value.trim(),
+        shared: shared
       };
     }
     function mailSaveAccount() {
@@ -530,12 +769,13 @@
           if (!mailState.accountId) mailState.accountId = accs[0] ? String(accs[0].id) : '';
           mailRenderAccountSelect();
           mailRenderSettingsList();
-          mailInit();
+          mailInitAccounts();
         }).catch(function (e) { document.getElementById('mailSettingsMsg').textContent = e.message; });
     }
     function mailEditAccount(id) {
       var a = mailState.accounts.filter(function (x) { return String(x.id) === String(id); })[0];
       if (!a) return;
+      if (!mailCanManageAccount(a)) { document.getElementById('mailSettingsMsg').textContent = 'No puedes modificar esta cuenta.'; return; }
       document.getElementById('mailEditingId').value = id;
       document.getElementById('accName').value = a.name || '';
       document.getElementById('accImapHost').value = a.imapHost || '';
@@ -545,15 +785,28 @@
       document.getElementById('accUser').value = a.user || '';
       document.getElementById('accPass').value = '';
       document.getElementById('accFromName').value = a.fromName || '';
+      document.getElementById('accSignature').value = a.signature || '';
+      var shared = document.getElementById('accShared');
+      if (shared) shared.checked = !a.owner;
+      mailUpdateSharedLabel();
+    }
+    function mailUpdateSharedLabel() {
+      var c = document.getElementById('accShared');
+      var l = document.getElementById('accSharedLabel');
+      if (!c) return;
+      if (l) l.textContent = c.checked ? 'Cuenta compartida (visible para todos)' : 'Cuenta privada (solo tú)';
     }
     function mailDeleteAccount(id) {
+      var a = mailState.accounts.filter(function (x) { return String(x.id) === String(id); })[0];
+      if (!a) { return; }
+      if (!mailCanManageAccount(a)) { document.getElementById('mailSettingsMsg').textContent = 'No puedes eliminar esta cuenta.'; return; }
       if (!confirm('¿Eliminar esta cuenta?')) return;
       mailFetch('/accounts/' + id, { method: 'DELETE' }).then(function () {
         mailState.accounts = mailState.accounts.filter(function (x) { return String(x.id) !== String(id); });
         if (String(mailState.accountId) === String(id)) mailState.accountId = '';
         mailRenderAccountSelect();
         mailRenderSettingsList();
-        mailInit();
+        mailInitAccounts();
       }).catch(function (e) { document.getElementById('mailSettingsMsg').textContent = e.message; });
     }
     function mailTestAccount() {
@@ -574,6 +827,206 @@
       }
     }
 
+    /* Agenda de contactos (Supabase) */
+    var agState = { contacts: [], editingId: null, init: false, error: null };
+    function agEsc(v) {
+      return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function agEtiqueta(et) {
+      var e = (et || 'Otro').toLowerCase();
+      var cls = e === 'proveedor' ? 'proveedor' : (e === 'cliente' ? 'cliente' : 'otro');
+      var lbl = e === 'proveedor' ? 'Proveedor' : (e === 'cliente' ? 'Cliente' : 'Otro');
+      return '<span class="ag-tag ' + cls + '">' + lbl + '</span>';
+    }
+    function agInitials(c) {
+      return (((c.nombre || '?').charAt(0) || '') + ((c.apellidos || '').charAt(0) || '')).toUpperCase();
+    }
+    function agWaNum(tel) {
+      var d = String(tel || '').replace(/\D/g, '');
+      if (!d) return '';
+      if (d.charAt(0) === '0') d = '58' + d.slice(1);
+      return d;
+    }
+    function agPhoneLink(tel) {
+      var d = String(tel || '').replace(/\D/g, '');
+      return d ? 'tel:' + d : '#';
+    }
+    function agSocialUrl(val, net) {
+      var v = String(val || '').trim();
+      if (!v) return '';
+      if (/^https?:\/\//i.test(v)) return v;
+      v = v.replace(/^@/, '');
+      return (net === 'ig' ? 'https://instagram.com/' : 'https://facebook.com/') + v;
+    }
+    function agOtherLinks(txt) {
+      if (!txt) return '';
+      return String(txt).split(/[\n,]/).map(function (l) {
+        l = l.trim();
+        if (!l) return '';
+        var url = /^https?:\/\//i.test(l) ? l : 'https://' + l;
+        return '<a href="' + agEsc(url) + '" target="_blank" rel="noopener" title="' + agEsc(l) + '">' + agEsc(l) + '</a>';
+      }).filter(Boolean).join('<span class="ag-sep">·</span>');
+    }
+    async function agLoad() {
+      agState.error = null;
+      var grid = document.getElementById('agGrid');
+      if (grid) grid.innerHTML = '<div class="ag-empty">Cargando contactos...</div>';
+      try {
+        var res = await supabaseClient
+          .from('agenda_contactos')
+          .select('*')
+          .order('nombre', { ascending: true })
+          .order('apellidos', { ascending: true });
+        if (res.error) throw res.error;
+        agState.contacts = res.data || [];
+      } catch (e) {
+        agState.contacts = [];
+        agState.error = 'No se pudieron cargar los contactos: ' + (e.message || e);
+      }
+      agRender();
+    }
+    function agRender() {
+      var q = (document.getElementById('search_contact_field').value || '').toLowerCase().trim();
+      var list = agState.contacts.filter(function (c) {
+        if (!q) return true;
+        return (c.nombre + ' ' + (c.apellidos || '') + ' ' + (c.telefono || '') + ' ' + (c.correo || '') + ' ' + (c.etiqueta || '')).toLowerCase().indexOf(q) !== -1;
+      });
+      document.getElementById('agCount').textContent = agState.contacts.length + ' contacto' + (agState.contacts.length === 1 ? '' : 's');
+      var grid = document.getElementById('agGrid');
+      if (agState.error) {
+        grid.innerHTML = '<div class="ag-empty" style="color:#dc2626;">' + agEsc(agState.error) + '</div>';
+        return;
+      }
+      if (!list.length) {
+        grid.innerHTML = '<div class="ag-empty">' + (q ? 'Sin resultados para "' + agEsc(q) + '".' : 'Aún no hay contactos. Pulsa "Nuevo contacto" para empezar.') + '</div>';
+        return;
+      }
+      grid.innerHTML = list.map(function (c) {
+        var ig = agSocialUrl(c.instagram, 'ig');
+        var fb = agSocialUrl(c.facebook, 'fb');
+        return '<div class="ag-card">' +
+          '<div class="ag-card-top">' +
+            '<div class="ag-avatar">' + agEsc(agInitials(c)) + '</div>' +
+            '<div style="flex:1;min-width:0;">' +
+              '<div class="ag-name">' + agEsc(c.nombre || '') + '</div>' +
+              '<div class="ag-subname">' + agEsc(c.apellidos || '') + '</div>' +
+              agEtiqueta(c.etiqueta) +
+            '</div>' +
+            '<div class="ag-edit-del">' +
+              '<button class="btn btn-outline" type="button" onclick="agOpenModal(\'' + c.id + '\')" title="Editar"><i class="fi fi-sr-edit" style="font-size:12px;pointer-events:none;"></i></button>' +
+              '<button class="btn btn-outline" type="button" onclick="agDelete(\'' + c.id + '\')" title="Eliminar"><i class="fi fi-sr-trash" style="font-size:12px;pointer-events:none;color:#dc2626;"></i></button>' +
+            '</div>' +
+          '</div>' +
+          (c.telefono ? '<div class="ag-line"><span class="lbl">Teléfono</span><a href="' + agPhoneLink(c.telefono) + '">' + agEsc(c.telefono) + '</a></div>' : '') +
+          (c.correo ? '<div class="ag-line"><span class="lbl">Correo</span><a href="mailto:' + agEsc(c.correo) + '">' + agEsc(c.correo) + '</a></div>' : '') +
+          ((ig || fb) ? '<div class="ag-line"><span class="lbl">Redes</span><span class="ag-socials">' +
+            (ig ? '<a href="' + agEsc(ig) + '" target="_blank" rel="noopener">Instagram</a>' : '') +
+            (fb ? '<a href="' + agEsc(fb) + '" target="_blank" rel="noopener">Facebook</a>' : '') +
+          '</span></div>' : '') +
+          (c.otras ? '<div class="ag-line"><span class="lbl">Otras</span><span class="ag-other">' + agOtherLinks(c.otras) + '</span></div>' : '') +
+          '<div class="ag-actions">' +
+            (c.correo ? '<button class="btn" type="button" onclick="agWriteMail(' + agEsc(JSON.stringify(c.correo)) + ')" title="Escribir correo"><i class="fi fi-sr-envelope" style="font-size:12px;pointer-events:none;"></i> Correo</button>' : '') +
+            (agWaNum(c.telefono) ? '<button class="btn ag-wa" type="button" onclick="window.open(\'https://wa.me/' + agWaNum(c.telefono) + '\', \'_blank\')">WhatsApp</button>' : '') +
+            (c.telefono ? '<button class="btn btn-outline" type="button" onclick="agCopyPhone(this, ' + agEsc(JSON.stringify(c.telefono)) + ')"><i class="fi fi-sr-copy" style="font-size:12px;pointer-events:none;"></i> Copiar</button>' : '') +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+    function agWriteMail(email) {
+      if (typeof switchTool === 'function') switchTool('mensajes');
+      setTimeout(function () {
+        if (typeof mailComposeOpen === 'function') mailComposeOpen({ to: email });
+      }, 80);
+    }
+    function agCopyPhone(btn, tel) {
+      var done = function () {
+        var old = btn.innerHTML;
+        btn.innerHTML = '¡Copiado!';
+        btn.classList.add('ag-copied');
+        setTimeout(function () { btn.innerHTML = old; btn.classList.remove('ag-copied'); }, 1400);
+      };
+      var fallback = function () {
+        var ta = document.createElement('textarea');
+        ta.value = tel;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) {}
+        document.body.removeChild(ta);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(tel).then(done).catch(fallback);
+      } else { fallback(); }
+    }
+    function agOpenModal(id) {
+      agState.editingId = id || null;
+      var c = id ? agState.contacts.filter(function (x) { return String(x.id) === String(id); })[0] : null;
+      document.getElementById('agModalTitle').textContent = c ? 'Editar contacto' : 'Nuevo contacto';
+      document.getElementById('agFNombre').value = c ? (c.nombre || '') : '';
+      document.getElementById('agFApellidos').value = c ? (c.apellidos || '') : '';
+      document.getElementById('agFTelefono').value = c ? (c.telefono || '') : '';
+      document.getElementById('agFCorreo').value = c ? (c.correo || '') : '';
+      document.getElementById('agFEtiqueta').value = c ? (c.etiqueta || 'Otro') : 'Otro';
+      document.getElementById('agFInsta').value = c ? (c.instagram || '') : '';
+      document.getElementById('agFFace').value = c ? (c.facebook || '') : '';
+      document.getElementById('agFOtras').value = c ? (c.otras || '') : '';
+      document.getElementById('agModalMsg').textContent = '';
+      document.getElementById('agModal').classList.add('show');
+    }
+    function agCloseModal() {
+      document.getElementById('agModal').classList.remove('show');
+    }
+    async function agSaveModal() {
+      var nombre = document.getElementById('agFNombre').value.trim();
+      if (!nombre) { document.getElementById('agModalMsg').textContent = 'Indica el nombre del contacto.'; return; }
+      var msg = document.getElementById('agModalMsg');
+      var data = {
+        nombre: nombre,
+        apellidos: document.getElementById('agFApellidos').value.trim(),
+        telefono: document.getElementById('agFTelefono').value.trim(),
+        correo: document.getElementById('agFCorreo').value.trim(),
+        etiqueta: document.getElementById('agFEtiqueta').value || 'Otro',
+        instagram: document.getElementById('agFInsta').value.trim(),
+        facebook: document.getElementById('agFFace').value.trim(),
+        otras: document.getElementById('agFOtras').value.trim()
+      };
+      msg.textContent = 'Guardando...';
+      try {
+        if (agState.editingId) {
+          var upd = await supabaseClient.from('agenda_contactos').update(data).eq('id', agState.editingId);
+          if (upd.error) throw upd.error;
+        } else {
+          var ins = await supabaseClient.from('agenda_contactos').insert([data]);
+          if (ins.error) throw ins.error;
+        }
+        agCloseModal();
+        await agLoad();
+      } catch (e) {
+        msg.textContent = 'Error al guardar: ' + (e.message || e);
+      }
+    }
+    async function agDelete(id) {
+      var c = agState.contacts.filter(function (x) { return String(x.id) === String(id); })[0];
+      if (!c) return;
+      if (!confirm('¿Eliminar a ' + ((c.nombre || '') + ' ' + (c.apellidos || '')).trim() + '?')) return;
+      try {
+        var res = await supabaseClient.from('agenda_contactos').delete().eq('id', c.id);
+        if (res.error) throw res.error;
+        await agLoad();
+      } catch (e) {
+        alert('Error al eliminar: ' + (e.message || e));
+      }
+    }
+    function agInit() {
+      if (agState.init) return;
+      agState.init = true;
+      var el = document.getElementById('search_contact_field');
+      if (el) el.value = '';
+      setTimeout(function () { if (el) el.value = ''; }, 500);
+      agLoad();
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
       document.getElementById('mailEditingId') || (function () {
         var h = document.createElement('input');
@@ -585,8 +1038,16 @@
       var orig = window.switchTool;
       window.switchTool = function (name) {
         if (orig) orig(name);
-        if (name === 'mensajes') mailInit();
+        if (name === 'agenda') agInit();
+        if (name === 'mensajes') {
+          mailShowDemoToggleIfAdmin();
+          mailInit();
+        }
       };
+      setTimeout(function () {
+        agInit();
+        if (typeof restoreTool === 'function') restoreTool();
+      }, 0);
     });
   </script>
   <script src="../js/module-help.js"></script>

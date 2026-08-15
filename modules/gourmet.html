@@ -105,10 +105,29 @@
       flex-direction: column;
       gap: 6px;
     }
+    .cat-card .cat-foto {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: var(--color-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-secondary);
+      font-size: 34px;
+    }
+    .cat-card .cat-foto img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
     .cat-card .cat-nombre {
       font-weight: 700;
       font-size: 14px;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: 8px;
     }
@@ -117,10 +136,6 @@
       color: var(--color-text-secondary);
       line-height: 1.45;
       flex: 1;
-    }
-    .cat-card .cat-precio {
-      font-weight: 700;
-      color: var(--module-gourmet);
     }
     .cat-card .cat-acciones {
       display: flex;
@@ -197,7 +212,7 @@
           </div>
           <div class="panel-item" data-tool="recetario" onclick="switchTool('recetario')" title="Recetario"><span class="panel-item-indicator bg-gourmet"></span><i class="fi fi-sr-books" style="font-size:24px;pointer-events:none;"></i>
           </div>
-          <div class="panel-item" data-tool="catalogo" onclick="switchTool('catalogo')" title="Catálogo"><span class="panel-item-indicator bg-gourmet"></span><i class="fi fi-sr-restaurant" style="font-size:24px;pointer-events:none;"></i>
+          <div class="panel-item" data-tool="catalogo" onclick="switchTool('catalogo')" title="Menú del día"><span class="panel-item-indicator bg-gourmet"></span><i class="fi fi-sr-restaurant" style="font-size:24px;pointer-events:none;"></i>
           </div>
         </div>
 
@@ -294,7 +309,7 @@
               </div>
             </div>
 
-            <!-- Catálogo -->
+            <!-- Menú del día -->
             <div class="tool-section" id="tool-catalogo">
               <div id="catContainer"></div>
             </div>
@@ -425,7 +440,7 @@
     </div>
   </div>
 
-  <!-- Modal Catálogo -->
+  <!-- Modal Menú del día -->
   <div class="modal-overlay" id="modalCatalogo">
     <div class="modal" style="max-width:540px;">
       <div class="modal-header"><h3 id="catalogoModalTitle">Agregar plato</h3><button class="modal-close" onclick="closeModal('modalCatalogo')">&times;</button></div>
@@ -438,8 +453,13 @@
             </div>
           </div>
           <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="cat_descripcion" rows="3" placeholder="Descripción del plato..."></textarea></div>
+          <div class="form-group"><label>Foto del plato</label>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <img id="catFotoPreview" alt="Foto del plato" style="width:96px;height:96px;object-fit:cover;border-radius:var(--radius-sm);background:var(--color-bg);border:1px solid var(--color-border);">
+              <input type="file" class="form-input" id="cat_foto" accept="image/*" style="flex:1;min-width:180px;" onchange="catFotoPreview.src = this.files.length ? URL.createObjectURL(this.files[0]) : catFotoPreview.dataset.fallback || ''">
+            </div>
+          </div>
           <div class="form-row">
-            <div class="form-group"><label>Precio (Bs.)</label><input type="number" class="form-input" id="cat_precio" min="0" step="0.01" value="0"></div>
             <div class="form-group" style="display:flex;align-items:flex-end;padding-bottom:8px;"><label style="display:flex;align-items:center;gap:8px;font-weight:600;"><input type="checkbox" id="cat_disponible" checked> Disponible en la carta</label></div>
           </div>
         </form>
@@ -500,10 +520,6 @@
     function fmtNum(n) {
       var v = Number(n || 0);
       return v % 1 === 0 ? v.toLocaleString('es-VE') : v.toLocaleString('es-VE');
-    }
-
-    function fmtBs(n) {
-      return 'Bs. ' + Number(n || 0).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
     /* ===== EQUIPOS Y UTENSILIOS ===== */
@@ -940,14 +956,14 @@
       openModalReceta(recetaStockId);
     }
 
-    /* ===== CATÁLOGO ===== */
+    /* ===== MENÚ DEL DÍA ===== */
     async function loadCatalogo() {
       try {
         var r = await supabaseClient.from('gourmet_catalogo').select('*').order('categoria').order('nombre');
         if (r.error) throw r.error;
         catItems = r.data || [];
       } catch (err) {
-        showAlert('Error al cargar el catálogo: ' + err.message, 'error');
+        showAlert('Error al cargar el menú del día: ' + err.message, 'error');
         catItems = [];
       }
       renderCatalogo();
@@ -962,7 +978,7 @@
       });
       var cont = document.getElementById('catContainer');
       if (!list.length) {
-        cont.innerHTML = '<div class="empty-hint">No hay platos en el catálogo' + (cat ? ' para esta categoría' : '') + '</div>';
+        cont.innerHTML = '<div class="empty-hint">No hay platos en el menú del día' + (cat ? ' para esta categoría' : '') + '</div>';
         return;
       }
       var html = '';
@@ -974,9 +990,9 @@
           + '<div class="cat-grupo-titulo"><i class="fi fi-sr-restaurant"></i>' + c + '<span class="badge badge-active">' + disponibles + '/' + items.length + ' disponibles</span></div>'
           + '<div class="cat-grid">' + items.map(function (x) {
             return '<div class="cat-card">'
+              + '<div class="cat-foto">' + (x.imagen_url ? '<img src="' + x.imagen_url + '" alt="' + uiEscape(x.nombre) + '" loading="lazy">' : '<i class="fi fi-sr-restaurant"></i>') + '</div>'
               + '<div class="cat-nombre">' + uiEscape(x.nombre) + (x.disponible ? '<span class="badge badge-active">Disponible</span>' : '<span class="badge badge-inactive">No disponible</span>') + '</div>'
               + (x.descripcion ? '<div class="cat-desc">' + uiEscape(x.descripcion) + '</div>' : '')
-              + '<div class="cat-precio">' + fmtBs(x.precio) + '</div>'
               + '<div class="cat-acciones">'
               + '<button class="btn btn-sm btn-outline" onclick="openModalCatalogo(\'' + x.id + '\')">Editar</button> '
               + '<button class="btn btn-sm btn-outline" onclick="deleteCatalogo(\'' + x.id + '\')" style="color:#dc2626;">Eliminar</button>'
@@ -989,9 +1005,10 @@
     function openModalCatalogo(id) {
       catalogoEditId = null;
       document.getElementById('catalogoForm').reset();
-      document.getElementById('cat_precio').value = 0;
       document.getElementById('cat_disponible').checked = true;
       document.getElementById('catalogoModalTitle').textContent = 'Agregar plato';
+      var prevImg = document.getElementById('catFotoPreview');
+      var fallback = '';
       if (id) {
         var x = catItems.find(function (i) { return String(i.id) === String(id); });
         if (x) {
@@ -1000,10 +1017,12 @@
           document.getElementById('cat_nombre').value = x.nombre;
           document.getElementById('cat_categoria').value = x.categoria || 'Platos principales';
           document.getElementById('cat_descripcion').value = x.descripcion || '';
-          document.getElementById('cat_precio').value = x.precio;
           document.getElementById('cat_disponible').checked = !!x.disponible;
+          fallback = x.imagen_url || '';
         }
       }
+      if (fallback) prevImg.src = fallback; else prevImg.removeAttribute('src');
+      prevImg.dataset.fallback = fallback;
       openModal('modalCatalogo');
     }
 
@@ -1014,10 +1033,26 @@
         nombre: nombre,
         categoria: document.getElementById('cat_categoria').value,
         descripcion: document.getElementById('cat_descripcion').value.trim() || null,
-        precio: Number(document.getElementById('cat_precio').value) || 0,
         disponible: document.getElementById('cat_disponible').checked
       };
+      var fotoFile = document.getElementById('cat_foto').files && document.getElementById('cat_foto').files[0];
+      if (catalogoEditId) {
+        var prevItem = catItems.find(function (i) { return String(i.id) === String(catalogoEditId); });
+        if (prevItem && prevItem.imagen_url) payload.imagen_url = prevItem.imagen_url;
+      }
       try {
+        if (fotoFile) {
+          var ext = (fotoFile.name.split('.').pop() || 'jpg').toLowerCase();
+          var path = 'menu/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+          var { error: upErr } = await supabaseClient.storage
+            .from('gourmet-menu')
+            .upload(path, fotoFile, { upsert: true });
+          if (upErr) throw upErr;
+          var { data: pubData } = supabaseClient.storage
+            .from('gourmet-menu')
+            .getPublicUrl(path);
+          payload.imagen_url = pubData.publicUrl;
+        }
         var r;
         if (catalogoEditId) {
           r = await supabaseClient.from('gourmet_catalogo').update(payload).eq('id', catalogoEditId);
@@ -1034,7 +1069,7 @@
     }
 
     async function deleteCatalogo(id) {
-      if (!(await showConfirm('¿Eliminar este plato del catálogo?'))) return;
+      if (!(await showConfirm('¿Eliminar este plato del menú del día?'))) return;
       try {
         var r = await supabaseClient.from('gourmet_catalogo').delete().eq('id', id);
         if (r.error) throw r.error;

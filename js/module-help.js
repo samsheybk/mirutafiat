@@ -169,7 +169,7 @@
         { icon: 'fi-sr-utensils', name: 'Inventario de equipos y utensilios', desc: 'Registro y control de los equipos y utensilios del área gourmet con su cantidad, ubicación y estado de operatividad.' },
         { icon: 'fi-sr-boxes', name: 'Inventario de insumos', desc: 'Control de existencias de insumos con unidad de medida, stock mínimo y alertas de bajo stock, agotado o vencido.' },
         { icon: 'fi-sr-books', name: 'Recetario', desc: 'Recetas con ingredientes y cantidades, con validación automática de disponibilidad de stock para preparar cada plato.' },
-        { icon: 'fi-sr-restaurant', name: 'Catálogo', desc: 'Carta del menú organizada por categorías (entradas, platos principales, postres, bebidas) con precios y disponibilidad.' }
+        { icon: 'fi-sr-restaurant', name: 'Menú del día', desc: 'Carta del día organizada por categorías (entradas, platos principales, postres, bebidas) con foto, disponible como beneficio gratuito para los trabajadores.' }
       ]
     }
   };

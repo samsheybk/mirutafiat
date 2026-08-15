@@ -90,7 +90,7 @@
       { key: 'equipos', name: 'Inventario de equipos y utensilios' },
       { key: 'insumos', name: 'Inventario de insumos' },
       { key: 'recetario', name: 'Recetario' },
-      { key: 'catalogo', name: 'Catálogo' }
+      { key: 'catalogo', name: 'Menú del día' }
     ]}
   ];
 

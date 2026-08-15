@@ -35,6 +35,7 @@
   --module-oportunidades: #059669;
   --module-usuarios: #0ea5e9;
   --module-gourmet: #a16207;
+  --module-ti: #0e7490;
 }
 
 html, body {
@@ -713,6 +714,7 @@ a {
   .panel-item.active .panel-item-indicator.bg-oportunidades ~ i.fi { color: var(--module-oportunidades); }
   .panel-item.active .panel-item-indicator.bg-usuarios ~ i.fi { color: var(--module-usuarios); }
   .panel-item.active .panel-item-indicator.bg-gourmet ~ i.fi { color: var(--module-gourmet); }
+  .panel-item.active .panel-item-indicator.bg-ti ~ i.fi { color: var(--module-ti); }
 .panel-item-indicator {
   position: absolute;
   top: 0;
@@ -1243,6 +1245,7 @@ a {
 .btn-oportunidades { background: var(--module-oportunidades); }
 .btn-usuarios { background: var(--module-usuarios); }
 .btn-gourmet { background: var(--module-gourmet); }
+.btn-ti { background: var(--module-ti); }
 
 .border-captacion { border-color: var(--module-captacion); }
 .border-relaciones { border-color: var(--module-relaciones); }
@@ -1286,6 +1289,7 @@ a {
 .bg-oportunidades { background: var(--module-oportunidades); }
 .bg-usuarios { background: var(--module-usuarios); }
 .bg-gourmet { background: var(--module-gourmet); }
+.bg-ti { background: var(--module-ti); }
 
 /* ===== EMPTY STATE ===== */
 .empty-state {

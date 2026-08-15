@@ -91,6 +91,11 @@
       { key: 'insumos', name: 'Inventario de insumos' },
       { key: 'recetario', name: 'Recetario' },
       { key: 'catalogo', name: 'Menú del día' }
+    ]},
+    { key: 'ti.html', name: 'Sistemas TI', tools: [
+      { key: 'inventario', name: 'Inventario TI' },
+      { key: 'helpdesk', name: 'Helpdesk' },
+      { key: 'proyectos', name: 'Gestión de proyectos TI' }
     ]}
   ];
 
@@ -184,22 +189,20 @@
   function applyNav() {
     var sel = document.getElementById('navSelect');
     if (!sel) return;
-    Array.prototype.slice.call(sel.options).forEach(function (opt) {
-      var base = pageOf(opt.value);
-      if (!base || base === 'dashboard.html') return;
-      if (base === 'gestion-usuarios.html') { opt.style.display = state.manage ? '' : 'none'; return; }
-      if (!canViewModule(base)) opt.style.display = 'none';
+    var cur = currentPage();
+    var home = inModules() ? '../dashboard.html' : 'dashboard.html';
+    var prefix = inModules() ? '' : 'modules/';
+    var opts = '<option value="' + home + '"' + (cur === 'dashboard.html' ? ' selected' : '') + '>Home</option>';
+    (window.FIAT_MODULES || []).forEach(function (m) {
+      if (m.key === 'oportunidades.html') return;
+      if (m.key === 'gestion-usuarios.html') return;
+      if (!canViewModule(m.key)) return;
+      opts += '<option value="' + prefix + m.key + '"' + (cur === m.key ? ' selected' : '') + '>' + m.name + '</option>';
     });
     if (state.manage) {
-      var exists = Array.prototype.some.call(sel.options, function (o) { return pageOf(o.value) === 'gestion-usuarios.html'; });
-      if (!exists) {
-        var opt = document.createElement('option');
-        opt.value = (inModules() ? '' : 'modules/') + 'gestion-usuarios.html';
-        opt.textContent = 'Gestión de usuarios';
-        sel.appendChild(opt);
-        if (currentPage() === 'gestion-usuarios.html') opt.selected = true;
-      }
+      opts += '<option value="' + prefix + 'gestion-usuarios.html"' + (cur === 'gestion-usuarios.html' ? ' selected' : '') + '>Gestión de usuarios</option>';
     }
+    sel.innerHTML = opts;
   }
 
   function applyDashboard() {

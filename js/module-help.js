@@ -171,6 +171,16 @@
         { icon: 'fi-sr-books', name: 'Recetario', desc: 'Recetas con ingredientes y cantidades, con validación automática de disponibilidad de stock para preparar cada plato.' },
         { icon: 'fi-sr-restaurant', name: 'Menú del día', desc: 'Carta del día organizada por categorías (entradas, platos principales, postres, bebidas) con foto, disponible como beneficio gratuito para los trabajadores.' }
       ]
+    },
+    'ti.html': {
+      title: 'Sistemas TI',
+      subtitle: 'Gestión del área de Sistemas: inventario de equipos, licencias y consumibles, mesa de ayuda (helpdesk) con tickets asignados y gestión de proyectos de TI con tareas.',
+      accent: '#0e7490',
+      tools: [
+        { icon: 'fi-sr-computer', name: 'Inventario TI', desc: 'Registro de equipos y activos de TI con su tipo, serial, estado y asignación a trabajadores, control de licencias de software e inventario de consumibles con entradas y salidas que capturan tu usuario automáticamente, stock mínimo y alertas de bajo stock.' },
+        { icon: 'fi-sr-headset', name: 'Helpdesk', desc: 'Mesa de ayuda con tickets por categoría y prioridad, estado (abierto, en proceso, resuelto, cerrado), solicitante y técnico asignado.' },
+        { icon: 'fi-sr-chart-gantt', name: 'Gestión de proyectos TI', desc: 'Proyectos con fase, avance, responsable y fechas, con tareas por proyecto y control de su estado.' }
+      ]
     }
   };
 

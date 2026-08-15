@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistemas TI - Intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
+  <style>
+    :root { --module-color: var(--module-ti); }
+
+    .ti-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .ti-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .ti-card i {
+      font-size: 22px;
+      color: var(--module-ti);
+      flex-shrink: 0;
+    }
+    .ti-card-body {
+      min-width: 0;
+    }
+    .ti-card span {
+      display: block;
+      font-size: 11px;
+      color: var(--color-text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .ti-card strong {
+      display: block;
+      font-size: 20px;
+      margin-top: 2px;
+    }
+    .ti-card .t-alert { color: #dc2626; }
+    .ti-card .t-warn { color: #D97706; }
+    .ti-card .t-ok { color: #059669; }
+
+    .ti-btn-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      color: var(--color-text-secondary);
+      border-radius: 6px;
+      cursor: pointer;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+    .ti-btn-icon:hover { color: var(--module-ti); border-color: var(--module-ti); }
+    .ti-btn-icon.entrada { color: #059669; }
+    .ti-btn-icon.entrada:hover { border-color: #059669; background: #059669; color: #fff; }
+    .ti-btn-icon.salida { color: #dc2626; }
+    .ti-btn-icon.salida:hover { border-color: #dc2626; background: #dc2626; color: #fff; }
+
+    .ti-tabs {
+      display: inline-flex;
+      align-items: stretch;
+      background: var(--color-bg);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+      gap: 3px;
+      height: 40px;
+      box-sizing: border-box;
+    }
+    .ti-tab {
+      border: none;
+      background: transparent;
+      padding: 0 14px;
+      border-radius: 5px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .ti-tab.active { background: var(--color-surface); color: var(--module-ti); box-shadow: var(--shadow-sm); }
+
+    .toolbar-content { align-items: center; }
+    .toolbar-content .form-input,
+    .toolbar-content .form-select,
+    .toolbar-content .btn-sm {
+      height: 40px;
+      box-sizing: border-box;
+    }
+
+    .ti-progress {
+      height: 6px;
+      background: var(--color-bg);
+      border-radius: 99px;
+      overflow: hidden;
+      width: 110px;
+    }
+    .ti-progress-bar { height: 100%; background: var(--module-ti); }
+    .ti-progress-label { font-size: 11px; color: var(--color-text-secondary); margin-top: 3px; }
+
+    .tarea-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      background: var(--color-surface);
+      font-size: 13px;
+    }
+    .tarea-row.done { opacity: 0.65; }
+    .tarea-row.done .tarea-nombre { text-decoration: line-through; }
+
+    .empty-hint {
+      padding: 18px;
+      text-align: center;
+      color: var(--color-text-secondary);
+      font-size: 13px;
+      background: var(--color-surface);
+      border: 1px dashed var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+
+    .toolbar-content[data-toolbar="inventario"] .form-input,
+    .toolbar-content[data-toolbar="inventario"] .form-select,
+    .toolbar-content[data-toolbar="helpdesk"] .form-input,
+    .toolbar-content[data-toolbar="helpdesk"] .form-select,
+    .toolbar-content[data-toolbar="proyectos"] .form-input,
+    .toolbar-content[data-toolbar="proyectos"] .form-select { height: 36px; }
+
+    .pr-critica { color: #dc2626; font-weight: 700; }
+    .pr-alta { color: #D97706; font-weight: 700; }
+    .pr-media { font-weight: 600; }
+    .pr-baja { color: var(--color-text-secondary); }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <nav class="topnav" style="background:var(--module-ti);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><span class="topnav-logo"></span>Intranet</div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Home</option>
+        <option value="captacion.html">Captación y Selección</option>
+        <option value="relaciones-laborales.html">Relaciones Laborales</option>
+        <option value="capacitacion.html">Capacitación y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="compensacion.html">Compensación</option>
+        <option value="finanzas.html">Finanzas</option>
+        <option value="repositorio.html">Repositorio</option>
+        <option value="chatfiat.html">Mensajería</option>
+        <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
+        <option value="gourmet.html">Gourmet</option>
+        <option value="ti.html" selected>Sistemas TI</option>
+      </select>
+
+      <div class="topnav-spacer"></div>
+      <div class="nav-user">
+        <div class="nav-user-menu">
+          <button class="nav-user-menu-btn" id="userMenuBtn" type="button" aria-label="Opciones de usuario" title="Opciones de usuario">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="12" cy="19" r="1.9"></circle></svg>
+          </button>
+          <div class="nav-user-dropdown" id="userDropdown">
+            <div class="user-drop-header">
+              <div class="user-drop-name" id="userDropName">Usuario</div>
+              <div class="user-drop-email" id="userDropEmail"></div>
+              <div class="user-drop-meta" id="userDropMeta"></div>
+            </div>
+            <button type="button" class="user-drop-item" id="userDropHelp">Detalles del módulo</button>
+            <button type="button" class="user-drop-item user-drop-danger" id="userDropLogout">Cerrar sesión</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-panel">
+          <div class="panel-item active" data-tool="inventario" onclick="switchTool('inventario')" title="Inventario TI"><span class="panel-item-indicator bg-ti"></span><i class="fi fi-sr-computer" style="font-size:24px;pointer-events:none;"></i>
+          </div>
+          <div class="panel-item" data-tool="helpdesk" onclick="switchTool('helpdesk')" title="Helpdesk"><span class="panel-item-indicator bg-ti"></span><i class="fi fi-sr-headset" style="font-size:24px;pointer-events:none;"></i>
+          </div>
+          <div class="panel-item" data-tool="proyectos" onclick="switchTool('proyectos')" title="Gestión de proyectos TI"><span class="panel-item-indicator bg-ti"></span><i class="fi fi-sr-chart-gantt" style="font-size:24px;pointer-events:none;"></i>
+          </div>
+        </div>
+
+        <div class="module-body">
+          <header class="topbar" style="gap:16px;">
+            <div class="toolbar-content" data-toolbar="inventario" style="display:flex;align-items:center;gap:10px;width:100%;flex-wrap:wrap;">
+              <div class="ti-tabs">
+                <button type="button" class="ti-tab active" id="tiTabEquiposBtn" onclick="tiTab('equipos')">Equipos</button>
+                <button type="button" class="ti-tab" id="tiTabLicenciasBtn" onclick="tiTab('licencias')">Licencias</button>
+                <button type="button" class="ti-tab" id="tiTabConsumiblesBtn" onclick="tiTab('consumibles')">Consumibles</button>
+              </div>
+              <div class="form-group" style="margin:0;flex:1;min-width:180px;">
+                <input type="text" class="form-input" id="eqSearch" placeholder="Buscar equipo o activo..." autocomplete="off" spellcheck="false" oninput="renderEquipos()">
+                <input type="text" class="form-input" id="licSearch" placeholder="Buscar licencia..." autocomplete="off" spellcheck="false" oninput="renderLicencias()" style="display:none;">
+                <input type="text" class="form-input" id="consSearch" placeholder="Buscar consumible..." autocomplete="off" spellcheck="false" oninput="renderConsumibles()" style="display:none;">
+              </div>
+              <button class="btn btn-ti btn-sm" id="eqAddBtn" onclick="openModalEquipo()">+ Registrar equipo</button>
+              <button class="btn btn-ti btn-sm" id="licAddBtn" onclick="openModalLicencia()" style="display:none;">+ Registrar licencia</button>
+              <button class="btn btn-ti btn-sm" id="consAddBtn" onclick="openModalConsumible()" style="display:none;">+ Registrar consumible</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="helpdesk" style="display:none;align-items:center;gap:10px;width:100%;flex-wrap:wrap;">
+              <div class="form-group" style="margin:0;flex:1;min-width:180px;">
+                <input type="text" class="form-input" id="ticSearch" placeholder="Buscar ticket..." autocomplete="off" spellcheck="false" oninput="renderTickets()">
+              </div>
+              <div class="form-group" style="margin:0;flex:1;min-width:180px;">
+                <select class="form-select" id="ticFilterEstado" onchange="renderTickets()">
+                  <option value="">Todos los estados</option>
+                  <option>Abierto</option>
+                  <option>En proceso</option>
+                  <option>Resuelto</option>
+                  <option>Cerrado</option>
+                </select>
+              </div>
+              <button class="btn btn-ti btn-sm" onclick="openModalTicket()">+ Nuevo ticket</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="proyectos" style="display:none;align-items:center;gap:10px;width:100%;flex-wrap:wrap;">
+              <div class="form-group" style="margin:0;flex:1;min-width:180px;">
+                <input type="text" class="form-input" id="proySearch" placeholder="Buscar proyecto..." autocomplete="off" spellcheck="false" oninput="renderProyectos()">
+              </div>
+              <button class="btn btn-ti btn-sm" onclick="openModalProyecto()">+ Nuevo proyecto</button>
+            </div>
+          </header>
+
+          <div class="module-content">
+            <!-- Inventario TI -->
+            <div class="tool-section active" id="tool-inventario">
+              <div class="ti-cards" id="eqCards">
+                <div class="ti-card"><i class="fi fi-sr-computer"></i><div class="ti-card-body"><span>Total equipos</span><strong id="eqTotal">-</strong></div></div>
+                <div class="ti-card"><i class="fi fi-sr-tool-box"></i><div class="ti-card-body"><span>En reparación</span><strong class="t-warn" id="eqReparacion">-</strong></div></div>
+                <div class="ti-card"><i class="fi fi-sr-trash"></i><div class="ti-card-body"><span>Dados de baja</span><strong class="t-alert" id="eqBaja">-</strong></div></div>
+              </div>
+              <div class="ti-cards" id="licCards" style="display:none;">
+                <div class="ti-card"><i class="fi fi-sr-badge-check"></i><div class="ti-card-body"><span>Licencias activas</span><strong class="t-ok" id="licActivas">-</strong></div></div>
+                <div class="ti-card"><i class="fi fi-sr-clock"></i><div class="ti-card-body"><span>Por vencer / vencidas</span><strong class="t-warn" id="licAtencion">-</strong></div></div>
+              </div>
+              <div class="ti-cards" id="consCards" style="display:none;">
+                <div class="ti-card"><i class="fi fi-sr-boxes"></i><div class="ti-card-body"><span>Total consumibles</span><strong id="consTotal">-</strong></div></div>
+                <div class="ti-card"><i class="fi fi-sr-box-open"></i><div class="ti-card-body"><span>Agotados</span><strong class="t-alert" id="consAgotados">-</strong></div></div>
+                <div class="ti-card"><i class="fi fi-sr-box-check"></i><div class="ti-card-body"><span>Bajo stock</span><strong class="t-warn" id="consBajo">-</strong></div></div>
+              </div>
+              <div id="eqBlock">
+                <div class="tabla-scroll">
+                  <table class="data-table">
+                    <thead><tr><th>Equipo</th><th>Tipo</th><th>Marca / Modelo</th><th>Serial</th><th>Asignado a</th><th>Ubicación</th><th>Estado</th><th style="width:150px;">Acción</th></tr></thead>
+                    <tbody id="eqTableBody"></tbody>
+                  </table>
+                </div>
+              </div>
+              <div id="licBlock" style="display:none;">
+                <div class="tabla-scroll">
+                  <table class="data-table">
+                    <thead><tr><th>Producto</th><th>Proveedor</th><th>Cantidad</th><th>Vencimiento</th><th>Estado</th><th style="width:150px;">Acción</th></tr></thead>
+                    <tbody id="licTableBody"></tbody>
+                  </table>
+                </div>
+              </div>
+              <div id="consBlock" style="display:none;">
+                <div class="tabla-scroll">
+                  <table class="data-table">
+                    <thead><tr><th>Consumible</th><th>Categoría</th><th>Unidad</th><th>Disponible</th><th>Mínimo</th><th>Estado</th><th style="width:250px;">Acción</th></tr></thead>
+                    <tbody id="consTableBody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Helpdesk -->
+            <div class="tool-section" id="tool-helpdesk">
+              <div class="ti-cards">
+                <div class="ti-card"><i class="fi fi-sr-ticket-airline"></i><div class="ti-card-body"><span>Abiertos</span><strong class="t-warn" id="ticAbiertos">-</strong></div></div>
+                <div class="ti-card"><i class="fi fi-sr-settings"></i><div class="ti-card-body"><span>En proceso</span><strong id="ticProceso">-</strong></div></div>
+                <div class="ti-card"><i class="fi fi-sr-badge-check"></i><div class="ti-card-body"><span>Resueltos</span><strong class="t-ok" id="ticResueltos">-</strong></div></div>
+                <div class="ti-card"><i class="fi fi-sr-circle-xmark"></i><div class="ti-card-body"><span>Cerrados</span><strong id="ticCerrados">-</strong></div></div>
+                <div class="ti-card"><i class="fi fi-sr-alarm-exclamation"></i><div class="ti-card-body"><span>Críticos</span><strong class="t-alert" id="ticCriticos">-</strong></div></div>
+              </div>
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Asunto</th><th>Categoría</th><th>Prioridad</th><th>Estado</th><th>Solicitante</th><th>Técnico</th><th>Acción</th></tr></thead>
+                  <tbody id="ticTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Gestión de proyectos TI -->
+            <div class="tool-section" id="tool-proyectos">
+              <div class="ti-cards">
+                <div class="ti-card"><i class="fi fi-sr-chart-gantt"></i><div class="ti-card-body"><span>Total proyectos</span><strong id="proyTotal">-</strong></div></div>
+                <div class="ti-card"><i class="fi fi-sr-settings"></i><div class="ti-card-body"><span>En curso</span><strong class="t-ok" id="proyCurso">-</strong></div></div>
+                <div class="ti-card"><i class="fi fi-sr-flag"></i><div class="ti-card-body"><span>Iniciados</span><strong class="t-warn" id="proyIniciados">-</strong></div></div>
+                <div class="ti-card"><i class="fi fi-sr-badge-check"></i><div class="ti-card-body"><span>Completados</span><strong id="proyCompletados">-</strong></div></div>
+                <div class="ti-card"><i class="fi fi-sr-chart-line-up"></i><div class="ti-card-body"><span>Avance promedio</span><strong id="proyPromedio">-</strong></div></div>
+              </div>
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Proyecto</th><th>Fase</th><th>Avance</th><th>Responsable</th><th>Inicio</th><th>Fin</th><th style="width:230px;">Acción</th></tr></thead>
+                  <tbody id="proyTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Equipo -->
+  <div class="modal-overlay" id="modalEquipo">
+    <div class="modal" style="max-width:540px;">
+      <div class="modal-header"><h3 id="equipoModalTitle">Registrar equipo</h3><button class="modal-close" onclick="closeModal('modalEquipo')">&times;</button></div>
+      <div class="modal-body">
+        <form id="equipoForm">
+          <div class="form-row">
+            <div class="form-group" style="flex:2;"><label>Nombre *</label><input type="text" class="form-input" id="eq_nombre" required placeholder="Ej: PC de recepción"></div>
+            <div class="form-group"><label>Tipo</label>
+              <select class="form-select" id="eq_tipo"><option>Computadora</option><option>Laptop</option><option>Servidor</option><option>Impresora</option><option>Periférico</option><option>Red</option><option>Otro</option></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Marca</label><input type="text" class="form-input" id="eq_marca" placeholder="Ej: Dell"></div>
+            <div class="form-group"><label>Modelo</label><input type="text" class="form-input" id="eq_modelo"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Serial</label><input type="text" class="form-input" id="eq_serial"></div>
+            <div class="form-group"><label>Asignado a</label><select class="form-select" id="eq_asignado"></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Ubicación</label><input type="text" class="form-input" id="eq_ubicacion" placeholder="Ej: Oficina 2"></div>
+            <div class="form-group"><label>Fecha de adquisición</label><input type="date" class="form-input" id="eq_fecha"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Estado</label>
+              <select class="form-select" id="eq_estado"><option>Operativo</option><option>En reparación</option><option>Dañado</option><option>Dado de baja</option></select>
+            </div>
+          </div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="eq_observaciones" rows="2"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalEquipo')">Cancelar</button>
+        <button class="btn btn-ti" onclick="saveEquipo()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Licencia -->
+  <div class="modal-overlay" id="modalLicencia">
+    <div class="modal" style="max-width:540px;">
+      <div class="modal-header"><h3 id="licenciaModalTitle">Registrar licencia</h3><button class="modal-close" onclick="closeModal('modalLicencia')">&times;</button></div>
+      <div class="modal-body">
+        <form id="licenciaForm">
+          <div class="form-group"><label>Producto *</label><input type="text" class="form-input" id="lic_producto" required placeholder="Ej: Microsoft 365"></div>
+          <div class="form-row">
+            <div class="form-group" style="flex:2;"><label>Proveedor</label><input type="text" class="form-input" id="lic_proveedor" placeholder="Ej: Software Center C.A."></div>
+            <div class="form-group"><label>Cantidad</label><input type="number" class="form-input" id="lic_cantidad" min="0" step="1" value="1"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Fecha de vencimiento</label><input type="date" class="form-input" id="lic_vencimiento"></div>
+          </div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="lic_observaciones" rows="2"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalLicencia')">Cancelar</button>
+        <button class="btn btn-ti" onclick="saveLicencia()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Ticket -->
+  <div class="modal-overlay" id="modalTicket">
+    <div class="modal" style="max-width:560px;">
+      <div class="modal-header"><h3 id="ticketModalTitle">Nuevo ticket</h3><button class="modal-close" onclick="closeModal('modalTicket')">&times;</button></div>
+      <div class="modal-body">
+        <form id="ticketForm">
+          <div class="form-group"><label>Asunto *</label><input type="text" class="form-input" id="tic_asunto" required placeholder="Ej: No funciona el correo"></div>
+          <div class="form-row">
+            <div class="form-group"><label>Categoría</label>
+              <select class="form-select" id="tic_categoria"><option>Soporte</option><option>Hardware</option><option>Software</option><option>Red</option><option>Accesos</option><option>Otro</option></select>
+            </div>
+            <div class="form-group"><label>Prioridad</label>
+              <select class="form-select" id="tic_prioridad"><option>Baja</option><option selected>Media</option><option>Alta</option><option>Crítica</option></select>
+            </div>
+            <div class="form-group"><label>Estado</label>
+              <select class="form-select" id="tic_estado"><option>Abierto</option><option>En proceso</option><option>Resuelto</option><option>Cerrado</option></select>
+            </div>
+          </div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="tic_descripcion" rows="3" placeholder="Describe el problema o solicitud..."></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Solicitante</label><select class="form-select" id="tic_solicitante"></select></div>
+            <div class="form-group"><label>Técnico asignado</label><select class="form-select" id="tic_tecnico"></select></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalTicket')">Cancelar</button>
+        <button class="btn btn-ti" onclick="saveTicket()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Proyecto -->
+  <div class="modal-overlay" id="modalProyecto">
+    <div class="modal" style="max-width:560px;">
+      <div class="modal-header"><h3 id="proyectoModalTitle">Nuevo proyecto</h3><button class="modal-close" onclick="closeModal('modalProyecto')">&times;</button></div>
+      <div class="modal-body">
+        <form id="proyectoForm">
+          <div class="form-group"><label>Nombre *</label><input type="text" class="form-input" id="proy_nombre" required placeholder="Ej: Migración a la nube"></div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="proy_descripcion" rows="3"></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Fase</label>
+              <select class="form-select" id="proy_fase"><option>Iniciado</option><option>En curso</option><option>En revisión</option><option>Completado</option></select>
+            </div>
+            <div class="form-group"><label>Avance (%)</label><input type="number" class="form-input" id="proy_avance" min="0" max="100" step="1" value="0"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Responsable</label><select class="form-select" id="proy_responsable"></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Fecha de inicio</label><input type="date" class="form-input" id="proy_inicio"></div>
+            <div class="form-group"><label>Fecha de fin</label><input type="date" class="form-input" id="proy_fin"></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalProyecto')">Cancelar</button>
+        <button class="btn btn-ti" onclick="saveProyecto()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Tareas del proyecto -->
+  <div class="modal-overlay" id="modalTareas">
+    <div class="modal" style="max-width:560px;">
+      <div class="modal-header"><h3 id="tareasModalTitle">Tareas del proyecto</h3><button class="modal-close" onclick="closeModal('modalTareas')">&times;</button></div>
+      <div class="modal-body">
+        <div id="tareasList"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <input type="text" class="form-input" id="tareaNombre" placeholder="Nombre de la nueva tarea..." style="flex:1;" onkeydown="if(event.key==='Enter'){addTarea();}">
+          <button class="btn btn-ti" onclick="addTarea()">+ Agregar</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalTareas')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Consumible -->
+  <div class="modal-overlay" id="modalConsumible">
+    <div class="modal" style="max-width:540px;">
+      <div class="modal-header"><h3 id="consumibleModalTitle">Registrar consumible</h3><button class="modal-close" onclick="closeModal('modalConsumible')">&times;</button></div>
+      <div class="modal-body">
+        <form id="consumibleForm">
+          <div class="form-row">
+            <div class="form-group" style="flex:2;"><label>Nombre *</label><input type="text" class="form-input" id="cons_nombre" required placeholder="Ej: Conectores RJ45"></div>
+            <div class="form-group"><label>Categoría</label>
+              <select class="form-select" id="cons_categoria"><option>Cableado</option><option>Redes</option><option>Oficina</option><option>Limpieza</option><option>Almacenamiento</option><option>Otro</option></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Unidad de medida</label>
+              <select class="form-select" id="cons_unidad"><option>unidad</option><option>caja</option><option>rollo</option><option>metro</option><option>litro</option><option>kg</option><option>paquete</option><option>tambor</option></select>
+            </div>
+            <div class="form-group"><label>Cantidad disponible</label><input type="number" class="form-input" id="cons_cantidad" min="0" step="any" value="0"></div>
+            <div class="form-group"><label>Cantidad mínima</label><input type="number" class="form-input" id="cons_minimo" min="0" step="any" value="0"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Ubicación</label><input type="text" class="form-input" id="cons_ubicacion" placeholder="Ej: Almacén TI"></div>
+            <div class="form-group"><label>Proveedor</label><input type="text" class="form-input" id="cons_proveedor"></div>
+          </div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="cons_observaciones" rows="2"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalConsumible')">Cancelar</button>
+        <button class="btn btn-ti" onclick="saveConsumible()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Movimiento (entrada/salida) -->
+  <div class="modal-overlay" id="modalMovimiento">
+    <div class="modal" style="max-width:500px;">
+      <div class="modal-header"><h3 id="movimientoModalTitle">Registrar movimiento</h3><button class="modal-close" onclick="closeModal('modalMovimiento')">&times;</button></div>
+      <div class="modal-body">
+        <div class="form-group"><label>Consumible</label><div style="font-weight:600;" id="movConsumibleInfo">-</div></div>
+        <div class="form-row">
+          <div class="form-group"><label>Tipo</label>
+            <select class="form-select" id="mov_tipo" onchange="movTipoChange()">
+              <option value="Entrada">Entrada (+)</option>
+              <option value="Salida">Salida (−)</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Cantidad *</label><input type="number" class="form-input" id="mov_cantidad" min="0.01" step="any" value="1"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Fecha</label><input type="date" class="form-input" id="mov_fecha"></div>
+          <div class="form-group"><label>Concepto</label>
+            <select class="form-select" id="mov_concepto">
+              <option value="">— Selecciona —</option>
+              <optgroup label="Entradas">
+                <option>Compra</option>
+                <option>Devolución</option>
+                <option>Transferencia</option>
+              </optgroup>
+              <optgroup label="Salidas">
+                <option>Uso en soporte</option>
+                <option>Instalación</option>
+                <option>Transferencia</option>
+                <option>Desecho / baja</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+        <div class="form-group"><label>Registrado por</label><input type="text" class="form-input" id="mov_usuario" readonly style="background:var(--color-bg);color:var(--color-text-secondary);cursor:not-allowed;" title="Se registra automáticamente con tu usuario"></div>
+        <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="mov_observaciones" rows="2"></textarea></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalMovimiento')">Cancelar</button>
+        <button class="btn btn-ti" onclick="saveMovimiento()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Historial de movimientos -->
+  <div class="modal-overlay" id="modalHistorial">
+    <div class="modal" style="max-width:640px;">
+      <div class="modal-header"><h3 id="historialModalTitle">Historial de movimientos</h3><button class="modal-close" onclick="closeModal('modalHistorial')">&times;</button></div>
+      <div class="modal-body">
+        <div class="tabla-scroll">
+          <table class="data-table">
+            <thead><tr><th>Fecha</th><th>Tipo</th><th>Concepto</th><th>Cantidad</th><th>Registrado por</th><th>Observaciones</th></tr></thead>
+            <tbody id="historialBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalHistorial')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/modules.js"></script>
+  <script>
+    var eqItems = [];
+    var licItems = [];
+    var ticItems = [];
+    var proyItems = [];
+    var tareasItems = [];
+    var consItems = [];
+    var movItems = [];
+    var tiWorkers = [];
+    var invTab = 'equipos';
+    var equipoEditId = null;
+    var licenciaEditId = null;
+    var ticketEditId = null;
+    var proyectoEditId = null;
+    var tareasProyectoId = null;
+    var consumibleEditId = null;
+    var movimientoConsumibleId = null;
+    var historialConsumibleId = null;
+
+    function openModal(id) { var el = document.getElementById(id); if (el) el.classList.add('show'); }
+    function closeModal(id) { var el = document.getElementById(id); if (el) el.classList.remove('show'); }
+
+    document.addEventListener('click', function (e) {
+      if (e.target.classList && e.target.classList.contains('modal-overlay')) {
+        e.target.classList.remove('show');
+      }
+    });
+
+    function badgeMap(estado) {
+      var m = {
+        'Operativo': 'badge-active',
+        'Activa': 'badge-active',
+        'Resuelto': 'badge-active',
+        'Completada': 'badge-active',
+        'Completado': 'badge-active',
+        'En reparación': 'badge-pending',
+        'Dañado': 'badge-pending',
+        'Por vencer': 'badge-pending',
+        'En proceso': 'badge-pending',
+        'Abierto': 'badge-pending',
+        'Iniciado': 'badge-pending',
+        'En curso': 'badge-active',
+        'En revisión': 'badge-pending',
+        'Pendiente': 'badge-pending',
+        'Dado de baja': 'badge-inactive',
+        'Vencida': 'badge-inactive',
+        'Agotada': 'badge-inactive',
+        'Cerrado': 'badge-inactive',
+        'Disponible': 'badge-active',
+        'Bajo stock': 'badge-pending',
+        'Agotado': 'badge-inactive'
+      };
+      return m[estado] || 'badge-pending';
+    }
+
+    function hoyISO() {
+      var d = new Date();
+      return d.toISOString().slice(0, 10);
+    }
+
+    function prioridadClase(p) {
+      var m = { 'Crítica': 'pr-critica', 'Alta': 'pr-alta', 'Media': 'pr-media', 'Baja': 'pr-baja' };
+      return m[p] || 'pr-media';
+    }
+
+    function nombreTrabajador(id) {
+      if (!id) return '-';
+      var w = tiWorkers.find(function (x) { return String(x.id) === String(id); });
+      return w ? w.nombre : '-';
+    }
+
+    async function loadWorkers() {
+      try {
+        var r = await supabaseClient.from('plantilla_trabajadores').select('id, nombres, apellidos').eq('estado', 'Activo').order('nombres');
+        if (r.error) throw r.error;
+        tiWorkers = (r.data || []).map(function (w) { return { id: w.id, nombre: ((w.nombres || '') + ' ' + (w.apellidos || '')).trim() || ('#' + w.id) }; });
+      } catch (e) {}
+      ['eq_asignado', 'tic_solicitante', 'tic_tecnico', 'proy_responsable'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        var placeholder = (id === 'tic_solicitante') ? '— Selecciona —' : '— Sin asignar —';
+        el.innerHTML = '<option value="">' + placeholder + '</option>' + tiWorkers.map(function (w) {
+          return '<option value="' + w.id + '">' + uiEscape(w.nombre) + '</option>';
+        }).join('');
+      });
+    }
+
+    function tiTab(name) {
+      invTab = name;
+      localStorage.setItem('fiat_ti_inv_tab', name);
+      var eqs = name === 'equipos';
+      var lics = name === 'licencias';
+      var cons = name === 'consumibles';
+      document.getElementById('eqCards').style.display = eqs ? '' : 'none';
+      document.getElementById('licCards').style.display = lics ? '' : 'none';
+      document.getElementById('consCards').style.display = cons ? '' : 'none';
+      document.getElementById('eqBlock').style.display = eqs ? '' : 'none';
+      document.getElementById('licBlock').style.display = lics ? '' : 'none';
+      document.getElementById('consBlock').style.display = cons ? '' : 'none';
+      document.getElementById('eqSearch').style.display = eqs ? '' : 'none';
+      document.getElementById('licSearch').style.display = lics ? '' : 'none';
+      document.getElementById('consSearch').style.display = cons ? '' : 'none';
+      document.getElementById('eqAddBtn').style.display = eqs ? '' : 'none';
+      document.getElementById('licAddBtn').style.display = lics ? '' : 'none';
+      document.getElementById('consAddBtn').style.display = cons ? '' : 'none';
+      document.getElementById('tiTabEquiposBtn').classList.toggle('active', eqs);
+      document.getElementById('tiTabLicenciasBtn').classList.toggle('active', lics);
+      document.getElementById('tiTabConsumiblesBtn').classList.toggle('active', cons);
+    }
+
+    /* ===== EQUIPOS ===== */
+    async function loadEquipos() {
+      try {
+        var r = await supabaseClient.from('ti_equipos').select('*').order('nombre');
+        if (r.error) throw r.error;
+        eqItems = r.data || [];
+      } catch (err) {
+        showAlert('Error al cargar equipos: ' + err.message, 'error');
+        eqItems = [];
+      }
+      renderEquipos();
+    }
+
+    function renderEquipos() {
+      var q = (document.getElementById('eqSearch').value || '').toLowerCase();
+      var list = eqItems.filter(function (x) {
+        return !q || (x.nombre + ' ' + (x.marca || '') + ' ' + (x.modelo || '') + ' ' + (x.serial || '') + ' ' + (x.ubicacion || '')).toLowerCase().indexOf(q) !== -1;
+      });
+      var total = eqItems.length;
+      var reparacion = eqItems.filter(function (x) { return x.estado === 'En reparación'; }).length;
+      var baja = eqItems.filter(function (x) { return x.estado === 'Dado de baja'; }).length;
+      document.getElementById('eqTotal').textContent = total;
+      document.getElementById('eqReparacion').textContent = reparacion;
+      document.getElementById('eqBaja').textContent = baja;
+
+      var tbody = document.getElementById('eqTableBody');
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#999;">No hay equipos registrados' + (q ? ' para "' + uiEscape(q) + '"' : '') + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = list.map(function (x) {
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + uiEscape(x.nombre) + '</span></td>'
+          + '<td>' + uiEscape(x.tipo || '-') + '</td>'
+          + '<td>' + uiEscape([x.marca, x.modelo].filter(Boolean).join(' · ') || '-') + '</td>'
+          + '<td>' + uiEscape(x.serial || '-') + '</td>'
+          + '<td>' + uiEscape(nombreTrabajador(x.asignado_a)) + '</td>'
+          + '<td>' + uiEscape(x.ubicacion || '-') + '</td>'
+          + '<td><span class="badge ' + badgeMap(x.estado) + '">' + uiEscape(x.estado) + '</span></td>'
+          + '<td><button class="ti-btn-icon" title="Editar" onclick="openModalEquipo(\'' + x.id + '\')"><i class="fi fi-sr-edit" style="font-size:13px;pointer-events:none;"></i></button> <button class="ti-btn-icon" title="Eliminar" onclick="deleteEquipo(\'' + x.id + '\')" style="color:#dc2626;"><i class="fi fi-sr-trash" style="font-size:13px;pointer-events:none;"></i></button></td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function openModalEquipo(id) {
+      equipoEditId = null;
+      document.getElementById('equipoForm').reset();
+      document.getElementById('equipoModalTitle').textContent = 'Registrar equipo';
+      if (id) {
+        var x = eqItems.find(function (i) { return String(i.id) === String(id); });
+        if (x) {
+          equipoEditId = id;
+          document.getElementById('equipoModalTitle').textContent = 'Editar equipo';
+          document.getElementById('eq_nombre').value = x.nombre;
+          document.getElementById('eq_tipo').value = x.tipo || 'Computadora';
+          document.getElementById('eq_marca').value = x.marca || '';
+          document.getElementById('eq_modelo').value = x.modelo || '';
+          document.getElementById('eq_serial').value = x.serial || '';
+          document.getElementById('eq_asignado').value = x.asignado_a ? String(x.asignado_a) : '';
+          document.getElementById('eq_ubicacion').value = x.ubicacion || '';
+          document.getElementById('eq_fecha').value = x.fecha_adquisicion || '';
+          document.getElementById('eq_estado').value = x.estado || 'Operativo';
+          document.getElementById('eq_observaciones').value = x.observaciones || '';
+        }
+      }
+      openModal('modalEquipo');
+    }
+
+    async function saveEquipo() {
+      var nombre = document.getElementById('eq_nombre').value.trim();
+      if (!nombre) { showAlert('Indica el nombre del equipo', 'warning'); return; }
+      var payload = {
+        nombre: nombre,
+        tipo: document.getElementById('eq_tipo').value,
+        marca: document.getElementById('eq_marca').value.trim() || null,
+        modelo: document.getElementById('eq_modelo').value.trim() || null,
+        serial: document.getElementById('eq_serial').value.trim() || null,
+        asignado_a: document.getElementById('eq_asignado').value || null,
+        ubicacion: document.getElementById('eq_ubicacion').value.trim() || null,
+        fecha_adquisicion: document.getElementById('eq_fecha').value || null,
+        estado: document.getElementById('eq_estado').value,
+        observaciones: document.getElementById('eq_observaciones').value.trim() || null
+      };
+      try {
+        var result;
+        if (equipoEditId) {
+          result = await supabaseClient.from('ti_equipos').update(payload).eq('id', equipoEditId);
+        } else {
+          result = await supabaseClient.from('ti_equipos').insert([payload]);
+        }
+        if (result.error) throw result.error;
+        closeModal('modalEquipo');
+        showAlert('Equipo guardado', 'success');
+        loadEquipos();
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteEquipo(id) {
+      if (!(await showConfirm('¿Eliminar este equipo/activo?'))) return;
+      try {
+        var r = await supabaseClient.from('ti_equipos').delete().eq('id', id);
+        if (r.error) throw r.error;
+        loadEquipos();
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== LICENCIAS ===== */
+    function licenciaEstado(x) {
+      var hoy = hoyISO();
+      var c = Number(x.cantidad || 0);
+      if (c <= 0) return 'Agotada';
+      if (x.fecha_vencimiento && x.fecha_vencimiento <= hoy) return 'Vencida';
+      if (x.fecha_vencimiento) {
+        var diff = (new Date(x.fecha_vencimiento + 'T00:00:00') - new Date()) / 86400000;
+        if (diff <= 30) return 'Por vencer';
+      }
+      return 'Activa';
+    }
+
+    async function loadLicencias() {
+      try {
+        var r = await supabaseClient.from('ti_licencias').select('*').order('producto');
+        if (r.error) throw r.error;
+        licItems = r.data || [];
+      } catch (err) {
+        showAlert('Error al cargar licencias: ' + err.message, 'error');
+        licItems = [];
+      }
+      renderLicencias();
+    }
+
+    function renderLicencias() {
+      var q = (document.getElementById('licSearch').value || '').toLowerCase();
+      var list = licItems.filter(function (x) {
+        return !q || (x.producto + ' ' + (x.proveedor || '')).toLowerCase().indexOf(q) !== -1;
+      });
+      var activas = 0, atencion = 0;
+      licItems.forEach(function (x) {
+        var e = licenciaEstado(x);
+        if (e === 'Activa') activas++;
+        else atencion++;
+      });
+      document.getElementById('licActivas').textContent = activas;
+      document.getElementById('licAtencion').textContent = atencion;
+
+      var tbody = document.getElementById('licTableBody');
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">No hay licencias registradas' + (q ? ' para "' + uiEscape(q) + '"' : '') + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = list.map(function (x) {
+        var e = licenciaEstado(x);
+        var venc = x.fecha_vencimiento;
+        var vencStyle = '';
+        if (venc) {
+          var diff = (new Date(venc + 'T00:00:00') - new Date()) / 86400000;
+          if (diff < 0) vencStyle = 'color:#dc2626;font-weight:600;';
+          else if (diff <= 30) vencStyle = 'color:#D97706;font-weight:600;';
+        }
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + uiEscape(x.producto) + '</span></td>'
+          + '<td>' + uiEscape(x.proveedor || '-') + '</td>'
+          + '<td>' + x.cantidad + '</td>'
+          + '<td style="' + vencStyle + '">' + (venc ? venc : '-') + '</td>'
+          + '<td><span class="badge ' + badgeMap(e) + '">' + e + '</span></td>'
+          + '<td><button class="ti-btn-icon" title="Editar" onclick="openModalLicencia(\'' + x.id + '\')"><i class="fi fi-sr-edit" style="font-size:13px;pointer-events:none;"></i></button> <button class="ti-btn-icon" title="Eliminar" onclick="deleteLicencia(\'' + x.id + '\')" style="color:#dc2626;"><i class="fi fi-sr-trash" style="font-size:13px;pointer-events:none;"></i></button></td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function openModalLicencia(id) {
+      licenciaEditId = null;
+      document.getElementById('licenciaForm').reset();
+      document.getElementById('lic_cantidad').value = 1;
+      document.getElementById('licenciaModalTitle').textContent = 'Registrar licencia';
+      if (id) {
+        var x = licItems.find(function (i) { return String(i.id) === String(id); });
+        if (x) {
+          licenciaEditId = id;
+          document.getElementById('licenciaModalTitle').textContent = 'Editar licencia';
+          document.getElementById('lic_producto').value = x.producto;
+          document.getElementById('lic_proveedor').value = x.proveedor || '';
+          document.getElementById('lic_cantidad').value = x.cantidad;
+          document.getElementById('lic_vencimiento').value = x.fecha_vencimiento || '';
+          document.getElementById('lic_observaciones').value = x.observaciones || '';
+        }
+      }
+      openModal('modalLicencia');
+    }
+
+    async function saveLicencia() {
+      var producto = document.getElementById('lic_producto').value.trim();
+      if (!producto) { showAlert('Indica el producto de la licencia', 'warning'); return; }
+      var payload = {
+        producto: producto,
+        proveedor: document.getElementById('lic_proveedor').value.trim() || null,
+        cantidad: Number(document.getElementById('lic_cantidad').value) || 0,
+        fecha_vencimiento: document.getElementById('lic_vencimiento').value || null,
+        observaciones: document.getElementById('lic_observaciones').value.trim() || null
+      };
+      try {
+        var r;
+        if (licenciaEditId) {
+          r = await supabaseClient.from('ti_licencias').update(payload).eq('id', licenciaEditId);
+        } else {
+          r = await supabaseClient.from('ti_licencias').insert([payload]);
+        }
+        if (r.error) throw r.error;
+        closeModal('modalLicencia');
+        showAlert('Licencia guardada', 'success');
+        loadLicencias();
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteLicencia(id) {
+      if (!(await showConfirm('¿Eliminar esta licencia?'))) return;
+      try {
+        var r = await supabaseClient.from('ti_licencias').delete().eq('id', id);
+        if (r.error) throw r.error;
+        loadLicencias();
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== CONSUMIBLES ===== */
+    function consumibleEstado(x) {
+      var c = Number(x.cantidad || 0);
+      var min = Number(x.cantidad_minima || 0);
+      if (c <= 0) return 'Agotado';
+      if (min > 0 && c <= min) return 'Bajo stock';
+      return 'Disponible';
+    }
+
+    function fmtCant(n) {
+      var v = Number(n || 0);
+      return Number.isInteger(v) ? String(v) : v.toFixed(2).replace(/\.?0+$/, '');
+    }
+
+    async function loadConsumibles() {
+      try {
+        var r = await supabaseClient.from('ti_consumibles').select('*').order('nombre');
+        if (r.error) throw r.error;
+        consItems = r.data || [];
+      } catch (err) {
+        showAlert('Error al cargar consumibles: ' + err.message, 'error');
+        consItems = [];
+      }
+      renderConsumibles();
+    }
+
+    function renderConsumibles() {
+      var q = (document.getElementById('consSearch').value || '').toLowerCase();
+      var list = consItems.filter(function (x) {
+        return !q || (x.nombre + ' ' + (x.categoria || '') + ' ' + (x.ubicacion || '')).toLowerCase().indexOf(q) !== -1;
+      });
+      var total = consItems.length;
+      var agotados = 0, bajo = 0;
+      consItems.forEach(function (x) {
+        var e = consumibleEstado(x);
+        if (e === 'Agotado') agotados++;
+        if (e === 'Bajo stock') bajo++;
+      });
+      document.getElementById('consTotal').textContent = total;
+      document.getElementById('consAgotados').textContent = agotados;
+      document.getElementById('consBajo').textContent = bajo;
+
+      var tbody = document.getElementById('consTableBody');
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay consumibles registrados' + (q ? ' para "' + uiEscape(q) + '"' : '') + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = list.map(function (x) {
+        var e = consumibleEstado(x);
+        var cantCls = e === 'Agotado' ? 'color:#dc2626;font-weight:700;' : (e === 'Bajo stock' ? 'color:#D97706;font-weight:700;' : 'font-weight:700;');
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + uiEscape(x.nombre) + '</span></td>'
+          + '<td>' + uiEscape(x.categoria || '-') + '</td>'
+          + '<td>' + uiEscape(x.unidad_medida || 'unidad') + '</td>'
+          + '<td style="' + cantCls + '">' + fmtCant(x.cantidad) + '</td>'
+          + '<td>' + fmtCant(x.cantidad_minima) + '</td>'
+          + '<td><span class="badge ' + badgeMap(e) + '">' + e + '</span></td>'
+          + '<td><button class="ti-btn-icon entrada" title="Entrada" onclick="openMovimiento(\'' + x.id + '\', \'Entrada\')"><i class="fi fi-sr-arrow-down-to-square" style="font-size:13px;pointer-events:none;"></i></button> <button class="ti-btn-icon salida" title="Salida" onclick="openMovimiento(\'' + x.id + '\', \'Salida\')"><i class="fi fi-sr-arrow-up-from-square" style="font-size:13px;pointer-events:none;"></i></button> <button class="ti-btn-icon" title="Historial" onclick="openHistorial(\'' + x.id + '\')"><i class="fi fi-sr-rectangle-vertical-history" style="font-size:13px;pointer-events:none;"></i></button> <button class="ti-btn-icon" title="Editar" onclick="openModalConsumible(\'' + x.id + '\')"><i class="fi fi-sr-edit" style="font-size:13px;pointer-events:none;"></i></button></td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function openModalConsumible(id) {
+      consumibleEditId = null;
+      document.getElementById('consumibleForm').reset();
+      document.getElementById('cons_cantidad').value = 0;
+      document.getElementById('cons_minimo').value = 0;
+      document.getElementById('consumibleModalTitle').textContent = 'Registrar consumible';
+      if (id) {
+        var x = consItems.find(function (i) { return String(i.id) === String(id); });
+        if (x) {
+          consumibleEditId = id;
+          document.getElementById('consumibleModalTitle').textContent = 'Editar consumible';
+          document.getElementById('cons_nombre').value = x.nombre;
+          document.getElementById('cons_categoria').value = x.categoria || 'Otro';
+          document.getElementById('cons_unidad').value = x.unidad_medida || 'unidad';
+          document.getElementById('cons_cantidad').value = x.cantidad;
+          document.getElementById('cons_minimo').value = x.cantidad_minima;
+          document.getElementById('cons_ubicacion').value = x.ubicacion || '';
+          document.getElementById('cons_proveedor').value = x.proveedor || '';
+          document.getElementById('cons_observaciones').value = x.observaciones || '';
+        }
+      }
+      openModal('modalConsumible');
+    }
+
+    async function saveConsumible() {
+      var nombre = document.getElementById('cons_nombre').value.trim();
+      if (!nombre) { showAlert('Indica el nombre del consumible', 'warning'); return; }
+      var cantidad = Number(document.getElementById('cons_cantidad').value) || 0;
+      if (cantidad < 0) { showAlert('La cantidad no puede ser negativa', 'warning'); return; }
+      var payload = {
+        nombre: nombre,
+        categoria: document.getElementById('cons_categoria').value,
+        unidad_medida: document.getElementById('cons_unidad').value,
+        cantidad: cantidad,
+        cantidad_minima: Number(document.getElementById('cons_minimo').value) || 0,
+        ubicacion: document.getElementById('cons_ubicacion').value.trim() || null,
+        proveedor: document.getElementById('cons_proveedor').value.trim() || null,
+        observaciones: document.getElementById('cons_observaciones').value.trim() || null
+      };
+      try {
+        var r;
+        if (consumibleEditId) {
+          r = await supabaseClient.from('ti_consumibles').update(payload).eq('id', consumibleEditId);
+        } else {
+          r = await supabaseClient.from('ti_consumibles').insert([payload]);
+        }
+        if (r.error) throw r.error;
+        closeModal('modalConsumible');
+        showAlert('Consumible guardado', 'success');
+        loadConsumibles();
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    function usuarioActual() {
+      try {
+        if (window.fiatAccess && fiatAccess.state && fiatAccess.state.worker) {
+          var w = fiatAccess.state.worker;
+          var n = ((w.nombres || '') + ' ' + (w.apellidos || '')).trim();
+          if (n) return n;
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    function movTipoChange() {
+      var tipo = document.getElementById('mov_tipo').value;
+      var sel = document.getElementById('mov_concepto');
+      var opts = {
+        'Entrada': ['Compra', 'Devolución', 'Transferencia'],
+        'Salida': ['Uso en soporte', 'Instalación', 'Transferencia', 'Desecho / baja']
+      };
+      sel.innerHTML = '<option value="">— Selecciona —</option>' + opts[tipo].map(function (c) {
+        return '<option>' + c + '</option>';
+      }).join('');
+    }
+
+    function openMovimiento(id, tipo) {
+      var x = consItems.find(function (i) { return String(i.id) === String(id); });
+      if (!x) return;
+      movimientoConsumibleId = id;
+      document.getElementById('movConsumibleInfo').textContent = x.nombre + ' (' + fmtCant(x.cantidad) + ' ' + (x.unidad_medida || 'unidad') + ' disponibles)';
+      document.getElementById('mov_tipo').value = tipo;
+      movTipoChange();
+      document.getElementById('mov_cantidad').value = 1;
+      document.getElementById('mov_fecha').value = hoyISO();
+      document.getElementById('mov_usuario').value = usuarioActual() || '';
+      document.getElementById('mov_observaciones').value = '';
+      document.getElementById('movimientoModalTitle').textContent = tipo === 'Entrada' ? 'Registrar entrada' : 'Registrar salida';
+      openModal('modalMovimiento');
+    }
+
+    async function saveMovimiento() {
+      if (!movimientoConsumibleId) return;
+      var x = consItems.find(function (i) { return String(i.id) === String(movimientoConsumibleId); });
+      if (!x) return;
+      var tipo = document.getElementById('mov_tipo').value;
+      var cantidad = Number(document.getElementById('mov_cantidad').value);
+      var fecha = document.getElementById('mov_fecha').value;
+      if (!cantidad || cantidad <= 0) { showAlert('Indica una cantidad válida', 'warning'); return; }
+      if (!fecha) { showAlert('Indica la fecha', 'warning'); return; }
+      var nuevaCantidad = Number(x.cantidad || 0) + (tipo === 'Entrada' ? cantidad : -cantidad);
+      if (nuevaCantidad < 0) {
+        showAlert('No hay suficiente stock para esa salida (disponible: ' + fmtCant(x.cantidad) + ')', 'warning');
+        return;
+      }
+      var movimiento = {
+        consumible_id: movimientoConsumibleId,
+        tipo: tipo,
+        concepto: document.getElementById('mov_concepto').value || null,
+        cantidad: cantidad,
+        fecha: fecha,
+        registrado_por: usuarioActual() || document.getElementById('mov_usuario').value.trim() || null,
+        observaciones: document.getElementById('mov_observaciones').value.trim() || null
+      };
+      try {
+        var r1 = await supabaseClient.from('ti_movimientos').insert([movimiento]);
+        if (r1.error) throw r1.error;
+        var r2 = await supabaseClient.from('ti_consumibles').update({ cantidad: nuevaCantidad }).eq('id', movimientoConsumibleId);
+        if (r2.error) throw r2.error;
+        closeModal('modalMovimiento');
+        showAlert(tipo === 'Entrada' ? 'Entrada registrada' : 'Salida registrada', 'success');
+        loadConsumibles();
+      } catch (err) {
+        showAlert('Error al guardar el movimiento: ' + err.message, 'error');
+      }
+    }
+
+    function openHistorial(id) {
+      var x = consItems.find(function (i) { return String(i.id) === String(id); });
+      if (!x) return;
+      historialConsumibleId = id;
+      document.getElementById('historialModalTitle').textContent = 'Historial · ' + x.nombre;
+      openModal('modalHistorial');
+      loadHistorial();
+    }
+
+    async function loadHistorial() {
+      if (!historialConsumibleId) return;
+      var tbody = document.getElementById('historialBody');
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#999;">Cargando...</td></tr>';
+      try {
+        var r = await supabaseClient.from('ti_movimientos').select('*').eq('consumible_id', historialConsumibleId).order('fecha', { ascending: false });
+        if (r.error) throw r.error;
+        var items = r.data || [];
+        if (!items.length) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#999;">Sin movimientos registrados</td></tr>';
+          return;
+        }
+        tbody.innerHTML = items.map(function (m) {
+          var esEntrada = m.tipo === 'Entrada';
+          return '<tr>'
+            + '<td>' + (m.fecha || String(m.created_at || '').slice(0, 10)) + '</td>'
+            + '<td><span class="badge ' + (esEntrada ? 'badge-active' : 'badge-inactive') + '">' + uiEscape(m.tipo) + '</span></td>'
+            + '<td>' + uiEscape(m.concepto || '-') + '</td>'
+            + '<td style="' + (esEntrada ? 'color:#059669;' : 'color:#dc2626;') + 'font-weight:700;">' + (esEntrada ? '+' : '−') + fmtCant(m.cantidad) + '</td>'
+            + '<td>' + uiEscape(m.registrado_por || '-') + '</td>'
+            + '<td>' + uiEscape(m.observaciones || '-') + '</td>'
+            + '</tr>';
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#dc2626;">Error: ' + uiEscape(err.message) + '</td></tr>';
+      }
+    }
+
+    /* ===== HELPDESK ===== */
+    async function loadTickets() {
+      try {
+        var r = await supabaseClient.from('ti_tickets').select('*').order('created_at', { ascending: false });
+        if (r.error) throw r.error;
+        ticItems = r.data || [];
+      } catch (err) {
+        showAlert('Error al cargar tickets: ' + err.message, 'error');
+        ticItems = [];
+      }
+      renderTickets();
+    }
+
+    function renderTickets() {
+      var q = (document.getElementById('ticSearch').value || '').toLowerCase();
+      var fe = document.getElementById('ticFilterEstado').value;
+      var list = ticItems.filter(function (x) {
+        if (fe && x.estado !== fe) return false;
+        return !q || (x.asunto + ' ' + (x.descripcion || '') + ' ' + (x.categoria || '')).toLowerCase().indexOf(q) !== -1;
+      });
+
+      var abiertos = 0, proceso = 0, resueltos = 0, cerrados = 0, criticos = 0;
+      ticItems.forEach(function (x) {
+        if (x.estado === 'Abierto') abiertos++;
+        else if (x.estado === 'En proceso') proceso++;
+        else if (x.estado === 'Resuelto') resueltos++;
+        else if (x.estado === 'Cerrado') cerrados++;
+        if (x.prioridad === 'Crítica' && (x.estado === 'Abierto' || x.estado === 'En proceso')) criticos++;
+      });
+      document.getElementById('ticAbiertos').textContent = abiertos;
+      document.getElementById('ticProceso').textContent = proceso;
+      document.getElementById('ticResueltos').textContent = resueltos;
+      document.getElementById('ticCerrados').textContent = cerrados;
+      document.getElementById('ticCriticos').textContent = criticos;
+
+      var tbody = document.getElementById('ticTableBody');
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay tickets registrados</td></tr>';
+        return;
+      }
+      tbody.innerHTML = list.map(function (x) {
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + uiEscape(x.asunto) + '</span><div style="font-size:11px;color:var(--color-text-secondary);">#' + x.id + ' · ' + (x.created_at ? String(x.created_at).slice(0, 10) : '-') + '</div></td>'
+          + '<td>' + uiEscape(x.categoria || '-') + '</td>'
+          + '<td class="' + prioridadClase(x.prioridad) + '">' + uiEscape(x.prioridad) + '</td>'
+          + '<td><select class="form-select" style="height:32px;font-size:12px;padding:0 24px 0 8px;" onchange="cambiarEstadoTicket(\'' + x.id + '\', this.value)">'
+          + '<option' + (x.estado === 'Abierto' ? ' selected' : '') + '>Abierto</option>'
+          + '<option' + (x.estado === 'En proceso' ? ' selected' : '') + '>En proceso</option>'
+          + '<option' + (x.estado === 'Resuelto' ? ' selected' : '') + '>Resuelto</option>'
+          + '<option' + (x.estado === 'Cerrado' ? ' selected' : '') + '>Cerrado</option>'
+          + '</select></td>'
+          + '<td>' + uiEscape(nombreTrabajador(x.solicitante_id)) + '</td>'
+          + '<td>' + uiEscape(nombreTrabajador(x.tecnico_id)) + '</td>'
+          + '<td><button class="ti-btn-icon" title="Editar" onclick="openModalTicket(\'' + x.id + '\')"><i class="fi fi-sr-edit" style="font-size:13px;pointer-events:none;"></i></button> <button class="ti-btn-icon" title="Eliminar" onclick="deleteTicket(\'' + x.id + '\')" style="color:#dc2626;"><i class="fi fi-sr-trash" style="font-size:13px;pointer-events:none;"></i></button></td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function openModalTicket(id) {
+      ticketEditId = null;
+      document.getElementById('ticketForm').reset();
+      document.getElementById('ticketModalTitle').textContent = 'Nuevo ticket';
+      if (id) {
+        var x = ticItems.find(function (i) { return String(i.id) === String(id); });
+        if (x) {
+          ticketEditId = id;
+          document.getElementById('ticketModalTitle').textContent = 'Editar ticket';
+          document.getElementById('tic_asunto').value = x.asunto;
+          document.getElementById('tic_categoria').value = x.categoria || 'Soporte';
+          document.getElementById('tic_prioridad').value = x.prioridad || 'Media';
+          document.getElementById('tic_estado').value = x.estado || 'Abierto';
+          document.getElementById('tic_descripcion').value = x.descripcion || '';
+          document.getElementById('tic_solicitante').value = x.solicitante_id ? String(x.solicitante_id) : '';
+          document.getElementById('tic_tecnico').value = x.tecnico_id ? String(x.tecnico_id) : '';
+        }
+      }
+      openModal('modalTicket');
+    }
+
+    async function saveTicket() {
+      var asunto = document.getElementById('tic_asunto').value.trim();
+      if (!asunto) { showAlert('Indica el asunto del ticket', 'warning'); return; }
+      var estado = document.getElementById('tic_estado').value;
+      var payload = {
+        asunto: asunto,
+        categoria: document.getElementById('tic_categoria').value,
+        prioridad: document.getElementById('tic_prioridad').value,
+        estado: estado,
+        descripcion: document.getElementById('tic_descripcion').value.trim() || null,
+        solicitante_id: document.getElementById('tic_solicitante').value || null,
+        tecnico_id: document.getElementById('tic_tecnico').value || null
+      };
+      if (estado === 'Resuelto' || estado === 'Cerrado') payload.fecha_resolucion = new Date().toISOString();
+      else payload.fecha_resolucion = null;
+      try {
+        var r;
+        if (ticketEditId) {
+          r = await supabaseClient.from('ti_tickets').update(payload).eq('id', ticketEditId);
+        } else {
+          r = await supabaseClient.from('ti_tickets').insert([payload]);
+        }
+        if (r.error) throw r.error;
+        closeModal('modalTicket');
+        showAlert('Ticket guardado', 'success');
+        loadTickets();
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function cambiarEstadoTicket(id, estado) {
+      var payload = { estado: estado };
+      if (estado === 'Resuelto' || estado === 'Cerrado') payload.fecha_resolucion = new Date().toISOString();
+      else payload.fecha_resolucion = null;
+      try {
+        var r = await supabaseClient.from('ti_tickets').update(payload).eq('id', id);
+        if (r.error) throw r.error;
+        showAlert('Ticket actualizado a "' + estado + '"', 'success');
+        loadTickets();
+      } catch (err) {
+        showAlert('Error al actualizar: ' + err.message, 'error');
+        loadTickets();
+      }
+    }
+
+    async function deleteTicket(id) {
+      if (!(await showConfirm('¿Eliminar este ticket?'))) return;
+      try {
+        var r = await supabaseClient.from('ti_tickets').delete().eq('id', id);
+        if (r.error) throw r.error;
+        loadTickets();
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== PROYECTOS ===== */
+    async function loadProyectos() {
+      try {
+        var r = await supabaseClient.from('ti_proyectos').select('*').order('fecha_inicio', { ascending: false, nullsFirst: false });
+        if (r.error) throw r.error;
+        proyItems = r.data || [];
+      } catch (err) {
+        showAlert('Error al cargar proyectos: ' + err.message, 'error');
+        proyItems = [];
+      }
+      renderProyectos();
+    }
+
+    function renderProyectos() {
+      var q = (document.getElementById('proySearch').value || '').toLowerCase();
+      var list = proyItems.filter(function (x) {
+        return !q || (x.nombre + ' ' + (x.descripcion || '')).toLowerCase().indexOf(q) !== -1;
+      });
+
+      var total = proyItems.length;
+      var curso = proyItems.filter(function (x) { return x.fase === 'En curso'; }).length;
+      var iniciados = proyItems.filter(function (x) { return x.fase === 'Iniciado'; }).length;
+      var completados = proyItems.filter(function (x) { return x.fase === 'Completado'; }).length;
+      var prom = total ? Math.round(proyItems.reduce(function (a, x) { return a + Number(x.avance || 0); }, 0) / total) : 0;
+      document.getElementById('proyTotal').textContent = total;
+      document.getElementById('proyCurso').textContent = curso;
+      document.getElementById('proyIniciados').textContent = iniciados;
+      document.getElementById('proyCompletados').textContent = completados;
+      document.getElementById('proyPromedio').textContent = total ? prom + '%' : '-';
+
+      var tbody = document.getElementById('proyTableBody');
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay proyectos registrados' + (q ? ' para "' + uiEscape(q) + '"' : '') + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = list.map(function (x) {
+        var av = Math.max(0, Math.min(100, Number(x.avance || 0)));
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + uiEscape(x.nombre) + '</span>' + (x.descripcion ? '<div style="font-size:11.5px;color:var(--color-text-secondary);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + uiEscape(x.descripcion) + '</div>' : '') + '</td>'
+          + '<td><span class="badge ' + badgeMap(x.fase) + '">' + uiEscape(x.fase) + '</span></td>'
+          + '<td><div class="ti-progress"><div class="ti-progress-bar" style="width:' + av + '%;"></div></div><div class="ti-progress-label">' + av + '%</div></td>'
+          + '<td>' + uiEscape(nombreTrabajador(x.responsable_id)) + '</td>'
+          + '<td>' + (x.fecha_inicio || '-') + '</td>'
+          + '<td>' + (x.fecha_fin || '-') + '</td>'
+          + '<td><button class="ti-btn-icon" title="Tareas" onclick="openTareas(\'' + x.id + '\')"><i class="fi fi-sr-list-timeline" style="font-size:13px;pointer-events:none;"></i></button> <button class="ti-btn-icon" title="Editar" onclick="openModalProyecto(\'' + x.id + '\')"><i class="fi fi-sr-edit" style="font-size:13px;pointer-events:none;"></i></button> <button class="ti-btn-icon" title="Eliminar" onclick="deleteProyecto(\'' + x.id + '\')" style="color:#dc2626;"><i class="fi fi-sr-trash" style="font-size:13px;pointer-events:none;"></i></button></td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function openModalProyecto(id) {
+      proyectoEditId = null;
+      document.getElementById('proyectoForm').reset();
+      document.getElementById('proy_avance').value = 0;
+      document.getElementById('proyectoModalTitle').textContent = 'Nuevo proyecto';
+      if (id) {
+        var x = proyItems.find(function (i) { return String(i.id) === String(id); });
+        if (x) {
+          proyectoEditId = id;
+          document.getElementById('proyectoModalTitle').textContent = 'Editar proyecto';
+          document.getElementById('proy_nombre').value = x.nombre;
+          document.getElementById('proy_descripcion').value = x.descripcion || '';
+          document.getElementById('proy_fase').value = x.fase || 'Iniciado';
+          document.getElementById('proy_avance').value = x.avance;
+          document.getElementById('proy_responsable').value = x.responsable_id ? String(x.responsable_id) : '';
+          document.getElementById('proy_inicio').value = x.fecha_inicio || '';
+          document.getElementById('proy_fin').value = x.fecha_fin || '';
+        }
+      }
+      openModal('modalProyecto');
+    }
+
+    async function saveProyecto() {
+      var nombre = document.getElementById('proy_nombre').value.trim();
+      if (!nombre) { showAlert('Indica el nombre del proyecto', 'warning'); return; }
+      var payload = {
+        nombre: nombre,
+        descripcion: document.getElementById('proy_descripcion').value.trim() || null,
+        fase: document.getElementById('proy_fase').value,
+        avance: Math.max(0, Math.min(100, Number(document.getElementById('proy_avance').value) || 0)),
+        responsable_id: document.getElementById('proy_responsable').value || null,
+        fecha_inicio: document.getElementById('proy_inicio').value || null,
+        fecha_fin: document.getElementById('proy_fin').value || null
+      };
+      try {
+        var r;
+        if (proyectoEditId) {
+          r = await supabaseClient.from('ti_proyectos').update(payload).eq('id', proyectoEditId);
+        } else {
+          r = await supabaseClient.from('ti_proyectos').insert([payload]);
+        }
+        if (r.error) throw r.error;
+        closeModal('modalProyecto');
+        showAlert('Proyecto guardado', 'success');
+        loadProyectos();
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteProyecto(id) {
+      if (!(await showConfirm('¿Eliminar este proyecto? También se eliminarán sus tareas.'))) return;
+      try {
+        var r = await supabaseClient.from('ti_proyectos').delete().eq('id', id);
+        if (r.error) throw r.error;
+        loadProyectos();
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== TAREAS ===== */
+    async function openTareas(id) {
+      var x = proyItems.find(function (i) { return String(i.id) === String(id); });
+      if (!x) return;
+      tareasProyectoId = id;
+      document.getElementById('tareasModalTitle').textContent = 'Tareas · ' + x.nombre;
+      document.getElementById('tareaNombre').value = '';
+      openModal('modalTareas');
+      await loadTareas();
+    }
+
+    async function loadTareas() {
+      if (!tareasProyectoId) return;
+      try {
+        var r = await supabaseClient.from('ti_tareas').select('*').eq('proyecto_id', tareasProyectoId).order('created_at', { ascending: true });
+        if (r.error) throw r.error;
+        tareasItems = r.data || [];
+      } catch (err) {
+        showAlert('Error al cargar tareas: ' + err.message, 'error');
+        tareasItems = [];
+      }
+      var cont = document.getElementById('tareasList');
+      if (!tareasItems.length) {
+        cont.innerHTML = '<div class="empty-hint">Este proyecto no tiene tareas todavía.</div>';
+        return;
+      }
+      cont.innerHTML = tareasItems.map(function (t) {
+        var done = t.estado === 'Completada';
+        return '<div class="tarea-row' + (done ? ' done' : '') + '">'
+          + '<input type="checkbox" ' + (done ? 'checked' : '') + ' onchange="toggleTarea(\'' + t.id + '\', this.checked)" style="width:16px;height:16px;">'
+          + '<span class="tarea-nombre" style="flex:1;">' + uiEscape(t.nombre) + '</span>'
+          + '<button type="button" class="btn btn-outline btn-sm" onclick="deleteTarea(\'' + t.id + '\')" style="color:#dc2626;height:30px;padding:0 10px;">Eliminar</button>'
+          + '</div>';
+      }).join('');
+    }
+
+    async function addTarea() {
+      var nombre = document.getElementById('tareaNombre').value.trim();
+      if (!nombre) { showAlert('Indica el nombre de la tarea', 'warning'); return; }
+      if (!tareasProyectoId) return;
+      try {
+        var r = await supabaseClient.from('ti_tareas').insert([{ proyecto_id: tareasProyectoId, nombre: nombre }]);
+        if (r.error) throw r.error;
+        document.getElementById('tareaNombre').value = '';
+        loadTareas();
+      } catch (err) {
+        showAlert('Error al agregar tarea: ' + err.message, 'error');
+      }
+    }
+
+    async function toggleTarea(id, done) {
+      try {
+        var r = await supabaseClient.from('ti_tareas').update({ estado: done ? 'Completada' : 'Pendiente' }).eq('id', id);
+        if (r.error) throw r.error;
+        loadTareas();
+      } catch (err) {
+        showAlert('Error al actualizar tarea: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteTarea(id) {
+      if (!(await showConfirm('¿Eliminar esta tarea?'))) return;
+      try {
+        var r = await supabaseClient.from('ti_tareas').delete().eq('id', id);
+        if (r.error) throw r.error;
+        loadTareas();
+      } catch (err) {
+        showAlert('Error al eliminar tarea: ' + err.message, 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      loadWorkers();
+      loadEquipos();
+      loadLicencias();
+      loadConsumibles();
+      loadTickets();
+      loadProyectos();
+      var savedTool = localStorage.getItem('fiat_tool_' + location.pathname);
+      if (savedTool && document.getElementById('tool-' + savedTool)) switchTool(savedTool);
+      var savedInvTab = localStorage.getItem('fiat_ti_inv_tab');
+      if (savedInvTab && ['equipos', 'licencias', 'consumibles'].indexOf(savedInvTab) !== -1) tiTab(savedInvTab);
+    });
+  </script>
+
+<script src="../js/module-help.js"></script>
+    <script src="../js/access.js"></script>
+</body>
+</html>

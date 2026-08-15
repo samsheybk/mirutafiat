@@ -34,6 +34,7 @@
   --module-finanzas: #1e3a8a;
   --module-oportunidades: #059669;
   --module-usuarios: #0ea5e9;
+  --module-gourmet: #a16207;
 }
 
 html, body {
@@ -711,6 +712,7 @@ a {
   .panel-item.active .panel-item-indicator.bg-finanzas ~ i.fi { color: var(--module-finanzas); }
   .panel-item.active .panel-item-indicator.bg-oportunidades ~ i.fi { color: var(--module-oportunidades); }
   .panel-item.active .panel-item-indicator.bg-usuarios ~ i.fi { color: var(--module-usuarios); }
+  .panel-item.active .panel-item-indicator.bg-gourmet ~ i.fi { color: var(--module-gourmet); }
 .panel-item-indicator {
   position: absolute;
   top: 0;
@@ -1240,6 +1242,7 @@ a {
 .btn-finanzas { background: var(--module-finanzas); }
 .btn-oportunidades { background: var(--module-oportunidades); }
 .btn-usuarios { background: var(--module-usuarios); }
+.btn-gourmet { background: var(--module-gourmet); }
 
 .border-captacion { border-color: var(--module-captacion); }
 .border-relaciones { border-color: var(--module-relaciones); }
@@ -1282,6 +1285,7 @@ a {
 .bg-finanzas { background: var(--module-finanzas); }
 .bg-oportunidades { background: var(--module-oportunidades); }
 .bg-usuarios { background: var(--module-usuarios); }
+.bg-gourmet { background: var(--module-gourmet); }
 
 /* ===== EMPTY STATE ===== */
 .empty-state {
@@ -2669,5 +2673,83 @@ a {
   font-size: 12.5px;
   color: var(--color-text-secondary);
   line-height: 1.5;
+}
+
+/* ============================================
+   MÓVIL: tablas anchas convertidas en tarjetas
+   (la clase .table-cards la agrega js/ui.js a las
+   tablas con más de 4 columnas en pantallas <= 640px)
+   ============================================ */
+@media (max-width: 640px) {
+  table.table-cards {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+  .table-cards thead {
+    display: none;
+  }
+  .table-cards tbody {
+    display: block;
+  }
+  .table-cards tbody > tr {
+    display: block;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 6px 0;
+    margin-bottom: 10px;
+  }
+  .table-cards tbody > tr:last-child {
+    margin-bottom: 0;
+  }
+  .table-cards tbody > tr:hover td {
+    background: transparent;
+  }
+  .table-cards td {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 7px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    border-left: none;
+    font-size: 13px;
+    line-height: 1.35;
+    white-space: normal;
+    word-break: break-word;
+  }
+  .table-cards td:last-child {
+    border-bottom: none;
+  }
+  .table-cards td::before {
+    content: attr(data-label);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--color-text-secondary);
+    margin-bottom: 2px;
+  }
+  .table-cards td[colspan] {
+    text-align: center;
+    color: #64748b;
+    padding: 18px 14px;
+  }
+  /* Celdas con botones o controles: etiqueta arriba, controles en fila */
+  .table-cards td.cell-actions,
+  .table-cards td.cell-ctrl {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .table-cards td.cell-actions::before,
+  .table-cards td.cell-ctrl::before {
+    flex-basis: 100%;
+  }
 }
 

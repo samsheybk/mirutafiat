@@ -150,3 +150,76 @@ function uiFadeIn(el) {
   void el.offsetWidth;
   el.classList.add('fade-in');
 }
+
+// ============================================
+// TABLAS A TARJETAS EN MÓVIL
+// En pantallas <= 640px, las tablas con más de
+// TABLE_CARDS_THRESHOLD columnas se convierten en
+// tarjetas: cada fila es una tarjeta y cada celda
+// muestra su etiqueta (del <th>) encima del valor.
+// Se aplica también a tablas renderizadas de forma
+// dinámica vía MutationObserver, sin romper la
+// estructura ni los manejadores de las filas.
+// ============================================
+
+const TABLE_CARDS_THRESHOLD = 4;
+let tableCardsTimer = null;
+let tableCardsObserver = null;
+
+function tableCardsLabel(th) {
+  const clone = th.cloneNode(true);
+  clone.querySelectorAll('.th-help-text').forEach((n) => n.remove());
+  return String(clone.textContent || '').replace(/\s+/g, ' ').trim();
+}
+
+function tableCardsApply(table) {
+  const thead = table.querySelector('thead');
+  const heads = thead ? Array.prototype.slice.call(thead.querySelectorAll('th')) : [];
+  if (heads.length > TABLE_CARDS_THRESHOLD) table.classList.add('table-cards');
+  else table.classList.remove('table-cards');
+  if (!heads.length) return;
+
+  const rows = table.querySelectorAll('tbody > tr');
+  rows.forEach((tr) => {
+    const cells = tr.querySelectorAll('td');
+    cells.forEach((td, idx) => {
+      if (td.hasAttribute('colspan')) return;
+      if (idx >= heads.length) return;
+      const label = tableCardsLabel(heads[idx]);
+      td.setAttribute('data-label', label);
+      const isAction = /accion|acción|opciones|editar|detalles/i.test(label);
+      const hasCtrl = !!td.querySelector('button, input, select, textarea, a.btn, a[class*="btn"]');
+      if (isAction) td.classList.add('cell-actions');
+      else if (hasCtrl) td.classList.add('cell-ctrl');
+      else td.classList.remove('cell-actions', 'cell-ctrl');
+    });
+  });
+}
+
+function tableCardsScan() {
+  if (window.innerWidth > 640) return;
+  document.querySelectorAll('table').forEach(tableCardsApply);
+}
+
+function tableCardsInit() {
+  window.addEventListener('resize', () => {
+    clearTimeout(tableCardsTimer);
+    tableCardsTimer = setTimeout(() => {
+      if (window.innerWidth <= 640) tableCardsScan();
+    }, 200);
+  });
+  if (document.body && !tableCardsObserver) {
+    tableCardsObserver = new MutationObserver(() => {
+      clearTimeout(tableCardsTimer);
+      tableCardsTimer = setTimeout(tableCardsScan, 150);
+    });
+    tableCardsObserver.observe(document.body, { childList: true, subtree: true });
+  }
+  tableCardsScan();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', tableCardsInit);
+} else {
+  tableCardsInit();
+}

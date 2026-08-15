@@ -85,6 +85,12 @@
     { key: 'gestion-usuarios.html', name: 'Gestión de usuarios', tools: [
       { key: 'usuarios', name: 'Usuarios y accesos' },
       { key: 'accesos', name: 'Permisos por módulo' }
+    ]},
+    { key: 'gourmet.html', name: 'Gourmet', tools: [
+      { key: 'equipos', name: 'Inventario de equipos y utensilios' },
+      { key: 'insumos', name: 'Inventario de insumos' },
+      { key: 'recetario', name: 'Recetario' },
+      { key: 'catalogo', name: 'Catálogo' }
     ]}
   ];
 
@@ -184,14 +190,6 @@
       if (base === 'gestion-usuarios.html') { opt.style.display = state.manage ? '' : 'none'; return; }
       if (!canViewModule(base)) opt.style.display = 'none';
     });
-    var perfilExists = Array.prototype.some.call(sel.options, function (o) { return pageOf(o.value) === 'perfil.html'; });
-    if (!perfilExists) {
-      var pOpt = document.createElement('option');
-      pOpt.value = (inModules() ? '../' : '') + 'perfil.html';
-      pOpt.textContent = 'Mi perfil';
-      sel.appendChild(pOpt);
-      if (currentPage() === 'perfil.html') pOpt.selected = true;
-    }
     if (state.manage) {
       var exists = Array.prototype.some.call(sel.options, function (o) { return pageOf(o.value) === 'gestion-usuarios.html'; });
       if (!exists) {

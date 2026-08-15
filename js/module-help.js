@@ -160,6 +160,17 @@
         { icon: 'fi-sr-route', name: 'Hoja de ruta', desc: 'Fases sugeridas para implementar las oportunidades priorizadas.' },
         { icon: 'fi-sr-coins', name: 'Propuesta de costos', desc: 'Estimación de los costos de infraestructura para operar la intranet en producción.' }
       ]
+    },
+    'gourmet.html': {
+      title: 'Gourmet',
+      subtitle: 'Gestión del área gastronómica: inventario de equipos, utensilios e insumos, recetario con validación de stock y carta del menú.',
+      accent: '#a16207',
+      tools: [
+        { icon: 'fi-sr-utensils', name: 'Inventario de equipos y utensilios', desc: 'Registro y control de los equipos y utensilios del área gourmet con su cantidad, ubicación y estado de operatividad.' },
+        { icon: 'fi-sr-boxes', name: 'Inventario de insumos', desc: 'Control de existencias de insumos con unidad de medida, stock mínimo y alertas de bajo stock, agotado o vencido.' },
+        { icon: 'fi-sr-books', name: 'Recetario', desc: 'Recetas con ingredientes y cantidades, con validación automática de disponibilidad de stock para preparar cada plato.' },
+        { icon: 'fi-sr-restaurant', name: 'Catálogo', desc: 'Carta del menú organizada por categorías (entradas, platos principales, postres, bebidas) con precios y disponibilidad.' }
+      ]
     }
   };
 

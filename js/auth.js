@@ -168,6 +168,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const logoutItem = document.getElementById('userDropLogout');
     if (logoutItem) {
+      const profileItem = document.createElement('button');
+      profileItem.type = 'button';
+      profileItem.className = 'user-drop-item';
+      profileItem.id = 'userDropProfile';
+      profileItem.textContent = 'Mi perfil';
+      logoutItem.parentNode.insertBefore(profileItem, logoutItem);
+      profileItem.addEventListener('click', function () {
+        setOpen(false);
+        const base = location.pathname.indexOf('/modules/') !== -1 ? '../perfil.html' : 'perfil.html';
+        window.location.href = base;
+      });
+
       logoutItem.addEventListener('click', async () => {
         setOpen(false);
         if (!(await showConfirm('¿Estás seguro de cerrar tu sesión?'))) return;

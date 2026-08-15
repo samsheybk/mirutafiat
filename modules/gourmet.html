@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gourmet - Intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
+  <style>
+    :root { --module-color: var(--module-gourmet); }
+
+    .gourmet-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .gourmet-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+    }
+    .gourmet-card span {
+      display: block;
+      font-size: 11px;
+      color: var(--color-text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .gourmet-card strong {
+      display: block;
+      font-size: 20px;
+      margin-top: 4px;
+    }
+    .gourmet-card .g-alert { color: #dc2626; }
+    .gourmet-card .g-warn { color: #D97706; }
+    .gourmet-card .g-ok { color: #059669; }
+
+    .ing-row {
+      display: grid;
+      grid-template-columns: 1fr 110px 80px 36px;
+      gap: 8px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+    .ing-row .form-input { height: 36px; }
+
+    .receta-view-ing {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      background: var(--color-surface);
+    }
+    .receta-view-ing.ok { border-color: #a7f3d0; background: #ecfdf5; }
+    .receta-view-ing.falta { border-color: #fecaca; background: #fef2f2; }
+
+    .receta-stock-resumen {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+    .receta-stock-resumen.listo { background: #ecfdf5; color: #059669; }
+    .receta-stock-resumen.no-listo { background: #fef2f2; color: #dc2626; }
+
+    .cat-grupo { margin-bottom: 22px; }
+    .cat-grupo-titulo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--module-gourmet);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 10px;
+    }
+    .cat-grupo-titulo .badge { margin-left: auto; }
+    .cat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px;
+    }
+    .cat-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .cat-card .cat-nombre {
+      font-weight: 700;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cat-card .cat-desc {
+      font-size: 12.5px;
+      color: var(--color-text-secondary);
+      line-height: 1.45;
+      flex: 1;
+    }
+    .cat-card .cat-precio {
+      font-weight: 700;
+      color: var(--module-gourmet);
+    }
+    .cat-card .cat-acciones {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .toolbar-content[data-toolbar="equipos"] .form-input,
+    .toolbar-content[data-toolbar="equipos"] .form-select,
+    .toolbar-content[data-toolbar="insumos"] .form-input,
+    .toolbar-content[data-toolbar="insumos"] .form-select,
+    .toolbar-content[data-toolbar="recetario"] .form-input,
+    .toolbar-content[data-toolbar="recetario"] .form-select,
+    .toolbar-content[data-toolbar="catalogo"] .form-input,
+    .toolbar-content[data-toolbar="catalogo"] .form-select { height: 36px; }
+
+    .modo-observacion { color: #D97706; font-weight: 600; }
+
+    .empty-hint {
+      padding: 18px;
+      text-align: center;
+      color: var(--color-text-secondary);
+      font-size: 13px;
+      background: var(--color-surface);
+      border: 1px dashed var(--color-border);
+      border-radius: var(--radius-sm);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <nav class="topnav" style="background:var(--module-gourmet);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><span class="topnav-logo"></span>Intranet</div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Home</option>
+        <option value="captacion.html">Captación y Selección</option>
+        <option value="relaciones-laborales.html">Relaciones Laborales</option>
+        <option value="capacitacion.html">Capacitación y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="compensacion.html">Compensación</option>
+        <option value="finanzas.html">Finanzas</option>
+        <option value="repositorio.html">Repositorio</option>
+        <option value="chatfiat.html">Mensajería</option>
+        <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
+        <option value="gourmet.html" selected>Gourmet</option>
+      </select>
+
+      <div class="topnav-spacer"></div>
+      <div class="nav-user">
+        <div class="nav-user-menu">
+          <button class="nav-user-menu-btn" id="userMenuBtn" type="button" aria-label="Opciones de usuario" title="Opciones de usuario">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="12" cy="19" r="1.9"></circle></svg>
+          </button>
+          <div class="nav-user-dropdown" id="userDropdown">
+            <div class="user-drop-header">
+              <div class="user-drop-name" id="userDropName">Usuario</div>
+              <div class="user-drop-email" id="userDropEmail"></div>
+              <div class="user-drop-meta" id="userDropMeta"></div>
+            </div>
+            <button type="button" class="user-drop-item" id="userDropHelp">Detalles del módulo</button>
+            <button type="button" class="user-drop-item user-drop-danger" id="userDropLogout">Cerrar sesión</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-panel">
+          <div class="panel-item active" data-tool="equipos" onclick="switchTool('equipos')" title="Inventario de equipos y utensilios"><span class="panel-item-indicator bg-gourmet"></span><i class="fi fi-sr-utensils" style="font-size:24px;pointer-events:none;"></i>
+          </div>
+          <div class="panel-item" data-tool="insumos" onclick="switchTool('insumos')" title="Inventario de insumos"><span class="panel-item-indicator bg-gourmet"></span><i class="fi fi-sr-boxes" style="font-size:24px;pointer-events:none;"></i>
+          </div>
+          <div class="panel-item" data-tool="recetario" onclick="switchTool('recetario')" title="Recetario"><span class="panel-item-indicator bg-gourmet"></span><i class="fi fi-sr-books" style="font-size:24px;pointer-events:none;"></i>
+          </div>
+          <div class="panel-item" data-tool="catalogo" onclick="switchTool('catalogo')" title="Catálogo"><span class="panel-item-indicator bg-gourmet"></span><i class="fi fi-sr-restaurant" style="font-size:24px;pointer-events:none;"></i>
+          </div>
+        </div>
+
+        <div class="module-body">
+          <header class="topbar" style="gap:16px;">
+            <div class="toolbar-content" data-toolbar="equipos" style="display:flex;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
+              <div class="form-group" style="margin:0;flex:1;min-width:200px;"><label>Buscar</label>
+                <input type="text" class="form-input" id="eqSearch" placeholder="Buscar equipo o utensilio..." autocomplete="off" spellcheck="false" oninput="renderEquipos()">
+              </div>
+              <button class="btn btn-gourmet btn-sm" onclick="openModalEquipo()">+ Registrar equipo</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="insumos" style="display:none;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
+              <div class="form-group" style="margin:0;flex:1;min-width:200px;"><label>Buscar</label>
+                <input type="text" class="form-input" id="insSearch" placeholder="Buscar insumo..." autocomplete="off" spellcheck="false" oninput="renderInsumos()">
+              </div>
+              <button class="btn btn-gourmet btn-sm" onclick="openModalInsumo()">+ Registrar insumo</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="recetario" style="display:none;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
+              <div class="form-group" style="margin:0;flex:1;min-width:180px;"><label>Buscar</label>
+                <input type="text" class="form-input" id="recSearch" placeholder="Buscar receta..." autocomplete="off" spellcheck="false" oninput="renderRecetas()">
+              </div>
+              <div class="form-group" style="margin:0;"><label>Categoría</label>
+                <select class="form-select" id="recFilterCategoria" onchange="renderRecetas()">
+                  <option value="">Todas las categorías</option>
+                  <option>Entradas</option>
+                  <option>Platos principales</option>
+                  <option>Postres</option>
+                  <option>Bebidas</option>
+                  <option>Otros</option>
+                </select>
+              </div>
+              <button class="btn btn-gourmet btn-sm" onclick="openModalReceta()">+ Nueva receta</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="catalogo" style="display:none;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
+              <div class="form-group" style="margin:0;flex:1;min-width:180px;"><label>Buscar</label>
+                <input type="text" class="form-input" id="catSearch" placeholder="Buscar plato..." autocomplete="off" spellcheck="false" oninput="renderCatalogo()">
+              </div>
+              <div class="form-group" style="margin:0;"><label>Categoría</label>
+                <select class="form-select" id="catFilterCategoria" onchange="renderCatalogo()">
+                  <option value="">Todas las categorías</option>
+                  <option>Entradas</option>
+                  <option>Platos principales</option>
+                  <option>Postres</option>
+                  <option>Bebidas</option>
+                  <option>Otros</option>
+                </select>
+              </div>
+              <button class="btn btn-gourmet btn-sm" onclick="openModalCatalogo()">+ Agregar plato</button>
+            </div>
+          </header>
+
+          <div class="module-content">
+            <!-- Inventario de equipos y utensilios -->
+            <div class="tool-section active" id="tool-equipos">
+              <div class="gourmet-cards">
+                <div class="gourmet-card"><span>Total registros</span><strong id="eqTotal">-</strong></div>
+                <div class="gourmet-card"><span>Equipos</span><strong id="eqEquipos">-</strong></div>
+                <div class="gourmet-card"><span>Utensilios</span><strong id="eqUtensilios">-</strong></div>
+                <div class="gourmet-card"><span>En reparación</span><strong class="g-warn" id="eqReparacion">-</strong></div>
+                <div class="gourmet-card"><span>Dados de baja</span><strong class="g-alert" id="eqBaja">-</strong></div>
+              </div>
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Nombre</th><th>Tipo</th><th>Marca / Modelo</th><th>Cantidad</th><th>Ubicación</th><th>Estado</th><th style="width:150px;">Acción</th></tr></thead>
+                  <tbody id="eqTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Inventario de insumos -->
+            <div class="tool-section" id="tool-insumos">
+              <div class="gourmet-cards">
+                <div class="gourmet-card"><span>Total insumos</span><strong id="insTotal">-</strong></div>
+                <div class="gourmet-card"><span>Bajo stock</span><strong class="g-warn" id="insBajo">-</strong></div>
+                <div class="gourmet-card"><span>Agotados</span><strong class="g-alert" id="insAgotados">-</strong></div>
+                <div class="gourmet-card"><span>Vencidos</span><strong class="g-alert" id="insVencidos">-</strong></div>
+                <div class="gourmet-card"><span>Disponibles</span><strong class="g-ok" id="insDisponibles">-</strong></div>
+              </div>
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Nombre</th><th>Unidad</th><th>Cantidad</th><th>Mínimo</th><th>Vencimiento</th><th>Proveedor</th><th>Estado</th><th style="width:150px;">Acción</th></tr></thead>
+                  <tbody id="insTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Recetario -->
+            <div class="tool-section" id="tool-recetario">
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Receta</th><th>Categoría</th><th>Porciones</th><th>Tiempo</th><th>Ingredientes</th><th style="width:230px;">Acción</th></tr></thead>
+                  <tbody id="recTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Catálogo -->
+            <div class="tool-section" id="tool-catalogo">
+              <div id="catContainer"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Equipo -->
+  <div class="modal-overlay" id="modalEquipo">
+    <div class="modal" style="max-width:540px;">
+      <div class="modal-header"><h3 id="equipoModalTitle">Registrar equipo</h3><button class="modal-close" onclick="closeModal('modalEquipo')">&times;</button></div>
+      <div class="modal-body">
+        <form id="equipoForm">
+          <div class="form-row">
+            <div class="form-group" style="flex:2;"><label>Nombre *</label><input type="text" class="form-input" id="eq_nombre" required placeholder="Ej: Horno industrial"></div>
+            <div class="form-group" style="flex:1;"><label>Tipo</label>
+              <select class="form-select" id="eq_tipo"><option>Equipo</option><option>Utensilio</option></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Marca</label><input type="text" class="form-input" id="eq_marca" placeholder="Ej: Imaco"></div>
+            <div class="form-group"><label>Modelo</label><input type="text" class="form-input" id="eq_modelo"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Cantidad</label><input type="number" class="form-input" id="eq_cantidad" min="0" step="1" value="1"></div>
+            <div class="form-group"><label>Ubicación</label><input type="text" class="form-input" id="eq_ubicacion" placeholder="Ej: Cocina principal"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Estado</label>
+              <select class="form-select" id="eq_estado"><option>Operativo</option><option>En reparación</option><option>Dañado</option><option>Dado de baja</option></select>
+            </div>
+          </div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="eq_observaciones" rows="2"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalEquipo')">Cancelar</button>
+        <button class="btn btn-gourmet" onclick="saveEquipo()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Insumo -->
+  <div class="modal-overlay" id="modalInsumo">
+    <div class="modal" style="max-width:540px;">
+      <div class="modal-header"><h3 id="insumoModalTitle">Registrar insumo</h3><button class="modal-close" onclick="closeModal('modalInsumo')">&times;</button></div>
+      <div class="modal-body">
+        <form id="insumoForm">
+          <div class="form-group"><label>Nombre *</label><input type="text" class="form-input" id="ins_nombre" required placeholder="Ej: Harina de trigo"></div>
+          <div class="form-row">
+            <div class="form-group"><label>Unidad de medida</label>
+              <select class="form-select" id="ins_unidad">
+                <option value="unidad">unidad</option>
+                <option value="kg">kg</option>
+                <option value="g">g</option>
+                <option value="l">l</option>
+                <option value="ml">ml</option>
+                <option value="lb">lb</option>
+                <option value="docena">docena</option>
+                <option value="paquete">paquete</option>
+                <option value="botella">botella</option>
+                <option value="lata">lata</option>
+              </select>
+            </div>
+            <div class="form-group"><label>Cantidad</label><input type="number" class="form-input" id="ins_cantidad" min="0" step="0.001" value="0"></div>
+            <div class="form-group"><label>Stock mínimo</label><input type="number" class="form-input" id="ins_minimo" min="0" step="0.001" value="0"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Fecha de vencimiento</label><input type="date" class="form-input" id="ins_vencimiento"></div>
+            <div class="form-group"><label>Proveedor</label><input type="text" class="form-input" id="ins_proveedor" placeholder="Ej: Distribuidora Delicia"></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalInsumo')">Cancelar</button>
+        <button class="btn btn-gourmet" onclick="saveInsumo()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Receta -->
+  <div class="modal-overlay" id="modalReceta">
+    <div class="modal" style="max-width:640px;">
+      <div class="modal-header"><h3 id="recetaModalTitle">Nueva receta</h3><button class="modal-close" onclick="closeModal('modalReceta')">&times;</button></div>
+      <div class="modal-body">
+        <form id="recetaForm">
+          <div class="form-row">
+            <div class="form-group" style="flex:2;"><label>Nombre *</label><input type="text" class="form-input" id="rec_nombre" required placeholder="Ej: Tortas de trigo gourmet"></div>
+            <div class="form-group"><label>Categoría</label>
+              <select class="form-select" id="rec_categoria"><option>Entradas</option><option>Platos principales</option><option>Postres</option><option>Bebidas</option><option>Otros</option></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Porciones</label><input type="number" class="form-input" id="rec_porciones" min="1" step="1" value="1"></div>
+            <div class="form-group"><label>Tiempo de preparación (min)</label><input type="number" class="form-input" id="rec_tiempo" min="0" step="1" value="0"></div>
+          </div>
+          <div class="form-group">
+            <label>Ingredientes (se validan contra el inventario de insumos)</label>
+            <div id="recIngredientes"></div>
+            <button type="button" class="btn btn-outline btn-sm" id="recIngAddBtn" onclick="addIngredienteRow()">+ Agregar ingrediente</button>
+            <div id="recIngAlerta" style="font-size:12px;color:#D97706;margin-top:6px;display:none;">No hay insumos registrados. Registra insumos en el inventario para poder armar la receta.</div>
+          </div>
+          <div class="form-group"><label>Instrucciones de preparación</label><textarea class="form-textarea" id="rec_instrucciones" rows="4" placeholder="Describe los pasos de preparación..."></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalReceta')">Cancelar</button>
+        <button class="btn btn-gourmet" onclick="saveReceta()">Guardar receta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Ver Receta + validación de stock -->
+  <div class="modal-overlay" id="modalRecetaStock">
+    <div class="modal" style="max-width:560px;">
+      <div class="modal-header"><h3 id="recStockTitle">Receta</h3><button class="modal-close" onclick="closeModal('modalRecetaStock')">&times;</button></div>
+      <div class="modal-body">
+        <div id="recStockResumen"></div>
+        <div id="recStockIngredientes"></div>
+        <div class="form-group" style="margin-top:14px;"><label>Instrucciones</label><div id="recStockInstrucciones" style="font-size:13px;color:var(--color-text-secondary);white-space:pre-wrap;"></div></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalRecetaStock')">Cerrar</button>
+        <button class="btn btn-gourmet" onclick="editRecetaFromStock()">Editar receta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Catálogo -->
+  <div class="modal-overlay" id="modalCatalogo">
+    <div class="modal" style="max-width:540px;">
+      <div class="modal-header"><h3 id="catalogoModalTitle">Agregar plato</h3><button class="modal-close" onclick="closeModal('modalCatalogo')">&times;</button></div>
+      <div class="modal-body">
+        <form id="catalogoForm">
+          <div class="form-row">
+            <div class="form-group" style="flex:2;"><label>Nombre *</label><input type="text" class="form-input" id="cat_nombre" required placeholder="Ej: Tartaleta de frutos rojos"></div>
+            <div class="form-group"><label>Categoría</label>
+              <select class="form-select" id="cat_categoria"><option>Entradas</option><option>Platos principales</option><option>Postres</option><option>Bebidas</option><option>Otros</option></select>
+            </div>
+          </div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="cat_descripcion" rows="3" placeholder="Descripción del plato..."></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Precio (Bs.)</label><input type="number" class="form-input" id="cat_precio" min="0" step="0.01" value="0"></div>
+            <div class="form-group" style="display:flex;align-items:flex-end;padding-bottom:8px;"><label style="display:flex;align-items:center;gap:8px;font-weight:600;"><input type="checkbox" id="cat_disponible" checked> Disponible en la carta</label></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalCatalogo')">Cancelar</button>
+        <button class="btn btn-gourmet" onclick="saveCatalogo()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/modules.js"></script>
+  <script>
+    var eqItems = [];
+    var insItems = [];
+    var recItems = [];
+    var catItems = [];
+    var equipoEditId = null;
+    var insumoEditId = null;
+    var recetaEditId = null;
+    var catalogoEditId = null;
+    var recetaStockId = null;
+
+    var CATEGORIAS = ['Entradas', 'Platos principales', 'Postres', 'Bebidas', 'Otros'];
+
+    function openModal(id) { var el = document.getElementById(id); if (el) el.classList.add('show'); }
+    function closeModal(id) { var el = document.getElementById(id); if (el) el.classList.remove('show'); }
+
+    document.addEventListener('click', function (e) {
+      if (e.target.classList && e.target.classList.contains('modal-overlay')) {
+        e.target.classList.remove('show');
+      }
+    });
+
+    function badgeMap(estado) {
+      var m = {
+        'Operativo': 'badge-active',
+        'Disponible': 'badge-active',
+        'Agotado': 'badge-inactive',
+        'Vencido': 'badge-inactive',
+        'Dado de baja': 'badge-inactive',
+        'Bajo stock': 'badge-pending',
+        'En reparación': 'badge-pending',
+        'Dañado': 'badge-pending'
+      };
+      return m[estado] || 'badge-pending';
+    }
+
+    function hoyISO() {
+      var d = new Date();
+      return d.toISOString().slice(0, 10);
+    }
+
+    function fmtNum(n) {
+      var v = Number(n || 0);
+      return v % 1 === 0 ? v.toLocaleString('es-VE') : v.toLocaleString('es-VE');
+    }
+
+    function fmtBs(n) {
+      return 'Bs. ' + Number(n || 0).toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    /* ===== EQUIPOS Y UTENSILIOS ===== */
+    async function loadEquipos() {
+      try {
+        var r = await supabaseClient.from('gourmet_equipos').select('*').order('nombre');
+        if (r.error) throw r.error;
+        eqItems = r.data || [];
+      } catch (err) {
+        showAlert('Error al cargar equipos: ' + err.message, 'error');
+        eqItems = [];
+      }
+      renderEquipos();
+    }
+
+    function renderEquipos() {
+      var q = (document.getElementById('eqSearch').value || '').toLowerCase();
+      var list = eqItems.filter(function (x) {
+        return !q || (x.nombre + ' ' + (x.marca || '') + ' ' + (x.modelo || '') + ' ' + (x.ubicacion || '')).toLowerCase().indexOf(q) !== -1;
+      });
+      var total = eqItems.length;
+      var equipos = eqItems.filter(function (x) { return x.tipo === 'Equipo'; }).length;
+      var utensilios = eqItems.filter(function (x) { return x.tipo === 'Utensilio'; }).length;
+      var reparacion = eqItems.filter(function (x) { return x.estado === 'En reparación'; }).length;
+      var baja = eqItems.filter(function (x) { return x.estado === 'Dado de baja'; }).length;
+      document.getElementById('eqTotal').textContent = total;
+      document.getElementById('eqEquipos').textContent = equipos;
+      document.getElementById('eqUtensilios').textContent = utensilios;
+      document.getElementById('eqReparacion').textContent = reparacion;
+      document.getElementById('eqBaja').textContent = baja;
+
+      var tbody = document.getElementById('eqTableBody');
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">No hay registros' + (q ? ' para "' + uiEscape(q) + '"' : '') + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = list.map(function (x) {
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + uiEscape(x.nombre) + '</span></td>'
+          + '<td>' + uiEscape(x.tipo || '-') + '</td>'
+          + '<td>' + uiEscape([x.marca, x.modelo].filter(Boolean).join(' · ') || '-') + '</td>'
+          + '<td>' + fmtNum(x.cantidad) + '</td>'
+          + '<td>' + uiEscape(x.ubicacion || '-') + '</td>'
+          + '<td><span class="badge ' + badgeMap(x.estado) + '">' + uiEscape(x.estado) + '</span></td>'
+          + '<td><button class="btn btn-sm btn-outline" onclick="openModalEquipo(\'' + x.id + '\')">Editar</button> <button class="btn btn-sm btn-outline" onclick="deleteEquipo(\'' + x.id + '\')" style="color:#dc2626;">Eliminar</button></td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function openModalEquipo(id) {
+      equipoEditId = null;
+      document.getElementById('equipoForm').reset();
+      document.getElementById('eq_cantidad').value = 1;
+      document.getElementById('equipoModalTitle').textContent = 'Registrar equipo';
+      if (id) {
+        var x = eqItems.find(function (i) { return String(i.id) === String(id); });
+        if (x) {
+          equipoEditId = id;
+          document.getElementById('equipoModalTitle').textContent = 'Editar equipo';
+          document.getElementById('eq_nombre').value = x.nombre;
+          document.getElementById('eq_tipo').value = x.tipo || 'Equipo';
+          document.getElementById('eq_marca').value = x.marca || '';
+          document.getElementById('eq_modelo').value = x.modelo || '';
+          document.getElementById('eq_cantidad').value = x.cantidad;
+          document.getElementById('eq_ubicacion').value = x.ubicacion || '';
+          document.getElementById('eq_estado').value = x.estado || 'Operativo';
+          document.getElementById('eq_observaciones').value = x.observaciones || '';
+        }
+      }
+      openModal('modalEquipo');
+    }
+
+    async function saveEquipo() {
+      var nombre = document.getElementById('eq_nombre').value.trim();
+      if (!nombre) { showAlert('Indica el nombre del equipo o utensilio', 'warning'); return; }
+      var payload = {
+        nombre: nombre,
+        tipo: document.getElementById('eq_tipo').value,
+        marca: document.getElementById('eq_marca').value.trim() || null,
+        modelo: document.getElementById('eq_modelo').value.trim() || null,
+        cantidad: Number(document.getElementById('eq_cantidad').value) || 0,
+        ubicacion: document.getElementById('eq_ubicacion').value.trim() || null,
+        estado: document.getElementById('eq_estado').value,
+        observaciones: document.getElementById('eq_observaciones').value.trim() || null
+      };
+      try {
+        var result;
+        if (equipoEditId) {
+          result = await supabaseClient.from('gourmet_equipos').update(payload).eq('id', equipoEditId);
+        } else {
+          result = await supabaseClient.from('gourmet_equipos').insert([payload]);
+        }
+        if (result.error) throw result.error;
+        closeModal('modalEquipo');
+        showAlert('Equipo guardado', 'success');
+        loadEquipos();
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteEquipo(id) {
+      if (!(await showConfirm('¿Eliminar este equipo/utensilio?'))) return;
+      try {
+        var r = await supabaseClient.from('gourmet_equipos').delete().eq('id', id);
+        if (r.error) throw r.error;
+        loadEquipos();
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== INSUMOS ===== */
+    function insumoEstado(x) {
+      var hoy = hoyISO();
+      if (x.fecha_vencimiento && x.fecha_vencimiento <= hoy) return 'Vencido';
+      var c = Number(x.cantidad || 0);
+      if (c <= 0) return 'Agotado';
+      if (Number(x.cantidad_minima) > 0 && c <= Number(x.cantidad_minima)) return 'Bajo stock';
+      return 'Disponible';
+    }
+
+    async function loadInsumos() {
+      try {
+        var r = await supabaseClient.from('gourmet_insumos').select('*').order('nombre');
+        if (r.error) throw r.error;
+        insItems = r.data || [];
+      } catch (err) {
+        showAlert('Error al cargar insumos: ' + err.message, 'error');
+        insItems = [];
+      }
+      renderInsumos();
+    }
+
+    function renderInsumos() {
+      var q = (document.getElementById('insSearch').value || '').toLowerCase();
+      var list = insItems.filter(function (x) {
+        return !q || (x.nombre + ' ' + (x.proveedor || '')).toLowerCase().indexOf(q) !== -1;
+      }).map(function (x) { return { item: x, estado: insumoEstado(x) }; });
+
+      var total = insItems.length;
+      var bajos = 0, agotados = 0, vencidos = 0, disponibles = 0;
+      insItems.forEach(function (x) {
+        var e = insumoEstado(x);
+        if (e === 'Bajo stock') bajos++;
+        else if (e === 'Agotado') agotados++;
+        else if (e === 'Vencido') vencidos++;
+        else disponibles++;
+      });
+      document.getElementById('insTotal').textContent = total;
+      document.getElementById('insBajo').textContent = bajos;
+      document.getElementById('insAgotados').textContent = agotados;
+      document.getElementById('insVencidos').textContent = vencidos;
+      document.getElementById('insDisponibles').textContent = disponibles;
+
+      var tbody = document.getElementById('insTableBody');
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#999;">No hay insumos registrados</td></tr>';
+        return;
+      }
+      tbody.innerHTML = list.map(function (o) {
+        var x = o.item;
+        var venc = x.fecha_vencimiento;
+        var vencStyle = '';
+        if (venc) {
+          var diff = (new Date(venc + 'T00:00:00') - new Date()) / 86400000;
+          if (diff < 0) vencStyle = 'color:#dc2626;font-weight:600;';
+          else if (diff <= 30) vencStyle = 'color:#D97706;font-weight:600;';
+        }
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + uiEscape(x.nombre) + '</span></td>'
+          + '<td>' + uiEscape(x.unidad_medida || 'unidad') + '</td>'
+          + '<td>' + fmtNum(x.cantidad) + '</td>'
+          + '<td>' + fmtNum(x.cantidad_minima) + '</td>'
+          + '<td style="' + vencStyle + '">' + (venc ? venc : '-') + '</td>'
+          + '<td>' + uiEscape(x.proveedor || '-') + '</td>'
+          + '<td><span class="badge ' + badgeMap(o.estado) + '">' + o.estado + '</span></td>'
+          + '<td><button class="btn btn-sm btn-outline" onclick="openModalInsumo(\'' + x.id + '\')">Editar</button> <button class="btn btn-sm btn-outline" onclick="deleteInsumo(\'' + x.id + '\')" style="color:#dc2626;">Eliminar</button></td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function openModalInsumo(id) {
+      insumoEditId = null;
+      document.getElementById('insumoForm').reset();
+      document.getElementById('ins_cantidad').value = 0;
+      document.getElementById('ins_minimo').value = 0;
+      document.getElementById('insumoModalTitle').textContent = 'Registrar insumo';
+      if (id) {
+        var x = insItems.find(function (i) { return String(i.id) === String(id); });
+        if (x) {
+          insumoEditId = id;
+          document.getElementById('insumoModalTitle').textContent = 'Editar insumo';
+          document.getElementById('ins_nombre').value = x.nombre;
+          document.getElementById('ins_unidad').value = x.unidad_medida || 'unidad';
+          document.getElementById('ins_cantidad').value = x.cantidad;
+          document.getElementById('ins_minimo').value = x.cantidad_minima;
+          document.getElementById('ins_vencimiento').value = x.fecha_vencimiento || '';
+          document.getElementById('ins_proveedor').value = x.proveedor || '';
+        }
+      }
+      openModal('modalInsumo');
+    }
+
+    async function saveInsumo() {
+      var nombre = document.getElementById('ins_nombre').value.trim();
+      if (!nombre) { showAlert('Indica el nombre del insumo', 'warning'); return; }
+      var payload = {
+        nombre: nombre,
+        unidad_medida: document.getElementById('ins_unidad').value,
+        cantidad: Number(document.getElementById('ins_cantidad').value) || 0,
+        cantidad_minima: Number(document.getElementById('ins_minimo').value) || 0,
+        fecha_vencimiento: document.getElementById('ins_vencimiento').value || null,
+        proveedor: document.getElementById('ins_proveedor').value.trim() || null
+      };
+      try {
+        var r;
+        if (insumoEditId) {
+          r = await supabaseClient.from('gourmet_insumos').update(payload).eq('id', insumoEditId);
+        } else {
+          r = await supabaseClient.from('gourmet_insumos').insert([payload]);
+        }
+        if (r.error) throw r.error;
+        closeModal('modalInsumo');
+        showAlert('Insumo guardado', 'success');
+        loadInsumos();
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteInsumo(id) {
+      if (!(await showConfirm('¿Eliminar este insumo?'))) return;
+      try {
+        var r = await supabaseClient.from('gourmet_insumos').delete().eq('id', id);
+        if (r.error) throw r.error;
+        loadInsumos();
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== RECETARIO ===== */
+    async function loadRecetas() {
+      try {
+        var r = await supabaseClient.from('gourmet_recetas').select('*').order('nombre');
+        if (r.error) throw r.error;
+        recItems = r.data || [];
+      } catch (err) {
+        showAlert('Error al cargar recetas: ' + err.message, 'error');
+        recItems = [];
+      }
+      renderRecetas();
+    }
+
+    function renderRecetas() {
+      var q = (document.getElementById('recSearch').value || '').toLowerCase();
+      var cat = document.getElementById('recFilterCategoria').value;
+      var list = recItems.filter(function (x) {
+        if (cat && x.categoria !== cat) return false;
+        return !q || x.nombre.toLowerCase().indexOf(q) !== -1;
+      });
+      var tbody = document.getElementById('recTableBody');
+      if (!list.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:#999;">No hay recetas registradas</td></tr>';
+        return;
+      }
+      tbody.innerHTML = list.map(function (x) {
+        var n = (x.ingredientes || []).length;
+        return '<tr>'
+          + '<td><span style="font-weight:600;">' + uiEscape(x.nombre) + '</span></td>'
+          + '<td>' + uiEscape(x.categoria || '-') + '</td>'
+          + '<td>' + x.porciones + '</td>'
+          + '<td>' + (x.tiempo_preparacion ? x.tiempo_preparacion + ' min' : '-') + '</td>'
+          + '<td>' + n + '</td>'
+          + '<td><button class="btn btn-sm btn-gourmet" onclick="openRecetaStock(\'' + x.id + '\')">Ver stock</button> <button class="btn btn-sm btn-outline" onclick="openModalReceta(\'' + x.id + '\')">Editar</button> <button class="btn btn-sm btn-outline" onclick="deleteReceta(\'' + x.id + '\')" style="color:#dc2626;">Eliminar</button></td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function addIngredienteRow(ing) {
+      var cont = document.getElementById('recIngredientes');
+      if (!insItems.length) return;
+      var row = document.createElement('div');
+      row.className = 'ing-row';
+      var opts = '<option value="">— Selecciona insumo —</option>' + insItems.map(function (i) {
+        return '<option value="' + i.id + '" data-u="' + uiEscape(i.unidad_medida || 'unidad') + '" data-n="' + uiEscape(i.nombre) + '">' + uiEscape(i.nombre) + ' (' + uiEscape(i.unidad_medida || 'unidad') + ')</option>';
+      }).join('');
+      row.innerHTML = ''
+        + '<select class="form-select ing-sel">' + opts + '</select>'
+        + '<input type="number" class="form-input ing-cant" min="0" step="0.001" value="1" placeholder="Cant.">'
+        + '<span class="ing-unidad" style="font-size:12px;color:var(--color-text-secondary);"></span>'
+        + '<button type="button" class="btn btn-outline btn-sm" style="height:36px;padding:0;width:36px;" onclick="this.parentNode.remove()" title="Quitar">&times;</button>';
+      cont.appendChild(row);
+      if (ing) {
+        var sel = row.querySelector('.ing-sel');
+        sel.value = String(ing.insumo_id);
+        row.querySelector('.ing-cant').value = ing.cantidad;
+        syncIngRow(row);
+      }
+      bindIngRow(row);
+    }
+
+    function bindIngRow(row) {
+      var sel = row.querySelector('.ing-sel');
+      sel.addEventListener('change', function () { syncIngRow(row); });
+    }
+
+    function syncIngRow(row) {
+      var sel = row.querySelector('.ing-sel');
+      var opt = sel.options[sel.selectedIndex];
+      var uni = row.querySelector('.ing-unidad');
+      if (opt && opt.value) uni.textContent = opt.dataset.u || '';
+      else uni.textContent = '';
+    }
+
+    async function openModalReceta(id) {
+      recetaEditId = null;
+      document.getElementById('recetaForm').reset();
+      document.getElementById('recIngredientes').innerHTML = '';
+      document.getElementById('rec_porciones').value = 1;
+      document.getElementById('rec_tiempo').value = 0;
+      document.getElementById('recetaModalTitle').textContent = 'Nueva receta';
+      try {
+        var r = await supabaseClient.from('gourmet_insumos').select('*').order('nombre');
+        if (!r.error) insItems = r.data || [];
+      } catch (e) {}
+      document.getElementById('recIngAlerta').style.display = insItems.length ? 'none' : '';
+      document.getElementById('recIngAddBtn').style.display = insItems.length ? '' : 'none';
+      if (id) {
+        var x = recItems.find(function (i) { return String(i.id) === String(id); });
+        if (x) {
+          recetaEditId = id;
+          document.getElementById('recetaModalTitle').textContent = 'Editar receta';
+          document.getElementById('rec_nombre').value = x.nombre;
+          document.getElementById('rec_categoria').value = x.categoria || 'Platos principales';
+          document.getElementById('rec_porciones').value = x.porciones;
+          document.getElementById('rec_tiempo').value = x.tiempo_preparacion;
+          document.getElementById('rec_instrucciones').value = x.instrucciones || '';
+          (x.ingredientes || []).forEach(function (ing) { addIngredienteRow(ing); });
+        }
+      } else {
+        addIngredienteRow();
+      }
+      openModal('modalReceta');
+    }
+
+    async function saveReceta() {
+      var nombre = document.getElementById('rec_nombre').value.trim();
+      if (!nombre) { showAlert('Indica el nombre de la receta', 'warning'); return; }
+      var ingredientes = [];
+      document.querySelectorAll('#recIngredientes .ing-row').forEach(function (row) {
+        var sel = row.querySelector('.ing-sel');
+        var insumo = insItems.find(function (i) { return String(i.id) === String(sel.value); });
+        if (!insumo) return;
+        var cant = Number(row.querySelector('.ing-cant').value);
+        if (!(cant > 0)) return;
+        ingredientes.push({ insumo_id: insumo.id, nombre: insumo.nombre, unidad_medida: insumo.unidad_medida || 'unidad', cantidad: cant });
+      });
+      var payload = {
+        nombre: nombre,
+        categoria: document.getElementById('rec_categoria').value,
+        porciones: Number(document.getElementById('rec_porciones').value) || 1,
+        tiempo_preparacion: Number(document.getElementById('rec_tiempo').value) || 0,
+        ingredientes: ingredientes,
+        instrucciones: document.getElementById('rec_instrucciones').value.trim() || null
+      };
+      try {
+        var r;
+        if (recetaEditId) {
+          r = await supabaseClient.from('gourmet_recetas').update(payload).eq('id', recetaEditId);
+        } else {
+          r = await supabaseClient.from('gourmet_recetas').insert([payload]);
+        }
+        if (r.error) throw r.error;
+        closeModal('modalReceta');
+        showAlert('Receta guardada', 'success');
+        loadRecetas();
+      } catch (err) {
+        showAlert('Error al guardar receta: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteReceta(id) {
+      if (!(await showConfirm('¿Eliminar esta receta?'))) return;
+      try {
+        var r = await supabaseClient.from('gourmet_recetas').delete().eq('id', id);
+        if (r.error) throw r.error;
+        loadRecetas();
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    async function openRecetaStock(id) {
+      var x = recItems.find(function (i) { return String(i.id) === String(id); });
+      if (!x) return;
+      recetaStockId = id;
+      document.getElementById('recStockTitle').textContent = x.nombre;
+      document.getElementById('recStockInstrucciones').textContent = x.instrucciones || 'Sin instrucciones registradas.';
+      try {
+        var r = await supabaseClient.from('gourmet_insumos').select('*');
+        var map = {};
+        (r.data || []).forEach(function (i) { map[i.id] = i; });
+        var ings = (x.ingredientes || []);
+        var faltantes = 0;
+        var html = ings.length ? ings.map(function (ing) {
+          var i = map[ing.insumo_id];
+          var disponible = i ? Number(i.cantidad || 0) : 0;
+          var suficiente = !!i && disponible >= Number(ing.cantidad || 0);
+          if (!suficiente) faltantes++;
+          var nombre = ing.nombre || (i ? i.nombre : 'Insumo eliminado');
+          return '<div class="receta-view-ing ' + (suficiente ? 'ok' : 'falta') + '">'
+            + '<div style="flex:1;min-width:0;"><strong>' + uiEscape(nombre) + '</strong><div style="font-size:12px;color:var(--color-text-secondary);">Requiere ' + fmtNum(ing.cantidad) + ' ' + uiEscape(ing.unidad_medida || '') + '</div></div>'
+            + '<div style="text-align:right;font-size:12px;">' + (i ? '<div>En inventario: <strong>' + fmtNum(disponible) + '</strong> ' + uiEscape(i.unidad_medida || '') + '</div>' : '<div style="color:#dc2626;">Sin registro</div>')
+            + (suficiente ? '<div style="color:#059669;font-weight:600;">Suficiente</div>' : '<div style="color:#dc2626;font-weight:600;">Faltan ' + fmtNum(Number(ing.cantidad) - disponible) + '</div>')
+            + '</div></div>';
+        }).join('') : '<div style="text-align:center;color:#999;padding:16px;">Esta receta no tiene ingredientes registrados.</div>';
+        var listo = faltantes === 0 && ings.length > 0;
+        document.getElementById('recStockResumen').innerHTML = ings.length === 0
+          ? ''
+          : '<div class="receta-stock-resumen ' + (listo ? 'listo' : 'no-listo') + '"><i class="fi ' + (listo ? 'fi-sr-check' : 'fi-sr-triangle-warning') + '"></i>'
+          + (listo ? 'Hay stock suficiente para preparar esta receta.' : 'Faltan ' + faltantes + ' ingrediente' + (faltantes === 1 ? '' : 's') + ' para preparar esta receta.') + '</div>';
+        document.getElementById('recStockIngredientes').innerHTML = html;
+        openModal('modalRecetaStock');
+      } catch (err) {
+        showAlert('Error al verificar stock: ' + err.message, 'error');
+      }
+    }
+
+    function editRecetaFromStock() {
+      if (!recetaStockId) return;
+      closeModal('modalRecetaStock');
+      openModalReceta(recetaStockId);
+    }
+
+    /* ===== CATÁLOGO ===== */
+    async function loadCatalogo() {
+      try {
+        var r = await supabaseClient.from('gourmet_catalogo').select('*').order('categoria').order('nombre');
+        if (r.error) throw r.error;
+        catItems = r.data || [];
+      } catch (err) {
+        showAlert('Error al cargar el catálogo: ' + err.message, 'error');
+        catItems = [];
+      }
+      renderCatalogo();
+    }
+
+    function renderCatalogo() {
+      var q = (document.getElementById('catSearch').value || '').toLowerCase();
+      var cat = document.getElementById('catFilterCategoria').value;
+      var list = catItems.filter(function (x) {
+        if (cat && x.categoria !== cat) return false;
+        return !q || (x.nombre + ' ' + (x.descripcion || '')).toLowerCase().indexOf(q) !== -1;
+      });
+      var cont = document.getElementById('catContainer');
+      if (!list.length) {
+        cont.innerHTML = '<div class="empty-hint">No hay platos en el catálogo' + (cat ? ' para esta categoría' : '') + '</div>';
+        return;
+      }
+      var html = '';
+      CATEGORIAS.forEach(function (c) {
+        var items = list.filter(function (x) { return (x.categoria || 'Otros') === c; });
+        if (!items.length) return;
+        var disponibles = items.filter(function (x) { return x.disponible; }).length;
+        html += '<div class="cat-grupo">'
+          + '<div class="cat-grupo-titulo"><i class="fi fi-sr-restaurant"></i>' + c + '<span class="badge badge-active">' + disponibles + '/' + items.length + ' disponibles</span></div>'
+          + '<div class="cat-grid">' + items.map(function (x) {
+            return '<div class="cat-card">'
+              + '<div class="cat-nombre">' + uiEscape(x.nombre) + (x.disponible ? '<span class="badge badge-active">Disponible</span>' : '<span class="badge badge-inactive">No disponible</span>') + '</div>'
+              + (x.descripcion ? '<div class="cat-desc">' + uiEscape(x.descripcion) + '</div>' : '')
+              + '<div class="cat-precio">' + fmtBs(x.precio) + '</div>'
+              + '<div class="cat-acciones">'
+              + '<button class="btn btn-sm btn-outline" onclick="openModalCatalogo(\'' + x.id + '\')">Editar</button> '
+              + '<button class="btn btn-sm btn-outline" onclick="deleteCatalogo(\'' + x.id + '\')" style="color:#dc2626;">Eliminar</button>'
+              + '</div></div>';
+          }).join('') + '</div></div>';
+      });
+      cont.innerHTML = html;
+    }
+
+    function openModalCatalogo(id) {
+      catalogoEditId = null;
+      document.getElementById('catalogoForm').reset();
+      document.getElementById('cat_precio').value = 0;
+      document.getElementById('cat_disponible').checked = true;
+      document.getElementById('catalogoModalTitle').textContent = 'Agregar plato';
+      if (id) {
+        var x = catItems.find(function (i) { return String(i.id) === String(id); });
+        if (x) {
+          catalogoEditId = id;
+          document.getElementById('catalogoModalTitle').textContent = 'Editar plato';
+          document.getElementById('cat_nombre').value = x.nombre;
+          document.getElementById('cat_categoria').value = x.categoria || 'Platos principales';
+          document.getElementById('cat_descripcion').value = x.descripcion || '';
+          document.getElementById('cat_precio').value = x.precio;
+          document.getElementById('cat_disponible').checked = !!x.disponible;
+        }
+      }
+      openModal('modalCatalogo');
+    }
+
+    async function saveCatalogo() {
+      var nombre = document.getElementById('cat_nombre').value.trim();
+      if (!nombre) { showAlert('Indica el nombre del plato', 'warning'); return; }
+      var payload = {
+        nombre: nombre,
+        categoria: document.getElementById('cat_categoria').value,
+        descripcion: document.getElementById('cat_descripcion').value.trim() || null,
+        precio: Number(document.getElementById('cat_precio').value) || 0,
+        disponible: document.getElementById('cat_disponible').checked
+      };
+      try {
+        var r;
+        if (catalogoEditId) {
+          r = await supabaseClient.from('gourmet_catalogo').update(payload).eq('id', catalogoEditId);
+        } else {
+          r = await supabaseClient.from('gourmet_catalogo').insert([payload]);
+        }
+        if (r.error) throw r.error;
+        closeModal('modalCatalogo');
+        showAlert('Plato guardado', 'success');
+        loadCatalogo();
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteCatalogo(id) {
+      if (!(await showConfirm('¿Eliminar este plato del catálogo?'))) return;
+      try {
+        var r = await supabaseClient.from('gourmet_catalogo').delete().eq('id', id);
+        if (r.error) throw r.error;
+        loadCatalogo();
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      loadEquipos();
+      loadInsumos();
+      loadRecetas();
+      loadCatalogo();
+      var savedTool = localStorage.getItem('fiat_tool_' + location.pathname);
+      if (savedTool && document.getElementById('tool-' + savedTool)) switchTool(savedTool);
+    });
+  </script>
+
+<script src="../js/module-help.js"></script>
+    <script src="../js/access.js"></script>
+</body>
+</html>

@@ -262,8 +262,94 @@ function mobileNavInit() {
   });
 }
 
+// ============================================
+// TOOLS MÓVIL: si hay más de 4 herramientas, la
+// 5ª posición es un botón "•••" que abre un menú
+// con las restantes. Solo aplica en <= 640px.
+// ============================================
+
+function mobilePanelMore() {
+  var panel = document.querySelector('.module-panel');
+  var btn = panel ? panel.querySelector('.panel-more-btn') : null;
+  var popup = document.getElementById('panelMorePopup');
+  var isMobile = window.innerWidth <= 640;
+
+  function closePopup() {
+    if (popup) popup.classList.remove('show');
+  }
+
+  function rebuild() {
+    closePopup();
+    if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
+    if (popup && popup.parentNode) popup.parentNode.removeChild(popup);
+    btn = null;
+    popup = null;
+    if (panel) panel.classList.remove('panel-more');
+
+    if (!panel || !isMobile) return;
+
+    var items = Array.prototype.slice.call(panel.querySelectorAll(':scope > .panel-item'));
+    if (items.length <= 4) return;
+
+    panel.classList.add('panel-more');
+    items.forEach(function (el, i) {
+      el.classList.toggle('panel-more-hidden', i >= 4);
+    });
+
+    btn = document.createElement('div');
+    btn.className = 'panel-item panel-more-btn';
+    btn.title = 'Más herramientas';
+    btn.setAttribute('aria-label', 'Más herramientas');
+    btn.innerHTML = '<span class="panel-more-dots">&#8226;&#8226;&#8226;</span>';
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (popup) {
+        popup.querySelectorAll('.panel-more-item').forEach(function (b) {
+          var on = panel.querySelector('.panel-item.active[data-tool="' + b.getAttribute('data-tool') + '"]');
+          b.classList.toggle('active', !!on);
+        });
+        popup.classList.toggle('show');
+      }
+    });
+    panel.appendChild(btn);
+
+    popup = document.createElement('div');
+    popup.id = 'panelMorePopup';
+    popup.className = 'panel-more-popup';
+    document.body.appendChild(popup);
+    items.slice(4).forEach(function (el) {
+      var name = el.getAttribute('data-tool');
+      var label = el.getAttribute('title') || name;
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'panel-more-item';
+      b.textContent = label;
+      b.setAttribute('data-tool', name);
+      b.addEventListener('click', function () {
+        var target = panel.querySelector('.panel-item[data-tool="' + name + '"]');
+        if (target) target.click();
+        closePopup();
+      });
+      popup.appendChild(b);
+    });
+  }
+
+  document.addEventListener('click', function (e) {
+    if (popup && popup.classList.contains('show') && !popup.contains(e.target) && !(btn && btn.contains(e.target))) {
+      closePopup();
+    }
+  });
+
+  window.addEventListener('resize', rebuild);
+  rebuild();
+}
+
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', mobileNavInit);
+  document.addEventListener('DOMContentLoaded', () => {
+    mobileNavInit();
+    mobilePanelMore();
+  });
 } else {
   mobileNavInit();
+  mobilePanelMore();
 }

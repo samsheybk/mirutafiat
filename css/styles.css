@@ -765,6 +765,63 @@ a {
   display: none;
 }
 
+/* Botón "más herramientas" (solo móvil cuando hay >4) */
+.panel-more-btn {
+  display: none;
+  cursor: pointer;
+}
+.panel-more-btn .panel-more-dots {
+  font-size: 18px;
+  letter-spacing: 2px;
+  color: #94a3b8;
+  line-height: 1;
+}
+.panel-more-popup {
+  position: fixed;
+  bottom: calc(62px + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  z-index: 300;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 12px 32px rgba(2, 6, 23, 0.22);
+  padding: 6px;
+  min-width: 200px;
+  max-height: 55vh;
+  overflow: auto;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+}
+.panel-more-popup.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+.panel-more-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  color: var(--color-text);
+  cursor: pointer;
+  text-align: left;
+}
+.panel-more-item:hover {
+  background: var(--color-bg);
+}
+.panel-more-item.active {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
 .module-body {
   flex: 1;
   display: flex;
@@ -2558,6 +2615,14 @@ a {
   }
   .panel-item {
     flex-shrink: 0;
+    width: 52px;
+    height: 46px;
+  }
+  .module-panel.panel-more .panel-item.panel-more-hidden {
+    display: none;
+  }
+  .module-panel.panel-more .panel-more-btn {
+    display: flex;
     width: 52px;
     height: 46px;
   }

@@ -223,3 +223,47 @@ if (document.readyState === 'loading') {
 } else {
   tableCardsInit();
 }
+
+// ============================================
+// NAV MÓVIL: hamburguesa para desplegar módulos/usuario
+// En pantallas <= 640px el topnav queda colapsado
+// tras el botón hamburguesa; se inyecta el botón
+// y se alterna la clase .open sobre .topnav.
+// ============================================
+
+function mobileNavInit() {
+  const nav = document.querySelector('.topnav');
+  if (!nav || nav.querySelector('.topnav-toggle')) return;
+
+  const btn = document.createElement('button');
+  btn.className = 'topnav-toggle';
+  btn.type = 'button';
+  btn.setAttribute('aria-label', 'Abrir menú');
+  btn.title = 'Menú';
+  btn.innerHTML = '<span></span><span></span><span></span>';
+  btn.addEventListener('click', () => {
+    const open = nav.classList.toggle('open');
+    btn.classList.toggle('open', open);
+  });
+  nav.appendChild(btn);
+
+  document.addEventListener('click', (e) => {
+    if (nav.classList.contains('open') && !nav.contains(e.target)) {
+      nav.classList.remove('open');
+      btn.classList.remove('open');
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 640 && nav.classList.contains('open')) {
+      nav.classList.remove('open');
+      btn.classList.remove('open');
+    }
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', mobileNavInit);
+} else {
+  mobileNavInit();
+}

@@ -93,13 +93,13 @@
               <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                 <button class="btn btn-sm eq-tab active" data-etab="asignaciones" onclick="switchEquiposView('asignaciones',this)" style="background:var(--module-relaciones);color:#fff;border:0;border-radius:4px;padding:6px 16px;">Asignaciones</button>
                 <button class="btn btn-sm eq-tab" data-etab="sensible" onclick="switchEquiposView('sensible',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Información sensible</button>
-                <button class="btn btn-sm eq-tab" data-etab="catalogo" onclick="switchEquiposView('catalogo',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Catálogo de equipos</button>
+                <button class="btn btn-sm eq-tab" data-etab="catalogo" onclick="switchEquiposView('catalogo',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Catálogo de equipos y vehículos</button>
               </div>
               <div style="flex:1;"></div>
               <input type="text" class="form-input" id="eqSearch" placeholder="Buscar equipo, trabajador o acceso..." oninput="filterEquipos()" style="max-width:300px;height:36px;">
               <button class="btn btn-relaciones btn-sm" id="btnNuevaAsignacion" onclick="rlOpenAsignacionModal()">+ Nueva asignación</button>
               <button class="btn btn-relaciones btn-sm" id="btnNuevaSensible" style="display:none;" onclick="rlOpenSensibleModal()">+ Nueva información sensible</button>
-              <button class="btn btn-relaciones btn-sm" id="btnNuevoEquipo" style="display:none;" onclick="rlOpenEquipoModal()">+ Nuevo equipo</button>
+              <button class="btn btn-relaciones btn-sm" id="btnNuevoEquipo" style="display:none;" onclick="rlOpenEquipoModal()">+ Nuevo vehículo</button>
             </div>
             <div class="toolbar-content" data-toolbar="plantilla" style="display:none;align-items:center;gap:16px;width:100%;">
               <input type="text" class="form-input" id="plantSearch" placeholder="Buscar por nombre, cédula, cargo..." oninput="filterPlantilla()" style="flex:1;max-width:340px;height:36px;">
@@ -163,12 +163,12 @@
               </div>
               <div id="eqCatalogoView" style="display:none;">
                 <div class="tool-section-header">
-                  <h2 style="color:var(--module-relaciones);">Catálogo de equipos</h2>
+                  <h2 style="color:var(--module-relaciones);">Catálogo de equipos y vehículos</h2>
                   <span style="font-size:12px;color:var(--color-text-secondary);" id="eqCount">0 equipos</span>
                 </div>
                 <table class="data-table">
                   <thead>
-                    <tr><th>Tipo</th><th>Equipo</th><th>Marca / Modelo</th><th>Serial</th><th>Código</th><th><span class="th-help">Estado<span class="th-help-text"><strong>Disponible:</strong> sin asignar, listo para entregar.<br><strong>Asignado:</strong> en poder de un trabajador.<br><strong>En mantenimiento:</strong> fuera de uso por reparación o revisión.<br><strong>Baja:</strong> fuera de servicio o dado de baja.</span><span class="th-help-icon">?</span></span></th><th style="width:180px;">Acción</th></tr>
+                    <tr><th>Tipo</th><th>Equipo</th><th>Marca / Modelo</th><th>Serial</th><th>Código</th><th><span class="th-help">Estado<span class="th-help-text"><strong>Vehículos:</strong> Disponible, Asignado, En mantenimiento, Baja.<br><strong>Equipos TI:</strong> Operativo, En reparación, Dañado, Dado de baja.</span><span class="th-help-icon">?</span></span></th><th>Asignable</th><th style="width:180px;">Acción</th></tr>
                   </thead>
                   <tbody id="eqTableBody">
                     <tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">Sin equipos registrados</td></tr>
@@ -296,19 +296,15 @@
 
   <div class="modal-overlay" id="modalEquipo">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalEquipoTitle">Nuevo equipo</h3><button class="modal-close" onclick="rlCloseModal('modalEquipo')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalEquipoTitle">Nuevo vehículo</h3><button class="modal-close" onclick="rlCloseModal('modalEquipo')">&times;</button></div>
       <div class="modal-body">
         <form id="equipoForm">
           <div class="form-group"><label>Tipo de equipo</label>
             <select class="form-select" id="eq_tipo">
               <option value="Vehículo">Vehículo</option>
-              <option value="Teléfono">Teléfono</option>
-              <option value="Tablet">Tablet</option>
-              <option value="Laptop">Laptop</option>
-              <option value="Otro">Otro</option>
             </select>
           </div>
-          <div class="form-group"><label>Descripción</label><input type="text" class="form-input" id="eq_descripcion" placeholder="Ej: Chevrolet Spark, iPhone 11, HP ProBook..." required></div>
+          <div class="form-group"><label>Descripción</label><input type="text" class="form-input" id="eq_descripcion" placeholder="Ej: Chevrolet Spark GT, Toyota Hilux, moto..." required></div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
             <div class="form-group"><label>Marca</label><input type="text" class="form-input" id="eq_marca"></div>
             <div class="form-group"><label>Modelo</label><input type="text" class="form-input" id="eq_modelo"></div>
@@ -361,7 +357,7 @@
         <form id="asignacionForm">
           <div class="form-group"><label>Tipo de asignación</label>
             <select class="form-select" id="asig_tipo" onchange="onAsigTipoChange()">
-              <option value="equipo">Equipo</option>
+              <option value="equipo">Equipo / Vehículo</option>
               <option value="sensible">Información sensible</option>
             </select>
           </div>
@@ -486,6 +482,8 @@
     var rlCargos = [];
     var rlConceptos = [];
     var rlEquipos = [];
+    var rlTiEquipos = [];
+    var rlVehiculos = [];
     var rlAsignaciones = [];
     var rlInfoSensible = [];
     var rlRegistros = [];
@@ -579,7 +577,21 @@
     }
 
     function getEquipo(id) {
-      return rlEquipos.find(function(x) { return String(x.id) === String(id); });
+      return rlEquipos.find(function(x) { return String(x.key) === String(id); });
+    }
+
+    function getEquipoTi(id) {
+      return rlTiEquipos.find(function(x) { return String(x.id) === String(id); });
+    }
+
+    function getVehiculo(id) {
+      return rlVehiculos.find(function(x) { return String(x.id) === String(id); });
+    }
+
+    function getAsigItem(a) {
+      if (a && a.vehiculo_id) return getVehiculo(a.vehiculo_id);
+      if (a && a.equipo_id) return getEquipoTi(a.equipo_id);
+      return null;
     }
 
     function getSensible(id) {
@@ -591,9 +603,20 @@
       return s.descripcion + (s.usuario ? ' — ' + s.usuario : '');
     }
 
+    function buildCatalogo() {
+      rlEquipos = [];
+      (rlTiEquipos || []).forEach(function(x) {
+        if (x.asignable === false) return;
+        rlEquipos.push(Object.assign({}, x, { key: 'ti-' + x.id, src: 'ti' }));
+      });
+      (rlVehiculos || []).forEach(function(x) {
+        rlEquipos.push(Object.assign({}, x, { key: 'veh-' + x.id, src: 'veh' }));
+      });
+    }
+
     function equipoNombre(e) {
       if (!e) return '-';
-      var base = e.descripcion || e.tipo || 'Equipo';
+      var base = e.descripcion || e.nombre || e.tipo || 'Equipo';
       var extra = [];
       if (e.marca) extra.push(e.marca);
       if (e.modelo) extra.push(e.modelo);
@@ -603,9 +626,9 @@
 
     function rlBadge(estado) {
       var map = {
-        'Activo': 'badge-active', 'Abierto': 'badge-active', 'Activa': 'badge-active', 'Disponible': 'badge-active', 'Programada': 'badge-active',
-        'Pendiente': 'badge-pending', 'Asignado': 'badge-pending', 'En mantenimiento': 'badge-pending', 'En curso': 'badge-pending',
-        'Finalizado': 'badge-inactive', 'Devuelta': 'badge-inactive', 'Baja': 'badge-inactive', 'Inactivo': 'badge-inactive', 'Cerrado': 'badge-inactive', 'Realizada': 'badge-inactive', 'Cancelada': 'badge-inactive'
+        'Activo': 'badge-active', 'Abierto': 'badge-active', 'Activa': 'badge-active', 'Disponible': 'badge-active', 'Programada': 'badge-active', 'Operativo': 'badge-active', 'Entregado': 'badge-active',
+        'Pendiente': 'badge-pending', 'Asignado': 'badge-pending', 'En mantenimiento': 'badge-pending', 'En curso': 'badge-pending', 'En reparación': 'badge-pending',
+        'Finalizado': 'badge-inactive', 'Devuelta': 'badge-inactive', 'Baja': 'badge-inactive', 'Inactivo': 'badge-inactive', 'Cerrado': 'badge-inactive', 'Realizada': 'badge-inactive', 'Cancelada': 'badge-inactive', 'Dañado': 'badge-inactive', 'Dado de baja': 'badge-inactive'
       };
       return map[estado] || 'badge-pending';
     }
@@ -620,18 +643,20 @@
 
     async function loadRelacionesData() {
       try {
-        var [u, c, t, co, eq, as, se, rg, ac] = await Promise.all([
+        var [u, c, t, co, eq, veh, as, se, rg, ac] = await Promise.all([
           rlFetch('est_unidades', 'nombre'),
           rlFetch('est_cargos', 'titulo'),
           rlFetch('plantilla_trabajadores', 'apellidos'),
           rlFetch('rl_conceptos', 'nombre'),
+          rlFetch('ti_equipos', 'nombre'),
           rlFetch('rl_equipos', 'descripcion'),
           rlFetch('rl_asignaciones', 'fecha_asignacion'),
           rlFetch('rl_info_sensible', 'created_at'),
           rlFetch('relaciones_registros', 'fecha'),
           rlFetch('rl_actas', 'fecha')
         ]);
-        rlUnidades = u; rlCargos = c; rlTrabajadores = t; rlConceptos = co; rlEquipos = eq; rlAsignaciones = as; rlInfoSensible = se; rlRegistros = rg; rlActas = ac;
+        rlUnidades = u; rlCargos = c; rlTrabajadores = t; rlConceptos = co; rlTiEquipos = eq; rlVehiculos = veh; rlAsignaciones = as; rlInfoSensible = se; rlRegistros = rg; rlActas = ac;
+        buildCatalogo();
         populateUnidadSelect();
         populateTrabajadorModalSelects();
         renderRegistros();
@@ -873,11 +898,11 @@
       editEquipoId = id || null;
       if (!id) detalleEquipoId = null;
       rlCloseModal('modalEquipoDetalle');
-      document.getElementById('modalEquipoTitle').textContent = id ? 'Editar equipo' : 'Nuevo equipo';
+      document.getElementById('modalEquipoTitle').textContent = id ? 'Editar vehículo' : 'Nuevo vehículo';
       if (id) {
-        var e = rlEquipos.find(function(x) { return String(x.id) === String(id); });
+        var e = getVehiculo(id);
         if (e) {
-          document.getElementById('eq_tipo').value = e.tipo || 'Otro';
+          document.getElementById('eq_tipo').value = 'Vehículo';
           document.getElementById('eq_descripcion').value = e.descripcion || '';
           document.getElementById('eq_marca').value = e.marca || '';
           document.getElementById('eq_modelo').value = e.modelo || '';
@@ -886,7 +911,7 @@
           document.getElementById('eq_estado').value = e.estado || 'Disponible';
         }
       } else {
-        document.getElementById('eq_tipo').value = 'Otro';
+        document.getElementById('eq_tipo').value = 'Vehículo';
         document.getElementById('eq_descripcion').value = '';
         document.getElementById('eq_marca').value = '';
         document.getElementById('eq_modelo').value = '';
@@ -894,15 +919,15 @@
         document.getElementById('eq_codigo').value = '';
         document.getElementById('eq_estado').value = 'Disponible';
       }
+      document.getElementById('eq_tipo').disabled = true;
       rlOpenModal('modalEquipo');
     }
 
     async function rlSaveEquipo() {
-      var tipo = document.getElementById('eq_tipo').value;
       var descripcion = document.getElementById('eq_descripcion').value.trim();
-      if (!descripcion) { showAlert('Escribe la descripción del equipo', 'warning'); return; }
+      if (!descripcion) { showAlert('Escribe la descripción del vehículo', 'warning'); return; }
       var payload = {
-        tipo: tipo,
+        tipo: 'Vehículo',
         descripcion: descripcion,
         marca: document.getElementById('eq_marca').value.trim() || null,
         modelo: document.getElementById('eq_modelo').value.trim() || null,
@@ -919,7 +944,7 @@
           if (error) throw error;
         }
         rlCloseModal('modalEquipo');
-        showAlert('Equipo guardado', 'success');
+        showAlert('Vehículo guardado', 'success');
         await loadRelacionesData();
         if (detalleEquipoId) rlOpenEquipoDetalle(detalleEquipoId);
       } catch (err) {
@@ -931,52 +956,57 @@
       var q = (document.getElementById('eqSearch').value || '').trim().toLowerCase();
       var data = rlEquipos.filter(function(e) {
         if (!q) return true;
-        return (equipoNombre(e) + ' ' + (e.codigo || '') + ' ' + e.tipo).toLowerCase().indexOf(q) !== -1;
+        return (equipoNombre(e) + ' ' + (e.codigo || '') + ' ' + (e.tipo || '')).toLowerCase().indexOf(q) !== -1;
       });
       var tbody = document.getElementById('eqTableBody');
       var countEl = document.getElementById('eqCount');
-      if (countEl) countEl.textContent = data.length + ' equipo' + (data.length !== 1 ? 's' : '');
+      if (countEl) countEl.textContent = data.length + ' ítem' + (data.length !== 1 ? 's' : '');
       if (!data.length) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:#999;">' + (q ? 'Sin resultados' : 'Sin equipos registrados') + '</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#999;">' + (q ? 'Sin resultados' : 'Sin equipos o vehículos registrados') + '</td></tr>';
         return;
       }
       tbody.innerHTML = data.map(function(e) {
         var estado = e.estado;
-        var disp = estado === 'Disponible' || estado === 'En mantenimiento' || estado === 'Baja';
+        var origen = e.src === 'veh' ? 'Vehículo' : (e.tipo || 'Equipo');
         return '<tr>'
-          + '<td>' + e.tipo + '</td>'
-          + '<td><span style="font-weight:600;">' + (e.descripcion || '-') + '</span></td>'
+          + '<td>' + origen + '</td>'
+          + '<td><span style="font-weight:600;">' + equipoNombre(e) + '</span>' + (e.src === 'ti' ? '<div style="font-size:11px;color:var(--color-text-secondary);">Módulo TI</div>' : '') + '</td>'
           + '<td>' + ((e.marca || '-') + (e.modelo ? ' / ' + e.modelo : '')) + '</td>'
           + '<td>' + (e.serial || '-') + '</td>'
           + '<td>' + (e.codigo || '-') + '</td>'
           + '<td><span class="badge ' + rlBadge(estado) + '">' + estado + '</span></td>'
+          + '<td>' + (e.src === 'ti' && e.asignable === false ? '<span class="badge badge-inactive">No</span>' : '<span class="badge badge-active">Sí</span>') + '</td>'
           + '<td>'
-          + '<button class="btn btn-sm btn-outline" title="Ver detalle e historial" onclick="rlOpenEquipoDetalle(' + e.id + ')"><i class="fi fi-sr-eye" style="font-size:15px;line-height:1;pointer-events:none;"></i></button>'
+          + '<button class="btn btn-sm btn-outline" title="Ver detalle e historial" onclick="rlOpenEquipoDetalle(\'' + e.key + '\')"><i class="fi fi-sr-eye" style="font-size:15px;line-height:1;pointer-events:none;"></i></button>'
           + '</td>'
           + '</tr>';
       }).join('');
     }
 
-    function rlOpenEquipoDetalle(id) {
-      detalleEquipoId = id;
-      var e = getEquipo(id);
+    function rlOpenEquipoDetalle(key) {
+      detalleEquipoId = key;
+      var e = getEquipo(key);
       if (!e) return;
-      document.getElementById('modalEquipoDetalleTitle').textContent = 'Detalle del equipo';
+      var esVehiculo = e.src === 'veh';
+      document.getElementById('modalEquipoDetalleTitle').textContent = esVehiculo ? 'Detalle del vehículo' : 'Detalle del equipo';
       var info = '<table class="data-table" style="margin-bottom:0;">'
         + '<tbody>'
-        + '<tr><td style="width:140px;color:var(--color-text-secondary);">Equipo</td><td><span style="font-weight:600;">' + (e.descripcion || '-') + '</span></td></tr>'
-        + '<tr><td style="color:var(--color-text-secondary);">Tipo</td><td>' + (e.tipo || '-') + '</td></tr>'
+        + '<tr><td style="width:140px;color:var(--color-text-secondary);">' + (esVehiculo ? 'Vehículo' : 'Equipo') + '</td><td><span style="font-weight:600;">' + equipoNombre(e) + '</span>' + (esVehiculo ? '' : '<div style="font-size:11px;color:var(--color-text-secondary);">Gestionado en el módulo TI</div>') + '</td></tr>'
+        + '<tr><td style="color:var(--color-text-secondary);">Tipo</td><td>' + (esVehiculo ? 'Vehículo' : (e.tipo || '-')) + '</td></tr>'
         + '<tr><td style="color:var(--color-text-secondary);">Marca / Modelo</td><td>' + ((e.marca || '-') + (e.modelo ? ' / ' + e.modelo : '')) + '</td></tr>'
         + '<tr><td style="color:var(--color-text-secondary);">Serial</td><td>' + (e.serial || '-') + '</td></tr>'
         + '<tr><td style="color:var(--color-text-secondary);">Código</td><td>' + (e.codigo || '-') + '</td></tr>'
         + '<tr><td style="color:var(--color-text-secondary);">Estado</td><td><span class="badge ' + rlBadge(e.estado) + '">' + e.estado + '</span></td></tr>'
+        + (esVehiculo ? '' : '<tr><td style="color:var(--color-text-secondary);">Asignable</td><td>' + (e.asignable === false ? '<span class="badge badge-inactive">No</span>' : '<span class="badge badge-active">Sí</span>') + '</td></tr>')
         + '</tbody></table>';
       document.getElementById('eqDetalleInfo').innerHTML = info;
-      var hist = rlAsignaciones.filter(function(a) { return String(a.equipo_id) === String(id); })
+      var hist = rlAsignaciones.filter(function(a) {
+        return esVehiculo ? String(a.vehiculo_id) === String(e.id) : String(a.equipo_id) === String(e.id);
+      })
         .sort(function(x, y) { return (y.fecha_asignacion || '').localeCompare(x.fecha_asignacion || ''); });
       var tbody = document.getElementById('eqDetalleHistBody');
       if (!hist.length) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:#999;">Este equipo aún no ha sido asignado</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:#999;">' + (esVehiculo ? 'Este vehículo aún no ha sido asignado' : 'Este equipo aún no ha sido asignado') + '</td></tr>';
       } else {
         tbody.innerHTML = hist.map(function(a) {
           var t = getTrabajador(a.trabajador_id);
@@ -991,19 +1021,23 @@
             + '</tr>';
         }).join('');
       }
-      document.getElementById('btnEquipoDetalleEditar').onclick = function() { rlOpenEquipoModal(id); };
-      document.getElementById('btnEquipoDetalleEliminar').onclick = function() { rlDeleteEquipo(id); };
+      document.getElementById('btnEquipoDetalleEditar').style.display = esVehiculo ? '' : 'none';
+      document.getElementById('btnEquipoDetalleEliminar').style.display = esVehiculo ? '' : 'none';
+      document.getElementById('btnEquipoDetalleEditar').onclick = function() { rlOpenEquipoModal(e.id); };
+      document.getElementById('btnEquipoDetalleEliminar').onclick = function() { rlDeleteEquipo(e.id); };
       rlOpenModal('modalEquipoDetalle');
     }
 
     async function rlDeleteEquipo(id) {
-      if (!(await showConfirm('¿Eliminar este equipo? Se eliminarán también sus asignaciones.'))) return;
+      var e = getVehiculo(id);
+      if (!e) return;
+      if (!(await showConfirm('¿Eliminar este vehículo? Se eliminarán también sus asignaciones.'))) return;
       try {
         var { error } = await supabaseClient.from('rl_equipos').delete().eq('id', id);
         if (error) throw error;
         detalleEquipoId = null;
         rlCloseModal('modalEquipoDetalle');
-        showAlert('Equipo eliminado', 'success');
+        showAlert('Vehículo eliminado', 'success');
         await loadRelacionesData();
       } catch (err) {
         showAlert('Error al eliminar: ' + err.message, 'error');
@@ -1040,7 +1074,7 @@
       editAsignacionId = id || null;
       detalleSensibleId = null;
       populateTrabajadorSelect();
-      var keepEquipoId = null;
+      var keepEquipoKey = null;
       var keepSensibleId = null;
       var tipo = 'equipo';
       document.getElementById('modalAsignacionTitle').textContent = id ? 'Editar asignación' : 'Nueva asignación';
@@ -1048,7 +1082,8 @@
         var a = rlAsignaciones.find(function(x) { return String(x.id) === String(id); });
         if (a) {
           if (a.info_sensible_id) { tipo = 'sensible'; keepSensibleId = a.info_sensible_id; }
-          else keepEquipoId = a.equipo_id;
+          else if (a.vehiculo_id) { keepEquipoKey = 'veh-' + a.vehiculo_id; }
+          else if (a.equipo_id) { keepEquipoKey = 'ti-' + a.equipo_id; }
           document.getElementById('asig_trabajador_id').value = a.trabajador_id || '';
           document.getElementById('asig_fecha_asignacion').value = a.fecha_asignacion || '';
           document.getElementById('asig_fecha_devolucion').value = a.fecha_devolucion || '';
@@ -1070,10 +1105,18 @@
       var selEq = document.getElementById('asig_equipo_id');
       selEq.innerHTML = '<option value="">— Selecciona —</option>';
       rlEquipos.forEach(function(e) {
-        var ok = e.estado === 'Disponible' || String(e.id) === String(keepEquipoId);
+        var esActual = String(e.key) === String(keepEquipoKey);
+        var esAsignable = e.src === 'veh' || e.asignable !== false;
+        var ok = ((e.src === 'veh' ? e.estado === 'Disponible' : e.estado === 'Operativo') && esAsignable) || esActual;
+        if (ok && !esActual) {
+          ok = rlAsignaciones.every(function(a) {
+            if (a.estado !== 'Activa') return true;
+            return !((e.src === 'veh' && String(a.vehiculo_id) === String(e.id)) || (e.src === 'ti' && String(a.equipo_id) === String(e.id)));
+          });
+        }
         if (!ok) return;
-        var selected = String(e.id) === String(keepEquipoId) ? ' selected' : '';
-        selEq.innerHTML += '<option value="' + e.id + '"' + selected + '>' + equipoNombre(e) + '</option>';
+        var selected = esActual ? ' selected' : '';
+        selEq.innerHTML += '<option value="' + e.key + '"' + selected + '>' + equipoNombre(e) + (e.src === 'veh' ? ' (vehículo)' : '') + '</option>';
       });
       populateAsigSensibleSelect(keepSensibleId);
       onAsigTipoChange();
@@ -1083,20 +1126,20 @@
     async function recomputeEstados() {
       try {
         var asigs = await rlFetch('rl_asignaciones');
-        var eqs = await rlFetch('rl_equipos');
+        var vehs = await rlFetch('rl_equipos');
         var sens = await rlFetch('rl_info_sensible');
-        var activasEq = {};
+        var activasVe = {};
         var activasSe = {};
         asigs.forEach(function(a) {
           if (a.estado !== 'Activa') return;
-          if (a.equipo_id) activasEq[a.equipo_id] = true;
+          if (a.vehiculo_id) activasVe[a.vehiculo_id] = true;
           if (a.info_sensible_id) activasSe[a.info_sensible_id] = true;
         });
         var updates = [];
-        eqs.forEach(function(e) {
-          if (e.estado === 'Baja' || e.estado === 'En mantenimiento') return;
-          var nuevo = activasEq[e.id] ? 'Asignado' : 'Disponible';
-          if (e.estado !== nuevo) updates.push(supabaseClient.from('rl_equipos').update({ estado: nuevo }).eq('id', e.id));
+        vehs.forEach(function(v) {
+          if (v.estado === 'Baja' || v.estado === 'En mantenimiento') return;
+          var nuevo = activasVe[v.id] ? 'Asignado' : 'Disponible';
+          if (v.estado !== nuevo) updates.push(supabaseClient.from('rl_equipos').update({ estado: nuevo }).eq('id', v.id));
         });
         sens.forEach(function(s) {
           var nuevo = activasSe[s.id] ? 'Entregado' : 'Pendiente';
@@ -1109,17 +1152,24 @@
     async function rlSaveAsignacion() {
       var trabajadorId = document.getElementById('asig_trabajador_id').value;
       var tipo = document.getElementById('asig_tipo').value;
-      var equipoId = tipo === 'equipo' ? document.getElementById('asig_equipo_id').value : '';
+      var equipoKey = tipo === 'equipo' ? document.getElementById('asig_equipo_id').value : '';
       var sensibleId = tipo === 'sensible' ? document.getElementById('asig_sensible_id').value : '';
       var fechaAsig = document.getElementById('asig_fecha_asignacion').value;
       var fechaDev = document.getElementById('asig_fecha_devolucion').value || null;
       var estado = document.getElementById('asig_estado').value;
       var notas = document.getElementById('asig_notas').value.trim();
       var item = tipo === 'equipo' ? 'el equipo' : 'el acceso';
-      if (!trabajadorId || (!equipoId && !sensibleId) || !fechaAsig) { showAlert('Completa trabajador, ' + item + ' y fecha de asignación', 'warning'); return; }
+      if (!trabajadorId || (!equipoKey && !sensibleId) || !fechaAsig) { showAlert('Completa trabajador, ' + item + ' y fecha de asignación', 'warning'); return; }
+      var vehiculoId = null;
+      var equipoTiId = null;
+      if (equipoKey) {
+        if (equipoKey.indexOf('veh-') === 0) vehiculoId = equipoKey.slice(4);
+        else equipoTiId = equipoKey.slice(3);
+      }
       var payload = {
         trabajador_id: trabajadorId,
-        equipo_id: tipo === 'equipo' ? equipoId : null,
+        vehiculo_id: vehiculoId,
+        equipo_id: equipoTiId,
         info_sensible_id: tipo === 'sensible' ? sensibleId : null,
         fecha_asignacion: fechaAsig,
         fecha_devolucion: fechaDev,
@@ -1149,7 +1199,7 @@
       var data = rlAsignaciones.filter(function(a) {
         if (!q) return true;
         var t = getTrabajador(a.trabajador_id);
-        var e = getEquipo(a.equipo_id);
+        var e = getAsigItem(a);
         var s = getSensible(a.info_sensible_id);
         var texto = (t ? t.nombres + ' ' + t.apellidos + ' ' + t.cedula : '') + ' ' + (e ? equipoNombre(e) : sensibleNombre(s));
         return texto.toLowerCase().indexOf(q) !== -1;
@@ -1165,11 +1215,12 @@
         var t = getTrabajador(a.trabajador_id);
         var nombre = t ? t.nombres + ' ' + t.apellidos : '-';
         var cedula = t ? t.cedula : '';
-        var e = getEquipo(a.equipo_id);
+        var e = getAsigItem(a);
         var s = getSensible(a.info_sensible_id);
-        var tipo = e ? 'Equipo' : 'Info. sensible';
+        var esVehiculo = a.vehiculo_id && e;
+        var tipo = e ? (esVehiculo ? 'Vehículo' : 'Equipo') : 'Info. sensible';
         var item = e ? equipoNombre(e) : sensibleNombre(s);
-        var itemSub = e ? (e.tipo || '') : (s ? (s.tipo || '') : '');
+        var itemSub = e ? ((esVehiculo ? 'Vehículo' : (e.tipo || '')) + (e.src === 'veh' ? '' : '')) : (s ? (s.tipo || '') : '');
         var accion = '';
         if (a.estado === 'Activa') {
           accion += '<button class="btn btn-sm btn-relaciones" style="padding:4px 10px;font-size:11px;" onclick="rlDevolverAsignacion(' + a.id + ')">Devolver</button> ';

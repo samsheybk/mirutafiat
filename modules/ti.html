@@ -264,7 +264,7 @@
               <div id="eqBlock">
                 <div class="tabla-scroll">
                   <table class="data-table">
-                    <thead><tr><th>Equipo</th><th>Tipo</th><th>Marca / Modelo</th><th>Serial</th><th>Asignado a</th><th>Ubicación</th><th>Estado</th><th style="width:150px;">Acción</th></tr></thead>
+                    <thead><tr><th>Equipo</th><th>Tipo</th><th>Marca / Modelo</th><th>Serial</th><th>Código</th><th>Asignado a</th><th>Ubicación</th><th>Estado</th><th>Asignable</th><th style="width:150px;">Acción</th></tr></thead>
                     <tbody id="eqTableBody"></tbody>
                   </table>
                 </div>
@@ -335,7 +335,7 @@
           <div class="form-row">
             <div class="form-group" style="flex:2;"><label>Nombre *</label><input type="text" class="form-input" id="eq_nombre" required placeholder="Ej: PC de recepción"></div>
             <div class="form-group"><label>Tipo</label>
-              <select class="form-select" id="eq_tipo"><option>Computadora</option><option>Laptop</option><option>Servidor</option><option>Impresora</option><option>Periférico</option><option>Red</option><option>Otro</option></select>
+              <select class="form-select" id="eq_tipo"><option>Computadora</option><option>Laptop</option><option>Servidor</option><option>Impresora</option><option>Periférico</option><option>Red</option><option>Teléfono</option><option>Tablet</option><option>Otro</option></select>
             </div>
           </div>
           <div class="form-row">
@@ -344,16 +344,22 @@
           </div>
           <div class="form-row">
             <div class="form-group"><label>Serial</label><input type="text" class="form-input" id="eq_serial"></div>
-            <div class="form-group"><label>Asignado a</label><select class="form-select" id="eq_asignado"></select></div>
+            <div class="form-group"><label>Código interno</label><input type="text" class="form-input" id="eq_codigo" placeholder="Ej: TI-0001"></div>
           </div>
           <div class="form-row">
+            <div class="form-group"><label>Asignado a</label><select class="form-select" id="eq_asignado"></select></div>
             <div class="form-group"><label>Ubicación</label><input type="text" class="form-input" id="eq_ubicacion" placeholder="Ej: Oficina 2"></div>
-            <div class="form-group"><label>Fecha de adquisición</label><input type="date" class="form-input" id="eq_fecha"></div>
           </div>
           <div class="form-row">
             <div class="form-group"><label>Estado</label>
               <select class="form-select" id="eq_estado"><option>Operativo</option><option>En reparación</option><option>Dañado</option><option>Dado de baja</option></select>
             </div>
+            <div class="form-group"><label>Fecha de adquisición</label><input type="date" class="form-input" id="eq_fecha"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-check">
+              <input type="checkbox" id="eq_asignable" checked> <span>Asignable (puede entregarse a un trabajador)</span>
+            </label>
           </div>
           <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="eq_observaciones" rows="2"></textarea></div>
         </form>
@@ -694,7 +700,7 @@
     function renderEquipos() {
       var q = (document.getElementById('eqSearch').value || '').toLowerCase();
       var list = eqItems.filter(function (x) {
-        return !q || (x.nombre + ' ' + (x.marca || '') + ' ' + (x.modelo || '') + ' ' + (x.serial || '') + ' ' + (x.ubicacion || '')).toLowerCase().indexOf(q) !== -1;
+        return !q || (x.nombre + ' ' + (x.marca || '') + ' ' + (x.modelo || '') + ' ' + (x.serial || '') + ' ' + (x.codigo || '') + ' ' + (x.ubicacion || '')).toLowerCase().indexOf(q) !== -1;
       });
       var total = eqItems.length;
       var reparacion = eqItems.filter(function (x) { return x.estado === 'En reparación'; }).length;
@@ -705,7 +711,7 @@
 
       var tbody = document.getElementById('eqTableBody');
       if (!list.length) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#999;">No hay equipos registrados' + (q ? ' para "' + uiEscape(q) + '"' : '') + '</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:#999;">No hay equipos registrados' + (q ? ' para "' + uiEscape(q) + '"' : '') + '</td></tr>';
         return;
       }
       tbody.innerHTML = list.map(function (x) {
@@ -714,9 +720,11 @@
           + '<td>' + uiEscape(x.tipo || '-') + '</td>'
           + '<td>' + uiEscape([x.marca, x.modelo].filter(Boolean).join(' · ') || '-') + '</td>'
           + '<td>' + uiEscape(x.serial || '-') + '</td>'
+          + '<td>' + uiEscape(x.codigo || '-') + '</td>'
           + '<td>' + uiEscape(nombreTrabajador(x.asignado_a)) + '</td>'
           + '<td>' + uiEscape(x.ubicacion || '-') + '</td>'
           + '<td><span class="badge ' + badgeMap(x.estado) + '">' + uiEscape(x.estado) + '</span></td>'
+          + '<td>' + (x.asignable === false ? '<span class="badge badge-inactive">No asignable</span>' : '<span class="badge badge-active">Asignable</span>') + '</td>'
           + '<td><button class="ti-btn-icon" title="Editar" onclick="openModalEquipo(\'' + x.id + '\')"><i class="fi fi-sr-edit" style="font-size:13px;pointer-events:none;"></i></button> <button class="ti-btn-icon" title="Eliminar" onclick="deleteEquipo(\'' + x.id + '\')" style="color:#dc2626;"><i class="fi fi-sr-trash" style="font-size:13px;pointer-events:none;"></i></button></td>'
           + '</tr>';
       }).join('');
@@ -736,10 +744,12 @@
           document.getElementById('eq_marca').value = x.marca || '';
           document.getElementById('eq_modelo').value = x.modelo || '';
           document.getElementById('eq_serial').value = x.serial || '';
+          document.getElementById('eq_codigo').value = x.codigo || '';
           document.getElementById('eq_asignado').value = x.asignado_a ? String(x.asignado_a) : '';
           document.getElementById('eq_ubicacion').value = x.ubicacion || '';
           document.getElementById('eq_fecha').value = x.fecha_adquisicion || '';
           document.getElementById('eq_estado').value = x.estado || 'Operativo';
+          document.getElementById('eq_asignable').checked = x.asignable !== false;
           document.getElementById('eq_observaciones').value = x.observaciones || '';
         }
       }
@@ -755,10 +765,12 @@
         marca: document.getElementById('eq_marca').value.trim() || null,
         modelo: document.getElementById('eq_modelo').value.trim() || null,
         serial: document.getElementById('eq_serial').value.trim() || null,
+        codigo: document.getElementById('eq_codigo').value.trim() || null,
         asignado_a: document.getElementById('eq_asignado').value || null,
         ubicacion: document.getElementById('eq_ubicacion').value.trim() || null,
         fecha_adquisicion: document.getElementById('eq_fecha').value || null,
         estado: document.getElementById('eq_estado').value,
+        asignable: document.getElementById('eq_asignable').checked,
         observaciones: document.getElementById('eq_observaciones').value.trim() || null
       };
       try {
@@ -1427,7 +1439,9 @@
         var r = await supabaseClient.from('ti_tareas').insert([{ proyecto_id: tareasProyectoId, nombre: nombre }]);
         if (r.error) throw r.error;
         document.getElementById('tareaNombre').value = '';
+        await recalcProyectoAvance();
         loadTareas();
+        loadProyectos();
       } catch (err) {
         showAlert('Error al agregar tarea: ' + err.message, 'error');
       }
@@ -1437,9 +1451,28 @@
       try {
         var r = await supabaseClient.from('ti_tareas').update({ estado: done ? 'Completada' : 'Pendiente' }).eq('id', id);
         if (r.error) throw r.error;
+        await recalcProyectoAvance();
         loadTareas();
+        loadProyectos();
       } catch (err) {
         showAlert('Error al actualizar tarea: ' + err.message, 'error');
+      }
+    }
+
+    async function recalcProyectoAvance() {
+      if (!tareasProyectoId) return;
+      try {
+        var r = await supabaseClient.from('ti_tareas').select('id, estado').eq('proyecto_id', tareasProyectoId);
+        if (r.error) throw r.error;
+        var ts = r.data || [];
+        var total = ts.length;
+        var done = ts.filter(function (t) { return t.estado === 'Completada'; }).length;
+        var avance = total ? Math.round((done / total) * 100) : 0;
+        var fase = avance === 100 ? 'Completado' : (avance > 0 ? 'En curso' : 'Iniciado');
+        var u = await supabaseClient.from('ti_proyectos').update({ avance: avance, fase: fase }).eq('id', tareasProyectoId);
+        if (u.error) throw u.error;
+      } catch (err) {
+        showAlert('Error al recalcular el avance del proyecto: ' + err.message, 'error');
       }
     }
 
@@ -1448,7 +1481,9 @@
       try {
         var r = await supabaseClient.from('ti_tareas').delete().eq('id', id);
         if (r.error) throw r.error;
+        await recalcProyectoAvance();
         loadTareas();
+        loadProyectos();
       } catch (err) {
         showAlert('Error al eliminar tarea: ' + err.message, 'error');
       }

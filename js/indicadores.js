@@ -139,8 +139,9 @@
       cards: [
         { title: 'Registros laborales', icon: 'fi-sr-clipboard-list', table: 'relaciones_registros', count: true, hint: 'Expedientes registrados' },
         { title: 'Conceptos', icon: 'fi-sr-tags', table: 'rl_conceptos', count: true, hint: 'Catálogo de conceptos' },
-        { title: 'Equipos', icon: 'fi-sr-box', table: 'rl_equipos', count: true, hint: 'Catálogo de equipos' },
-        { title: 'Asignaciones activas', icon: 'fi-sr-box', table: 'rl_asignaciones', count: true, filter: { estado: 'Activa' }, hint: 'Equipos en uso' },
+        { title: 'Equipos', icon: 'fi-sr-box', table: 'ti_equipos', count: true, hint: 'Catálogo de equipos (módulo TI)' },
+        { title: 'Vehículos', icon: 'fi-sr-car', table: 'rl_equipos', count: true, hint: 'Catálogo de vehículos' },
+        { title: 'Asignaciones activas', icon: 'fi-sr-box', table: 'rl_asignaciones', count: true, filter: { estado: 'Activa' }, hint: 'Activos y accesos en uso' },
         { title: 'Información sensible', icon: 'fi-sr-shield', table: 'rl_info_sensible', count: true, hint: 'Accesos y credenciales' },
         { title: 'Actas y reuniones', icon: 'fi-sr-file-edit', table: 'rl_actas', count: true, hint: 'Actas registradas' },
         { title: 'Acuerdos', icon: 'fi-sr-badge-check', table: 'rl_acta_acuerdos', count: true, hint: 'Compromisos de las actas' },

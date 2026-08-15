@@ -36,14 +36,17 @@ async function alertarPendientesAlRetirar(trabajadorId) {
 
   if (p.equipos.length) {
     var eqMap = {};
+    var vehMap = {};
     try {
-      var re = await supabaseClient.from('rl_equipos').select('*');
+      var re = await supabaseClient.from('ti_equipos').select('*');
       if (!re.error) (re.data || []).forEach(function(e) { eqMap[e.id] = e; });
+      var rv = await supabaseClient.from('rl_equipos').select('*');
+      if (!rv.error) (rv.data || []).forEach(function(v) { vehMap[v.id] = v; });
     } catch (e) { /* noop */ }
     html += '<p style="margin:0 0 4px;font-weight:700;">Activos de la empresa asignados (' + p.equipos.length + '):</p><ul style="margin:0 0 12px;padding-left:18px;">';
     p.equipos.forEach(function(a) {
-      var e = eqMap[a.equipo_id];
-      var nombre = e ? (e.descripcion || e.tipo || 'Equipo') + (e.marca ? ' — ' + e.marca : '') + (e.modelo ? ' ' + e.modelo : '') : 'Equipo #' + a.equipo_id;
+      var e = a.vehiculo_id ? vehMap[a.vehiculo_id] : eqMap[a.equipo_id];
+      var nombre = e ? (e.descripcion || e.nombre || e.tipo || 'Equipo') + (e.marca ? ' — ' + e.marca : '') + (e.modelo ? ' ' + e.modelo : '') : ((a.vehiculo_id ? 'Vehículo #' + a.vehiculo_id : 'Equipo #' + a.equipo_id));
       html += '<li>' + nombre + ' <span style="color:#b45309;">(asignado ' + (a.fecha_asignacion || '-') + ')</span></li>';
     });
     html += '</ul>';

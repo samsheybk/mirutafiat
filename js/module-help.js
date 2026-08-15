@@ -205,12 +205,6 @@
     });
     sel.parentNode.insertBefore(splashBtn, sel.nextSibling);
     refreshSplashNav();
-
-    var opt = document.createElement('option');
-    opt.value = (inModules ? '' : 'modules/') + 'oportunidades.html';
-    opt.textContent = 'Oportunidades de acción';
-    sel.appendChild(opt);
-    if (page === 'oportunidades.html') opt.selected = true;
   }
 
   function openHelp() {

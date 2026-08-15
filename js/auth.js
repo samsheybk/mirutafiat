@@ -180,6 +180,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = base;
       });
 
+      const hasOportunidades = !window.fiatAccess || window.fiatAccess.canViewModule('oportunidades.html');
+      if (hasOportunidades) {
+        const oppItem = document.createElement('button');
+        oppItem.type = 'button';
+        oppItem.className = 'user-drop-item';
+        oppItem.id = 'userDropOportunidades';
+        oppItem.textContent = 'Oportunidades de acción';
+        logoutItem.parentNode.insertBefore(oppItem, logoutItem);
+        oppItem.addEventListener('click', function () {
+          setOpen(false);
+          const base = location.pathname.indexOf('/modules/') !== -1 ? '../modules/oportunidades.html' : 'modules/oportunidades.html';
+          window.location.href = base;
+        });
+      }
+
       logoutItem.addEventListener('click', async () => {
         setOpen(false);
         if (!(await showConfirm('¿Estás seguro de cerrar tu sesión?'))) return;

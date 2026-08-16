@@ -65,6 +65,21 @@
     @keyframes mailFlash { 0% { background-color: rgba(37, 99, 235, 0.18); } 100% { background-color: transparent; } }
     .mail-flash { animation: mailFlash 1s ease-out; }
 
+    /* Modal de cuentas: pestañas */
+    .mail-modal-tabs { display: flex; gap: 4px; padding: 12px 24px 0; border-bottom: 1px solid var(--color-border); flex-shrink: 0; }
+    .mail-modal-tab { flex: 1; padding: 10px 12px; font-size: 13px; font-weight: 600; color: var(--color-text-secondary); background: transparent; border: none; border-bottom: 2px solid transparent; cursor: pointer; transition: color .15s, border-color .15s; }
+    .mail-modal-tab:hover { color: var(--color-text); }
+    .mail-modal-tab.active { color: var(--module-chatfiat); border-bottom-color: var(--module-chatfiat); }
+    .mail-vinc-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+    .mail-vinc-method { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 100px; padding: 16px 12px; border: 1px solid var(--color-border); border-radius: 10px; background: transparent; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--color-text); line-height: 1.3; box-sizing: border-box; overflow: hidden; transition: border-color .15s, background .15s; }
+    .mail-vinc-method:hover { border-color: var(--module-chatfiat); background: var(--color-bg); }
+    .mail-vinc-method:disabled { opacity: .5; filter: grayscale(1); cursor: not-allowed; }
+    .mail-vinc-method:disabled:hover { border-color: var(--color-border); background: transparent; }
+    .mail-vinc-method svg { flex: none; }
+    .mail-vinc-method .sub { font-size: 11px; font-weight: 400; color: var(--color-text-secondary); text-align: center; }
+    .mail-vinc-back { height: auto; min-height: 30px; padding: 4px 10px; font-size: 12px; margin-bottom: 12px; }
+    .mail-vinc-actions { display: flex; align-items: center; gap: 8px; padding-top: 16px; margin-top: 4px; border-top: 1px solid var(--color-border); }
+
     /* Agenda de contactos */
     .agenda-view { height: 100%; display: flex; flex-direction: column; padding: 16px 20px; min-width: 0; }
     .agenda-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
@@ -177,6 +192,11 @@
             </div>
 
             <div class="tool-section" id="tool-mensajes">
+              <div class="mail-empty" id="mailFrozen" style="display:none;">
+                <div style="font-size:28px;font-weight:700;color:var(--module-chatfiat);">Correo Corporativo</div>
+                <p style="margin-top:8px;">Un beneficio pensado para toda la empresa.</p>
+                <p style="font-size:12px;color:#999;max-width:520px;margin:8px auto 0;">Muy pronto podrás gestionar tus cuentas de correo (cPanel / Gmail) desde un solo lugar: leer, responder y enviar mensajes con la identidad oficial de la organización. Estamos preparando esta mejora para brindarte una experiencia segura, rápida y confiable.</p>
+              </div>
               <div class="mail-empty" id="mailEmpty" style="display:none;">
                 <div style="font-size:28px;font-weight:700;color:var(--module-chatfiat);">Correo electrónico</div>
                 <p style="margin-top:8px;">Aún no hay cuentas de correo configuradas.</p>
@@ -251,44 +271,56 @@
         <h3>Cuentas de correo</h3>
         <button class="modal-close" type="button" onclick="mailSettingsClose()"><i class="fi fi-sr-cross-small"></i></button>
       </div>
-      <div class="modal-body">
-        <div id="mailSettingsList"></div>
-        <div style="margin:12px 0;">
-          <button class="btn" type="button" id="mailOAuthBtn" onclick="mailOAuthStart()" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;border:1px solid var(--color-border);">
-            <svg width="18" height="18" viewBox="0 0 48 48" style="flex:none;"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.7 2.4 30.2 0 24 0 14.6 0 6.4 5.4 2.5 13.2l7.9 6.1C12 14.3 17.5 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.2 7-17.6z"/><path fill="#FBBC05" d="M10.4 28.6c-.5-1.5-.8-3.1-.8-4.6s.3-3.1.8-4.6l-7.9-6.1C.9 16 0 19.9 0 24s.9 8 2.5 11.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.6l-7.6-5.9c-2.1 1.4-4.8 2.3-7.6 2.3-6.5 0-12-4.8-13.6-11.2l-7.9 6.1C6.4 42.6 14.6 48 24 48z"/></svg>
-            Conectar con Gmail (Google)
-          </button>
-          <div class="mail-hint" id="mailOAuthHint" style="padding:6px 0 0;color:#b45309;"></div>
-        </div>
-        <hr style="border:none;border-top:1px solid var(--color-border);margin:6px 0 14px;">
-        <div class="form-group"><label>Nombre de la cuenta</label><input type="text" class="form-input" id="accName" placeholder="RRHH"></div>
-        <div class="form-group">
-          <label>Proveedor</label>
-          <select class="form-input" id="accProvider" onchange="mailApplyProvider()">
-            <option value="">Manual (cualquier servidor)</option>
-            <option value="gmail">Gmail (Google Workspace / @gmail.com)</option>
-            <option value="cpanel">cPanel (correo propio)</option>
-          </select>
-          <div class="mail-hint" id="accProviderHint" style="padding:4px 0 0;"></div>
-        </div>
-        <div class="form-row" style="display:flex;gap:10px;">
-          <div class="form-group" style="flex:1;"><label>Servidor IMAP *</label><input type="text" class="form-input" id="accImapHost" placeholder="mail.tudominio.com"></div>
-          <div class="form-group" style="width:90px;"><label>Puerto</label><input type="number" class="form-input" id="accImapPort" value="993"></div>
-        </div>
-        <div class="form-row" style="display:flex;gap:10px;">
-          <div class="form-group" style="flex:1;"><label>Servidor SMTP</label><input type="text" class="form-input" id="accSmtpHost" placeholder="mail.tudominio.com"></div>
-          <div class="form-group" style="width:90px;"><label>Puerto</label><input type="number" class="form-input" id="accSmtpPort" value="465"></div>
-        </div>
-        <div class="form-group"><label>Usuario (correo completo) *</label><input type="text" class="form-input" id="accUser" placeholder="usuario@tudominio.com" onchange="mailMaybeAutoGmail()"></div>
-        <div class="form-group"><label>Contraseña *</label><input type="password" class="form-input" id="accPass" placeholder="••••••••"></div>
-        <div class="form-group"><label>Nombre que aparecerá en "De"</label><input type="text" class="form-input" id="accFromName" placeholder="Recursos Humanos"></div>
-        <div class="form-group"><label>Firma del correo</label><textarea class="form-input" id="accSignature" rows="4" placeholder="Atentamente,&#10;Nombre Apellido&#10;Cargo | Empresa&#10;Teléfono | Web"></textarea><div class="mail-hint" style="padding:4px 0 0;">Se agrega automáticamente al final de los correos que envíes.</div></div>
-        <div class="mail-hint" id="mailSettingsMsg"></div>
+      <div class="mail-modal-tabs">
+        <button class="mail-modal-tab active" id="mailTabAdmin" type="button" onclick="mailSettingsTab('admin')">Administración de cuentas</button>
+        <button class="mail-modal-tab" id="mailTabVinc" type="button" onclick="mailSettingsTab('vinc')">Vinculación de correo</button>
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" type="button" onclick="mailTestAccount()">Probar conexión</button>
-        <span style="flex:1;"></span>
-        <button class="btn btn-outline" type="button" onclick="mailSaveAccount()">Guardar cuenta</button>
+      <div class="modal-body">
+        <div id="mailSettingsAdminPane">
+          <div id="mailSettingsList"></div>
+          <div class="mail-hint" id="mailAdminMsg"></div>
+        </div>
+        <div id="mailSettingsVincPane" style="display:none;">
+          <div id="mailVincMethod">
+            <div class="mail-hint" style="padding:0 0 10px;">Elige cómo quieres vincular tu correo:</div>
+            <div class="mail-vinc-methods">
+              <button class="mail-vinc-method" type="button" disabled title="Próximamente">
+                <svg width="28" height="28" viewBox="0 0 48 48" style="flex:none;"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.7 2.4 30.2 0 24 0 14.6 0 6.4 5.4 2.5 13.2l7.9 6.1C12 14.3 17.5 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.2 7-17.6z"/><path fill="#FBBC05" d="M10.4 28.6c-.5-1.5-.8-3.1-.8-4.6s.3-3.1.8-4.6l-7.9-6.1C.9 16 0 19.9 0 24s.9 8 2.5 11.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.6l-7.6-5.9c-2.1 1.4-4.8 2.3-7.6 2.3-6.5 0-12-4.8-13.6-11.2l-7.9 6.1C6.4 42.6 14.6 48 24 48z"/></svg>
+                <span>Conectar con Gmail</span>
+                <span class="sub">Próximamente</span>
+              </button>
+              <button class="mail-vinc-method" type="button" onclick="mailShowForm()">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="flex:none;color:var(--module-chatfiat);"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+                <span>IMAP / cPanel</span>
+                <span class="sub">Configuración manual del servidor</span>
+              </button>
+            </div>
+            <div class="mail-hint" id="mailOAuthHint" style="padding:6px 0 0;color:#b45309;"></div>
+          </div>
+          <div id="mailVincForm" style="display:none;">
+            <button class="btn btn-outline mail-vinc-back" type="button" onclick="mailShowMethod()"><i class="fi fi-sr-arrow-small-left"></i> Elegir otro método</button>
+            <input type="hidden" id="mailEditingId" value="">
+            <div class="form-group"><label>Nombre de la cuenta</label><input type="text" class="form-input" id="accName" placeholder="RRHH"></div>
+            <div class="form-row" style="display:flex;gap:10px;">
+              <div class="form-group" style="flex:1;"><label>Servidor IMAP *</label><input type="text" class="form-input" id="accImapHost" placeholder="mail.tudominio.com"></div>
+              <div class="form-group" style="width:90px;"><label>Puerto</label><input type="number" class="form-input" id="accImapPort" value="993"></div>
+            </div>
+            <div class="form-row" style="display:flex;gap:10px;">
+              <div class="form-group" style="flex:1;"><label>Servidor SMTP</label><input type="text" class="form-input" id="accSmtpHost" placeholder="mail.tudominio.com"></div>
+              <div class="form-group" style="width:90px;"><label>Puerto</label><input type="number" class="form-input" id="accSmtpPort" value="465"></div>
+            </div>
+            <div class="form-group"><label>Usuario (correo completo) *</label><input type="text" class="form-input" id="accUser" placeholder="usuario@tudominio.com"></div>
+            <div class="form-group"><label>Contraseña *</label><input type="password" class="form-input" id="accPass" placeholder="••••••••"></div>
+            <div class="form-group"><label>Nombre que aparecerá en "De"</label><input type="text" class="form-input" id="accFromName" placeholder="Recursos Humanos"></div>
+            <div class="form-group"><label>Firma del correo</label><textarea class="form-input" id="accSignature" rows="4" placeholder="Atentamente,&#10;Nombre Apellido&#10;Cargo | Empresa&#10;Teléfono | Web"></textarea><div class="mail-hint" style="padding:4px 0 0;">Se agrega automáticamente al final de los correos que envíes.</div></div>
+            <div class="mail-hint" id="mailSettingsMsg"></div>
+            <div class="mail-vinc-actions">
+              <button class="btn btn-outline" type="button" onclick="mailTestAccount()">Probar conexión</button>
+              <span style="flex:1;"></span>
+              <button class="btn btn-outline" type="button" onclick="mailSaveAccount()">Guardar cuenta</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -335,6 +367,46 @@
   <script src="../js/pwa.js"></script>
 
   <script>
+    /* ============================================================
+       CORREO ELECTRÓNICO — CONGELADO (MAIL_FROZEN = true)
+       ------------------------------------------------------------
+       IDEA / LO NECESARIO PARA QUE FUNCIONE EN PRODUCCIÓN:
+
+       Este módulo no puede funcionar solo con el frontend estático
+       de Vercel. Necesita el backend "email-server" (Node.js) que
+       hace la conexión real por IMAP/SMTP, guarda las cuentas en
+       data/accounts.json, revisa bandejas y envía avisos push y
+       gestiona el OAuth de Google. Vercel solo sirve archivos.
+
+       1) Desplegar fiat-intranet/email-server en un host persistente
+          con HTTPS y almacenamiento permanente (Railway / VPS / Fly.io).
+          NO sirve serverless: usa archivos locales + setInterval.
+          En Railway, Root Directory = fiat-intranet/email-server.
+
+       2) Variables de entorno del email-server:
+          - HOST=0.0.0.0
+          - DATA_DIR=/data            (volumen montado, ahí vive accounts.json)
+          - PORT                       (lo asigna el host)
+          - MAIL_API_TOKEN, ACCOUNTS_ENC_KEY, GOOGLE_STATE_SECRET
+          - CORS_ORIGIN=https://braindev-swart.vercel.app
+          - INTRANET_ORIGINS=https://braindev-swart.vercel.app
+          - GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET
+          - GOOGLE_REDIRECT_URI=https://<server>/oauth/google/callback
+            (registrarla en Google Cloud Console como URI autorizada)
+          - VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY / VAPID_SUBJECT
+          - SUPABASE_URL / SERVICE_ROLE_KEY / MAIL_POLL_SECONDS
+
+       3) Apuntar el frontend al servidor:
+          - MAIL_API_REAL (de este archivo) -> https://<server>/api
+          - js/pwa.js -> MAIL_API_REAL igual (para push/test)
+
+       4) Publicar la pantalla de consentimiento de Google (o agregar
+          cada correo como usuario de prueba).
+
+       5) Cuando esté todo listo: poner MAIL_FROZEN = false.
+       ============================================================ */
+    var MAIL_FROZEN = true;
+
     /* ===== Webmail (IMAP/SMTP) ===== */
     var MAIL_API_REAL = 'http://localhost:4000/api'; /* Servidor real de correo */
     var mailState = {
@@ -390,7 +462,7 @@
         mailState.owner = String(fa.state.worker.correo).trim().toLowerCase();
         return Promise.resolve();
       }
-      if (window.supabaseClient) {
+      if (typeof supabaseClient !== 'undefined') {
         return supabaseClient.auth.getSession().then(function (res) {
           var s = res.data && res.data.session;
           if (s && s.user && s.user.email) mailState.owner = String(s.user.email).trim().toLowerCase();
@@ -400,6 +472,12 @@
     }
 
     function mailInit() {
+      if (MAIL_FROZEN) {
+        document.getElementById('mailApp').style.display = 'none';
+        document.getElementById('mailEmpty').style.display = 'none';
+        document.getElementById('mailFrozen').style.display = 'block';
+        return;
+      }
       mailResolveOwner().then(function () {
         mailInitAccounts();
       });
@@ -707,13 +785,44 @@
       return mailState.owner && String(a.owner).toLowerCase() === mailState.owner;
     }
     function mailSettingsOpen() {
+      mailSettingsResetForm();
       mailRenderSettingsList();
-      document.getElementById('mailSettingsMsg').textContent = '';
-      document.getElementById('accPass').placeholder = '••••••••';
+      document.getElementById('mailAdminMsg').textContent = '';
+      mailSettingsTab('admin');
       document.getElementById('mailSettingsModal').classList.add('show');
     }
     function mailSettingsClose() {
       document.getElementById('mailSettingsModal').classList.remove('show');
+    }
+    function mailSettingsTab(which) {
+      document.getElementById('mailTabAdmin').classList.toggle('active', which === 'admin');
+      document.getElementById('mailTabVinc').classList.toggle('active', which === 'vinc');
+      document.getElementById('mailSettingsAdminPane').style.display = which === 'admin' ? '' : 'none';
+      document.getElementById('mailSettingsVincPane').style.display = which === 'vinc' ? '' : 'none';
+      if (which === 'vinc') mailShowMethod();
+    }
+    function mailShowMethod() {
+      document.getElementById('mailVincMethod').style.display = '';
+      document.getElementById('mailVincForm').style.display = 'none';
+    }
+    function mailShowForm() {
+      document.getElementById('mailVincMethod').style.display = 'none';
+      document.getElementById('mailVincForm').style.display = '';
+    }
+    function mailSettingsResetForm() {
+      document.getElementById('mailEditingId').value = '';
+      document.getElementById('accName').value = '';
+      document.getElementById('accImapHost').value = '';
+      document.getElementById('accImapPort').value = 993;
+      document.getElementById('accSmtpHost').value = '';
+      document.getElementById('accSmtpPort').value = 465;
+      document.getElementById('accUser').value = '';
+      document.getElementById('accPass').value = '';
+      document.getElementById('accPass').placeholder = '••••••••';
+      document.getElementById('accFromName').value = '';
+      document.getElementById('accSignature').value = '';
+      document.getElementById('mailSettingsMsg').textContent = '';
+      document.getElementById('mailOAuthHint').textContent = '';
     }
     function mailRenderSettingsList() {
       var el = document.getElementById('mailSettingsList');
@@ -761,12 +870,13 @@
           mailRenderAccountSelect();
           mailRenderSettingsList();
           mailInitAccounts();
+          mailSettingsTab('admin');
         }).catch(function (e) { document.getElementById('mailSettingsMsg').textContent = e.message; });
     }
     function mailEditAccount(id) {
       var a = mailState.accounts.filter(function (x) { return String(x.id) === String(id); })[0];
       if (!a) return;
-      if (!mailCanManageAccount(a)) { document.getElementById('mailSettingsMsg').textContent = 'No puedes modificar esta cuenta.'; return; }
+      if (!mailCanManageAccount(a)) { document.getElementById('mailAdminMsg').textContent = 'No puedes modificar esta cuenta.'; return; }
       mailEnsureEditingId().value = id;
       document.getElementById('accName').value = a.name || '';
       document.getElementById('accImapHost').value = a.imapHost || '';
@@ -775,54 +885,21 @@
       document.getElementById('accSmtpPort').value = a.smtpPort || 465;
       document.getElementById('accUser').value = a.user || '';
       document.getElementById('accPass').value = '';
-      document.getElementById('accProvider').value = (a.imapHost || '') === 'imap.gmail.com' ? 'gmail' : '';
-      mailApplyProvider();
       if (a.authType === 'oauth') {
         document.getElementById('accPass').placeholder = 'No es necesaria (conectada con Google)';
         document.getElementById('mailSettingsMsg').textContent = 'Cuenta conectada con Google: guarda los cambios sin contraseña.';
-        var h = document.getElementById('accProviderHint');
-        if (h) h.textContent = 'Cuenta conectada con Google: la contraseña no es necesaria.';
       } else {
         document.getElementById('accPass').placeholder = '••••••••';
       }
       document.getElementById('accFromName').value = a.fromName || '';
       document.getElementById('accSignature').value = a.signature || '';
-    }
-    function mailApplyProvider() {
-      var p = document.getElementById('accProvider').value;
-      var hint = document.getElementById('accProviderHint');
-      if (p === 'gmail') {
-        document.getElementById('accImapHost').value = 'imap.gmail.com';
-        document.getElementById('accImapPort').value = 993;
-        document.getElementById('accSmtpHost').value = 'smtp.gmail.com';
-        document.getElementById('accSmtpPort').value = 465;
-        if (hint) hint.textContent = 'Para Gmail necesitas una "Contraseña de aplicación" de 16 caracteres: activa la verificación en 2 pasos en tu cuenta de Google, crea una en myaccount.google.com/apppasswords y úsala aquí como contraseña.';
-      } else if (p === 'cpanel') {
-        var user = (document.getElementById('accUser').value || '').trim();
-        var domain = user.indexOf('@') >= 0 ? user.split('@')[1] : '';
-        document.getElementById('accImapHost').value = domain ? 'mail.' + domain : '';
-        document.getElementById('accImapPort').value = 993;
-        document.getElementById('accSmtpHost').value = domain ? 'mail.' + domain : '';
-        document.getElementById('accSmtpPort').value = 465;
-        if (hint) hint.textContent = 'En cPanel el servidor suele ser mail.' + (domain || 'tudominio.com') + ' con puertos 993 (IMAP) y 465 (SMTP) con SSL. Usa el correo completo y su contraseña. Si no conecta, revisa los puertos en el panel (a veces son 143/587).';
-      } else if (hint) {
-        hint.textContent = '';
-      }
-    }
-    function mailMaybeAutoGmail() {
-      var user = (document.getElementById('accUser').value || '').toLowerCase();
-      var isGmail = /@(gmail|googlemail)\.com$/.test(user);
-      var imapHost = document.getElementById('accImapHost').value;
-      var isGmailHost = imapHost === 'imap.gmail.com' || imapHost === '';
-      if (isGmail && isGmailHost) {
-        document.getElementById('accProvider').value = 'gmail';
-        mailApplyProvider();
-      }
+      mailSettingsTab('vinc');
+      mailShowForm();
     }
     function mailDeleteAccount(id) {
       var a = mailState.accounts.filter(function (x) { return String(x.id) === String(id); })[0];
       if (!a) { return; }
-      if (!mailCanManageAccount(a)) { document.getElementById('mailSettingsMsg').textContent = 'No puedes eliminar esta cuenta.'; return; }
+      if (!mailCanManageAccount(a)) { document.getElementById('mailAdminMsg').textContent = 'No puedes eliminar esta cuenta.'; return; }
       if (!confirm('¿Eliminar esta cuenta?')) return;
       mailFetch('/accounts/' + id, { method: 'DELETE' }).then(function () {
         mailState.accounts = mailState.accounts.filter(function (x) { return String(x.id) !== String(id); });
@@ -830,12 +907,12 @@
         mailRenderAccountSelect();
         mailRenderSettingsList();
         mailInitAccounts();
-      }).catch(function (e) { document.getElementById('mailSettingsMsg').textContent = e.message; });
+      }).catch(function (e) { document.getElementById('mailAdminMsg').textContent = e.message; });
     }
     function mailDisconnectAccount(id) {
       var a = mailState.accounts.filter(function (x) { return String(x.id) === String(id); })[0];
       if (!a) return;
-      if (!mailCanManageAccount(a)) { document.getElementById('mailSettingsMsg').textContent = 'No puedes desvincular esta cuenta.'; return; }
+      if (!mailCanManageAccount(a)) { document.getElementById('mailAdminMsg').textContent = 'No puedes desvincular esta cuenta.'; return; }
       if (!confirm('¿Desvincular ' + a.user + '? Google dejará de tener acceso y la cuenta se eliminará del correo.')) return;
       mailFetch('/accounts/' + id + '/disconnect', { method: 'POST' }).then(function () {
         mailState.accounts = mailState.accounts.filter(function (x) { return String(x.id) !== String(id); });
@@ -843,17 +920,10 @@
         mailRenderAccountSelect();
         mailRenderSettingsList();
         mailInitAccounts();
-      }).catch(function (e) { document.getElementById('mailSettingsMsg').textContent = e.message; });
+      }).catch(function (e) { document.getElementById('mailAdminMsg').textContent = e.message; });
     }
     function mailEnsureEditingId() {
-      var el = document.getElementById('mailEditingId');
-      if (el) return el;
-      var h = document.createElement('input');
-      h.type = 'hidden';
-      h.id = 'mailEditingId';
-      h.value = '';
-      (document.getElementById('mailSettingsList') || document.body).appendChild(h);
-      return h;
+      return document.getElementById('mailEditingId');
     }
     function mailOAuthOpen() {
       var hint = document.getElementById('mailOAuthHint');
@@ -1131,6 +1201,10 @@
         if (orig) orig(name);
         if (name === 'agenda') agInit();
         if (name === 'mensajes') {
+          if (MAIL_FROZEN) {
+            var tb = document.querySelector('[data-toolbar="mensajes"]');
+            if (tb) tb.style.display = 'none';
+          }
           mailInit();
         }
       };

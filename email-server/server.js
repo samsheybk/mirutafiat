@@ -11,7 +11,7 @@ const multer = require('multer');
 const webpush = require('web-push');
 
 const PORT = process.env.PORT || 4000;
-const DATA_DIR = path.join(__dirname, 'data');
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 const ACCOUNTS_FILE = path.join(DATA_DIR, 'accounts.json');
 const PUSH_STATE_FILE = path.join(DATA_DIR, 'push-state.json');
 const TOKEN = process.env.MAIL_API_TOKEN || '';

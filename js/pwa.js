@@ -32,7 +32,7 @@
   }
 
   function sessionEmail() {
-    if (!window.supabaseClient) return Promise.resolve('');
+    if (typeof supabaseClient === 'undefined') return Promise.resolve('');
     return supabaseClient.auth.getSession().then(function (res) {
       var s = res.data && res.data.session;
       return (s && s.user && s.user.email) || '';
@@ -81,7 +81,7 @@
       keys_p256dh: (j.keys && j.keys.p256dh) || '',
       user_agent: navigator.userAgent || ''
     };
-    if (!window.supabaseClient) return Promise.resolve();
+    if (typeof supabaseClient === 'undefined') return Promise.resolve();
     return supabaseClient.from(TABLE).upsert(payload, { onConflict: 'endpoint' });
   }
 

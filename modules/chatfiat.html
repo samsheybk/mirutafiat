@@ -420,6 +420,11 @@
       opts = opts || {};
       opts.headers = Object.assign({}, opts.headers);
       if (mailState.owner) opts.headers['x-owner-email'] = mailState.owner;
+      try {
+        var sess = await supabaseClient.auth.getSession();
+        var tok = sess && sess.data && sess.data.session && sess.data.session.access_token;
+        if (tok) opts.headers['Authorization'] = 'Bearer ' + tok;
+      } catch (e) {}
       var res = await fetch(mailApiBase() + url, opts);
       if (!res.ok) {
         var msg = 'Error ' + res.status;
@@ -615,8 +620,52 @@
       });
     }
     function mailSanitizeHtml(html) {
-      var s = String(html || '').replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<iframe[\s\S]*?<\/iframe>/gi, '');
-      return s;
+      if (!html) return '';
+      var doc = new DOMParser().parseFromString(String(html), 'text/html');
+      var ALLOW = {
+        A: ['href', 'target', 'rel'],
+        P: [], BR: [], B: [], STRONG: [], I: [], EM: [], U: [],
+        UL: [], OL: [], LI: [], DIV: [], BLOCKQUOTE: [], PRE: [],
+        H1: [], H2: [], H3: [], H4: [], SPAN: [],
+        IMG: ['src', 'alt', 'width', 'height']
+      };
+      var DROP = { SCRIPT: 1, IFRAME: 1, FRAME: 1, OBJECT: 1, EMBED: 1, STYLE: 1,
+                   LINK: 1, META: 1, BASE: 1, HEAD: 1, SVG: 1, MATH: 1,
+                   FORM: 1, INPUT: 1, TEXTAREA: 1, BUTTON: 1, SELECT: 1 };
+      function walk(node) {
+        var children = Array.prototype.slice.call(node.childNodes);
+        children.forEach(function (ch) {
+          if (ch.nodeType === 1) {
+            var tag = ch.tagName.toUpperCase();
+            if (DROP[tag]) { ch.remove(); return; }
+            if (!ALLOW[tag]) {
+              while (ch.firstChild) ch.parentNode.insertBefore(ch.firstChild, ch);
+              ch.remove();
+              return;
+            }
+            var attrs = Array.prototype.slice.call(ch.attributes);
+            attrs.forEach(function (a) {
+              var name = a.name.toLowerCase();
+              if (name === 'href') {
+                var href = String(a.value || '').trim();
+                ch.setAttribute('href', /^https?:/i.test(href) ? href : '#');
+                ch.setAttribute('rel', 'noopener noreferrer');
+                ch.setAttribute('target', '_blank');
+              } else if (name === 'src' && tag === 'IMG') {
+                var src = String(a.value || '').trim();
+                if (!/^https?:/i.test(src) && !/^data:image\/(png|jpe?g|webp|gif);base64,/i.test(src)) ch.removeAttribute('src');
+              } else if (ALLOW[tag].indexOf(name) === -1) {
+                ch.removeAttribute(a.name);
+              }
+            });
+            walk(ch);
+          } else if (ch.nodeType === 8) {
+            ch.remove();
+          }
+        });
+      }
+      walk(doc.body);
+      return doc.body ? doc.body.innerHTML : '';
     }
     function mailSize(n) {
       n = Number(n) || 0;

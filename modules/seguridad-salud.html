@@ -981,8 +981,8 @@
       try {
         var [res, resTrab, resCand, resCargo, resUni] = await Promise.all([
           supabaseClient.from('seguridad_servicio_medico').select('*').order('fecha', { ascending: false }),
-          supabaseClient.from('plantilla_trabajadores').select('*').eq('estado', 'Activo').order('apellidos'),
-          supabaseClient.from('ats_candidatos').select('*').order('apellidos'),
+          supabaseClient.from('plantilla_trabajadores').select('id, nombres, apellidos, cedula').eq('estado', 'Activo').order('apellidos'),
+          supabaseClient.from('ats_candidatos').select('id, nombres, apellidos, cedula, cargo_interes').order('apellidos'),
           supabaseClient.from('est_cargos').select('id, titulo'),
           supabaseClient.from('est_unidades').select('id, nombre')
         ]);
@@ -1294,7 +1294,7 @@
       tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:30px;color:#999;">Cargando movimientos...</td></tr>';
       try {
         var [resMov, resEq] = await Promise.all([
-          supabaseClient.from('seguridad_inventario_equipo_movimientos').select('*').order('fecha', { ascending: false }),
+          supabaseClient.from('seguridad_inventario_equipo_movimientos').select('fecha, equipo_id, tipo, concepto, ubicacion, cantidad, lote, fecha_vencimiento, observaciones').order('fecha', { ascending: false }),
           supabaseClient.from('seguridad_inventario_equipos').select('id, nombre')
         ]);
         if (resMov.error) throw resMov.error;
@@ -1721,7 +1721,7 @@
       ssShowModal('modalMovimientosInsumo');
       try {
         var [resMov, resTrab] = await Promise.all([
-          supabaseClient.from('seguridad_inventario_movimientos').select('*').eq('insumo_id', id).order('fecha', { ascending: false }),
+          supabaseClient.from('seguridad_inventario_movimientos').select('fecha, tipo, concepto, trabajador_id, cantidad, lote, fecha_vencimiento, observaciones').eq('insumo_id', id).order('fecha', { ascending: false }),
           supabaseClient.from('plantilla_trabajadores').select('id, nombres, apellidos').order('apellidos')
         ]);
         if (resMov.error) throw resMov.error;
@@ -1846,7 +1846,7 @@
       tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:30px;color:#999;">Cargando movimientos...</td></tr>';
       try {
         var [resMov, resIns, resTrab] = await Promise.all([
-          supabaseClient.from('seguridad_inventario_movimientos').select('*').order('fecha', { ascending: false }),
+          supabaseClient.from('seguridad_inventario_movimientos').select('insumo_id, fecha, tipo, concepto, trabajador_id, cantidad, lote, fecha_vencimiento, observaciones').order('fecha', { ascending: false }),
           supabaseClient.from('seguridad_inventario_insumos').select('id, nombre'),
           supabaseClient.from('plantilla_trabajadores').select('id, nombres, apellidos').order('apellidos')
         ]);

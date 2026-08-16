@@ -53,7 +53,7 @@ async function loadData() {
   try {
     const { data, error } = await supabaseClient
       .from(currentTable)
-      .select('*')
+      .select(currentFields.join(', ') || '*')
       .order('created_at', { ascending: false });
 
     if (error) throw error;

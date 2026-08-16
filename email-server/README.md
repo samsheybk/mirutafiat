@@ -18,10 +18,10 @@ cp .env.example .env   # ajustar valores si hace falta
 npm start              # escucha en http://localhost:4000
 ```
 
-Verificación rápida:
+Verificación rápida (la API exige autenticación):
 
 ```bash
-curl http://localhost:4000/api/status
+curl -H "Authorization: Bearer $MAIL_API_TOKEN" http://localhost:4000/api/status
 # {"ok":true,"accounts":0,"time":"..."}
 ```
 
@@ -113,14 +113,20 @@ Opcionalmente se pueden precargar a mano en ese archivo:
 var MAIL_API = 'https://intranet.tudominio.com/correo-api/api';
 ```
 
-> Si la intranet y la API están en dominios distintos, el servidor ya envía cabeceras CORS abiertas. Para producción conviene restringirlas en `server.js`.
+> Si la intranet y la API están en dominios distintos, configura en `.env` la variable `CORS_ORIGIN` con la lista de orígenes permitidos (separados por coma). Si se deja vacía, la API solo acepta peticiones del mismo origen.
 
 ## Seguridad
 
-- Las contraseñas quedan en texto plano en `email-server/data/accounts.json`. En producción:
-  - Proteger ese archivo (permisos `600`) y la carpeta `data/`.
-  - Opcional: definir `MAIL_API_TOKEN` en `.env`; si se define, todas las peticiones deben incluir `Authorization: Bearer <token>` y el frontend debe enviarlo.
-  - Cifrar las contraseñas (p. ej. `crypto` con clave en `.env`) en una mejora posterior.
+- **Autenticación obligatoria**: todas las rutas `/api/*` exigen un token válido:
+  1. `Authorization: Bearer <MAIL_API_TOKEN>` (token de operaciones definido en `.env`), o
+  2. `Authorization: Bearer <access_token de la sesión Supabase>`, validado contra `{SUPABASE_URL}/auth/v1/user`. El webmail envía este token automáticamente, por lo que no es necesario (ni recomendado) guardar `MAIL_API_TOKEN` en el frontend.
+  - El servidor aborta el arranque si no hay ningún método de autenticación configurado (`MAIL_API_TOKEN` vacío y sin `SUPABASE_URL`).
+  - El dueño de una cuenta privada se deduce del token verificado, no de la cabecera `x-owner-email` (que deja de ser fiable).
+- **CORS restringido**: por defecto sin cross-origin. Definir `CORS_ORIGIN` con los orígenes de la intranet.
+- **TLS verificado**: `TLS_REJECT_UNAUTHORIZED=1` (por defecto) verifica el certificado de los servidores IMAP/SMTP. Poner `0` solo si el servidor de correo usa un certificado auto-firmado.
+- **Contraseñas cifradas en reposo**: si defines `ACCOUNTS_ENC_KEY` en `.env`, las contraseñas de `data/accounts.json` se guardan cifradas con AES-256-GCM. Sin esa clave se guardan en texto plano (no recomendado).
+  - Migración: las claves ya guardadas en texto plano se siguen leyendo; al editar la cuenta se cifran automáticamente.
+- Proteger `data/` (permisos `600`) y rotar `ACCOUNTS_ENC_KEY`, `MAIL_API_TOKEN` y `SERVICE_ROLE_KEY` periódicamente.
 - Usar siempre IMAP/SMTP por SSL (993/465).
 
 ## API

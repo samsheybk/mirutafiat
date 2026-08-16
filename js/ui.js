@@ -344,12 +344,345 @@ function mobilePanelMore() {
   rebuild();
 }
 
+// ============================================
+// ICONOS EN BOTONES (global)
+// Los botones con texto de acción se muestran
+// solo con icono; el texto original queda en
+// title/aria-label para accesibilidad.
+// ============================================
+
+const UI_ICON_EXACT = {
+  'cerrar sesion': 'fi-sr-sign-out-alt',
+  'detalles del modulo': 'fi-sr-info',
+  'crear y abrir recorrido': 'fi-sr-route',
+  'personal activo': 'fi-sr-users-alt',
+  'movimientos': 'fi-sr-exchange-alt',
+  'entrada': 'fi-sr-arrow-down-to-square',
+  'salida': 'fi-sr-arrow-up-from-square',
+  'ingreso': 'fi-sr-arrow-down-to-square',
+  'equipos': 'fi-sr-computer',
+  'licencias': 'fi-sr-license',
+  'inventario': 'fi-sr-boxes',
+  'stock': 'fi-sr-box',
+  'ventas': 'fi-sr-chart-line-up',
+  'whatsapp': 'fi-sr-comment',
+  'correo': 'fi-sr-envelope',
+  'cronograma': 'fi-sr-calendar-lines',
+  'carpetas': 'fi-sr-folder',
+  'documentacion': 'fi-sr-document',
+  'configuracion': 'fi-sr-settings',
+  'configurar cuenta': 'fi-sr-settings',
+  'entregas': 'fi-sr-box-open',
+  'consumibles': 'fi-sr-package',
+  'asignaciones': 'fi-sr-clipboard-list',
+  'carga familiar': 'fi-sr-users',
+  'accesos': 'fi-sr-key',
+  'perfiles': 'fi-sr-user',
+  'cuentas': 'fi-sr-credit-card',
+  'solicitudes': 'fi-sr-inbox',
+  'historial': 'fi-sr-clock',
+  'historico': 'fi-sr-clock',
+  'datos': 'fi-sr-database',
+  'detallado': 'fi-sr-list',
+  'consolidado': 'fi-sr-chart-histogram',
+  'horas por trabajador': 'fi-sr-clock',
+  'vacantes pendientes': 'fi-sr-briefcase',
+  'solo usd': 'fi-sr-dollar',
+  'solo bs': 'fi-sr-money-bill-simple',
+  'completa bs usd': 'fi-sr-coins',
+  'si continuar': 'fi-sr-check',
+  'tabla': 'fi-sr-table',
+  'cuadricula': 'fi-sr-grid',
+  'lista': 'fi-sr-list',
+  'kanban': 'fi-sr-square-kanban',
+  'exportar excel': 'fi-sr-file-excel',
+  'exportar pdf': 'fi-sr-file-pdf',
+  'importar csv': 'fi-sr-file-csv',
+  'descargar plantilla excel': 'fi-sr-file-excel',
+  'descargar pdf': 'fi-sr-file-pdf',
+  'adjuntar contrato firmado': 'fi-sr-paperclip-vertical',
+  'enrolar trabajador': 'fi-sr-fingerprint',
+  'registrar huella': 'fi-sr-fingerprint',
+  'seleccionar trabajadores': 'fi-sr-list-check',
+  'seleccionar cursos': 'fi-sr-list-check',
+  'aplicar seleccion': 'fi-sr-check-double',
+  'aplicar a toda la estructura': 'fi-sr-check-double',
+  'seleccionar foto': 'fi-sr-picture',
+  'capturar frente': 'fi-sr-face-viewfinder',
+  'ver como trabajador': 'fi-sr-eye',
+  'ver stock': 'fi-sr-eye',
+  'calcular liquidacion': 'fi-sr-calculator',
+  'consultar tasa bcv': 'fi-sr-calculator',
+  'probar conexion': 'fi-sr-link',
+  'probar notificacion': 'fi-sr-bell',
+  'cambiar estado': 'fi-sr-exchange-alt',
+  'cambiar foto de perfil': 'fi-sr-camera',
+  'confirmar ingreso': 'fi-sr-check',
+  'confirmar descarte': 'fi-sr-check',
+  'confirmar rechazo': 'fi-sr-check',
+  'finalizar evaluacion': 'fi-sr-check-circle',
+  'redactar': 'fi-sr-pen-fancy',
+  'restablecer valores': 'fi-sr-rotate-left',
+  'volver a plantilla': 'fi-sr-arrow-left',
+  'volver a cursos': 'fi-sr-arrow-left',
+  'contrato firmado': 'fi-sr-file-signature',
+  'informacion sensible': 'fi-sr-shield-exclamation',
+  'catalogo de equipos y vehiculos': 'fi-sr-car',
+};
+
+const UI_ICON_RULES = [
+  [/^x+$/, 'fi-sr-x'],
+  [/cerrar sesion/, 'fi-sr-sign-out-alt'],
+  [/adjuntar/, 'fi-sr-paperclip-vertical'],
+  [/registrar (entrada|ingreso)$|^entrada$|^ingreso$/, 'fi-sr-arrow-down-to-square'],
+  [/registrar salida$|^salida$/, 'fi-sr-arrow-up-from-square'],
+  [/eliminar|borrar|descartar/, 'fi-sr-trash'],
+  [/devolver/, 'fi-sr-undo'],
+  [/quitar/, 'fi-sr-minus'],
+  [/restaurar|restablecer/, 'fi-sr-trash-restore'],
+  [/limpiar/, 'fi-sr-broom'],
+  [/editar|corregir|modificar/, 'fi-sr-pencil'],
+  [/imprimir/, 'fi-sr-print'],
+  [/importar/, 'fi-sr-file-import'],
+  [/exportar|descargar/, 'fi-sr-file-export'],
+  [/subir/, 'fi-sr-upload'],
+  [/copiar/, 'fi-sr-copy'],
+  [/enviar/, 'fi-sr-paper-plane'],
+  [/responder/, 'fi-sr-reply-all'],
+  [/cancelar/, 'fi-sr-x'],
+  [/pagar|pago/, 'fi-sr-credit-card'],
+  [/guardar/, 'fi-sr-disk'],
+  [/registrar/, 'fi-sr-plus'],
+  [/nuev[oa]|agregar|crear|añadir/, 'fi-sr-plus'],
+  [/incidente/, 'fi-sr-alarm-exclamation'],
+  [/cambiar estado/, 'fi-sr-exchange-alt'],
+  [/cambiar foto|capturar/, 'fi-sr-camera'],
+  [/seleccionar/, 'fi-sr-list-check'],
+  [/aplicar/, 'fi-sr-check-double'],
+  [/confirmar|aceptar|finalizar/, 'fi-sr-check'],
+  [/reintentar|actualizar|repetir/, 'fi-sr-rotate-right'],
+  [/calcular|consultar/, 'fi-sr-calculator'],
+  [/probar/, 'fi-sr-link'],
+  [/enrolar|huella/, 'fi-sr-fingerprint'],
+  [/ver/, 'fi-sr-eye'],
+  [/volver|anterior/, 'fi-sr-arrow-left'],
+  [/siguiente/, 'fi-sr-arrow-right'],
+  [/configurar|configuracion/, 'fi-sr-settings'],
+  [/cerrar/, 'fi-sr-circle-xmark'],
+];
+
+function uiNormText(t) {
+  return String(t || '')
+    .replace(/[\u00d7\u2715\u2716]/g, 'x')
+    .replace(/[\u00ab\u00bb\u2039\u203a\u25c0\u25b6]/g, ' ')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N} ]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function uiBtnLabel(btn) {
+  return String(btn.textContent || '').replace(/\s+/g, ' ').trim();
+}
+
+function uiIconFor(text) {
+  const norm = uiNormText(text);
+  if (!norm) return null;
+  if (UI_ICON_EXACT[norm]) return UI_ICON_EXACT[norm];
+  for (let i = 0; i < UI_ICON_RULES.length; i++) {
+    if (UI_ICON_RULES[i][0].test(norm)) return UI_ICON_RULES[i][1];
+  }
+  return null;
+}
+
+function uiIconButtons() {
+  document.querySelectorAll('button').forEach((btn) => {
+    if (btn.dataset.uiIcon === '1') return;
+    if (btn.classList.contains('topnav-toggle')) {
+      btn.dataset.uiIcon = '1';
+      return;
+    }
+    if (btn.closest('.rich-toolbar') || btn.classList.contains('filter-toggle-btn')) {
+      btn.dataset.uiIcon = '1';
+      return;
+    }
+
+    const label = uiBtnLabel(btn);
+    if (!label) return;
+
+    const textSpan = '<span class="btn-text">' + uiEscape(label) + '</span>';
+    const existingIcon = btn.querySelector('i.fi');
+
+    if (existingIcon) {
+      Array.from(btn.childNodes).forEach((n) => {
+        if (n !== existingIcon && !(n.nodeType === 3 && n.textContent.trim() === '')) {
+          btn.removeChild(n);
+        }
+      });
+      if (!btn.hasAttribute('title')) btn.title = label;
+      if (!btn.hasAttribute('aria-label')) btn.setAttribute('aria-label', label);
+      btn.classList.add('ui-icon-btn');
+      btn.insertAdjacentHTML('beforeend', textSpan);
+      btn.dataset.uiIcon = '1';
+      return;
+    }
+
+    const icon = uiIconFor(label);
+    if (!icon) return;
+    if (!btn.hasAttribute('title')) btn.title = label;
+    btn.setAttribute('aria-label', label);
+    btn.innerHTML = '<i class="fi ' + icon + '" style="pointer-events:none;line-height:1;"></i>' + textSpan;
+    btn.classList.add('ui-icon-btn');
+    btn.dataset.uiIcon = '1';
+  });
+}
+
+// ============================================
+// FILTROS COLAPSABLES (global)
+// Los controles de búsqueda/filtro de cada
+// toolbar se ocultan tras un botón de filtro
+// con icono; al hacer clic se despliegan.
+// ============================================
+
+function uiIsFilterControl(el) {
+  if (!el || el.nodeType !== 1) return false;
+  const tag = el.tagName;
+  if (tag === 'INPUT') {
+    const type = String(el.getAttribute('type') || 'text').toLowerCase();
+    if (type === 'date' || type === 'checkbox' || type === 'radio' || type === 'search') return true;
+    const ph = String(el.getAttribute('placeholder') || '');
+    if (/buscar|filtrar|filtro|busca/i.test(ph)) return true;
+    const handlers = ['oninput', 'onkeyup', 'onkeydown', 'onchange']
+      .map((a) => String(el.getAttribute(a) || ''))
+      .join(' ');
+    if (/filtr|filter|buscar|render|search/i.test(handlers)) return true;
+    const id = String(el.getAttribute('id') || '');
+    return /buscar|filtr|search|busq|filtro/i.test(id);
+  }
+  if (tag === 'SELECT') return true;
+  if (tag === 'BUTTON') {
+    return /buscar|filtrar|limpiar/i.test(el.textContent || '');
+  }
+  if (tag === 'DIV' && el.classList.contains('form-group')) {
+    const hasFilter = el.querySelector('input, select');
+    const hasAction = el.querySelector('button, a[class*="btn"]');
+    return !!hasFilter && !hasAction;
+  }
+  return false;
+}
+
+function uiFilterCollapse() {
+  document.querySelectorAll('.toolbar-content, .gu-filters, .mail-toolbar').forEach((container) => {
+    if (container.dataset.uiFilters === '1') return;
+    container.dataset.uiFilters = '1';
+
+    const panel = document.createElement('div');
+    panel.className = 'filter-collapse';
+    let moved = 0;
+
+    Array.from(container.children).forEach((child) => {
+      if (uiIsFilterControl(child)) {
+        panel.appendChild(child);
+        moved++;
+      } else if (child.classList && child.classList.contains('mail-toolbar')) {
+        Array.from(child.children).forEach((gc) => {
+          if (gc.tagName === 'INPUT' || gc.tagName === 'SELECT') {
+            panel.appendChild(gc);
+            moved++;
+          }
+        });
+      }
+    });
+
+    if (!moved) return;
+
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'btn btn-outline ui-icon-btn filter-toggle-btn';
+    toggle.title = 'Filtros';
+    toggle.setAttribute('aria-label', 'Filtros');
+    toggle.innerHTML = '<i class="fi fi-sr-filter" style="pointer-events:none;line-height:1;"></i>';
+
+    const updateActive = function () {
+      const has = Array.prototype.some.call(panel.querySelectorAll('input, select'), (el) => {
+        return el.value && String(el.value).trim() !== '';
+      });
+      toggle.classList.toggle('has-value', has);
+    };
+    panel.addEventListener('input', updateActive);
+    panel.addEventListener('change', updateActive);
+    updateActive();
+
+    toggle.addEventListener('click', function () {
+      const open = panel.classList.toggle('open');
+      toggle.classList.toggle('active', open);
+    });
+
+    container.insertBefore(toggle, container.firstChild);
+    container.appendChild(panel);
+  });
+}
+
+// ============================================
+// SCAN GLOBAL: aplica iconos y filtros a
+// contenido estático y dinámico (MutationObserver)
+// ============================================
+
+let uiGlobalTimer = null;
+
+function uiGlobalScan() {
+  clearTimeout(uiGlobalTimer);
+  uiGlobalTimer = setTimeout(() => {
+    uiFilterCollapse();
+    uiIconButtons();
+  }, 80);
+}
+
+function uiGlobalInit() {
+  uiGlobalScan();
+  if (document.body && !document.body.__uiGlobalObserver) {
+    document.body.__uiGlobalObserver = new MutationObserver(uiGlobalScan);
+    document.body.__uiGlobalObserver.observe(document.body, { childList: true, subtree: true });
+  }
+}
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     mobileNavInit();
     mobilePanelMore();
+    uiGlobalInit();
   });
 } else {
   mobileNavInit();
   mobilePanelMore();
+  uiGlobalInit();
+}
+
+// ============================================
+// CACHE DE CONSULTAS (datos maestros)
+// cachedGet evita repetir la misma consulta a
+// datos maestros (unidades, cargos) durante la
+// ventana TTL. cachedGetInvalidate limpia la
+// caché tras una escritura para ver los cambios
+// de inmediato en los demás módulos/herramientas.
+// ============================================
+
+const uiCacheStore = {};
+const UI_CACHE_TTL_MS = 30000;
+
+async function cachedGet(key, loader) {
+  const now = Date.now();
+  const hit = uiCacheStore[key];
+  if (hit && now - hit.ts < UI_CACHE_TTL_MS) return hit.data;
+  const res = await loader();
+  uiCacheStore[key] = { ts: now, data: res };
+  return res;
+}
+
+function cachedGetInvalidate(prefix) {
+  const keys = Object.keys(uiCacheStore);
+  for (let i = 0; i < keys.length; i++) {
+    if (!prefix || keys[i].indexOf(prefix) === 0) delete uiCacheStore[keys[i]];
+  }
 }

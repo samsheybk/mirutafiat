@@ -2907,3 +2907,89 @@ a {
   }
 }
 
+/* ============================================
+   BOTONES CON ICONO (global)
+   En escritorio: icono + texto. En móvil
+   (<=640px): solo icono.
+   ============================================ */
+.ui-icon-btn {
+  justify-content: center;
+}
+
+.btn-text {
+  font: inherit;
+}
+
+/* ============================================
+   FILTROS COLAPSABLES (global)
+   En escritorio los filtros quedan expandidos
+   en línea; en móvil se ocultan tras el botón
+   de filtro (icono).
+   ============================================ */
+.filter-collapse {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+  flex: 1 1 auto;
+  order: -1;
+  box-sizing: border-box;
+}
+
+.filter-collapse .form-group {
+  margin: 0;
+}
+
+.filter-toggle-btn {
+  display: none;
+  position: relative;
+}
+
+.filter-toggle-btn.active {
+  background: var(--color-text);
+  color: #fff;
+}
+
+.filter-toggle-btn.has-value::after {
+  content: '';
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ef4444;
+  border: 2px solid var(--color-surface, #fff);
+}
+
+@media (max-width: 640px) {
+  .btn-text {
+    display: none;
+  }
+
+  .btn.ui-icon-btn,
+  .btn-outline.ui-icon-btn {
+    padding: 0;
+    min-width: 44px;
+  }
+
+  .view-toggle button.ui-icon-btn,
+  .ti-tab.ui-icon-btn {
+    padding: 0 10px;
+  }
+
+  .filter-collapse {
+    display: none;
+    width: 100%;
+  }
+
+  .filter-collapse.open {
+    display: flex;
+    padding: 10px 0 4px;
+  }
+
+  .filter-toggle-btn {
+    display: inline-flex;
+  }
+}
+

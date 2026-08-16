@@ -162,9 +162,9 @@
 
       async function loadDatos() {
         const [pRes, cRes, aRes] = await Promise.all([
-          supabaseClient.from('plantilla_trabajadores').select('*').eq('estado', 'Activo').order('nombres'),
+          supabaseClient.from('plantilla_trabajadores').select('id, nombres, apellidos, cedula, correo, cargo_id, estado').eq('estado', 'Activo').order('nombres'),
           supabaseClient.from('est_cargos').select('id,titulo').order('titulo'),
-          supabaseClient.from('usuario_accesos').select('*')
+          supabaseClient.from('usuario_accesos').select('id, trabajador_id, rol, modulos, activo')
         ]);
         cargosById = {};
         (cRes.data || []).forEach(function (c) { cargosById[c.id] = c.titulo; });

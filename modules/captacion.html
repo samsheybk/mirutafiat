@@ -886,7 +886,7 @@
         });
         const { data, error } = await supabaseClient
           .from('ats_candidatos')
-          .select('*')
+          .select('id, nombres, apellidos, cedula, cargo_interes, telefono, correo, estado_kanban')
           .order('created_at', { ascending: false });
 
         if (error) throw error;
@@ -1223,7 +1223,9 @@
         document.getElementById('ingreso_nombre').value = c.nombres + ' ' + c.apellidos;
         var hoy = new Date().toISOString().split('T')[0];
         document.getElementById('ingreso_fecha').value = hoy;
-        var { data: unidades } = await supabaseClient.from('est_unidades').select('*').order('nombre');
+        var { data: unidades } = await cachedGet('master:unidades', function() {
+          return supabaseClient.from('est_unidades').select('*').order('nombre');
+        });
         if (unidades) {
           var sel = document.getElementById('ingreso_unidad_id');
           sel.innerHTML = '<option value="">— Selecciona unidad —</option>' + unidades.map(function(u) { return '<option value="' + u.id + '">' + u.nombre + ' (' + u.tipo + ')</option>'; }).join('');
@@ -1330,6 +1332,17 @@
       }
     }
 
+    function escapeHtml(s) {
+      return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function safeImgUrl(raw) {
+      var u = String(raw == null ? '' : raw).trim();
+      if (/^https?:\/\//i.test(u)) return u;
+      if (/^data:image\/(png|jpe?g|webp|gif);base64,/i.test(u)) return u;
+      return '';
+    }
+
     async function openFichaTecnica(id) {
       fichaActualId = id;
       try {
@@ -1340,8 +1353,9 @@
         var { data: logs } = await supabaseClient.from('ats_log_estados').select('*').eq('candidato_id', id).order('created_at', { ascending: false });
         var { data: comentarios } = await supabaseClient.from('ats_comentarios').select('*').eq('candidato_id', id).order('created_at', { ascending: false });
 
-        var fotoHtml = c.foto_url
-          ? '<div><img src="' + c.foto_url + '" style="width:80px;height:80px;object-fit:cover;border:1px solid var(--color-border);"></div>'
+        var fotoUrl = safeImgUrl(c.foto_url);
+        var fotoHtml = fotoUrl
+          ? '<div><img src="' + escapeHtml(fotoUrl) + '" style="width:80px;height:80px;object-fit:cover;border:1px solid var(--color-border);"></div>'
           : '<div style="width:80px;height:80px;border:1px solid var(--color-border);display:flex;align-items:center;justify-content:center;background:var(--color-bg);"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--color-text-secondary)" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>';
 
         var logHtml = '';
@@ -1398,9 +1412,13 @@
 
     async function loadEstructura() {
       try {
-        var u = await supabaseClient.from('est_unidades').select('*').order('nombre');
+        var u = await cachedGet('master:unidades', function() {
+          return supabaseClient.from('est_unidades').select('*').order('nombre');
+        });
         if (u.data) allUnidades = u.data;
-        var c = await supabaseClient.from('est_cargos').select('*').order('titulo');
+        var c = await cachedGet('master:cargos', function() {
+          return supabaseClient.from('est_cargos').select('*').order('titulo');
+        });
         if (c.data) allCargos = c.data;
         renderUnidadesTree('');
         populateUnidadSelects();
@@ -1571,6 +1589,7 @@
           var { error } = await supabaseClient.from('est_unidades').insert([{ nombre: nombre, tipo: tipo, unidad_padre_id: padre || null }]);
           if (error) throw error;
         }
+        cachedGetInvalidate();
         await loadEstructura();
         closeModalUnidad();
       } catch (err) {
@@ -1595,6 +1614,7 @@
       try {
         var { error } = await supabaseClient.from('est_unidades').delete().eq('id', id);
         if (error) throw error;
+        cachedGetInvalidate();
         await loadEstructura();
       } catch (err) {
         showAlert('Error: ' + err.message, 'error');
@@ -1683,6 +1703,7 @@
         // Esperar un momento y cerrar modal
         await new Promise(resolve => setTimeout(resolve, 800));
         
+        cachedGetInvalidate();
         await loadEstructura();
         closeModalCargo();
         loadRequisiciones();
@@ -1749,6 +1770,7 @@
         var { error } = await supabaseClient.from('est_cargos').delete().eq('id', id);
         if (error) throw error;
         closeModalCargo();
+        cachedGetInvalidate();
         await loadEstructura();
       } catch (err) {
         showAlert('Error: ' + err.message, 'error');
@@ -1836,8 +1858,12 @@
 
     async function exportarOrganigrama() {
       try {
-        var { data: unidades } = await supabaseClient.from('est_unidades').select('*').order('nombre');
-        var { data: cargos } = await supabaseClient.from('est_cargos').select('*,jefe_inmediato_id').order('titulo');
+        var { data: unidades } = await cachedGet('master:unidades', function() {
+          return supabaseClient.from('est_unidades').select('*').order('nombre');
+        });
+        var { data: cargos } = await cachedGet('org:cargos', function() {
+          return supabaseClient.from('est_cargos').select('*,jefe_inmediato_id').order('titulo');
+        });
         if (unidades) allUnidades = unidades;
         if (cargos) allCargos = cargos;
         renderOrganigrama();
@@ -2022,9 +2048,13 @@
       try {
         document.getElementById('plantTableBody').innerHTML = tableLoadingHTML(7);
         document.getElementById('histTableBody').innerHTML = tableLoadingHTML(7);
-        var u = await supabaseClient.from('est_unidades').select('*').order('nombre');
+        var u = await cachedGet('master:unidades', function() {
+          return supabaseClient.from('est_unidades').select('*').order('nombre');
+        });
         if (u.data) allUnidades = u.data;
-        var c = await supabaseClient.from('est_cargos').select('*').order('titulo');
+        var c = await cachedGet('master:cargos', function() {
+          return supabaseClient.from('est_cargos').select('*').order('titulo');
+        });
         if (c.data) allCargos = c.data;
         var t = await supabaseClient.from('plantilla_trabajadores').select('*').order('apellidos');
         if (t.error) {
@@ -2100,8 +2130,12 @@
 
     async function descargarPlantillaTemplate() {
       try {
-        var u = await supabaseClient.from('est_unidades').select('*').order('nombre');
-        var c = await supabaseClient.from('est_cargos').select('*').order('titulo');
+        var u = await cachedGet('master:unidades', function() {
+          return supabaseClient.from('est_unidades').select('*').order('nombre');
+        });
+        var c = await cachedGet('master:cargos', function() {
+          return supabaseClient.from('est_cargos').select('*').order('titulo');
+        });
         var unidades = u.data || [];
         var cargos = c.data || [];
         var headers = ['CÉDULA', 'NOMBRES', 'APELLIDOS', 'CÓDIGO DE NÓMINA', 'CORREO', 'TELÉFONO', 'DIRECCIÓN', 'UNIDAD', 'CARGO', 'FECHA DE INGRESO', 'ESTADO'];
@@ -2238,9 +2272,13 @@
       try {
         document.getElementById('reqTableBody').innerHTML = tableLoadingHTML(6);
         var q = document.getElementById('reqSearch').value.trim().toLowerCase();
-        var { data: cargos } = await supabaseClient.from('est_cargos').select('*,jefe_inmediato_id').order('titulo');
-        var { data: plantilla } = await supabaseClient.from('plantilla_trabajadores').select('*');
-        var { data: unidades } = await supabaseClient.from('est_unidades').select('*').order('nombre');
+        var { data: cargos } = await cachedGet('org:cargos', function() {
+          return supabaseClient.from('est_cargos').select('*,jefe_inmediato_id').order('titulo');
+        });
+        var { data: plantilla } = await supabaseClient.from('plantilla_trabajadores').select('cargo_id, estado');
+        var { data: unidades } = await cachedGet('master:unidades', function() {
+          return supabaseClient.from('est_unidades').select('*').order('nombre');
+        });
         var { data: candidatos } = await supabaseClient.from('ats_candidatos').select('cargo_interes,estado_kanban');
         if (!cargos) cargos = [];
         if (!plantilla) plantilla = [];
@@ -2435,7 +2473,8 @@
           if (error) throw error;
           var { error: e2 } = await supabaseClient.from('requisiciones_solicitudes').update({ estado: 'Aprobada' }).eq('id', id);
           if (e2) throw e2;
-          await loadEstructura();
+          cachedGetInvalidate();
+        await loadEstructura();
           loadRequisiciones();
           loadSolicitudes();
           showAlert('Vacantes actualizadas: ' + cargo.titulo + ' ahora tiene ' + nuevasVacantes + ' vacantes', 'success');

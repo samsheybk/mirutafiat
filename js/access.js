@@ -153,6 +153,15 @@
         state.ready = true;
         return;
       }
+      var admRes = { data: null };
+      try {
+        admRes = await supabaseClient
+          .from('app_administradores')
+          .select('email')
+          .eq('email', emailNorm)
+          .maybeSingle();
+      } catch (e) { admRes = { data: null }; }
+      var isSuper = !!(admRes && admRes.data);
       var wRes = await supabaseClient
         .from('plantilla_trabajadores')
         .select('*')
@@ -177,8 +186,8 @@
       if (acc && acc.activo === false) { state.allow = false; state.error = 'NO_MATCH'; return; }
       state.role = acc ? acc.rol : 'Empleado';
       state.modulos = acc && acc.modulos ? acc.modulos : null;
-      state.isAdmin = state.role === 'Administrador';
-      state.manage = state.isAdmin;
+      state.isAdmin = isSuper || state.role === 'Administrador';
+      state.manage = isSuper;
       state.ready = true;
     } catch (err) {
       console.error('[access.buildState]', err && err.message ? err.message : err);

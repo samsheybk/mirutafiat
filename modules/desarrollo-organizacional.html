@@ -1430,9 +1430,9 @@
           supabaseClient.from('plantilla_trabajadores').select('id, nombres, apellidos, cargo_id, unidad_id, fecha_ingreso, fecha_egreso, estado'),
           supabaseClient.from('cap_cursos').select('id, titulo, estado').order('titulo'),
           supabaseClient.from('car_cursos_obligatorios').select('cargo_id, curso_id'),
-          supabaseClient.from('rh_ausencias').select('*').order('fecha', { ascending: false }),
-          supabaseClient.from('rh_vacantes').select('*').order('created_at', { ascending: false }),
-          supabaseClient.from('rh_capacitaciones').select('*').order('fecha_completado', { ascending: false })
+          supabaseClient.from('rh_ausencias').select('id, trabajador_id, fecha, tipo, motivo').order('fecha', { ascending: false }),
+          supabaseClient.from('rh_vacantes').select('id, cargo, unidad, vacantes, fecha_apertura, fecha_cubierta, estado, nota').order('created_at', { ascending: false }),
+          supabaseClient.from('rh_capacitaciones').select('id, trabajador_id, curso_id, fecha_completado, calificacion').order('fecha_completado', { ascending: false })
         ]);
         if (pRes.error) throw pRes.error;
         if (cRes.error) throw cRes.error;

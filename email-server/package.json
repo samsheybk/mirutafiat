@@ -18,7 +18,7 @@
     "imapflow": "^1.0.164",
     "mailparser": "^3.7.1",
     "multer": "^2.0.2",
-    "nodemailer": "^6.9.14",
+    "nodemailer": "^9.0.5",
     "web-push": "^3.6.7"
   }
 }

@@ -625,9 +625,9 @@
     async function loadPlantilla() {
       try {
         var [trabRes, uniRes, carRes] = await Promise.all([
-          supabaseClient.from('plantilla_trabajadores').select('*').order('apellidos'),
-          supabaseClient.from('est_unidades').select('*').order('nombre'),
-          supabaseClient.from('est_cargos').select('*').order('titulo')
+          supabaseClient.from('plantilla_trabajadores').select('id, nombres, apellidos, cedula, unidad_id, cargo_id, estado').order('apellidos'),
+          supabaseClient.from('est_unidades').select('id, nombre').order('nombre'),
+          supabaseClient.from('est_cargos').select('id, titulo').order('titulo')
         ]);
         if (trabRes.error) throw trabRes.error;
         if (uniRes.error) throw uniRes.error;
@@ -684,7 +684,7 @@
 
     async function loadPrestamos() {
       try {
-        var { data, error } = await supabaseClient.from('bienestar_prestamos').select('*').order('fecha', { ascending: false });
+        var { data, error } = await supabaseClient.from('bienestar_prestamos').select('id, trabajador_id, monto, cuotas, cuota_actual, fecha, estado, descripcion').order('fecha', { ascending: false });
         if (error) throw error;
         bienestarPrestamos = data || [];
         renderPrestamos();
@@ -795,8 +795,8 @@
     async function loadPolizas() {
       try {
         var [tiposRes, asigRes] = await Promise.all([
-          supabaseClient.from('bienestar_poliza_tipos').select('*').order('created_at', { ascending: false }),
-          supabaseClient.from('bienestar_poliza_trabajadores').select('*')
+          supabaseClient.from('bienestar_poliza_tipos').select('id, nombre, proveedor, cobertura, descripcion, activo, created_at').order('created_at', { ascending: false }),
+          supabaseClient.from('bienestar_poliza_trabajadores').select('poliza_tipo_id')
         ]);
         if (tiposRes.error) throw tiposRes.error;
         if (asigRes.error) throw asigRes.error;
@@ -1028,8 +1028,8 @@
     async function loadVentas() {
       try {
         var [ventasRes, pagosRes] = await Promise.all([
-          supabaseClient.from('bienestar_vehiculos_ventas').select('*').order('fecha_venta', { ascending: false }),
-          supabaseClient.from('bienestar_vehiculos_pagos').select('*')
+          supabaseClient.from('bienestar_vehiculos_ventas').select('id, trabajador_id, vehiculo, placa, precio_total, inicial, numero_cuotas, estado, fecha_venta, descripcion').order('fecha_venta', { ascending: false }),
+          supabaseClient.from('bienestar_vehiculos_pagos').select('id, venta_id, numero_cuota, monto, estado, fecha_pagada')
         ]);
         if (ventasRes.error) throw ventasRes.error;
         if (pagosRes.error) throw pagosRes.error;
@@ -1319,7 +1319,7 @@
 
     async function loadUniformeStock() {
       try {
-        var { data, error } = await supabaseClient.from('bienestar_uniforme_stock').select('*').order('prenda');
+        var { data, error } = await supabaseClient.from('bienestar_uniforme_stock').select('id, prenda, talla, cantidad, imagen_url, observaciones').order('prenda');
         if (error) throw error;
         uniStock = data || [];
         renderUniformeStock();
@@ -1441,8 +1441,8 @@
     async function loadUniformeEntregas() {
       try {
         var [entRes, itRes] = await Promise.all([
-          supabaseClient.from('bienestar_uniforme_entregas').select('*').order('fecha', { ascending: false }),
-          supabaseClient.from('bienestar_uniforme_entrega_items').select('*')
+          supabaseClient.from('bienestar_uniforme_entregas').select('id, trabajador_id, fecha, estado, observaciones').order('fecha', { ascending: false }),
+          supabaseClient.from('bienestar_uniforme_entrega_items').select('entrega_id, stock_id, prenda, talla, cantidad')
         ]);
         if (entRes.error) throw entRes.error;
         if (itRes.error) throw itRes.error;
@@ -1623,7 +1623,7 @@
 
     async function loadEncuestas() {
       try {
-        var { data, error } = await supabaseClient.from('bienestar_encuestas').select('*').order('created_at', { ascending: false });
+        var { data, error } = await supabaseClient.from('bienestar_encuestas').select('id, titulo, anonima, descripcion, fecha_inicio, fecha_fin, estado').order('created_at', { ascending: false });
         if (error) throw error;
         bienestarEncuestas = data || [];
         renderEncuestas();
@@ -2073,7 +2073,7 @@
 
     async function loadCalendario() {
       try {
-        var { data, error } = await supabaseClient.from('bienestar_calendario').select('*').order('fecha');
+        var { data, error } = await supabaseClient.from('bienestar_calendario').select('id, titulo, fecha, fecha_fin, hora, lugar, tipo, descripcion').order('fecha');
         if (error) throw error;
         bienestarCalendario = data || [];
         renderCalendario();
@@ -2254,7 +2254,7 @@
 
     async function loadSplash() {
       try {
-        var { data, error } = await supabaseClient.from('bienestar_splash').select('*').order('created_at', { ascending: false });
+        var { data, error } = await supabaseClient.from('bienestar_splash').select('id, imagen_url, titulo, descripcion, fecha_inicio, fecha_fin, activo, evento_id, created_at').order('created_at', { ascending: false });
         if (error) throw error;
         bienestarSplash = data || [];
         mostrarSplashOverlay();

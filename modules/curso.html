@@ -464,23 +464,6 @@
       badge.style.background = estado === 'Publicado' ? '#059669' : '#D97706';
     }
 
-    async function cargarQuizCompleto(q) {
-      var rp = await supabaseClient.from('cap_preguntas').select('*').eq('cuestionario_id', q.id).order('posicion');
-      if (rp.error) throw rp.error;
-      var preguntas = [];
-      for (var i = 0; i < (rp.data || []).length; i++) {
-        var p = rp.data[i];
-        var rr = await supabaseClient.from('cap_respuestas').select('*').eq('pregunta_id', p.id).order('posicion');
-        if (rr.error) throw rr.error;
-        preguntas.push({
-          id: p.id,
-          pregunta: p.pregunta,
-          respuestas: (rr.data || []).map(function(x) { return { id: x.id, respuesta: x.respuesta, es_correcta: !!x.es_correcta }; })
-        });
-      }
-      return { id: q.id, titulo: q.titulo, preguntas: preguntas };
-    }
-
     async function cargarCurso() {
       var params = new URLSearchParams(location.search);
       var id = params.get('id');
@@ -498,33 +481,71 @@
           }
           document.getElementById('cursoTitulo').textContent = c.titulo;
 
-          var rm = await supabaseClient.from('cap_modulos').select('*').eq('curso_id', id).order('posicion');
-          if (rm.error) throw rm.error;
-          modulos = [];
-          for (var i = 0; i < (rm.data || []).length; i++) {
-            var m = rm.data[i];
-            var rv = await supabaseClient.from('cap_videos').select('*').eq('modulo_id', m.id).order('posicion');
-            if (rv.error) throw rv.error;
-            var rq = await supabaseClient.from('cap_cuestionarios').select('*').eq('modulo_id', m.id).order('posicion');
-            if (rq.error) throw rq.error;
-            var quizzes = [];
-            for (var k = 0; k < (rq.data || []).length; k++) {
-              quizzes.push(await cargarQuizCompleto(rq.data[k]));
-            }
-            modulos.push({
-              id: m.id,
-              titulo: m.titulo,
-              videos: (rv.data || []).map(function(v) { return { id: v.id, titulo: v.titulo, url: v.url }; }),
-              quizzes: quizzes
+          var rMod = await supabaseClient.from('cap_modulos').select('id,titulo').eq('curso_id', id).order('posicion');
+          if (rMod.error) throw rMod.error;
+          var modulosData = rMod.data || [];
+          var moduloIds = modulosData.map(function(m) { return m.id; });
+
+          var vidsByModulo = {};
+          if (moduloIds.length) {
+            var rVid = await supabaseClient.from('cap_videos').select('id,titulo,url,modulo_id').in('modulo_id', moduloIds).order('posicion');
+            if (rVid.error) throw rVid.error;
+            (rVid.data || []).forEach(function(v) {
+              (vidsByModulo[v.modulo_id] = vidsByModulo[v.modulo_id] || []).push(v);
             });
           }
 
-          var rc = await supabaseClient.from('cap_cuestionarios').select('*').eq('curso_id', id).is('modulo_id', null).order('posicion');
-          if (rc.error) throw rc.error;
-          cuestionarios = [];
-          for (var k = 0; k < (rc.data || []).length; k++) {
-            cuestionarios.push(await cargarQuizCompleto(rc.data[k]));
+          var rQuiz = await supabaseClient.from('cap_cuestionarios').select('id,titulo,modulo_id').eq('curso_id', id).order('posicion');
+          if (rQuiz.error) throw rQuiz.error;
+          var quizData = rQuiz.data || [];
+          var quizIds = quizData.map(function(q) { return q.id; });
+          var pregByQuiz = {};
+          var respByPreg = {};
+          if (quizIds.length) {
+            var rPreg = await supabaseClient.from('cap_preguntas').select('id,pregunta,cuestionario_id').in('cuestionario_id', quizIds).order('posicion');
+            if (rPreg.error) throw rPreg.error;
+            var pregData = rPreg.data || [];
+            pregData.forEach(function(p) {
+              (pregByQuiz[p.cuestionario_id] = pregByQuiz[p.cuestionario_id] || []).push(p);
+            });
+            var pregIds = pregData.map(function(p) { return p.id; });
+            if (pregIds.length) {
+              var rResp = await supabaseClient.from('cap_respuestas').select('id,respuesta,es_correcta,pregunta_id').in('pregunta_id', pregIds).order('posicion');
+              if (rResp.error) throw rResp.error;
+              (rResp.data || []).forEach(function(x) {
+                (respByPreg[x.pregunta_id] = respByPreg[x.pregunta_id] || []).push(x);
+              });
+            }
           }
+
+          var quizzesByModulo = {};
+          cuestionarios = [];
+          quizData.forEach(function(q) {
+            var quiz = { id: q.id, titulo: q.titulo, preguntas: [] };
+            (pregByQuiz[q.id] || []).forEach(function(p) {
+              quiz.preguntas.push({
+                id: p.id,
+                pregunta: p.pregunta,
+                respuestas: (respByPreg[p.id] || []).map(function(x) {
+                  return { id: x.id, respuesta: x.respuesta, es_correcta: !!x.es_correcta };
+                })
+              });
+            });
+            if (q.modulo_id === null) {
+              cuestionarios.push(quiz);
+            } else {
+              (quizzesByModulo[q.modulo_id] = quizzesByModulo[q.modulo_id] || []).push(quiz);
+            }
+          });
+
+          modulos = modulosData.map(function(m) {
+            return {
+              id: m.id,
+              titulo: m.titulo,
+              videos: (vidsByModulo[m.id] || []).map(function(v) { return { id: v.id, titulo: v.titulo, url: v.url }; }),
+              quizzes: quizzesByModulo[m.id] || []
+            };
+          });
         } else {
           document.getElementById('cur_estado').value = 'Borrador';
           modulos = [];

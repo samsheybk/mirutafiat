@@ -57,13 +57,28 @@
     .home-section-title h2 { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; margin: 0; }
     .home-section-title span { font-size: 12.5px; color: var(--color-text-secondary); font-weight: 600; }
 
-    /* ===== Tarjetas de módulo ===== */
-    #homeModules { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
-    .module-card { padding: 20px; }
-    .module-card .module-icon { background: transparent; border: 1px solid var(--color-border); }
-    .module-card h3 { font-size: 14px; margin-top: 14px; }
-    .module-card p { font-size: 12px; }
-    .module-card .module-icon i { font-size: 18px; }
+    /* ===== Íconos de módulo ===== */
+    #homeModules { grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); gap: 14px; }
+    .home-module-card {
+      aspect-ratio: 1;
+      padding: 0;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface);
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+    .home-module-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--m-accent, #cbd5e1);
+    }
+    .home-module-card i { font-size: 26px; line-height: 1; }
 
     /* ===== Columna lateral ===== */
     .home-side { display: flex; flex-direction: column; gap: 24px; }
@@ -82,45 +97,12 @@
     .home-dot { width: 9px; height: 9px; border-radius: 50%; border: none; padding: 0; cursor: pointer; background: var(--color-border); transition: background 0.3s ease, transform 0.3s ease; }
     .home-dot.active { background: #0d9488; transform: scale(1.35); }
 
-    /* ===== Accesos rápidos ===== */
-    .home-quick { display: flex; flex-direction: column; gap: 10px; }
-    .home-quick-btn {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      width: 100%;
-      padding: 12px 14px;
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      background: transparent;
-      color: var(--color-text);
-      font-family: inherit;
-      font-size: 13.5px;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: left;
-      transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
-    }
-    .home-quick-btn:hover { border-color: #cbd5e1; background: var(--color-bg); transform: translateX(2px); }
-    .home-quick-btn i {
-      width: 34px;
-      height: 34px;
-      flex-shrink: 0;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--radius-sm);
-      background: var(--color-bg);
-      font-size: 16px;
-      color: #0d9488;
-    }
-
     @media (max-width: 1024px) {
       .home-layout { grid-template-columns: 1fr; }
     }
     @media (max-width: 640px) {
       .home-hero { padding: 24px 20px; }
-      #homeModules { grid-template-columns: 1fr; }
+      #homeModules { grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 10px; }
     }
   </style>
 </head>
@@ -152,13 +134,6 @@
     </nav>
 
     <div class="main-content">
-      <header class="topbar">
-        <div>
-          <h1>Home</h1>
-          <div class="topbar-breadcrumb">Inicio / Home</div>
-        </div>
-      </header>
-
       <div class="content-area home-area">
         <div class="home-hero">
           <div class="home-hello" id="homeGreeting">¡Hola, <strong id="homeName">bienvenido</strong>!</div>
@@ -181,15 +156,6 @@
               <div class="home-carousel">
                 <div class="home-phrase" id="homePhrase"></div>
                 <div class="home-dots" id="homeDots"></div>
-              </div>
-            </div>
-
-            <div class="home-card">
-              <div class="home-card-head"><h3>Accesos rápidos</h3></div>
-              <div class="home-quick">
-                <button type="button" class="home-quick-btn" onclick="location.href='reloj.html'"><i class="fi fi-sr-fingerprint"></i><span>Registro de marcaje</span></button>
-                <button type="button" class="home-quick-btn" onclick="location.href='perfil.html'"><i class="fi fi-sr-id-badge"></i><span>Mi perfil</span></button>
-                <button type="button" class="home-quick-btn" onclick="openHelp()"><i class="fi fi-sr-life-ring"></i><span>Detalle del módulo</span></button>
               </div>
             </div>
           </aside>

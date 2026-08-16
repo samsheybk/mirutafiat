@@ -137,7 +137,8 @@ function openModal() {
 }
 
 function closeModal() {
-  document.getElementById('modal').classList.remove('show');
+  const el = document.getElementById('modal');
+  if (el) el.classList.remove('show');
 }
 
 async function saveModule() {

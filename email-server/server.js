@@ -20,6 +20,21 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',')
 const TLS_REJECT_UNAUTHORIZED = String(process.env.TLS_REJECT_UNAUTHORIZED || '1') !== '0';
 const ACCOUNTS_ENC_KEY = process.env.ACCOUNTS_ENC_KEY || '';
 
+/* ---------- Google OAuth (Sign in with Gmail) ----------
+   Requiere un cliente OAuth 2.0 en Google Cloud Console (tipo "Web") con
+   GOOGLE_REDIRECT_URI como URI de redirección autorizada. Los tokens
+   (refresh + access) se guardan cifrados en la cuenta (campo googleTokens). */
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || '';
+const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || '';
+const GOOGLE_STATE_SECRET = process.env.GOOGLE_STATE_SECRET || ACCOUNTS_ENC_KEY || 'fiat-google-oauth';
+const INTRANET_ORIGINS = (process.env.INTRANET_ORIGINS || 'http://localhost:3000,http://127.0.0.1:3000')
+  .split(',').map(s => s.trim().replace(/\/+$/, '')).filter(Boolean);
+const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';
+const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
+const GOOGLE_REVOKE_URL = 'https://oauth2.googleapis.com/revoke';
+const GOOGLE_SCOPE = 'openid email profile https://mail.google.com/';
+
 /* ---------- Web Push (notificaciones) ---------- */
 const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY || '';
 const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || '';
@@ -94,7 +109,7 @@ async function pollNewMail() {
   const accounts = loadAccounts().filter(a => a.owner && a.user);
   for (const acc of accounts) {
     try {
-      const imap = imapClient(acc);
+      const imap = await imapClient(acc);
       await imap.connect();
       try {
         const lock = await imap.getMailboxLock('INBOX');
@@ -134,7 +149,7 @@ setTimeout(pollNewMail, 5000);
 setInterval(pollNewMail, POLL_SECONDS * 1000);
 
 const app = express();
-app.use(cors({ origin: CORS_ORIGIN.length ? CORS_ORIGIN : false }));
+app.use(cors(CORS_ORIGIN.length ? { origin: CORS_ORIGIN } : { origin: true }));
 app.use(express.json({ limit: '2mb' }));
 
 /* ---------- Almacenamiento de cuentas (archivo local JSON) ---------- */
@@ -151,7 +166,7 @@ function findAccount(id) {
   return loadAccounts().find(a => String(a.id) === String(id));
 }
 function newId() { return crypto.randomBytes(6).toString('hex'); }
-function sanitize(a) { const { pass, ...rest } = a; return rest; }
+function sanitize(a) { const { pass, googleTokens, ...rest } = a; return rest; }
 
 /* Credenciales en reposo: se cifran con AES-256-GCM si ACCOUNTS_ENC_KEY está
    definida. Las claves viejas en texto plano se siguen leyendo (migración). */
@@ -179,6 +194,95 @@ function decryptPass(e) {
   } catch (err) {
     return '';
   }
+}
+
+/* ---------- Helpers de Google OAuth ---------- */
+function oauthIsConfigured() {
+  return !!(GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET && GOOGLE_REDIRECT_URI);
+}
+function oauthStateSign(owner, ret) {
+  const payload = Buffer.from(JSON.stringify({ owner, ret, n: crypto.randomBytes(8).toString('hex') })).toString('base64url');
+  const sig = crypto.createHmac('sha256', GOOGLE_STATE_SECRET).update(payload).digest('base64url');
+  return payload + '.' + sig;
+}
+function oauthStateVerify(state) {
+  if (!state || typeof state !== 'string') return null;
+  const dot = state.lastIndexOf('.');
+  if (dot <= 0) return null;
+  const payload = state.slice(0, dot);
+  const expect = crypto.createHmac('sha256', GOOGLE_STATE_SECRET).update(payload).digest('base64url');
+  const got = Buffer.from(state.slice(dot + 1), 'base64url');
+  const want = Buffer.from(expect, 'base64url');
+  if (got.length !== want.length || !crypto.timingSafeEqual(got, want)) return null;
+  try { return JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')); } catch (e) { return null; }
+}
+function oauthEmailFromIdToken(idToken) {
+  if (!idToken) return '';
+  try {
+    const payload = idToken.split('.')[1];
+    const json = Buffer.from(payload.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8');
+    return String(JSON.parse(json).email || '').trim().toLowerCase();
+  } catch (e) { return ''; }
+}
+function oauthTokensSave(acc, tokens) {
+  const list = loadAccounts();
+  const i = list.findIndex(x => String(x.id) === String(acc.id));
+  if (i === -1) return;
+  list[i].googleTokens = encryptPass(JSON.stringify(tokens));
+  saveAccounts(list);
+}
+function oauthTokensRead(acc) {
+  const raw = decryptPass(acc.googleTokens);
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch (e) { return null; }
+}
+async function oauthExchangeCode(code) {
+  const res = await fetch(GOOGLE_TOKEN_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      code, client_id: GOOGLE_CLIENT_ID, client_secret: GOOGLE_CLIENT_SECRET,
+      redirect_uri: GOOGLE_REDIRECT_URI, grant_type: 'authorization_code'
+    }).toString()
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.access_token) {
+    throw new Error('Google token exchange: HTTP ' + res.status + ' ' + (data.error_description || data.error || 'error'));
+  }
+  return {
+    access_token: data.access_token,
+    refresh_token: data.refresh_token || '',
+    expires_at: Date.now() + (parseInt(data.expires_in, 10) || 3600) * 1000,
+    email: oauthEmailFromIdToken(data.id_token)
+  };
+}
+async function oauthRefreshTokens(acc) {
+  const tokens = oauthTokensRead(acc);
+  if (!tokens || !tokens.refresh_token) throw new Error('Cuenta OAuth sin refresh_token de Google');
+  const res = await fetch(GOOGLE_TOKEN_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      refresh_token: tokens.refresh_token, client_id: GOOGLE_CLIENT_ID,
+      client_secret: GOOGLE_CLIENT_SECRET, grant_type: 'refresh_token'
+    }).toString()
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.access_token) {
+    throw new Error('Google refresh: HTTP ' + res.status + ' ' + (data.error_description || data.error || 'error'));
+  }
+  const next = Object.assign({}, tokens, {
+    access_token: data.access_token,
+    expires_at: Date.now() + (parseInt(data.expires_in, 10) || 3600) * 1000
+  });
+  oauthTokensSave(acc, next);
+  return next;
+}
+async function oauthAccessToken(acc) {
+  const tokens = oauthTokensRead(acc);
+  if (!tokens || !tokens.access_token) throw new Error('Cuenta OAuth sin tokens de Google');
+  if (Date.now() < tokens.expires_at - 60000) return tokens;
+  return oauthRefreshTokens(acc);
 }
 
 function escHtml(s) {
@@ -280,22 +384,42 @@ app.use('/api', requireAuth);
 app.use('/api', rateLimit({ max: 120 }));
 
 /* ---------- Utilidades IMAP/SMTP ---------- */
-function imapClient(acc) {
+async function imapClient(acc) {
+  const auth = { user: acc.user };
+  if (acc.authType === 'oauth') {
+    const tokens = await oauthAccessToken(acc);
+    auth.accessToken = tokens.access_token;
+  } else {
+    auth.pass = decryptPass(acc.pass);
+  }
   return new ImapFlow({
     host: acc.imapHost,
     port: parseInt(acc.imapPort, 10) || 993,
     secure: acc.imapSecure !== false,
-    auth: { user: acc.user, pass: decryptPass(acc.pass) },
+    auth,
     logger: false,
     tls: { rejectUnauthorized: TLS_REJECT_UNAUTHORIZED }
   });
 }
-function smtpTransport(acc) {
+async function smtpTransport(acc) {
+  const auth = { user: acc.user };
+  if (acc.authType === 'oauth') {
+    const tokens = await oauthAccessToken(acc);
+    Object.assign(auth, {
+      type: 'OAuth2',
+      clientId: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
+      refreshToken: tokens.refresh_token || '',
+      accessToken: tokens.access_token
+    });
+  } else {
+    auth.pass = decryptPass(acc.pass);
+  }
   return nodemailer.createTransport({
     host: acc.smtpHost || acc.imapHost,
     port: parseInt(acc.smtpPort, 10) || 465,
     secure: acc.smtpSecure !== false,
-    auth: { user: acc.user, pass: decryptPass(acc.pass) },
+    auth,
     tls: { rejectUnauthorized: TLS_REJECT_UNAUTHORIZED }
   });
 }
@@ -323,13 +447,12 @@ const upload = multer({
 /* ---------- Endpoints ---------- */
 
 app.get('/api/status', (req, res) => {
-  res.json({ ok: true, accounts: loadAccounts().length, time: new Date().toISOString() });
+  res.json({ ok: true, accounts: loadAccounts().length, oauth: oauthIsConfigured(), time: new Date().toISOString() });
 });
 
-/* Cuentas. Una cuenta puede ser:
-   - Privada: tiene `owner` (correo del trabajador); solo su dueño la ve/edita/elimina.
-   - Compartida: sin `owner`; visible para todos y editable por cualquiera (intranet interna).
-   El dueño se identifica con la cabecera x-owner-email enviada por el frontend. */
+/* Cuentas. Todas son privadas: tienen `owner` (correo del trabajador) y solo su
+   dueño la ve/edita/elimina. El dueño se identifica con la cabecera
+   x-owner-email enviada por el frontend. */
 function ownerEmailOf(req) {
   if (req.verifiedEmail) return req.verifiedEmail;
   return String(req.get('x-owner-email') || '').trim().toLowerCase();
@@ -367,7 +490,7 @@ app.post('/api/accounts', (req, res) => {
     pass: encryptPass(a.pass),
     fromName: a.fromName || '',
     signature: a.signature || '',
-    owner: a.shared ? '' : ownerEmailOf(req)
+    owner: ownerEmailOf(req)
   };
   const list = loadAccounts();
   list.push(acc);
@@ -396,7 +519,9 @@ app.put('/api/accounts/:id', (req, res) => {
     pass: a.pass ? encryptPass(a.pass) : old.pass,
     fromName: a.fromName !== undefined ? a.fromName : old.fromName,
     signature: a.signature !== undefined ? a.signature : old.signature,
-    owner: a.shared !== undefined ? (a.shared ? '' : ownerEmail) : old.owner
+    owner: old.owner || ownerEmail,
+    authType: old.authType,
+    googleTokens: old.googleTokens
   };
   list[i] = acc;
   saveAccounts(list);
@@ -413,10 +538,113 @@ app.delete('/api/accounts/:id', (req, res) => {
   res.json({ ok: true });
 });
 
+/* Desvincular cuenta OAuth: revoca el token de Google (deja de tener acceso)
+   y elimina la cuenta. En cuentas con contraseña equivale a eliminarlas. */
+app.post('/api/accounts/:id/disconnect', asyncHandler(async (req, res) => {
+  const list = loadAccounts();
+  const i = list.findIndex(x => String(x.id) === String(req.params.id));
+  if (i === -1) return res.status(404).json({ error: 'Cuenta no encontrada' });
+  const acc = list[i];
+  if (!canManage(acc, ownerEmailOf(req))) return res.status(403).json({ error: 'Solo el dueño de la cuenta puede modificarla' });
+  if (acc.authType === 'oauth') {
+    const tokens = oauthTokensRead(acc);
+    if (tokens && tokens.refresh_token) {
+      try {
+        await fetch(GOOGLE_REVOKE_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ token: tokens.refresh_token }).toString()
+        });
+      } catch (e) {
+        console.error('[oauth] revoke: ' + (e && e.message ? e.message : e));
+      }
+    }
+  }
+  list.splice(i, 1);
+  saveAccounts(list);
+  res.json({ ok: true });
+}));
+
+/* ---------- Google OAuth ----------
+   El flujo inicia con una navegación del navegador (no lleva Authorization),
+   por eso estas rutas están fuera de /api. El dueño viaja firmado en `state`,
+   de modo que al volver Google no se puede manipular a qué cuenta se asigna. */
+app.get('/oauth/google/start', rateLimit({ max: 30 }), (req, res) => {
+  if (!oauthIsConfigured()) {
+    return res.status(400).json({ error: 'OAuth de Google no configurado. Revisa GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET/GOOGLE_REDIRECT_URI en el email-server/.env' });
+  }
+  const owner = String(req.query.owner || '').trim().toLowerCase().slice(0, 200);
+  const ret = String(req.query.return || '').trim().slice(0, 500);
+  const returnOk = INTRANET_ORIGINS.some(o => ret === o || ret.startsWith(o + '/'));
+  if (!returnOk) return res.status(400).json({ error: 'Origen de retorno no permitido' });
+  const state = oauthStateSign(owner, returnOk ? ret : '');
+  const params = new URLSearchParams({
+    client_id: GOOGLE_CLIENT_ID,
+    redirect_uri: GOOGLE_REDIRECT_URI,
+    response_type: 'code',
+    scope: GOOGLE_SCOPE,
+    access_type: 'offline',
+    prompt: 'consent',
+    state
+  });
+  res.redirect(GOOGLE_AUTH_URL + '?' + params.toString());
+});
+
+app.get('/oauth/google/callback', rateLimit({ max: 30 }), asyncHandler(async (req, res) => {
+  const st = oauthStateVerify(req.query.state);
+  const ret = (st && st.ret) || INTRANET_ORIGINS[0] || 'http://localhost:3000';
+  const finish = (ok, msg) => {
+    const u = new URL(ret);
+    u.searchParams.set('oauth', ok ? 'ok' : 'err');
+    if (msg) u.searchParams.set('msg', msg);
+    res.redirect(u.toString());
+  };
+  try {
+    const code = req.query.code;
+    if (!code) return finish(false, 'Google no devolvió un código de autorización');
+    const tokens = await oauthExchangeCode(code);
+    const email = tokens.email || (st ? st.owner : '');
+    if (!email) return finish(false, 'Google no devolvió el correo de la cuenta');
+    const list = loadAccounts();
+    const stOwner = st ? st.owner : '';
+    let acc = list.find(a => String(a.user).toLowerCase() === email &&
+      (!stOwner || !a.owner || String(a.owner).toLowerCase() === stOwner));
+    if (!acc) {
+      acc = {
+        id: newId(),
+        name: email.split('@')[0] || email,
+        imapHost: 'imap.gmail.com',
+        imapPort: 993,
+        imapSecure: true,
+        smtpHost: 'smtp.gmail.com',
+        smtpPort: 465,
+        smtpSecure: true,
+        user: email,
+        pass: '',
+        fromName: '',
+        signature: '',
+        owner: stOwner || email,
+        authType: 'oauth'
+      };
+      list.push(acc);
+    } else {
+      acc.authType = 'oauth';
+      acc.owner = stOwner || acc.owner || email;
+    }
+    acc.googleTokens = encryptPass(JSON.stringify(tokens));
+    saveAccounts(list);
+    console.log('[oauth] cuenta conectada: ' + email);
+    finish(true);
+  } catch (e) {
+    console.error('[oauth]', e && e.message ? e.message : e);
+    finish(false, 'Error al conectar con Google');
+  }
+}));
+
 app.post('/api/accounts/:id/test', asyncHandler(async (req, res) => {
   const acc = findAccount(req.params.id);
   if (!acc) return res.status(404).json({ error: 'Cuenta no encontrada' });
-  const imap = imapClient(acc);
+  const imap = await imapClient(acc);
   await imap.connect();
   const info = await imap.list();
   await imap.logout();
@@ -427,7 +655,7 @@ app.post('/api/accounts/:id/test', asyncHandler(async (req, res) => {
 app.get('/api/mailboxes', asyncHandler(async (req, res) => {
   const acc = findAccount(req.query.account);
   if (!acc) return res.status(404).json({ error: 'Cuenta no encontrada' });
-  const imap = imapClient(acc);
+  const imap = await imapClient(acc);
   await imap.connect();
   try {
     const list = await imap.list();
@@ -452,7 +680,7 @@ app.get('/api/messages', asyncHandler(async (req, res) => {
   const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
   const per = Math.min(Math.max(parseInt(req.query.per, 10) || 50, 1), 200);
 
-  const imap = imapClient(acc);
+  const imap = await imapClient(acc);
   await imap.connect();
   try {
     const lock = await imap.getMailboxLock(mailbox);
@@ -471,8 +699,8 @@ app.get('/api/messages', asyncHandler(async (req, res) => {
             subject: env.subject || '(sin asunto)',
             from: from ? (from.name || '') + (from.name && from.address ? ' <' + from.address + '>' : from.address || '') : '(desconocido)',
             date: msg.internalDate ? new Date(msg.internalDate).toISOString() : null,
-            seen: !(msg.flags && msg.flags.includes('\\Seen')),
-            flagged: !!(msg.flags && msg.flags.includes('\\Flagged')),
+            seen: !(msg.flags && (msg.flags.has ? msg.flags.has('\\Seen') : msg.flags.includes('\\Seen'))),
+            flagged: !!(msg.flags && (msg.flags.has ? msg.flags.has('\\Flagged') : msg.flags.includes('\\Flagged'))),
             hasAttach: !!(env.attachments && env.attachments.length)
           });
         }
@@ -494,7 +722,7 @@ app.get('/api/messages/:uid', asyncHandler(async (req, res) => {
   const mailbox = req.query.mailbox || 'INBOX';
   const uid = parseInt(req.params.uid, 10);
 
-  const imap = imapClient(acc);
+  const imap = await imapClient(acc);
   await imap.connect();
   try {
     const lock = await imap.getMailboxLock(mailbox);
@@ -535,7 +763,7 @@ app.get('/api/messages/:uid/attachment/:index', asyncHandler(async (req, res) =>
   const uid = parseInt(req.params.uid, 10);
   const index = parseInt(req.params.index, 10);
 
-  const imap = imapClient(acc);
+  const imap = await imapClient(acc);
   await imap.connect();
   try {
     const lock = await imap.getMailboxLock(mailbox);
@@ -580,7 +808,7 @@ app.post('/api/send', rateLimit({ max: 10, dailyMax: 200 }), upload.array('attac
     mail.attachments = req.files.map(f => ({ filename: f.originalname, content: f.buffer, contentType: f.mimetype }));
   }
 
-  const transport = smtpTransport(acc);
+  const transport = await smtpTransport(acc);
   const info = await transport.sendMail(mail);
   res.json({ ok: true, messageId: info.messageId });
 }));
@@ -594,7 +822,7 @@ app.post('/api/messages/:uid/flags', asyncHandler(async (req, res) => {
   const flags = req.body.flags || [];
   const remove = !!req.body.remove;
 
-  const imap = imapClient(acc);
+  const imap = await imapClient(acc);
   await imap.connect();
   try {
     const lock = await imap.getMailboxLock(mailbox);
@@ -615,7 +843,7 @@ app.delete('/api/messages/:uid', asyncHandler(async (req, res) => {
   const mailbox = req.query.mailbox || 'INBOX';
   const uid = parseInt(req.params.uid, 10);
 
-  const imap = imapClient(acc);
+  const imap = await imapClient(acc);
   await imap.connect();
   try {
     const lock = await imap.getMailboxLock(mailbox);
@@ -637,7 +865,7 @@ app.post('/api/messages/:uid/move', asyncHandler(async (req, res) => {
   const uid = parseInt(req.params.uid, 10);
   if (!dest) return res.status(400).json({ error: 'dest es obligatorio' });
 
-  const imap = imapClient(acc);
+  const imap = await imapClient(acc);
   await imap.connect();
   try {
     const lock = await imap.getMailboxLock(mailbox);
@@ -668,6 +896,22 @@ app.post('/api/push/test', rateLimit({ max: 10, dailyMax: 50 }), asyncHandler(as
 // Para servir detrás de un reverse proxy en el mismo host, usar HOST=127.0.0.1
 // (default); si se quiere exponer en red explícitamente, configurar HOST.
 const HOST = process.env.HOST || '127.0.0.1';
+
+/* Todas las cuentas son privadas: las que quedaron sin dueño (compartidas)
+   se asignan al correo IMAP de la cuenta para que nadie más pueda verlas. */
+function migratePrivateOnly() {
+  const list = loadAccounts();
+  let changed = false;
+  list.forEach(a => {
+    if (!a.owner && a.user) { a.owner = String(a.user).trim().toLowerCase(); changed = true; }
+  });
+  if (changed) {
+    saveAccounts(list);
+    console.log('Migración: cuentas compartidas convertidas a privadas.');
+  }
+}
+migratePrivateOnly();
+
 app.listen(PORT, HOST, () => {
   console.log('Email server escuchando en http://' + HOST + ':' + PORT);
 });

@@ -29,46 +29,17 @@ Verificación rápida (la API exige autenticación):
 
 ```bash
 curl -H "Authorization: Bearer $MAIL_API_TOKEN" http://localhost:4000/api/status
-# {"ok":true,"accounts":0,"time":"..."}
+# {"ok":true,"accounts":0,"oauth":false,"time":"..."}
 ```
 
-## Ver el webmail SIN dominio real (modo demo)
+## Ver el webmail (cuentas reales)
 
-Para ver el módulo de Mensajería **ya configurado con datos de ejemplo** (sin cuentas de correo, sin dominio y sin credenciales):
+El módulo **Mensajería → Correo** usa siempre el servidor real (puerto 4000) y no
+incluye modo demo. Configura una cuenta real (Gmail o cPanel) desde
+**Cuentas → Proveedor → Gmail / cPanel** en la interfaz.
 
-```bash
-cd email-server
-npm run demo
-```
-
-Luego abre en el navegador:
-
-```
-http://localhost:4001/modules/chatfiat.html?demo=1
-```
-
-Qué incluye la demo (todo en memoria, se reinicia al detener el servidor):
-
-- Cuenta precargada **Recursos Humanos** (`rrhh@fiat-ve.com`) con bandejas INBOX (13 no leídos), Enviados, Borradores, spam y Papelera.
-- ~22 correos de ejemplo (banco, gerencia, compañeros, proveedores, notificaciones del sistema) con HTML, adjuntos descargables y búsqueda.
-- Envío de correos (se guardan en Enviados), responder, marcar importante, eliminar y gestionar cuentas desde **Cuentas → Probar conexión**.
-
-### Interruptor Demo (forma recomendada)
-
-Para alternar **entre el servidor real y los datos demo sin cambiar nada**, levanta **ambos** servidores a la vez:
-
-```bash
-cd email-server
-npm run servers     # real en 4000 + demo en 4001
-```
-
-Luego entra a la intranet como **administrador** (con tu sesión real, ej. `npm run dev` en la raíz) y, dentro del módulo **Mensajería → Correo**, activa el interruptor **Demo** que aparece en la barra de herramientas (solo visible para administradores y en localhost). El webmail carga las cuentas del demo (`rrhh@fiat-ve.com`) y lo puedes apagar para volver a tu servidor real.
-
-El interruptor recuerda la elección en el navegador y, si el servidor seleccionado no está corriendo, se muestra el aviso de "servidor no disponible" en lugar de un error confuso.
-
-El `?demo=1` solo funciona en `localhost`/`127.0.0.1` y solo sirve para previsualizar la interfaz sin sesión; en cualquier otro host no tiene efecto y el acceso normal no cambia.
-
-> Nota: también puedes verlo con tu sesión real de la intranet levantando `npm run dev` (puerto 3000) y el servidor demo en el 4001.
+> El servidor demo (`demo-server.js`, puerto 4001) quedó obsoleto: ya no hay
+> interruptor en la interfaz y no es necesario para usar el correo real.
 
 ## Configuración de cuentas
 
@@ -105,6 +76,46 @@ Opcionalmente se pueden precargar a mano en ese archivo:
   }
 ]
 ```
+
+## Conectar Gmail con Google OAuth (botón "Conectar con Gmail")
+
+En el modal **Cuentas** hay un botón **Conectar con Gmail (Google)** que inicia el
+flujo OAuth 2.0: el usuario autoriza en Google y la cuenta se crea sola
+(authType `oauth`), sin contraseña de aplicación.
+
+### 1. Crear el cliente OAuth en Google Cloud
+
+1. Entra en <https://console.cloud.google.com/apis/credentials> (consola del proyecto).
+2. **Crear credenciales → ID de cliente de OAuth → Aplicación web**.
+3. En **URIs de redireccionamiento autorizados** agrega exactamente:
+   `http://localhost:4000/oauth/google/callback` (o la URL pública de la API en producción).
+4. Guarda el **ID de cliente** y el **secreto** en `email-server/.env`:
+
+```env
+GOOGLE_CLIENT_ID=xxxxxxxx.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=GOCSPX-...
+GOOGLE_REDIRECT_URI=http://localhost:4000/oauth/google/callback
+```
+
+5. Activa la API **Gmail API** en <https://console.cloud.google.com/apis/library/gmail.googleapis.com>
+   (no es estrictamente necesaria para IMAP, pero evita errores de consentimiento).
+6. El flujo usa el alcance sensible `https://mail.google.com/`. Mientras la app
+   está en **modo pruebas**, Google mostrará el aviso *"app no verificada"* →
+   **Acceso avanzado → Continuar**. Para quitar ese aviso hay que solicitar la
+   verificación de la app (solo cuando se publique).
+
+### 2. Variables adicionales
+
+- `GOOGLE_STATE_SECRET`: firma el `state` de OAuth (CSRF). Vacío ⇒ usa `ACCOUNTS_ENC_KEY`.
+- `INTRANET_ORIGINS`: orígenes permitidos para volver tras autorizar (por defecto
+  `http://localhost:3000,http://127.0.0.1:3000`).
+
+### 3. Comportamiento
+
+- Los tokens (refresh + access) se guardan cifrados en el campo `googleTokens` de la cuenta.
+- El access token se renueva solo (refresh token) al conectar IMAP o enviar SMTP.
+- El dueño de la cuenta se fija en el correo del trabajador autenticado en la intranet.
+- Si una cuenta Gmail ya existe (mismo `user` y dueño), solo se actualizan sus tokens.
 
 ## Despliegue en cPanel
 
@@ -145,6 +156,7 @@ var MAIL_API = 'https://intranet.tudominio.com/correo-api/api';
 | POST | `/api/accounts` | Crear cuenta |
 | PUT | `/api/accounts/:id` | Actualizar cuenta |
 | DELETE | `/api/accounts/:id` | Eliminar cuenta |
+| POST | `/api/accounts/:id/disconnect` | Desvincular cuenta OAuth (revoca el token de Google y elimina la cuenta) |
 | POST | `/api/accounts/:id/test` | Probar conexión IMAP |
 | GET | `/api/mailboxes?account=ID` | Lista bandejas + no leídos |
 | GET | `/api/messages?account=ID&mailbox=INBOX&page=1&per=40&q=` | Lista mensajes (search opcional) |
@@ -154,6 +166,8 @@ var MAIL_API = 'https://intranet.tudominio.com/correo-api/api';
 | POST | `/api/messages/:uid/flags` | Marcar/desmarcar (`\Seen`, `\Flagged`) |
 | DELETE | `/api/messages/:uid?account=ID&mailbox=INBOX` | Eliminar mensaje |
 | POST | `/api/messages/:uid/move` | Mover a otra bandeja |
+| GET | `/oauth/google/start?owner=&return=` | Inicia OAuth de Google (redirige a Google; sin auth, solo navegación) |
+| GET | `/oauth/google/callback?code=&state=` | Callback de Google (crea la cuenta y redirige a `return` con `?oauth=ok\|err`) |
 
 ### Parámetros comunes
 

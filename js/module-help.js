@@ -202,8 +202,9 @@
     'inspeccion.html': 'seguridad-salud.html'
   };
 
-  function getCatalog() {
-    var key = PARENT[page] || page;
+  function getCatalog(key) {
+    key = key || page;
+    key = PARENT[key] || key;
     return CATALOG[key] || CATALOG['dashboard.html'];
   }
 
@@ -226,8 +227,8 @@
     refreshSplashNav();
   }
 
-  function openHelp() {
-    var data = getCatalog();
+  function openHelp(key) {
+    var data = getCatalog(key);
 
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay help-overlay';

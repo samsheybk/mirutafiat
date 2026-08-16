@@ -47,6 +47,7 @@
     btn.type = 'button';
     btn.className = 'nav-alerta-btn';
     btn.title = 'Alertas de compromisos';
+    btn.style.display = 'none';
     btn.innerHTML = '<i class="fi fi-sr-bell-ring"></i><span id="navAlertaBadge" class="nav-alerta-badge" style="display:none;">0</span>';
     btn.addEventListener('click', function (e) {
       e.stopPropagation();
@@ -122,6 +123,8 @@
           badge.textContent = noLeidas > 99 ? '99+' : String(noLeidas);
           badge.style.display = noLeidas ? '' : 'none';
         }
+        var btn = document.getElementById('navAlertaBtn');
+        if (btn) btn.style.display = (noLeidas > 0 || panelAbierto) ? '' : 'none';
         pintarPanel(items);
       });
   }

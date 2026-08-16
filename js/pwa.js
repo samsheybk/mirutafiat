@@ -15,7 +15,6 @@
   var VAPID_PUBLIC_KEY = 'BFiQv0ZJjrPrGwsebHyarxvgmhhaakIvSIan-hxFe1yRAMuY-DjPJVnZ6SymEZPhnQ3wfXV5V14pA-z83Btr588';
   var TABLE = 'push_subscriptions';
   var MAIL_API_REAL = 'http://localhost:4000/api';
-  var MAIL_API_DEMO = 'http://localhost:4001/api';
 
   var pwa = { state: { registered: false, subscribed: false, sub: null } };
 
@@ -29,9 +28,7 @@
   }
 
   function mailApiBase() {
-    var demo = false;
-    try { demo = localStorage.getItem('fiat_mail_demo') === '1'; } catch (e) {}
-    return demo ? MAIL_API_DEMO : MAIL_API_REAL;
+    return MAIL_API_REAL;
   }
 
   function sessionEmail() {

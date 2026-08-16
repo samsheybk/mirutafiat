@@ -117,20 +117,16 @@
     grid.innerHTML = '';
     mods.forEach(function (m) {
       var meta = MODULES_META[m.key] || { icon: 'fi-sr-dashboard', accent: '#0d9488' };
-      var card = document.createElement('div');
-      card.className = 'module-card';
-      card.tabIndex = 0;
-      card.setAttribute('role', 'button');
-      card.setAttribute('aria-label', 'Abrir ' + m.name);
-      card.addEventListener('click', function () { navigateModule('modules/' + m.key); });
-      card.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigateModule('modules/' + m.key); }
+      var card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'home-module-card';
+      card.title = m.name;
+      card.setAttribute('aria-label', 'Detalle del módulo ' + m.name);
+      card.style.setProperty('--m-accent', meta.accent);
+      card.addEventListener('click', function () {
+        if (typeof openHelp === 'function') openHelp(m.key);
       });
-      card.innerHTML =
-        '<div class="module-card-accent" style="background:' + meta.accent + ';"></div>' +
-        '<div class="module-icon"><i class="fi ' + meta.icon + '"></i></div>' +
-        '<h3>' + m.name + '</h3>' +
-        '<p>' + (m.tools.length + ' herramientas') + '</p>';
+      card.innerHTML = '<i class="fi ' + meta.icon + '" style="color:' + meta.accent + ';"></i>';
       grid.appendChild(card);
     });
     if (countEl) countEl.textContent = mods.length ? (mods.length + (mods.length === 1 ? ' módulo' : ' módulos') + ' disponibles') : 'Sin módulos asignados';

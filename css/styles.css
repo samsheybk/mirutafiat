@@ -3022,6 +3022,7 @@ a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   white-space: nowrap;
 }
 
@@ -3039,5 +3040,14 @@ a {
   .mod-tab {
     min-height: 34px;
   }
+}
+
+/* ===== Botones: ícono separado del texto ===== */
+button:has(i.fi):not(.filter-toggle-btn):not(.topnav-toggle),
+a:has(i.fi) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 

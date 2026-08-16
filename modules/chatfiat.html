@@ -158,12 +158,6 @@
                 <button class="btn btn-outline mail-btn-icon" type="button" onclick="mailSearch()" title="Buscar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;"><circle cx="11.5" cy="11.5" r="8.5"></circle><line x1="18" y1="18" x2="23.5" y2="23.5"></line></svg></button>
                 <button class="btn btn-outline" type="button" onclick="mailComposeOpen()"><i class="fi fi-sr-pencil" style="font-size:13px;line-height:1;pointer-events:none;"></i> Redactar</button>
                 <button class="btn btn-outline" type="button" onclick="mailSettingsOpen()"><i class="fi fi-sr-settings" style="font-size:13px;line-height:1;pointer-events:none;"></i> Cuentas</button>
-                <button class="btn btn-outline" type="button" onclick="mailTestPush()" title="Solicita permiso de notificaciones y envía una notificación de prueba"><i class="fi fi-sr-bell" style="font-size:13px;line-height:1;pointer-events:none;"></i> Probar notificación</button>
-                <label class="mail-switch" id="mailDemoWrap" style="display:none;" title="Mostrar datos de demostración en lugar del servidor de correo real">
-                  <input type="checkbox" id="mailDemoToggle" onchange="mailToggleDemo()">
-                  <span class="mail-switch-track"></span>
-                  <span id="mailDemoLabel">Demo OFF</span>
-                </label>
                 <span class="spacer"></span>
                 <span id="mailStatus" style="font-size:12px;color:var(--color-text-secondary);"></span>
               </div>
@@ -187,7 +181,6 @@
                 <div style="font-size:28px;font-weight:700;color:var(--module-chatfiat);">Correo electrónico</div>
                 <p style="margin-top:8px;">Aún no hay cuentas de correo configuradas.</p>
                 <p style="font-size:12px;color:#999;">Agrega una cuenta IMAP/SMTP (cPanel, Gmail, etc.) para comenzar.</p>
-                <p style="display:none;margin-top:4px;font-size:12px;color:#999;" id="mailDemoHint">¿Administrador? Enciende el interruptor <b>Demo</b> (arriba) para ver datos de ejemplo. Requiere el servidor de demo en el puerto 4001: <code>npm run servers</code> en la carpeta <code>email-server</code>. Si el interruptor está apagado, se usa el servidor real (puerto 4000) y su lista de cuentas está vacía.</p>
                 <button class="btn btn-outline" style="margin-top:16px;" type="button" onclick="mailSettingsOpen()">Configurar cuenta</button>
               </div>
               <div class="mail-app" id="mailApp" style="display:none;">
@@ -260,8 +253,24 @@
       </div>
       <div class="modal-body">
         <div id="mailSettingsList"></div>
-        <hr style="border:none;border-top:1px solid var(--color-border);margin:14px 0;">
+        <div style="margin:12px 0;">
+          <button class="btn" type="button" id="mailOAuthBtn" onclick="mailOAuthStart()" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;border:1px solid var(--color-border);">
+            <svg width="18" height="18" viewBox="0 0 48 48" style="flex:none;"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.7 2.4 30.2 0 24 0 14.6 0 6.4 5.4 2.5 13.2l7.9 6.1C12 14.3 17.5 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.2 7-17.6z"/><path fill="#FBBC05" d="M10.4 28.6c-.5-1.5-.8-3.1-.8-4.6s.3-3.1.8-4.6l-7.9-6.1C.9 16 0 19.9 0 24s.9 8 2.5 11.7l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.2 0 11.4-2 15.2-5.6l-7.6-5.9c-2.1 1.4-4.8 2.3-7.6 2.3-6.5 0-12-4.8-13.6-11.2l-7.9 6.1C6.4 42.6 14.6 48 24 48z"/></svg>
+            Conectar con Gmail (Google)
+          </button>
+          <div class="mail-hint" id="mailOAuthHint" style="padding:6px 0 0;color:#b45309;"></div>
+        </div>
+        <hr style="border:none;border-top:1px solid var(--color-border);margin:6px 0 14px;">
         <div class="form-group"><label>Nombre de la cuenta</label><input type="text" class="form-input" id="accName" placeholder="RRHH"></div>
+        <div class="form-group">
+          <label>Proveedor</label>
+          <select class="form-input" id="accProvider" onchange="mailApplyProvider()">
+            <option value="">Manual (cualquier servidor)</option>
+            <option value="gmail">Gmail (Google Workspace / @gmail.com)</option>
+            <option value="cpanel">cPanel (correo propio)</option>
+          </select>
+          <div class="mail-hint" id="accProviderHint" style="padding:4px 0 0;"></div>
+        </div>
         <div class="form-row" style="display:flex;gap:10px;">
           <div class="form-group" style="flex:1;"><label>Servidor IMAP *</label><input type="text" class="form-input" id="accImapHost" placeholder="mail.tudominio.com"></div>
           <div class="form-group" style="width:90px;"><label>Puerto</label><input type="number" class="form-input" id="accImapPort" value="993"></div>
@@ -270,17 +279,10 @@
           <div class="form-group" style="flex:1;"><label>Servidor SMTP</label><input type="text" class="form-input" id="accSmtpHost" placeholder="mail.tudominio.com"></div>
           <div class="form-group" style="width:90px;"><label>Puerto</label><input type="number" class="form-input" id="accSmtpPort" value="465"></div>
         </div>
-        <div class="form-group"><label>Usuario (correo completo) *</label><input type="text" class="form-input" id="accUser" placeholder="usuario@tudominio.com"></div>
+        <div class="form-group"><label>Usuario (correo completo) *</label><input type="text" class="form-input" id="accUser" placeholder="usuario@tudominio.com" onchange="mailMaybeAutoGmail()"></div>
         <div class="form-group"><label>Contraseña *</label><input type="password" class="form-input" id="accPass" placeholder="••••••••"></div>
         <div class="form-group"><label>Nombre que aparecerá en "De"</label><input type="text" class="form-input" id="accFromName" placeholder="Recursos Humanos"></div>
         <div class="form-group"><label>Firma del correo</label><textarea class="form-input" id="accSignature" rows="4" placeholder="Atentamente,&#10;Nombre Apellido&#10;Cargo | Empresa&#10;Teléfono | Web"></textarea><div class="mail-hint" style="padding:4px 0 0;">Se agrega automáticamente al final de los correos que envíes.</div></div>
-        <div class="form-group" id="accSharedWrap" style="display:none;">
-          <label class="mail-switch" title="Una cuenta compartida es visible y editable por todos. Las privadas solo las ve y modifica su dueño.">
-            <input type="checkbox" id="accShared" onchange="mailUpdateSharedLabel()">
-            <span class="mail-switch-track"></span>
-            <span id="accSharedLabel">Cuenta privada (solo tú)</span>
-          </label>
-        </div>
         <div class="mail-hint" id="mailSettingsMsg"></div>
       </div>
       <div class="modal-footer">
@@ -335,49 +337,12 @@
   <script>
     /* ===== Webmail (IMAP/SMTP) ===== */
     var MAIL_API_REAL = 'http://localhost:4000/api'; /* Servidor real de correo */
-    var MAIL_API_DEMO = 'http://localhost:4001/api'; /* Servidor con datos de demostración */
     var mailState = {
-      accounts: [], accountId: '', mailbox: 'INBOX', page: 1, per: 40, q: '', total: 0, messages: [], openUid: null, attachFiles: [], owner: '',
-      demo: (function () {
-        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-          if (location.port === '4001') return true;
-          var saved = null;
-          try { saved = localStorage.getItem('fiat_mail_demo'); } catch (e) {}
-          if (saved !== null) return saved === '1';
-        }
-        return false;
-      })()
+      accounts: [], accountId: '', mailbox: 'INBOX', page: 1, per: 40, q: '', total: 0, messages: [], openUid: null, attachFiles: [], owner: ''
     };
 
     function mailApiBase() {
-      return mailState.demo ? MAIL_API_DEMO : MAIL_API_REAL;
-    }
-    function mailToggleDemo() {
-      mailState.demo = !mailState.demo;
-      try { localStorage.setItem('fiat_mail_demo', mailState.demo ? '1' : '0'); } catch (e) {}
-      mailRenderDemoToggle();
-      mailInit();
-    }
-    function mailRenderDemoToggle() {
-      var c = document.getElementById('mailDemoToggle');
-      var l = document.getElementById('mailDemoLabel');
-      if (c) c.checked = !!mailState.demo;
-      if (l) l.textContent = 'Demo ' + (mailState.demo ? 'ON' : 'OFF');
-    }
-    function mailShowDemoToggleIfAdmin() {
-      var wrap = document.getElementById('mailDemoWrap');
-      if (!wrap) return;
-      var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-      var fa = window.fiatAccess;
-      var isAdmin = !!(fa && fa.state && fa.state.isAdmin);
-      if (!isLocal || !isAdmin) {
-        var notReady = fa && fa.state && !fa.state.ready && !fa.state.isAdmin && !(typeof demoPreviewMode === 'function' && demoPreviewMode());
-        wrap.style.display = 'none';
-        if (isLocal && notReady) setTimeout(mailShowDemoToggleIfAdmin, 250);
-        return;
-      }
-      wrap.style.display = '';
-      mailRenderDemoToggle();
+      return MAIL_API_REAL;
     }
 
     function mailEscape(s) {
@@ -399,22 +364,6 @@
     function mailStatus(msg, err) {
       var el = document.getElementById('mailStatus');
       if (el) { el.textContent = msg || ''; el.style.color = err ? '#dc2626' : 'var(--color-text-secondary)'; }
-    }
-    function mailTestPush() {
-      if (!window.fiatPush) { mailStatus('Notificaciones no disponibles en este navegador.', true); return; }
-      mailStatus('Enviando notificación de prueba...');
-      window.fiatPush.test().then(function () {
-        mailStatus('Notificación de prueba enviada. Revisa tu equipo.');
-        setTimeout(function () { mailStatus(''); }, 4000);
-      }).catch(function (e) {
-        mailStatus(e.message || 'No se pudo enviar la notificación.', true);
-      });
-    }
-    function mailShowDemoHint() {
-      if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-        var h = document.getElementById('mailDemoHint');
-        if (h) h.style.display = '';
-      }
     }
     async function mailFetch(url, opts) {
       opts = opts || {};
@@ -451,8 +400,6 @@
     }
 
     function mailInit() {
-      mailShowDemoToggleIfAdmin();
-      mailRenderDemoToggle();
       mailResolveOwner().then(function () {
         mailInitAccounts();
       });
@@ -471,16 +418,11 @@
         } else {
           document.getElementById('mailApp').style.display = 'none';
           document.getElementById('mailEmpty').style.display = 'block';
-          mailShowDemoHint();
         }
       }).catch(function (e) {
-        var hint = mailState.demo
-          ? 'Modo demo activado pero el servidor de demo (4001) no responde. Ejecuta: npm run servers en la carpeta email-server.'
-          : 'Servidor de correo real (4000) no disponible. Ejecuta: npm run servers en la carpeta email-server.';
-        mailStatus(hint, true);
+        mailStatus('Servidor de correo real (4000) no disponible. Ejecuta: npm start en la carpeta email-server.', true);
         document.getElementById('mailApp').style.display = 'none';
         document.getElementById('mailEmpty').style.display = 'block';
-        mailShowDemoHint();
       });
     }
 
@@ -766,9 +708,8 @@
     }
     function mailSettingsOpen() {
       mailRenderSettingsList();
-      var sharedWrap = document.getElementById('accSharedWrap');
-      if (sharedWrap) sharedWrap.style.display = mailIsAdmin() ? '' : 'none';
       document.getElementById('mailSettingsMsg').textContent = '';
+      document.getElementById('accPass').placeholder = '••••••••';
       document.getElementById('mailSettingsModal').classList.add('show');
     }
     function mailSettingsClose() {
@@ -778,19 +719,17 @@
       var el = document.getElementById('mailSettingsList');
       if (!mailState.accounts.length) { el.innerHTML = '<div class="mail-hint">Sin cuentas configuradas.</div>'; return; }
       el.innerHTML = mailState.accounts.map(function (a) {
-        var tag = a.owner
-          ? '<span class="mail-hint" style="font-size:11px;padding:0;color:#475569;">tuya</span>'
-          : '<span class="mail-hint" style="font-size:11px;padding:0;color:#0d9488;">compartida</span>';
+        var tag = '<span class="mail-hint" style="font-size:11px;padding:0;color:#475569;">privada' + (a.authType === 'oauth' ? ' · Google' : '') + '</span>';
         var btnEdit = mailCanManageAccount(a) ? '<button class="btn btn-outline" style="padding:2px 10px;font-size:12px;" type="button" onclick="mailEditAccount(\'' + a.id + '\')">Editar</button>' : '';
+        var btnUnlink = (a.authType === 'oauth' && mailCanManageAccount(a)) ? '<button class="btn btn-outline" style="padding:2px 10px;font-size:12px;" type="button" onclick="mailDisconnectAccount(\'' + a.id + '\')">Desvincular</button>' : '';
         var btnDel = mailCanManageAccount(a) ? '<button class="btn btn-outline" style="padding:2px 10px;font-size:12px;color:#dc2626;" type="button" onclick="mailDeleteAccount(\'' + a.id + '\')">Eliminar</button>' : '';
         return '<div class="mail-hint" style="display:flex;align-items:center;gap:10px;">' +
           '<span style="flex:1;"><strong>' + mailEscape(a.name || a.user) + '</strong> · ' + mailEscape(a.user) + ' ' + tag + '</span>' +
-          btnEdit + btnDel +
+          btnEdit + btnUnlink + btnDel +
           '</div>';
       }).join('');
     }
     function mailFormAccount() {
-      var shared = document.getElementById('accShared') && document.getElementById('accShared').checked;
       return {
         name: document.getElementById('accName').value.trim(),
         imapHost: document.getElementById('accImapHost').value.trim(),
@@ -801,13 +740,15 @@
         pass: document.getElementById('accPass').value,
         fromName: document.getElementById('accFromName').value.trim(),
         signature: document.getElementById('accSignature').value.trim(),
-        shared: shared
+        shared: false
       };
     }
     function mailSaveAccount() {
       var a = mailFormAccount();
-      if (!a.user || !a.pass || !a.imapHost) { document.getElementById('mailSettingsMsg').textContent = 'IMAP, usuario y contraseña son obligatorios.'; return; }
-      var editing = document.getElementById('mailEditingId').value;
+      var editing = mailEnsureEditingId().value;
+      var editingAcc = editing ? mailState.accounts.filter(function (x) { return String(x.id) === String(editing); })[0] : null;
+      var isOAuth = !!(editingAcc && editingAcc.authType === 'oauth');
+      if (!a.user || !a.imapHost || (!isOAuth && !a.pass)) { document.getElementById('mailSettingsMsg').textContent = isOAuth ? 'IMAP y usuario son obligatorios.' : 'IMAP, usuario y contraseña son obligatorios.'; return; }
       var url = editing ? '/accounts/' + editing : '/accounts';
       var method = editing ? 'PUT' : 'POST';
       mailFetch(url, { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) })
@@ -826,7 +767,7 @@
       var a = mailState.accounts.filter(function (x) { return String(x.id) === String(id); })[0];
       if (!a) return;
       if (!mailCanManageAccount(a)) { document.getElementById('mailSettingsMsg').textContent = 'No puedes modificar esta cuenta.'; return; }
-      document.getElementById('mailEditingId').value = id;
+      mailEnsureEditingId().value = id;
       document.getElementById('accName').value = a.name || '';
       document.getElementById('accImapHost').value = a.imapHost || '';
       document.getElementById('accImapPort').value = a.imapPort || 993;
@@ -834,17 +775,49 @@
       document.getElementById('accSmtpPort').value = a.smtpPort || 465;
       document.getElementById('accUser').value = a.user || '';
       document.getElementById('accPass').value = '';
+      document.getElementById('accProvider').value = (a.imapHost || '') === 'imap.gmail.com' ? 'gmail' : '';
+      mailApplyProvider();
+      if (a.authType === 'oauth') {
+        document.getElementById('accPass').placeholder = 'No es necesaria (conectada con Google)';
+        document.getElementById('mailSettingsMsg').textContent = 'Cuenta conectada con Google: guarda los cambios sin contraseña.';
+        var h = document.getElementById('accProviderHint');
+        if (h) h.textContent = 'Cuenta conectada con Google: la contraseña no es necesaria.';
+      } else {
+        document.getElementById('accPass').placeholder = '••••••••';
+      }
       document.getElementById('accFromName').value = a.fromName || '';
       document.getElementById('accSignature').value = a.signature || '';
-      var shared = document.getElementById('accShared');
-      if (shared) shared.checked = !a.owner;
-      mailUpdateSharedLabel();
     }
-    function mailUpdateSharedLabel() {
-      var c = document.getElementById('accShared');
-      var l = document.getElementById('accSharedLabel');
-      if (!c) return;
-      if (l) l.textContent = c.checked ? 'Cuenta compartida (visible para todos)' : 'Cuenta privada (solo tú)';
+    function mailApplyProvider() {
+      var p = document.getElementById('accProvider').value;
+      var hint = document.getElementById('accProviderHint');
+      if (p === 'gmail') {
+        document.getElementById('accImapHost').value = 'imap.gmail.com';
+        document.getElementById('accImapPort').value = 993;
+        document.getElementById('accSmtpHost').value = 'smtp.gmail.com';
+        document.getElementById('accSmtpPort').value = 465;
+        if (hint) hint.textContent = 'Para Gmail necesitas una "Contraseña de aplicación" de 16 caracteres: activa la verificación en 2 pasos en tu cuenta de Google, crea una en myaccount.google.com/apppasswords y úsala aquí como contraseña.';
+      } else if (p === 'cpanel') {
+        var user = (document.getElementById('accUser').value || '').trim();
+        var domain = user.indexOf('@') >= 0 ? user.split('@')[1] : '';
+        document.getElementById('accImapHost').value = domain ? 'mail.' + domain : '';
+        document.getElementById('accImapPort').value = 993;
+        document.getElementById('accSmtpHost').value = domain ? 'mail.' + domain : '';
+        document.getElementById('accSmtpPort').value = 465;
+        if (hint) hint.textContent = 'En cPanel el servidor suele ser mail.' + (domain || 'tudominio.com') + ' con puertos 993 (IMAP) y 465 (SMTP) con SSL. Usa el correo completo y su contraseña. Si no conecta, revisa los puertos en el panel (a veces son 143/587).';
+      } else if (hint) {
+        hint.textContent = '';
+      }
+    }
+    function mailMaybeAutoGmail() {
+      var user = (document.getElementById('accUser').value || '').toLowerCase();
+      var isGmail = /@(gmail|googlemail)\.com$/.test(user);
+      var imapHost = document.getElementById('accImapHost').value;
+      var isGmailHost = imapHost === 'imap.gmail.com' || imapHost === '';
+      if (isGmail && isGmailHost) {
+        document.getElementById('accProvider').value = 'gmail';
+        mailApplyProvider();
+      }
     }
     function mailDeleteAccount(id) {
       var a = mailState.accounts.filter(function (x) { return String(x.id) === String(id); })[0];
@@ -859,11 +832,55 @@
         mailInitAccounts();
       }).catch(function (e) { document.getElementById('mailSettingsMsg').textContent = e.message; });
     }
+    function mailDisconnectAccount(id) {
+      var a = mailState.accounts.filter(function (x) { return String(x.id) === String(id); })[0];
+      if (!a) return;
+      if (!mailCanManageAccount(a)) { document.getElementById('mailSettingsMsg').textContent = 'No puedes desvincular esta cuenta.'; return; }
+      if (!confirm('¿Desvincular ' + a.user + '? Google dejará de tener acceso y la cuenta se eliminará del correo.')) return;
+      mailFetch('/accounts/' + id + '/disconnect', { method: 'POST' }).then(function () {
+        mailState.accounts = mailState.accounts.filter(function (x) { return String(x.id) !== String(id); });
+        if (String(mailState.accountId) === String(id)) mailState.accountId = '';
+        mailRenderAccountSelect();
+        mailRenderSettingsList();
+        mailInitAccounts();
+      }).catch(function (e) { document.getElementById('mailSettingsMsg').textContent = e.message; });
+    }
+    function mailEnsureEditingId() {
+      var el = document.getElementById('mailEditingId');
+      if (el) return el;
+      var h = document.createElement('input');
+      h.type = 'hidden';
+      h.id = 'mailEditingId';
+      h.value = '';
+      (document.getElementById('mailSettingsList') || document.body).appendChild(h);
+      return h;
+    }
+    function mailOAuthOpen() {
+      var hint = document.getElementById('mailOAuthHint');
+      var ret = location.origin + location.pathname;
+      var u = mailApiBase().replace(/\/api$/, '') + '/oauth/google/start?owner=' +
+        encodeURIComponent(mailState.owner || '') + '&return=' + encodeURIComponent(ret);
+      var w = window.open(u, 'oauth-google', 'width=520,height=660');
+      if (!w && hint) hint.textContent = 'Permite las ventanas emergentes para continuar con Google.';
+    }
+    async function mailOAuthStart() {
+      var hint = document.getElementById('mailOAuthHint');
+      if (hint) hint.textContent = '';
+      await mailResolveOwner();
+      try {
+        var st = await mailFetch('/status');
+        if (st && !st.oauth) {
+          if (hint) hint.textContent = 'OAuth no configurado en el servidor: completa GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET y GOOGLE_REDIRECT_URI en email-server/.env.';
+          return;
+        }
+      } catch (e) {}
+      mailOAuthOpen();
+    }
     function mailTestAccount() {
       var a = mailFormAccount();
       var msg = document.getElementById('mailSettingsMsg');
       msg.textContent = 'Probando conexión IMAP...';
-      var editing = document.getElementById('mailEditingId').value;
+      var editing = mailEnsureEditingId().value;
       if (editing) {
         mailFetch('/accounts/' + editing, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(a) })
           .then(function (acc) { return mailFetch('/accounts/' + acc.id + '/test'); })
@@ -1078,19 +1095,42 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-      document.getElementById('mailEditingId') || (function () {
-        var h = document.createElement('input');
-        h.type = 'hidden';
-        h.id = 'mailEditingId';
-        h.value = '';
-        document.getElementById('mailSettingsList').appendChild(h);
-      })();
+      mailEnsureEditingId();
+      var qp = new URLSearchParams(location.search);
+      var oauthRes = qp.get('oauth');
+      if (oauthRes) {
+        var notifyOpener = function (fn, msg, err) {
+          if (window.opener) {
+            try {
+              if (fn) fn();
+              if (window.opener.mailStatus) window.opener.mailStatus(msg, err);
+              window.close();
+              return true;
+            } catch (e) {}
+          }
+          return false;
+        };
+        if (oauthRes === 'ok') {
+          var okMsg = 'Cuenta de Gmail conectada correctamente.';
+          if (!notifyOpener(function () { if (window.opener.mailInitAccounts) window.opener.mailInitAccounts(); }, okMsg)) {
+            alert(okMsg);
+          }
+        } else {
+          var errMsg = 'Error al conectar con Google: ' + (qp.get('msg') || 'vuelve a intentarlo.');
+          if (!notifyOpener(null, errMsg, true)) {
+            alert(errMsg);
+          }
+        }
+        qp.delete('oauth');
+        qp.delete('msg');
+        var clean = qp.toString();
+        history.replaceState({}, '', location.pathname + (clean ? '?' + clean : ''));
+      }
       var orig = window.switchTool;
       window.switchTool = function (name) {
         if (orig) orig(name);
         if (name === 'agenda') agInit();
         if (name === 'mensajes') {
-          mailShowDemoToggleIfAdmin();
           mailInit();
         }
       };

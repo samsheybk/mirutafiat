@@ -202,6 +202,51 @@ function applySignature(acc, text, html) {
   return { text: t, html: h };
 }
 
+/* ---------- Rate limiting (M-5) ----------
+   Límites en memoria por ventana deslizante:
+   - Llave: token de ops, correo autenticado o IP.
+   - /api/send y /api/push/test: estricto (máx. por minuto y por día).
+   - Resto de /api: límite general por minuto.
+   Previene fuerza bruta y abuso de envío (spam). */
+const RL_WINDOW_MS = 60 * 1000;
+const RL_DAY_MS = 24 * 60 * 60 * 1000;
+const rlBuckets = new Map();
+const rlDaily = new Map();
+function rlCleanup() {
+  const now = Date.now();
+  rlBuckets.forEach((v, k) => { if (now - v.reset >= RL_WINDOW_MS) rlBuckets.delete(k); });
+  rlDaily.forEach((v, k) => { if (now - v.reset >= RL_DAY_MS) rlDaily.delete(k); });
+}
+function rlKey(req) {
+  if (req.trusted) return 'ops:' + TOKEN;
+  if (req.verifiedEmail) return 'user:' + req.verifiedEmail;
+  return 'ip:' + (req.ip || (req.socket && req.socket.remoteAddress) || 'unknown');
+}
+function rateLimit(opts) {
+  const max = opts.max || 60;
+  const dailyMax = opts.dailyMax || 0;
+  return function (req, res, next) {
+    const now = Date.now();
+    rlCleanup();
+    const key = rlKey(req);
+    let b = rlBuckets.get(key);
+    if (!b || now >= b.reset) { b = { count: 0, reset: now + RL_WINDOW_MS }; rlBuckets.set(key, b); }
+    b.count++;
+    if (b.count > max) {
+      return res.status(429).json({ error: 'Demasiadas solicitudes. Intenta de nuevo más tarde.' });
+    }
+    if (dailyMax > 0) {
+      let d = rlDaily.get(key);
+      if (!d || now >= d.reset) { d = { count: 0, reset: now + RL_DAY_MS }; rlDaily.set(key, d); }
+      d.count++;
+      if (d.count > dailyMax) {
+        return res.status(429).json({ error: 'Límite diario alcanzado. Intenta de nuevo mañana.' });
+      }
+    }
+    next();
+  };
+}
+
 /* ---------- Autenticación de la API ----------
    Acepta dos formas:
    - "Authorization: Bearer <MAIL_API_TOKEN>"  (token de operación/ops)
@@ -232,6 +277,7 @@ async function requireAuth(req, res, next) {
   return res.status(401).json({ error: 'No autorizado' });
 }
 app.use('/api', requireAuth);
+app.use('/api', rateLimit({ max: 120 }));
 
 /* ---------- Utilidades IMAP/SMTP ---------- */
 function imapClient(acc) {
@@ -513,7 +559,7 @@ app.get('/api/messages/:uid/attachment/:index', asyncHandler(async (req, res) =>
 }));
 
 /* Enviar correo */
-app.post('/api/send', upload.array('attachments', 10), asyncHandler(async (req, res) => {
+app.post('/api/send', rateLimit({ max: 10, dailyMax: 200 }), upload.array('attachments', 10), asyncHandler(async (req, res) => {
   const acc = findAccount(req.body.account);
   if (!acc) return res.status(404).json({ error: 'Cuenta no encontrada' });
   const to = (req.body.to || '').toString();
@@ -605,7 +651,7 @@ app.post('/api/messages/:uid/move', asyncHandler(async (req, res) => {
 }));
 
 /* Notificaciones push: prueba enviada por el propio navegador */
-app.post('/api/push/test', asyncHandler(async (req, res) => {
+app.post('/api/push/test', rateLimit({ max: 10, dailyMax: 50 }), asyncHandler(async (req, res) => {
   const sub = req.body && req.body.subscription;
   if (!sub || !sub.endpoint) {
     return res.status(400).json({ error: 'Falta la suscripción push' });
@@ -618,6 +664,10 @@ app.post('/api/push/test', asyncHandler(async (req, res) => {
   res.json({ ok: true });
 }));
 
-app.listen(PORT, () => {
-  console.log('Email server escuchando en http://localhost:' + PORT);
+// M-4: por defecto SOLO loopback (el webmail siempre consulta localhost).
+// Para servir detrás de un reverse proxy en el mismo host, usar HOST=127.0.0.1
+// (default); si se quiere exponer en red explícitamente, configurar HOST.
+const HOST = process.env.HOST || '127.0.0.1';
+app.listen(PORT, HOST, () => {
+  console.log('Email server escuchando en http://' + HOST + ':' + PORT);
 });

@@ -354,6 +354,13 @@
             <label>Notas adicionales</label>
             <textarea class="form-textarea" id="notas" placeholder="Experiencia, formación, disponibilidad..."></textarea>
           </div>
+          <input type="text" id="websiteHoney" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;overflow:hidden;">
+          <div class="form-group">
+            <label class="consent-label" style="display:flex;gap:8px;align-items:flex-start;font-size:13px;line-height:1.5;">
+              <input type="checkbox" id="consentLopdp" required style="margin-top:2px;">
+              <span>Autorizo el tratamiento de mis datos personales conforme a la LOPDP. Mi foto se utilizará exclusivamente para fines de selección de personal.</span>
+            </label>
+          </div>
           <button type="submit" class="btn-submit" id="submitBtn">Enviar postulación</button>
         </form>
       </div>
@@ -435,6 +442,13 @@
       var file = e.target.files[0];
       if (!file) return;
 
+      // M-7: limitar el tamaño de la foto (~1.5 MB) para evitar abuso de storage
+      if (file.size > 1500000) {
+        showError('La foto supera el límite de 1.5 MB. Usa una imagen más liviana.');
+        e.target.value = '';
+        return;
+      }
+
       var reader = new FileReader();
       reader.onload = function(event) {
         fotoBase64 = event.target.result;
@@ -447,6 +461,29 @@
     document.getElementById('postulacionForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       hideError();
+
+      // M-5: honeypot contra bots (campo oculto que solo llena un bot)
+      var honey = document.getElementById('websiteHoney');
+      if (honey && honey.value.trim() !== '') {
+        document.getElementById('formContainer').style.display = 'none';
+        document.getElementById('successContainer').style.display = 'block';
+        return;
+      }
+
+      // M-5: límite client-side de envíos (1 por minuto por navegador)
+      var ahora = Date.now();
+      var ultimo = parseInt(localStorage.getItem('postulacion_last_ts') || '0', 10);
+      if (ahora - ultimo < 60000) {
+        showError('Ya enviaste una postulación recientemente. Intenta de nuevo en unos minutos.');
+        return;
+      }
+
+      // M-7: aviso de privacidad (LOPDP)
+      var consent = document.getElementById('consentLopdp');
+      if (!consent || !consent.checked) {
+        showError('Debes autorizar el tratamiento de tus datos personales (LOPDP) para continuar.');
+        return;
+      }
 
       var cedula = document.getElementById('cedula').value.trim();
       var nombres = document.getElementById('nombres').value.trim();
@@ -477,15 +514,11 @@
       submitBtn.textContent = 'Enviando...';
 
       try {
-        var { data: existente, error: errCheck } = await supabaseClient
-          .from('ats_candidatos')
-          .select('id')
-          .eq('cedula', cedula)
-          .limit(1);
-
+        // Verificación de duplicados SIN exponer el ATS a anon (RPC security definer)
+        var { data: existe, error: errCheck } = await supabaseClient.rpc('ats_cedula_registrada', { p_cedula: cedula });
         if (errCheck) throw errCheck;
 
-        if (existente && existente.length > 0) {
+        if (existe === true) {
           showError('Ya existe una postulación con esta cédula. Si ya te postulaste anteriormente, espera a que nuestro equipo te contacte.');
           submitBtn.disabled = false;
           submitBtn.textContent = 'Enviar postulación';
@@ -509,6 +542,7 @@
 
         if (errInsert) throw errInsert;
 
+        localStorage.setItem('postulacion_last_ts', String(Date.now()));
         document.getElementById('formContainer').style.display = 'none';
         document.getElementById('successContainer').style.display = 'block';
       } catch (err) {

@@ -18,6 +18,13 @@ cp .env.example .env   # ajustar valores si hace falta
 npm start              # escucha en http://localhost:4000
 ```
 
+> **Seguridad (M-4):** tanto la API real como el modo demo escuchan por defecto
+> **solo en `127.0.0.1`** (loopback), porque el webmail consulta siempre
+> `localhost`. Si despliegas tras un reverse proxy, déjalo en `127.0.0.1` (el
+> proxy conecta por loopback). Solo cambia `HOST`/`DEMO_HOST` si necesitas
+> exponerlo en red de forma explícita (no recomendado; el demo **no** tiene
+> autenticación).
+
 Verificación rápida (la API exige autenticación):
 
 ```bash

@@ -676,13 +676,17 @@ app.post('/api/push/test', (req, res) => {
 const STATIC_ROOT = process.env.MAIL_STATIC_ROOT || path.join(__dirname, '..');
 app.use(express.static(STATIC_ROOT, { dotfiles: 'deny', index: false }));
 
-app.listen(PORT, () => {
+// M-4: SOLO loopback. El modo demo no tiene autenticación y sirve la intranet
+// estática; nunca debe exponerse a la red. Para un reverse proxy en el mismo
+// host se mantiene 127.0.0.1 (el proxy conecta por loopback).
+const HOST = process.env.DEMO_HOST || '127.0.0.1';
+app.listen(PORT, HOST, () => {
   console.log('----------------------------------------------');
   console.log('  FIAT EMAIL — MODO DEMO');
-  console.log('  API simulada:  http://localhost:' + PORT + '/api');
-  console.log('  Intranet:      http://localhost:' + PORT + '/modules/chatfiat.html?demo=1');
+  console.log('  API simulada:  http://' + HOST + ':' + PORT + '/api');
+  console.log('  Intranet:      http://' + HOST + ':' + PORT + '/modules/chatfiat.html?demo=1');
   console.log('  Cuenta demo:   rrhh@fiat-ve.com (RRHH)');
   console.log('  En el webmail, el admin puede alternar con el interruptor Demo.');
-  console.log('  Servidor real: http://localhost:4000 (npm start)');
+  console.log('  Servidor real: http://' + HOST + ':4000 (npm start)');
   console.log('----------------------------------------------');
 });

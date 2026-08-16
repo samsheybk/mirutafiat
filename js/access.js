@@ -5,8 +5,9 @@
      solo las herramientas permitidas por módulo.
    - Rol "Administrador": acceso total + gestión de usuarios.
    - Gestión de usuarios es EXCLUSIVA del rol "Administrador".
-   - Un trabajador sin fila en usuario_accesos ve todo (config. inicial)
-     PERO no gestiona usuarios.
+   - DENEGAR POR DEFECTO (hallazgo M-1): un trabajador sin fila en
+     usuario_accesos, o con fila pero sin módulos configurados, NO ve
+     módulos. El onboarding debe crear la fila de accesos al contratar.
    - USUARIO MAESTRO: los correos en SUPERADMIN_EMAILS no necesitan estar
      en plantilla_trabajadores; siempre tienen acceso total y gestionan.
    ============================================================ */
@@ -126,14 +127,14 @@
     if (!state.allow) return false;
     if (baseModule(page) === 'gestion-usuarios.html') return state.manage;
     if (state.isAdmin) return true;
-    if (!state.hasRow || !state.modulos) return true;
+    if (!state.hasRow || !state.modulos) return false;
     return Object.prototype.hasOwnProperty.call(state.modulos, baseModule(page));
   }
 
   function canUseTool(page, tool) {
     if (!state.allow) return false;
     if (state.isAdmin) return true;
-    if (!state.hasRow || !state.modulos) return true;
+    if (!state.hasRow || !state.modulos) return false;
     var tools = state.modulos[baseModule(page)];
     if (tools === undefined) return false;
     if (Array.isArray(tools) && tools.indexOf('*') !== -1) return true;

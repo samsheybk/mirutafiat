@@ -15,6 +15,35 @@ En el backend de correo (`email-server`), la API no exige token (`MAIL_API_TOKEN
 
 **Recomendación:** el sistema no debe publicarse a producción hasta corregir los hallazgos CRÍTICOS (RLS + escalamiento de rol) y ALTO (auth del email-server, TLS, sanitización de correo).
 
+> **Estado (2026-08-16):** los hallazgos C-1, C-2, C-3, M-1, M-3, M-5, M-6 y M-7 quedaron **corregidos** en el código/schema (ver §1.1). Los hallazgos A-1…A-5 del `email-server` están corregidos (incluidos A-4: `npm audit` en 0 y nodemailer v9; A-2: TLS verificado). El **M-4** (demo-server sin auth) quedó resuelto escuchando solo en loopback. Solo restan **notas operativas** (kiosco/ATS requieren rol Administrador) y el **proceso DevSecOps** (CSP opcional, rotación de secretos, pruebas en CI).
+
+---
+
+## 1.1 Estado de remediación (2026-08-16)
+
+| # | Hallazgo | Estado | Dónde quedó corregido |
+|---|----------|--------|-----------------------|
+| C-1 | Escalamiento de rol (`usuario_accesos`) | ✅ Corregido | `supabase-schema.sql` §18 (Nivel F) + sección existente de `usuario_accesos` |
+| C-2 | RLS `USING(true)` en 78+ tablas | ✅ Corregido | `supabase-schema.sql` §18: elimina todas las políticas de `public` y recrea 4 niveles; 0 políticas con `using (true)` |
+| C-3 | XSS en Captación (`foto_url`) | ✅ Corregido | `modules/captacion.html` (`escapeHtml` + `safeImgUrl`) + política anon valida formato/largo de foto |
+| A-1 | API de correo sin auth / CORS `*` | ✅ Corregido | `email-server/server.js` (`requireAuth`, CORS allowlist, aborta sin token) |
+| A-2 | TLS sin verificación | ✅ Corregido | `email-server/server.js` (`TLS_REJECT_UNAUTHORIZED` default `1`) |
+| A-3 | Contraseñas IMAP/SMTP en claro | ✅ Corregido | `email-server/server.js` (`encryptPass`/`decryptPass`, AES-256-GCM) |
+| A-4 | `npm audit` high (multer/nodemailer) | ✅ Corregido | `package.json`: multer `^2.0.2` (instalado 2.2.0) y nodemailer `^9.0.5`; `npm audit` = 0 vulnerabilidades; código compatible con v9 (sin `disableFileAccess`/`disableUrlAccess`) |
+| A-5 | XSS en webmail | ✅ Corregido | `modules/chatfiat.html` (sanitizador allow-list con DOMParser) |
+| M-1 | Default abierto sin fila en `usuario_accesos` + superadmin hardcodeado | ✅ Corregido | `js/access.js` deny-by-default; superadmin respaldado por `app_administradores` |
+| M-2 | Fuga de detalles en errores API | ✅ Corregido | `email-server/server.js` (`asyncHandler` sin `err.message`) |
+| M-3 | Datos de candidatos/encuestas legibles | ✅ Corregido | `supabase-schema.sql` §18 Nivel D y E (ATS por módulo; respuestas admin) |
+| M-4 | demo-server sin auth | ✅ Corregido | `email-server/demo-server.js` y `server.js` escuchan **solo en `127.0.0.1`** (loopback; `HOST`/`DEMO_HOST` configurable); verificado con netstat |
+| M-5 | Sin rate-limiting | ✅ Corregido | `email-server/server.js` (limiter por IP/correo/token); `postulacion/index.html` (honeypot + límite client-side); login cubierto por rate-limit nativo de Supabase Auth |
+| M-6 | Schema duplicado | ✅ Corregido | `supabase-schema.sql` (un solo bloque; 85 tablas únicas) |
+| M-7 | Fotos base64 sin límite + sin aviso LOPDP | ✅ Corregido | `postulacion/index.html` (1.5 MB, aviso LOPDP), `supabase-schema.sql` (`CHECK` y política anon ≤ 2.000.000 chars) |
+
+**Notas operativas que exige el nuevo modelo RLS:**
+- El **reloj/kiosco de biometría** debe autenticarse con un **Administrador** (lee el banco de rostros y registra marcajes). Un trabajador con sesión normal solo ve sus propios perfiles/marcajes.
+- Los **operadores del ATS** deben tener rol **`Administrador`** (o estar en `app_administradores`) para insertar/actualizar/eliminar candidatos; la **postulación pública** sigue abierta vía anon validado.
+- El **onboarding** debe crear la fila en `usuario_accesos` al contratar; sin ella el trabajador no ve módulos (denegar por defecto).
+
 ---
 
 ## 2. Hallazgos por severidad
@@ -58,9 +87,9 @@ En el backend de correo (`email-server`), la API no exige token (`MAIL_API_TOKEN
 
 ---
 
-## 3. C�digo corregido (hallazgos principales)
+## 3. Código corregido (hallazgos principales)
 
-### C-1 / C-2 � Pol�ticas RLS restrictivas
+### C-1 / C-2 — Políticas RLS restrictivas
 
 ```sql
 -- 1) Impedir que el usuario cambie su propio rol/accesos (usuario_accesos)
@@ -72,7 +101,7 @@ create policy "accesos_read_own"
   using (trabajador_id = (select id from public.plantilla_trabajadores
           where correo = auth.jwt() ->> 'email' limit 1));
 
--- Solo el SUPERADMIN (lista expl�cita en una tabla de confianza) modifica
+-- Solo el SUPERADMIN (lista explícita en una tabla de confianza) modifica
 create table if not exists public.app_administradores (
   email text primary key
 );
@@ -85,7 +114,7 @@ create policy "accesos_admin_all"
 ```
 
 ```sql
--- 2) Auditar y cerrar las pol�ticas USING(true) de las tablas sensibles
+-- 2) Auditar y cerrar las políticas USING(true) de las tablas sensibles
 --    Ejemplo (plantilla_trabajadores): lectura solo para autenticados,
 --    escritura SOLO para administradores.
 drop policy if exists "plantilla_auth_all" on public.plantilla_trabajadores;
@@ -108,7 +137,7 @@ create policy "plantilla_admin_delete"
   using (auth.jwt() ->> 'email' in (select email from public.app_administradores));
 ```
 
-> Regla de oro: `using (true)` solo para columnas p�blicas. Para el resto, definir por rol/owner. Revisar las 78 tablas con esta query:
+> Regla de oro: `using (true)` solo para columnas públicas. Para el resto, definir por rol/owner. Revisar las 78 tablas con esta query:
 
 ```sql
 select tablename, policyname, cmd
@@ -117,7 +146,7 @@ where schemaname = 'public' and (qual ilike '%true%' or with_check ilike '%true%
 order by tablename;
 ```
 
-### C-3 � XSS en Captaci�n (escapado + validaci�n de URL)
+### C-3 — XSS en Captación (escapado + validación de URL)
 
 ```js
 function escapeHtml(s) {
@@ -142,9 +171,9 @@ var fotoHtml = fotoUrl
   : '<div style="width:80px;height:80px;border:1px solid var(--color-border);display:flex;align-items:center;justify-content:center;background:var(--color-bg);"></div>';
 ```
 
-> Adem�s: quitar la pol�tica `INSERT TO anon` de `ats_candidatos` o limitar los campos que el anon puede escribir; subir la foto a Supabase Storage (`fotos-perfil`) y guardar solo la ruta del bucket, no base64 en la tabla.
+> Además: quitar la política `INSERT TO anon` de `ats_candidatos` o limitar los campos que el anon puede escribir; subir la foto a Supabase Storage (`fotos-perfil`) y guardar solo la ruta del bucket, no base64 en la tabla.
 
-### A-5 � Sanitizador allow-list para el webmail
+### A-5 — Sanitizador allow-list para el webmail
 
 ```js
 function sanitizeHtml(input) {
@@ -189,14 +218,14 @@ function sanitizeHtml(input) {
 // Uso: mailView.innerHTML = sanitizeHtml(mail.html);
 ```
 
-> Complemento: a�adir CSP en las p�ginas de la intranet para mitigar XSS residual:
+> Complemento: añadir CSP en las páginas de la intranet para mitigar XSS residual:
 
 ```html
 <meta http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'; img-src 'self' data: https:;">
 ```
 
-### A-1 � email-server: token obligatorio + CORS restringido + TLS verificado
+### A-1 — email-server: token obligatorio + CORS restringido + TLS verificado
 
 ```js
 const TOKEN = process.env.MAIL_API_TOKEN;
@@ -215,12 +244,12 @@ app.use('/api', requireToken);
 ```
 
 ```js
-// imapClient / smtpTransport: eliminar la desactivaci�n de validaci�n TLS
+// imapClient / smtpTransport: eliminar la desactivación de validación TLS
 tls: { rejectUnauthorized: true }
-// (o al menos a true; si el certificado del dominio tiene CA v�lida, no hace falta "tls")
+// (o al menos a true; si el certificado del dominio tiene CA válida, no hace falta "tls")
 ```
 
-### A-3 � Contrase�as de correo cifradas en reposo
+### A-3 — Contraseñas de correo cifradas en reposo
 
 ```js
 const key = crypto.scryptSync(process.env.ACCOUNTS_ENC_KEY || '', 'fiat', 32);
@@ -235,7 +264,7 @@ function encryptPass(p) {
 }
 function decryptPass(e) {
   if (!e) return '';
-  if (typeof e === 'string') return e; // migraci�n: plano viejo
+  if (typeof e === 'string') return e; // migración: plano viejo
   const d = crypto.createDecipheriv('aes-256-gcm', key, Buffer.from(e.iv, 'base64'));
   d.setAuthTag(Buffer.from(e.tag, 'base64'));
   return Buffer.concat([d.update(Buffer.from(e.data, 'base64')), d.final()]).toString('utf8');
@@ -243,7 +272,7 @@ function decryptPass(e) {
 // usar encryptPass() al guardar (server.js:258) y decryptPass() en imapClient/smtpTransport.
 ```
 
-### A-2 � Manejo de errores sin fuga de informaci�n
+### A-2 — Manejo de errores sin fuga de información
 
 ```js
 const asyncHandler = fn => (req, res, next) =>
@@ -256,13 +285,25 @@ const asyncHandler = fn => (req, res, next) =>
 
 ---
 
-## 4. Plan de remediaci�n (prioridad)
+## 4. Plan de remediación (estado 2026-08-16)
 
-1. **(Inmediato)** Cerrar C-1: pol�ticas de `usuario_accesos` (solo lectura propia + escritura superadmin). Rotar cualquier cuenta creada con rol Administrador.
-2. **(Inmediato)** C-2: auditar las 78 tablas con la query de `pg_policies`; reemplazar `USING(true)` por policies de rol/owner. Prioridad a n�mina/salarios/liquidaciones/salud.
-3. **(Inmediato)** C-3 y A-5: aplicar sanitizaci�n allow-list y CSP; bloquear `INSERT anon` a `ats_candidatos` o restringir columnas.
-4. **(Corto plazo)** A-1/A-2/A-3: token obligatorio, CORS `false`/allowlist, `rejectUnauthorized: true`, cifrar credenciales, no loguear `err.message` al cliente.
-5. **(Corto plazo)** A-4: `npm audit fix` (multer) y planificar migraci�n a nodemailer v9 en una rama (cambios de API).
-6. **(Mediano plazo)** M-1: migrar el "ve todo" por defecto a un onboarding que cree la fila de accesos al contratar; reemplazar superadmin hardcodeado por `app_administradores`.
-7. **(Mediano plazo)** M-4/M-5/M-6: no exponer demo-server fuera de localhost; rate-limit en `/api/send` y postulaci�n; unificar el schema en un solo bloque.
-8. **Proceso DevSecOps:** ejecutar `npm audit` en CI, revisar rotaci�n de `SERVICE_ROLE_KEY`/`VAPID_PRIVATE_KEY`, pruebas de seguridad (RLS, XSS), y backup cifrado de `email-server/data`.
+- ✅ **C-1:** `usuario_accesos` solo lectura propia + escritura administrador. **Hecho** en `supabase-schema.sql` §18.
+- ✅ **C-2:** reemplazadas TODAS las políticas `USING(true)` de `public` por el modelo de 4 niveles (operativas / sensibles / personales / candidatos + encuestas + infra). **Hecho** en `supabase-schema.sql` §18 (0 políticas con `true`).
+- ✅ **C-3 y A-5:** sanitización allow-list (`escapeHtml`/`safeImgUrl` en captacion, DOMParser en chatfiat) y política anon restringida. **Hecho.**
+- ✅ **A-1/A-2/A-3/M-2:** token obligatorio + abortar sin token, CORS allowlist, `rejectUnauthorized: true`, credenciales cifradas AES-256-GCM, errores sin fuga de detalles. **Hecho** en `email-server/server.js`.
+- ✅ **A-4:** `npm audit` = **0 vulnerabilidades** (multer 2.2.0, nodemailer 9.0.5); código sin opciones deprecadas de nodemailer v8. **Hecho.**
+- ✅ **M-1:** deny-by-default en `js/access.js`; el onboarding debe crear la fila de accesos. Superadmin respaldado por `app_administradores`. **Hecho.**
+- ✅ **M-5:** rate limiting en `email-server/server.js` (`/api/send` 10/min·200/día, push/test 10/min·50/día, general 120/min) + honeypot/límite client-side en `postulacion/index.html`. Login cubierto por el rate-limit nativo de Supabase Auth. **Hecho.**
+- ✅ **M-6:** schema unificado en un solo bloque (85 tablas únicas). **Hecho.**
+- ✅ **M-7:** límite de 1.5 MB en la foto de postulación + aviso LOPDP + `CHECK` en `ats_candidatos.foto_url` (≤ 2.000.000 chars) + validación de URL en captacion. **Hecho.**
+- ✅ **M-4:** servidores real y demo escuchan **solo en `127.0.0.1`** (`HOST`/`DEMO_HOST`, default loopback) — el demo sin auth nunca queda expuesto a la red. **Hecho** y verificado con netstat.
+- 🔄 **Proceso DevSecOps:** `npm audit` en CI, rotación de `SERVICE_ROLE_KEY`/`VAPID_PRIVATE_KEY`, pruebas de seguridad (RLS, XSS), backup cifrado de `email-server/data`.
+
+**Para aplicar el bloque RLS en una base existente:** ejecutar la sección §18 de `supabase-schema.sql` (es idempotente: elimina y recrea todas las políticas de `public`). Verificar con:
+
+```sql
+select tablename, policyname, cmd
+from pg_policies
+where schemaname = 'public' and (qual ilike '%true%' or with_check ilike '%true%');
+-- Debe devolver 0 filas.
+```

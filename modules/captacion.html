@@ -1106,6 +1106,8 @@
       if (!validarCedulaVE(cedula)) { showAlert('La cédula debe comenzar con V o E seguido solo de números (ej: V12345678)', 'warning'); return; }
       if (telefono && !validarTelefonoVE(telefono)) { showAlert('El teléfono debe ser un número venezolano válido (ej: 0412-1234567)', 'warning'); return; }
       if (correo && !validarCorreoDominio(correo)) { showAlert('El correo debe tener un dominio válido (ej: usuario@dominio.com)', 'warning'); return; }
+      if (foto_url && !safeImgUrl(foto_url)) { showAlert('La foto debe ser una URL http(s) o una imagen data: válida', 'warning'); return; }
+      if (foto_url && foto_url.length > 2000000) { showAlert('La foto supera el tamaño máximo permitido', 'warning'); return; }
 
       if (existingCandidatoId) {
         var confirmar = await showConfirm('Esta cédula ya existe. ¿Deseas actualizar los datos?\n\nLos datos anteriores serán reemplazados.\nEl historial de movimientos NO se verá afectado.');

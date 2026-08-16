@@ -99,20 +99,6 @@
     }
     .bio-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     .bio-card-head h3 { margin: 0; }
-    .bio-tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--color-border); margin-top: 16px; }
-    .bio-tab {
-      background: transparent;
-      border: none;
-      border-bottom: 2px solid transparent;
-      padding: 10px 14px;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--color-text-secondary);
-      cursor: pointer;
-      font-family: inherit;
-    }
-    .bio-tab:hover { color: #0f172a; }
-    .bio-tab.active { color: var(--module-compensacion); border-bottom-color: var(--module-compensacion); }
     .bio-tab-panel { display: none; margin-top: 16px; }
     .bio-tab-panel.active { display: block; }
     .bio-dias { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -177,6 +163,7 @@
         <option value="capacitacion.html">Capacitación y Desarrollo</option>
         <option value="bienestar-social.html">Bienestar Social</option>
         <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="seguridad-fisica.html">Seguridad Física</option>
         <option value="compensacion.html" selected>Compensación</option>
         <option value="finanzas.html">Finanzas</option>
         <option value="repositorio.html">Repositorio</option>
@@ -222,7 +209,7 @@
               <input type="number" class="form-input" id="esTasaTool" min="0" step="0.0001" placeholder="0.0000" style="width:130px;height:36px;" oninput="esTasaToolSync()" title="Digita la tasa manualmente (si la API BCV no está disponible) o consúltala automáticamente.">
               <button class="btn btn-outline" onclick="esAplicarManual()"><i class="fi fi-sr-check-double"></i> Aplicar a toda la estructura</button>
               <button class="btn btn-outline" onclick="esConsultarTasa(true)"><i class="fi fi-sr-refresh"></i> Consultar tasa BCV</button>
-              <button class="btn btn-compensacion" onclick="esOpen()"><i class="fi fi-sr-money-check"></i> + Nueva estructura</button>
+              <button class="btn btn-compensacion" onclick="esOpen()"><i class="fi fi-sr-money-check"></i> Nueva estructura</button>
               <span class="topnav-spacer" style="flex:1;"></span>
               <div class="es-vista" id="esVista" title="Forma de ver la estructura salarial">
                 <button type="button" class="es-vista-btn active" data-vista="completa" onclick="esSetVista('completa')">Completa (Bs + USD)</button>
@@ -232,15 +219,15 @@
             </div>
             <div class="toolbar-content" data-toolbar="liquidaciones" style="display:none;align-items:center;gap:8px;flex-wrap:wrap;width:100%;">
               <button class="btn btn-outline" onclick="liExportExcel()"><i class="fi fi-sr-file-excel"></i> Exportar Excel</button>
-              <button class="btn btn-compensacion" onclick="liOpen()"><i class="fi fi-sr-calculator"></i> + Nueva liquidación</button>
+              <button class="btn btn-compensacion" onclick="liOpen()"><i class="fi fi-sr-calculator"></i> Nueva liquidación</button>
             </div>
             <div class="toolbar-content" data-toolbar="biometria" style="display:none;align-items:center;gap:6px;flex-wrap:wrap;width:100%;">
-              <div class="bio-tabs" style="margin-top:0;border-bottom:0;">
-                <button class="bio-tab active" data-tab="historial" onclick="bioSwitchTab('historial')">Historial</button>
-                <button class="bio-tab" data-tab="horas" onclick="bioSwitchTab('horas')">Horas por trabajador</button>
-                <button class="bio-tab" data-tab="perfiles" onclick="bioSwitchTab('perfiles')">Perfiles</button>
-                <button class="bio-tab" data-tab="enrolar" onclick="bioSwitchTab('enrolar')">Enrolar trabajador</button>
-                <button class="bio-tab" data-tab="config" onclick="bioSwitchTab('config')">Configuración</button>
+              <div class="mod-tabs">
+                <button class="mod-tab active" data-tab="historial" onclick="bioSwitchTab('historial')">Historial</button>
+                <button class="mod-tab" data-tab="horas" onclick="bioSwitchTab('horas')">Horas por trabajador</button>
+                <button class="mod-tab" data-tab="perfiles" onclick="bioSwitchTab('perfiles')">Perfiles</button>
+                <button class="mod-tab" data-tab="enrolar" onclick="bioSwitchTab('enrolar')">Enrolar trabajador</button>
+                <button class="mod-tab" data-tab="config" onclick="bioSwitchTab('config')">Configuración</button>
               </div>
             </div>
           </header>
@@ -410,7 +397,7 @@
 
   <div class="modal-overlay" id="modal">
     <div class="modal">
-      <div class="modal-header"><h3 id="esModalTitle">Estructura salarial por cargo</h3><button class="modal-close" onclick="esClose()">&times;</button></div>
+      <div class="modal-header"><h3 id="esModalTitle">Estructura salarial por cargo</h3><button class="modal-close" onclick="esClose()"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <div class="form-group">
           <label>Cargo (organigrama)</label>
@@ -442,7 +429,7 @@
 
   <div class="modal-overlay" id="modalLiquidaciones">
     <div class="modal">
-      <div class="modal-header"><h3 id="liModalTitle">Nueva liquidación</h3><button class="modal-close" onclick="liClose()">&times;</button></div>
+      <div class="modal-header"><h3 id="liModalTitle">Nueva liquidación</h3><button class="modal-close" onclick="liClose()"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <div class="form-group">
           <label>Trabajador</label>
@@ -1792,7 +1779,7 @@
       }
 
       function bioSwitchTab(name) {
-        document.querySelectorAll('.bio-tab').forEach(function (b) {
+        document.querySelectorAll('.mod-tab').forEach(function (b) {
           b.classList.toggle('active', b.getAttribute('data-tab') === name);
         });
         document.querySelectorAll('.bio-tab-panel').forEach(function (p) {

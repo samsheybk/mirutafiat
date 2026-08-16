@@ -11,20 +11,117 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/uicons-solid-rounded.css">
   <link rel="stylesheet" href="css/styles.css">
   <style>
-    .home-area { display: flex; align-items: center; justify-content: center; }
-    .home-welcome { max-width: 760px; text-align: center; padding: 40px 24px; }
-    .home-hello { font-size: clamp(28px, 5vw, 44px); font-weight: 800; letter-spacing: -1px; color: var(--color-text); }
+    .home-area { display: block; padding: 8px 0 40px; }
+
+    /* ===== Héroe ===== */
+    .home-hero {
+      border-radius: var(--radius-lg);
+      padding: 34px 38px;
+      margin-bottom: 28px;
+      background:
+        radial-gradient(900px 220px at 8% -10%, rgba(37, 99, 235, 0.16), transparent 60%),
+        radial-gradient(700px 200px at 92% -20%, rgba(13, 148, 136, 0.16), transparent 60%),
+        var(--color-surface);
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+    .home-hero::after {
+      content: "";
+      position: absolute;
+      right: -70px;
+      top: -70px;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(13, 148, 136, 0.12), transparent 70%);
+      pointer-events: none;
+    }
+    .home-hello { font-size: clamp(24px, 3.6vw, 36px); font-weight: 800; letter-spacing: -1px; color: var(--color-text); }
     .home-hello strong { color: #0d9488; }
-    .home-sub { margin-top: 10px; color: var(--color-text-secondary); font-size: 15px; }
-    .home-carousel { margin-top: 48px; min-height: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    .home-phrase { font-size: clamp(20px, 3.2vw, 30px); line-height: 1.45; font-weight: 600; color: #334155; max-width: 640px; opacity: 0; transform: translateY(10px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .home-date { margin-top: 8px; font-size: 13.5px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.6px; }
+    .home-sub { margin-top: 14px; color: var(--color-text-secondary); font-size: 14.5px; max-width: 640px; line-height: 1.55; }
+
+    /* ===== Layout principal ===== */
+    .home-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 24px;
+      align-items: start;
+    }
+    .home-section-title { display: flex; align-items: baseline; gap: 10px; margin: 4px 2px 16px; }
+    .home-section-title h2 { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; margin: 0; }
+    .home-section-title span { font-size: 12.5px; color: var(--color-text-secondary); font-weight: 600; }
+
+    /* ===== Tarjetas de módulo ===== */
+    #homeModules { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+    .module-card { padding: 20px; }
+    .module-card .module-icon { background: transparent; border: 1px solid var(--color-border); }
+    .module-card h3 { font-size: 14px; margin-top: 14px; }
+    .module-card p { font-size: 12px; }
+    .module-card .module-icon i { font-size: 18px; }
+
+    /* ===== Columna lateral ===== */
+    .home-side { display: flex; flex-direction: column; gap: 24px; }
+    .home-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 20px 22px;
+    }
+    .home-card-head h3 { font-size: 14px; font-weight: 800; margin: 0 0 16px; }
+    .home-carousel { min-height: 118px; display: flex; flex-direction: column; justify-content: center; }
+    .home-phrase { font-size: clamp(16px, 2vw, 19px); line-height: 1.5; font-weight: 600; color: #334155; opacity: 0; transform: translateY(8px); transition: opacity 0.45s ease, transform 0.45s ease; }
     .home-phrase.show { opacity: 1; transform: translateY(0); }
-    .home-dots { margin-top: 28px; display: flex; gap: 8px; }
+    .home-dots { margin-top: 20px; display: flex; gap: 7px; flex-wrap: wrap; }
     .home-dot { width: 9px; height: 9px; border-radius: 50%; border: none; padding: 0; cursor: pointer; background: var(--color-border); transition: background 0.3s ease, transform 0.3s ease; }
     .home-dot.active { background: #0d9488; transform: scale(1.35); }
-    .home-hint { margin-top: 44px; font-size: 13px; color: var(--color-text-secondary); }
+
+    /* ===== Accesos rápidos ===== */
+    .home-quick { display: flex; flex-direction: column; gap: 10px; }
+    .home-quick-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: transparent;
+      color: var(--color-text);
+      font-family: inherit;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+    }
+    .home-quick-btn:hover { border-color: #cbd5e1; background: var(--color-bg); transform: translateX(2px); }
+    .home-quick-btn i {
+      width: 34px;
+      height: 34px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+      background: var(--color-bg);
+      font-size: 16px;
+      color: #0d9488;
+    }
+
+    @media (max-width: 1024px) {
+      .home-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .home-hero { padding: 24px 20px; }
+      #homeModules { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -33,17 +130,6 @@
       <div class="topnav-brand" onclick="location.href='dashboard.html'"><span class="topnav-logo"></span>Intranet</div>
       <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
         <option value="dashboard.html">Home</option>
-        <option value="modules/captacion.html">Captación y Selección</option>
-        <option value="modules/relaciones-laborales.html">Relaciones Laborales</option>
-        <option value="modules/capacitacion.html">Capacitación y Desarrollo</option>
-        <option value="modules/bienestar-social.html">Bienestar Social</option>
-        <option value="modules/seguridad-salud.html">Seguridad y Salud Laboral</option>
-        <option value="modules/compensacion.html">Compensación</option>
-        <option value="modules/finanzas.html">Finanzas</option>
-        <option value="modules/repositorio.html">Repositorio</option>
-        <option value="modules/chatfiat.html">Mensajería</option>
-        <option value="modules/desarrollo-organizacional.html">Desarrollo organizacional</option>
-        <option value="modules/gourmet.html">Gourmet</option>
       </select>
 
       <div class="topnav-spacer"></div>
@@ -74,14 +160,39 @@
       </header>
 
       <div class="content-area home-area">
-        <div class="home-welcome">
-          <div class="home-hello">¡Hola, <strong id="homeName">bienvenido</strong>!</div>
-          <div class="home-sub">Nos alegra verte de nuevo en la intranet FIAT</div>
-          <div class="home-carousel">
-            <div class="home-phrase" id="homePhrase"></div>
-            <div class="home-dots" id="homeDots"></div>
-          </div>
-          <div class="home-hint">Usa el menú superior para navegar por los módulos</div>
+        <div class="home-hero">
+          <div class="home-hello" id="homeGreeting">¡Hola, <strong id="homeName">bienvenido</strong>!</div>
+          <div class="home-date" id="homeDate"></div>
+          <div class="home-sub" id="homeSub">Hoy es un gran día para lograr grandes cosas. Usa el menú superior o los accesos de abajo para comenzar.</div>
+        </div>
+
+        <div class="home-layout">
+          <section class="home-main">
+            <div class="home-section-title">
+              <h2>Tus módulos</h2>
+              <span id="homeModulesCount"></span>
+            </div>
+            <div class="module-grid" id="homeModules"></div>
+          </section>
+
+          <aside class="home-side">
+            <div class="home-card">
+              <div class="home-card-head"><h3>Frase del día</h3></div>
+              <div class="home-carousel">
+                <div class="home-phrase" id="homePhrase"></div>
+                <div class="home-dots" id="homeDots"></div>
+              </div>
+            </div>
+
+            <div class="home-card">
+              <div class="home-card-head"><h3>Accesos rápidos</h3></div>
+              <div class="home-quick">
+                <button type="button" class="home-quick-btn" onclick="location.href='reloj.html'"><i class="fi fi-sr-fingerprint"></i><span>Registro de marcaje</span></button>
+                <button type="button" class="home-quick-btn" onclick="location.href='perfil.html'"><i class="fi fi-sr-id-badge"></i><span>Mi perfil</span></button>
+                <button type="button" class="home-quick-btn" onclick="openHelp()"><i class="fi fi-sr-life-ring"></i><span>Detalle del módulo</span></button>
+              </div>
+            </div>
+          </aside>
         </div>
       </div>
     </div>

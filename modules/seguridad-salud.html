@@ -31,6 +31,7 @@
         <option value="capacitacion.html">Capacitación y Desarrollo</option>
         <option value="bienestar-social.html">Bienestar Social</option>
         <option value="seguridad-salud.html" selected>Seguridad y Salud Laboral</option>
+        <option value="seguridad-fisica.html">Seguridad Física</option>
         <option value="compensacion.html">Compensación</option>
         <option value="finanzas.html">Finanzas</option>
         <option value="repositorio.html">Repositorio</option>
@@ -76,24 +77,19 @@
         <div class="module-body">
           <header class="topbar" style="gap:16px;">
             <div class="toolbar-content" data-toolbar="incidentes" style="display:flex;align-items:center;gap:16px;width:100%;">
-              <h2 style="font-size:18px;font-weight:700;color:var(--module-seguridad);">Incidentes</h2>
-              <button class="btn btn-seguridad btn-sm" onclick="openModalIncidente()" style="margin-left:auto;">+ Reportar incidente</button>
+              <button class="btn btn-seguridad btn-sm" onclick="openModalIncidente()" style="margin-left:auto;">Reportar incidente</button>
             </div>
             <div class="toolbar-content" data-toolbar="inspecciones" style="display:none;align-items:center;gap:16px;width:100%;">
-              <h2 style="font-size:18px;font-weight:700;color:var(--module-seguridad);">Inspecciones</h2>
-              <button class="btn btn-seguridad btn-sm" onclick="openModalInspeccion()" style="margin-left:auto;">+ Nueva inspección</button>
+              <button class="btn btn-seguridad btn-sm" onclick="openModalInspeccion()" style="margin-left:auto;">Nueva inspección</button>
             </div>
             <div class="toolbar-content" data-toolbar="servicio-medico" style="display:none;align-items:center;gap:16px;width:100%;">
-              <h2 style="font-size:18px;font-weight:700;color:var(--module-seguridad);">Servicio Médico</h2>
-              <button class="btn btn-seguridad btn-sm" onclick="openModalServicioMedico()" style="margin-left:auto;">+ Registrar atención</button>
+              <button class="btn btn-seguridad btn-sm" onclick="openModalServicioMedico()" style="margin-left:auto;">Registrar atención</button>
             </div>
             <div class="toolbar-content" data-toolbar="inv-equipos" style="display:none;align-items:center;gap:16px;width:100%;">
-              <h2 style="font-size:18px;font-weight:700;color:var(--module-seguridad);">Inventario de equipos de seguridad</h2>
-              <button class="btn btn-seguridad btn-sm" onclick="openModalInvEquipo()" style="margin-left:auto;">+ Nuevo equipo</button>
+              <button class="btn btn-seguridad btn-sm" onclick="openModalInvEquipo()" style="margin-left:auto;">Nuevo equipo</button>
             </div>
             <div class="toolbar-content" data-toolbar="inv-insumos" style="display:none;align-items:center;gap:16px;width:100%;">
-              <h2 style="font-size:18px;font-weight:700;color:var(--module-seguridad);">Inventario de insumos y medicamentos</h2>
-              <button class="btn btn-seguridad btn-sm" onclick="openModalInvInsumo()" style="margin-left:auto;">+ Nuevo insumo</button>
+              <button class="btn btn-seguridad btn-sm" onclick="openModalInvInsumo()" style="margin-left:auto;">Nuevo insumo</button>
             </div>
           </header>
 
@@ -145,9 +141,9 @@
             </div>
 
             <div class="tool-section" id="tool-inv-equipos">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
-                <button class="btn btn-sm eqp-tab" data-etab="inventario" onclick="eqpSwitchView('inventario',this)" style="background:var(--module-seguridad);color:#fff;border:0;border-radius:4px;padding:6px 16px;">Inventario</button>
-                <button class="btn btn-sm eqp-tab" data-etab="movimientos" onclick="eqpSwitchView('movimientos',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Movimientos</button>
+              <div class="mod-tabs" style="margin-bottom:14px;">
+                <button class="mod-tab" data-etab="inventario" onclick="eqpSwitchView('inventario',this)">Inventario</button>
+                <button class="mod-tab" data-etab="movimientos" onclick="eqpSwitchView('movimientos',this)">Movimientos</button>
               </div>
               <div id="eqpInventarioView">
                 <div class="tabla-scroll">
@@ -175,9 +171,9 @@
             </div>
 
             <div class="tool-section" id="tool-inv-insumos">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
-                <button class="btn btn-sm ins-tab" data-itab="inventario" onclick="insSwitchView('inventario',this)" style="background:var(--module-seguridad);color:#fff;border:0;border-radius:4px;padding:6px 16px;">Inventario</button>
-                <button class="btn btn-sm ins-tab" data-itab="movimientos" onclick="insSwitchView('movimientos',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Movimientos</button>
+              <div class="mod-tabs" style="margin-bottom:14px;">
+                <button class="mod-tab" data-itab="inventario" onclick="insSwitchView('inventario',this)">Inventario</button>
+                <button class="mod-tab" data-itab="movimientos" onclick="insSwitchView('movimientos',this)">Movimientos</button>
               </div>
               <div id="insInventarioView">
                 <div class="tabla-scroll">
@@ -212,7 +208,7 @@
   <!-- Modal Incidente -->
   <div class="modal-overlay" id="modalIncidente">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalIncidenteTitle">Reportar incidente</h3><button class="modal-close" onclick="ssHideModal('modalIncidente')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalIncidenteTitle">Reportar incidente</h3><button class="modal-close" onclick="ssHideModal('modalIncidente')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="formIncidente">
           <div class="form-group"><label>Tipo de incidente</label>
@@ -241,7 +237,7 @@
   <!-- Modal Inspección -->
   <div class="modal-overlay" id="modalInspeccion">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalInspeccionTitle">Nueva inspección</h3><button class="modal-close" onclick="ssHideModal('modalInspeccion')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalInspeccionTitle">Nueva inspección</h3><button class="modal-close" onclick="ssHideModal('modalInspeccion')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="formInspeccion">
           <div class="form-group"><label>Título / nombre de la evaluación</label><input type="text" class="form-input" id="insp_titulo" placeholder="Ej: Recorrido de patio de recepción y distribución de vehículos" required></div>
@@ -272,7 +268,7 @@
   <!-- Modal Servicio Médico -->
   <div class="modal-overlay" id="modalServicioMedico">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalServicioMedicoTitle">Registrar atención médica</h3><button class="modal-close" onclick="ssHideModal('modalServicioMedico')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalServicioMedicoTitle">Registrar atención médica</h3><button class="modal-close" onclick="ssHideModal('modalServicioMedico')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="formServicioMedico">
           <div class="form-row">
@@ -337,7 +333,7 @@
   <!-- Modal Inventario Equipos -->
   <div class="modal-overlay" id="modalInvEquipo">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalInvEquipoTitle">Nuevo equipo de seguridad</h3><button class="modal-close" onclick="ssHideModal('modalInvEquipo')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalInvEquipoTitle">Nuevo equipo de seguridad</h3><button class="modal-close" onclick="ssHideModal('modalInvEquipo')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="formInvEquipo">
           <div class="form-row">
@@ -378,7 +374,7 @@
   <!-- Modal Inventario Insumos -->
   <div class="modal-overlay" id="modalInvInsumo">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalInvInsumoTitle">Nuevo insumo / medicamento</h3><button class="modal-close" onclick="ssHideModal('modalInvInsumo')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalInvInsumoTitle">Nuevo insumo / medicamento</h3><button class="modal-close" onclick="ssHideModal('modalInvInsumo')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="formInvInsumo">
           <div class="form-row">
@@ -412,7 +408,7 @@
   <!-- Modal Salida de Insumo (con concepto de asignación) -->
   <div class="modal-overlay" id="modalSalidaInsumo">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalSalidaInsumoTitle">Registrar salida de insumo</h3><button class="modal-close" onclick="ssHideModal('modalSalidaInsumo')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalSalidaInsumoTitle">Registrar salida de insumo</h3><button class="modal-close" onclick="ssHideModal('modalSalidaInsumo')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <div class="ss-pac-info" id="salInsumoInfo" style="display:none;"></div>
         <form id="formSalidaInsumo">
@@ -446,7 +442,7 @@
   <!-- Modal Movimientos de Insumo -->
   <div class="modal-overlay" id="modalMovimientosInsumo">
     <div class="modal" style="max-width:840px;">
-      <div class="modal-header"><h3 id="modalMovimientosInsumoTitle">Movimientos del insumo</h3><button class="modal-close" onclick="ssHideModal('modalMovimientosInsumo')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalMovimientosInsumoTitle">Movimientos del insumo</h3><button class="modal-close" onclick="ssHideModal('modalMovimientosInsumo')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <div class="tabla-scroll" style="max-height:55vh;overflow-y:auto;">
           <table class="data-table">
@@ -464,7 +460,7 @@
   <!-- Modal Detalle de Insumo (clic en el nombre) -->
   <div class="modal-overlay" id="modalDetalleInsumo">
     <div class="modal" style="max-width:640px;">
-      <div class="modal-header"><h3 id="modalDetalleInsumoTitle">Detalle del insumo</h3><button class="modal-close" onclick="ssHideModal('modalDetalleInsumo')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalDetalleInsumoTitle">Detalle del insumo</h3><button class="modal-close" onclick="ssHideModal('modalDetalleInsumo')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <div class="ss-pac-info" id="detalleInsumoInfo" style="display:none;"></div>
       </div>
@@ -482,7 +478,7 @@
   <!-- Modal Entrada de Insumo (con lote y vencimiento para rotación FEFO) -->
   <div class="modal-overlay" id="modalEntradaInsumo">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalEntradaInsumoTitle">Registrar entrada de insumo</h3><button class="modal-close" onclick="ssHideModal('modalEntradaInsumo')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalEntradaInsumoTitle">Registrar entrada de insumo</h3><button class="modal-close" onclick="ssHideModal('modalEntradaInsumo')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <div class="ss-pac-info" id="entInsumoInfo" style="display:none;"></div>
         <form id="formEntradaInsumo">
@@ -515,7 +511,7 @@
   <!-- Modal Entrada de Equipo (lote y vencimiento opcionales) -->
   <div class="modal-overlay" id="modalEntradaEquipo">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalEntradaEquipoTitle">Registrar entrada de equipo</h3><button class="modal-close" onclick="ssHideModal('modalEntradaEquipo')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalEntradaEquipoTitle">Registrar entrada de equipo</h3><button class="modal-close" onclick="ssHideModal('modalEntradaEquipo')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <div class="ss-pac-info" id="entEquipoInfo" style="display:none;"></div>
         <form id="formEntradaEquipo">
@@ -548,7 +544,7 @@
   <!-- Modal Salida de Equipo (asignación a ubicación) -->
   <div class="modal-overlay" id="modalSalidaEquipo">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalSalidaEquipoTitle">Registrar salida de equipo</h3><button class="modal-close" onclick="ssHideModal('modalSalidaEquipo')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalSalidaEquipoTitle">Registrar salida de equipo</h3><button class="modal-close" onclick="ssHideModal('modalSalidaEquipo')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <div class="ss-pac-info" id="salEquipoInfo" style="display:none;"></div>
         <form id="formSalidaEquipo">
@@ -1280,12 +1276,7 @@
       localStorage.setItem('fiat_seguridad_equipos_view', view);
       document.getElementById('eqpInventarioView').style.display = view === 'inventario' ? '' : 'none';
       document.getElementById('eqpMovimientosView').style.display = view === 'movimientos' ? '' : 'none';
-      document.querySelectorAll('.eqp-tab').forEach(function(t) {
-        var on = t.getAttribute('data-etab') === view;
-        t.style.background = on ? 'var(--module-seguridad)' : 'transparent';
-        t.style.color = on ? '#fff' : 'var(--color-text)';
-        t.style.border = on ? '0' : '1px solid var(--border-color)';
-      });
+      Array.prototype.forEach.call(btn.parentElement.querySelectorAll('.mod-tab'), function(t) { t.classList.toggle('active', t === btn); });
       if (view === 'movimientos') loadMovimientosEquipos();
     }
 
@@ -1832,12 +1823,7 @@
       localStorage.setItem('fiat_seguridad_insumos_view', view);
       document.getElementById('insInventarioView').style.display = view === 'inventario' ? '' : 'none';
       document.getElementById('insMovimientosView').style.display = view === 'movimientos' ? '' : 'none';
-      document.querySelectorAll('.ins-tab').forEach(function(t) {
-        var on = t.getAttribute('data-itab') === view;
-        t.style.background = on ? 'var(--module-seguridad)' : 'transparent';
-        t.style.color = on ? '#fff' : 'var(--color-text)';
-        t.style.border = on ? '0' : '1px solid var(--border-color)';
-      });
+      Array.prototype.forEach.call(btn.parentElement.querySelectorAll('.mod-tab'), function(t) { t.classList.toggle('active', t === btn); });
       if (view === 'movimientos') loadMovimientosGlobales();
     }
 
@@ -1898,10 +1884,10 @@
       loadInvEquipos();
       loadInvInsumos();
       var savedInsView = localStorage.getItem('fiat_seguridad_insumos_view');
-      var insBtn = document.querySelector('.ins-tab[data-itab="' + savedInsView + '"]');
+      var insBtn = document.querySelector('.mod-tab[data-itab="' + savedInsView + '"]');
       if (insBtn) insSwitchView(savedInsView, insBtn);
       var savedEqpView = localStorage.getItem('fiat_seguridad_equipos_view');
-      var eqpBtn = document.querySelector('.eqp-tab[data-etab="' + savedEqpView + '"]');
+      var eqpBtn = document.querySelector('.mod-tab[data-etab="' + savedEqpView + '"]');
       if (eqpBtn) eqpSwitchView(savedEqpView, eqpBtn);
     });
   </script>

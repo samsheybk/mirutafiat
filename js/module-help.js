@@ -88,6 +88,15 @@
         { icon: 'fi-sr-dashboard', name: 'Indicadores de gestión', desc: 'Panel con los indicadores clave del módulo: incidentes, inspecciones, atenciones médicas y movimientos de inventario.' }
       ]
     },
+    'seguridad-fisica.html': {
+      title: 'Seguridad Física',
+      subtitle: 'Control de ingreso y salida de personas y vehículos, y bitácora de novedades del personal de seguridad.',
+      accent: '#334155',
+      tools: [
+        { icon: 'fi-sr-arrow-right-to-bracket', name: 'Control de acceso', desc: 'Registro de entrada y salida de personas y vehículos por punto de control, con tipo (trabajador, visitante, proveedor, contratista), cédula, empresa, placa, motivo y responsable. Incluye búsqueda y filtros por dirección y tipo.' },
+        { icon: 'fi-sr-clipboard-list-check', name: 'Libro de novedades', desc: 'Bitácora de novedades del turno: fecha, hora, turno, categoría, descripción, ubicación, acciones tomadas y estado de seguimiento (abierta, en seguimiento, cerrada).' }
+      ]
+    },
     'compensacion.html': {
       title: 'Compensación',
       subtitle: 'Administración de la estructura salarial, bonificaciones y beneficios económicos.',
@@ -236,7 +245,7 @@
     var closeBtn = document.createElement('button');
     closeBtn.className = 'modal-close';
     closeBtn.type = 'button';
-    closeBtn.innerHTML = '&times;';
+    closeBtn.innerHTML = '<i class="fi fi-sr-cross-small"></i>';
     closeBtn.setAttribute('aria-label', 'Cerrar');
     closeBtn.addEventListener('click', closeHelp);
     header.appendChild(h3);
@@ -321,7 +330,7 @@
     overlay.id = 'globalSplashOverlay';
     overlay.innerHTML =
       '<div class="splash-show-content">' +
-        '<button class="splash-show-close" aria-label="Cerrar">&times;</button>' +
+        '<button class="splash-show-close" aria-label="Cerrar"><i class="fi fi-sr-cross-small"></i></button>' +
         '<button class="splash-show-arrow left" aria-label="Anterior">&#8249;</button>' +
         '<div class="splash-show-media"><img class="splash-show-img" id="globalSplashImg" src="" alt="Splash"><div class="splash-show-dots" id="globalSplashDots"></div></div>' +
         '<div class="splash-show-panel">' +
@@ -417,7 +426,7 @@
       overlay.id = 'splashDetalleOverlay';
       overlay.innerHTML =
         '<div class="splash-detail-card">' +
-          '<button class="splash-show-close" aria-label="Cerrar">&times;</button>' +
+          '<button class="splash-show-close" aria-label="Cerrar"><i class="fi fi-sr-cross-small"></i></button>' +
           '<div class="splash-detail-img-wrap"><img id="splashDetalleImg" src="" alt=""></div>' +
           '<div class="splash-detail-texto">' +
             '<h3 id="splashDetalleTitulo"></h3>' +

@@ -176,6 +176,7 @@
         <option value="capacitacion.html">Capacitación y Desarrollo</option>
         <option value="bienestar-social.html">Bienestar Social</option>
         <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="seguridad-fisica.html">Seguridad Física</option>
         <option value="compensacion.html">Compensación</option>
         <option value="finanzas.html">Finanzas</option>
         <option value="repositorio.html">Repositorio</option>
@@ -222,13 +223,13 @@
               <div class="form-group" style="margin:0;flex:1;min-width:200px;"><label>Buscar</label>
                 <input type="text" class="form-input" id="eqSearch" placeholder="Buscar equipo o utensilio..." autocomplete="off" spellcheck="false" oninput="renderEquipos()">
               </div>
-              <button class="btn btn-gourmet btn-sm" onclick="openModalEquipo()">+ Registrar equipo</button>
+              <button class="btn btn-gourmet btn-sm" onclick="openModalEquipo()">Registrar equipo</button>
             </div>
             <div class="toolbar-content" data-toolbar="insumos" style="display:none;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
               <div class="form-group" style="margin:0;flex:1;min-width:200px;"><label>Buscar</label>
                 <input type="text" class="form-input" id="insSearch" placeholder="Buscar insumo..." autocomplete="off" spellcheck="false" oninput="renderInsumos()">
               </div>
-              <button class="btn btn-gourmet btn-sm" onclick="openModalInsumo()">+ Registrar insumo</button>
+              <button class="btn btn-gourmet btn-sm" onclick="openModalInsumo()">Registrar insumo</button>
             </div>
             <div class="toolbar-content" data-toolbar="recetario" style="display:none;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
               <div class="form-group" style="margin:0;flex:1;min-width:180px;"><label>Buscar</label>
@@ -244,7 +245,7 @@
                   <option>Otros</option>
                 </select>
               </div>
-              <button class="btn btn-gourmet btn-sm" onclick="openModalReceta()">+ Nueva receta</button>
+              <button class="btn btn-gourmet btn-sm" onclick="openModalReceta()">Nueva receta</button>
             </div>
             <div class="toolbar-content" data-toolbar="catalogo" style="display:none;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
               <div class="form-group" style="margin:0;flex:1;min-width:180px;"><label>Buscar</label>
@@ -260,7 +261,7 @@
                   <option>Otros</option>
                 </select>
               </div>
-              <button class="btn btn-gourmet btn-sm" onclick="openModalCatalogo()">+ Agregar plato</button>
+              <button class="btn btn-gourmet btn-sm" onclick="openModalCatalogo()">Agregar plato</button>
             </div>
           </header>
 
@@ -322,7 +323,7 @@
   <!-- Modal Equipo -->
   <div class="modal-overlay" id="modalEquipo">
     <div class="modal" style="max-width:540px;">
-      <div class="modal-header"><h3 id="equipoModalTitle">Registrar equipo</h3><button class="modal-close" onclick="closeModal('modalEquipo')">&times;</button></div>
+      <div class="modal-header"><h3 id="equipoModalTitle">Registrar equipo</h3><button class="modal-close" onclick="closeModal('modalEquipo')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="equipoForm">
           <div class="form-row">
@@ -357,7 +358,7 @@
   <!-- Modal Insumo -->
   <div class="modal-overlay" id="modalInsumo">
     <div class="modal" style="max-width:540px;">
-      <div class="modal-header"><h3 id="insumoModalTitle">Registrar insumo</h3><button class="modal-close" onclick="closeModal('modalInsumo')">&times;</button></div>
+      <div class="modal-header"><h3 id="insumoModalTitle">Registrar insumo</h3><button class="modal-close" onclick="closeModal('modalInsumo')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="insumoForm">
           <div class="form-group"><label>Nombre *</label><input type="text" class="form-input" id="ins_nombre" required placeholder="Ej: Harina de trigo"></div>
@@ -395,7 +396,7 @@
   <!-- Modal Receta -->
   <div class="modal-overlay" id="modalReceta">
     <div class="modal" style="max-width:640px;">
-      <div class="modal-header"><h3 id="recetaModalTitle">Nueva receta</h3><button class="modal-close" onclick="closeModal('modalReceta')">&times;</button></div>
+      <div class="modal-header"><h3 id="recetaModalTitle">Nueva receta</h3><button class="modal-close" onclick="closeModal('modalReceta')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="recetaForm">
           <div class="form-row">
@@ -411,7 +412,7 @@
           <div class="form-group">
             <label>Ingredientes (se validan contra el inventario de insumos)</label>
             <div id="recIngredientes"></div>
-            <button type="button" class="btn btn-outline btn-sm" id="recIngAddBtn" onclick="addIngredienteRow()">+ Agregar ingrediente</button>
+            <button type="button" class="btn btn-outline btn-sm" id="recIngAddBtn" onclick="addIngredienteRow()">Agregar ingrediente</button>
             <div id="recIngAlerta" style="font-size:12px;color:#D97706;margin-top:6px;display:none;">No hay insumos registrados. Registra insumos en el inventario para poder armar la receta.</div>
           </div>
           <div class="form-group"><label>Instrucciones de preparación</label><textarea class="form-textarea" id="rec_instrucciones" rows="4" placeholder="Describe los pasos de preparación..."></textarea></div>
@@ -427,7 +428,7 @@
   <!-- Modal Ver Receta + validación de stock -->
   <div class="modal-overlay" id="modalRecetaStock">
     <div class="modal" style="max-width:560px;">
-      <div class="modal-header"><h3 id="recStockTitle">Receta</h3><button class="modal-close" onclick="closeModal('modalRecetaStock')">&times;</button></div>
+      <div class="modal-header"><h3 id="recStockTitle">Receta</h3><button class="modal-close" onclick="closeModal('modalRecetaStock')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <div id="recStockResumen"></div>
         <div id="recStockIngredientes"></div>
@@ -443,7 +444,7 @@
   <!-- Modal Menú del día -->
   <div class="modal-overlay" id="modalCatalogo">
     <div class="modal" style="max-width:540px;">
-      <div class="modal-header"><h3 id="catalogoModalTitle">Agregar plato</h3><button class="modal-close" onclick="closeModal('modalCatalogo')">&times;</button></div>
+      <div class="modal-header"><h3 id="catalogoModalTitle">Agregar plato</h3><button class="modal-close" onclick="closeModal('modalCatalogo')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="catalogoForm">
           <div class="form-row">

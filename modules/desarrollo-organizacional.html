@@ -89,6 +89,7 @@
         <option value="capacitacion.html">Capacitación y Desarrollo</option>
         <option value="bienestar-social.html">Bienestar Social</option>
         <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="seguridad-fisica.html">Seguridad Física</option>
         <option value="compensacion.html">Compensación</option>
         <option value="finanzas.html">Finanzas</option>
         <option value="repositorio.html">Repositorio</option>
@@ -141,8 +142,8 @@
               <div class="form-group" style="margin:0;"><label>Período RH</label>
                 <input type="month" class="form-input" id="rh_periodo" onchange="renderRhIndicadores();renderRhRotacion();renderRhAusencias();renderRhVacantes();renderRhCapacitaciones();renderRhPendientes();">
               </div>
-              <button class="btn btn-desarrollo btn-sm" onclick="openModalKpi()">+ Nuevo KPI</button>
-              <button class="btn btn-outline btn-sm" onclick="openModalMedicion('unidad')">+ Registrar medición</button>
+              <button class="btn btn-desarrollo btn-sm" onclick="openModalKpi()">Nuevo KPI</button>
+              <button class="btn btn-outline btn-sm" onclick="openModalMedicion('unidad')">Registrar medición</button>
             </div>
             <div class="toolbar-content" data-toolbar="rendimiento-kpi" style="display:none;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
               <div class="form-group" style="margin:0;"><label>Período</label>
@@ -154,7 +155,7 @@
               <div class="form-group" style="margin:0;"><label>Cargo</label>
                 <select class="form-select" id="krc_cargo" onchange="renderCumplimientoCargos();renderMedicionesCargo();"></select>
               </div>
-              <button class="btn btn-desarrollo btn-sm" onclick="openModalMedicion('cargo')">+ Registrar medición</button>
+              <button class="btn btn-desarrollo btn-sm" onclick="openModalMedicion('cargo')">Registrar medición</button>
             </div>
             <div class="toolbar-content" data-toolbar="okr" style="display:none;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
               <div class="form-group" style="margin:0;flex:1;min-width:180px;"><label>Buscar</label>
@@ -170,7 +171,7 @@
                   <option value="">Todos</option><option value="En progreso">En progreso</option><option value="En riesgo">En riesgo</option><option value="En espera">En espera</option><option value="Completado">Completado</option><option value="Cancelado">Cancelado</option>
                 </select>
               </div>
-              <button class="btn btn-desarrollo btn-sm" onclick="openModalOkr()">+ Nuevo OKR</button>
+              <button class="btn btn-desarrollo btn-sm" onclick="openModalOkr()">Nuevo OKR</button>
             </div>
             <div class="toolbar-content" data-toolbar="estadisticas" style="display:none;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
               <div class="form-group" style="margin:0;"><label>Período</label>
@@ -200,19 +201,19 @@
 
                 <div class="org-rh-sec-head" style="margin-top:16px;">
                   <div class="org-sec-title" style="margin:0;"><i class="fi fi-sr-user"></i>Registro de ausencias</div>
-                  <button class="btn btn-outline btn-sm" onclick="openModalAusencia()">+ Registrar ausencia</button>
+                  <button class="btn btn-outline btn-sm" onclick="openModalAusencia()">Registrar ausencia</button>
                 </div>
                 <div class="tabla-scroll"><table class="table org-table" id="rhAusenciasTable"></table></div>
 
                 <div class="org-rh-sec-head" style="margin-top:16px;">
                   <div class="org-sec-title" style="margin:0;"><i class="fi fi-sr-hourglass"></i>Vacantes y tiempo de cobertura</div>
-                  <button class="btn btn-outline btn-sm" onclick="openModalVacante()">+ Registrar vacante</button>
+                  <button class="btn btn-outline btn-sm" onclick="openModalVacante()">Registrar vacante</button>
                 </div>
                 <div class="tabla-scroll"><table class="table org-table" id="rhVacantesTable"></table></div>
 
                 <div class="org-rh-sec-head" style="margin-top:16px;">
                   <div class="org-sec-title" style="margin:0;"><i class="fi fi-sr-graduation-cap"></i>Capacitaciones completadas</div>
-                  <button class="btn btn-outline btn-sm" onclick="openModalCapacitacion()">+ Registrar completado</button>
+                  <button class="btn btn-outline btn-sm" onclick="openModalCapacitacion()">Registrar completado</button>
                 </div>
                 <div class="tabla-scroll"><table class="table org-table" id="rhCapacitacionesTable"></table></div>
                 <div class="org-sec-title" style="font-size:13px;margin-top:12px;"><i class="fi fi-sr-clipboard-list-check"></i>Cursos obligatorios pendientes</div>
@@ -260,7 +261,7 @@
 
   <div class="modal-overlay" id="modalKpi">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalKpiTitle">Nuevo KPI</h3><button class="modal-close" onclick="orgHideModal('modalKpi')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalKpiTitle">Nuevo KPI</h3><button class="modal-close" onclick="orgHideModal('modalKpi')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="formKpi">
           <div class="form-group"><label>Nombre del KPI</label><input type="text" class="form-input" id="kpi_nombre" placeholder="Ej: Rotación de personal" required></div>
@@ -293,7 +294,7 @@
 
   <div class="modal-overlay" id="modalMedicion">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalMedicionTitle">Registrar medición</h3><button class="modal-close" onclick="orgHideModal('modalMedicion')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalMedicionTitle">Registrar medición</h3><button class="modal-close" onclick="orgHideModal('modalMedicion')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="formMedicion">
           <div class="form-row">
@@ -319,7 +320,7 @@
 
   <div class="modal-overlay" id="modalOkr">
     <div class="modal modal-wide">
-      <div class="modal-header"><h3 id="modalOkrTitle">Nuevo OKR</h3><button class="modal-close" onclick="orgHideModal('modalOkr')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalOkrTitle">Nuevo OKR</h3><button class="modal-close" onclick="orgHideModal('modalOkr')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="formOkr">
           <div class="form-group"><label>Objetivo</label><input type="text" class="form-input" id="okr_titulo" placeholder="Ej: Reducir la rotación de personal en recepción" required></div>
@@ -352,7 +353,7 @@
           <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="okr_descripcion" rows="2"></textarea></div>
           <div class="org-sec-title" style="font-size:13px;"><i class="fi fi-sr-list-check"></i>Resultados clave</div>
           <div id="okr_krRows"></div>
-          <button type="button" class="btn btn-outline btn-sm" onclick="addKrRow()">+ Agregar resultado clave</button>
+          <button type="button" class="btn btn-outline btn-sm" onclick="addKrRow()">Agregar resultado clave</button>
         </form>
       </div>
       <div class="modal-footer">
@@ -364,7 +365,7 @@
 
   <div class="modal-overlay" id="modalOkrDetalle">
     <div class="modal modal-wide">
-      <div class="modal-header"><h3>Detalle del OKR</h3><button class="modal-close" onclick="orgHideModal('modalOkrDetalle')">&times;</button></div>
+      <div class="modal-header"><h3>Detalle del OKR</h3><button class="modal-close" onclick="orgHideModal('modalOkrDetalle')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body" id="orgOkrDetalleContent"></div>
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="orgHideModal('modalOkrDetalle')">Cerrar</button>
@@ -376,7 +377,7 @@
 
   <div class="modal-overlay" id="modalAusencia">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalAusenciaTitle">Registrar ausencia</h3><button class="modal-close" onclick="orgHideModal('modalAusencia')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalAusenciaTitle">Registrar ausencia</h3><button class="modal-close" onclick="orgHideModal('modalAusencia')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="formAusencia">
           <div class="form-group"><label>Trabajador</label><select class="form-select" id="aus_trabajador" required></select></div>
@@ -403,7 +404,7 @@
 
   <div class="modal-overlay" id="modalVacante">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalVacanteTitle">Registrar vacante</h3><button class="modal-close" onclick="orgHideModal('modalVacante')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalVacanteTitle">Registrar vacante</h3><button class="modal-close" onclick="orgHideModal('modalVacante')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="formVacante">
           <div class="form-row">
@@ -436,7 +437,7 @@
 
   <div class="modal-overlay" id="modalCapacitacion">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalCapacitacionTitle">Registrar capacitación completada</h3><button class="modal-close" onclick="orgHideModal('modalCapacitacion')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalCapacitacionTitle">Registrar capacitación completada</h3><button class="modal-close" onclick="orgHideModal('modalCapacitacion')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="formCapacitacion">
           <div class="form-row">
@@ -458,7 +459,7 @@
 
   <div class="modal-overlay" id="modalConfirm">
     <div class="modal modal-sm">
-      <div class="modal-header"><h3>Confirmar</h3><button class="modal-close" onclick="orgHideModal('modalConfirm')">&times;</button></div>
+      <div class="modal-header"><h3>Confirmar</h3><button class="modal-close" onclick="orgHideModal('modalConfirm')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body"><p id="confirmMsg"></p></div>
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="orgHideModal('modalConfirm')">Cancelar</button>

@@ -66,8 +66,6 @@
       padding: 20px 24px;
     }
     .det-tabbar {
-      display: flex;
-      gap: 8px;
       margin-bottom: 20px;
     }
     .det-section-label {
@@ -97,7 +95,7 @@
       .det-head-back { width: 100%; margin-left: 0 !important; justify-content: center; }
       .det-grid, .modal-grid { grid-template-columns: 1fr !important; }
       .det-tabbar { flex-wrap: wrap !important; gap: 6px; }
-      .det-tabbar .det-tab { flex: 1 1 auto; }
+      .det-tabbar .mod-tab { flex: 1 1 auto; }
       #detTitulo { white-space: normal !important; }
       .det-photo-top { width: 52px; height: 52px; }
     }
@@ -114,6 +112,7 @@
         <option value="capacitacion.html">Capacitación y Desarrollo</option>
         <option value="bienestar-social.html">Bienestar Social</option>
         <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="seguridad-fisica.html">Seguridad Física</option>
         <option value="compensacion.html">Compensación</option>
         <option value="finanzas.html">Finanzas</option>
         <option value="repositorio.html">Repositorio</option>
@@ -189,11 +188,11 @@
             </div>
 
             <div id="detContenido" style="display:none;">
-              <div class="det-tabbar">
-                <button class="btn btn-sm det-tab active" data-dtab="datos" onclick="switchDetalleTab('datos',this)" style="background:var(--module-captacion);color:#fff;border:0;border-radius:4px;padding:6px 16px;">Datos</button>
-                <button class="btn btn-sm det-tab" data-dtab="documentos" onclick="switchDetalleTab('documentos',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Documentación</button>
-                <button class="btn btn-sm det-tab" data-dtab="familia" onclick="switchDetalleTab('familia',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Carga familiar</button>
-                <button class="btn btn-sm det-tab" data-dtab="contrato" onclick="switchDetalleTab('contrato',this)" style="display:none;background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Contrato firmado</button>
+              <div class="det-tabbar mod-tabs">
+                <button class="mod-tab active" data-dtab="datos" onclick="switchDetalleTab('datos',this)">Datos</button>
+                <button class="mod-tab" data-dtab="documentos" onclick="switchDetalleTab('documentos',this)">Documentación</button>
+                <button class="mod-tab" data-dtab="familia" onclick="switchDetalleTab('familia',this)">Carga familiar</button>
+                <button class="mod-tab" data-dtab="contrato" onclick="switchDetalleTab('contrato',this)" style="display:none;">Contrato firmado</button>
               </div>
 
               <div class="det-panel" id="detDatosView">
@@ -342,7 +341,7 @@
               <div class="det-panel" id="detDocumentosView" style="display:none;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
                   <span style="font-size:12px;color:#666;" id="detDocCount">0 documentos</span>
-                  <button class="btn btn-captacion btn-sm" onclick="openModalDoc()">+ Agregar documento</button>
+                  <button class="btn btn-captacion btn-sm" onclick="openModalDoc()">Agregar documento</button>
                 </div>
                 <table class="data-table">
                   <thead>
@@ -357,7 +356,7 @@
               <div class="det-panel" id="detFamiliaView" style="display:none;">
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
                   <span style="font-size:12px;color:#666;" id="detFamCount">0 cargas familiares</span>
-                  <button class="btn btn-captacion btn-sm" onclick="openModalFamiliar()">+ Agregar carga familiar</button>
+                  <button class="btn btn-captacion btn-sm" onclick="openModalFamiliar()">Agregar carga familiar</button>
                 </div>
                 <table class="data-table">
                   <thead>
@@ -388,7 +387,7 @@
                 </div>
                 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                   <input type="file" id="detContratoFile" accept=".pdf,application/pdf" style="display:none;" onchange="onContratoChange()">
-                  <button class="btn btn-captacion btn-sm" onclick="document.getElementById('detContratoFile').click()">+ Adjuntar contrato firmado</button>
+                  <button class="btn btn-captacion btn-sm" onclick="document.getElementById('detContratoFile').click()">Adjuntar contrato firmado</button>
                   <button class="btn btn-outline btn-sm" id="detContratoGuardar" style="display:none;" onclick="guardarContrato()">Guardar contrato</button>
                   <span style="font-size:12px;color:#666;" id="detContratoNomFile"></span>
                 </div>
@@ -404,7 +403,7 @@
     <div class="modal" style="max-width:520px;">
       <div class="modal-header">
         <h3 id="modalDocTitle">Agregar documento</h3>
-        <button class="modal-close" onclick="closeModalDoc()">&times;</button>
+        <button class="modal-close" onclick="closeModalDoc()"><i class="fi fi-sr-cross-small"></i></button>
       </div>
       <div class="modal-body">
         <form id="docForm">
@@ -455,7 +454,7 @@
     <div class="modal" style="max-width:520px;">
       <div class="modal-header">
         <h3 id="modalFamiliarTitle">Agregar carga familiar</h3>
-        <button class="modal-close" onclick="closeModalFamiliar()">&times;</button>
+        <button class="modal-close" onclick="closeModalFamiliar()"><i class="fi fi-sr-cross-small"></i></button>
       </div>
       <div class="modal-body">
         <form id="familiarForm">
@@ -564,9 +563,9 @@
           back.textContent = '← Volver';
         }
         document.title = 'Detalle del trabajador - Relaciones Laborales';
-        var tabFam = document.querySelector('.det-tab[data-dtab="familia"]');
+        var tabFam = document.querySelector('.mod-tab[data-dtab="familia"]');
         if (tabFam) tabFam.style.display = 'none';
-        var tabContrato = document.querySelector('.det-tab[data-dtab="contrato"]');
+        var tabContrato = document.querySelector('.mod-tab[data-dtab="contrato"]');
         if (tabContrato) tabContrato.style.display = '';
         var tallas = document.getElementById('detTallasWrap');
         if (tallas) tallas.style.display = 'none';
@@ -589,19 +588,15 @@
         if (crumbBox) {
           crumbBox.innerHTML = '<a href="bienestar-social.html" style="color:var(--color-text-secondary);">Bienestar Social</a> / Plantilla de trabajadores';
         }
-        var tabFam = document.querySelector('.det-tab[data-dtab="familia"]');
+        var tabFam = document.querySelector('.mod-tab[data-dtab="familia"]');
         if (tabFam) tabFam.style.display = '';
-        var tabContrato = document.querySelector('.det-tab[data-dtab="contrato"]');
+        var tabContrato = document.querySelector('.mod-tab[data-dtab="contrato"]');
         if (tabContrato) tabContrato.style.display = 'none';
       }
     }
 
     function switchDetalleTab(tab, btn) {
-      document.querySelectorAll('.det-tab').forEach(function(b) {
-        b.style.background = b === btn ? 'var(--module-captacion)' : 'transparent';
-        b.style.color = b === btn ? '#fff' : 'var(--color-text)';
-        b.style.border = b === btn ? '0' : '1px solid var(--border-color)';
-      });
+      Array.prototype.forEach.call(btn.parentElement.querySelectorAll('.mod-tab'), function(b) { b.classList.toggle('active', b === btn); });
       document.getElementById('detDatosView').style.display = tab === 'datos' ? '' : 'none';
       document.getElementById('detDocumentosView').style.display = tab === 'documentos' ? '' : 'none';
       document.getElementById('detFamiliaView').style.display = tab === 'familia' ? '' : 'none';
@@ -679,9 +674,9 @@
         document.getElementById('detEgresoTopWrap').style.display = t.estado === 'Retirado' ? '' : 'none';
         detalleEstadoActual = t.estado;
         var tabGuardado = sessionStorage.getItem('detTab_' + t.id);
-        var btnGuardado = document.querySelector('.det-tab[data-dtab="' + tabGuardado + '"]');
+        var btnGuardado = document.querySelector('.mod-tab[data-dtab="' + tabGuardado + '"]');
         if (!btnGuardado || btnGuardado.style.display === 'none') tabGuardado = 'datos';
-        var btnInicial = document.querySelector('.det-tab[data-dtab="' + tabGuardado + '"]');
+        var btnInicial = document.querySelector('.mod-tab[data-dtab="' + tabGuardado + '"]');
         switchDetalleTab(tabGuardado, btnInicial);
         loadDocumentos();
         loadCargaFamiliar();

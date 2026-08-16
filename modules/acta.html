@@ -159,6 +159,7 @@
         <option value="capacitacion.html">Capacitación y Desarrollo</option>
         <option value="bienestar-social.html">Bienestar Social</option>
         <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="seguridad-fisica.html">Seguridad Física</option>
         <option value="compensacion.html">Compensación</option>
         <option value="finanzas.html">Finanzas</option>
         <option value="repositorio.html">Repositorio</option>
@@ -262,7 +263,7 @@
                   <div class="form-group" style="grid-column:span 3;">
                     <label>Acuerdos y compromisos</label>
                     <div id="actaAcuerdosList" style="display:flex;flex-direction:column;gap:8px;"></div>
-                    <button type="button" class="btn btn-outline btn-sm" onclick="agregarAcuerdo()" style="margin-top:10px;">+ Agregar acuerdo</button>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="agregarAcuerdo()" style="margin-top:10px;">Agregar acuerdo</button>
                   </div>
                 </div>
               </div>
@@ -287,7 +288,7 @@
     <div class="modal" style="max-width:560px;">
       <div class="modal-header">
         <h3>Seleccionar trabajadores</h3>
-        <button class="modal-close" onclick="cerrarSelectorTrabajadores()">&times;</button>
+        <button class="modal-close" onclick="cerrarSelectorTrabajadores()"><i class="fi fi-sr-cross-small"></i></button>
       </div>
       <div class="modal-body">
         <input type="text" class="form-input" id="rlActaTrabBuscar" placeholder="Buscar por nombre o cédula..." oninput="filtrarTrabajadoresSelector()">

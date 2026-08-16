@@ -27,6 +27,7 @@
         <option value="capacitacion.html">Capacitación y Desarrollo</option>
         <option value="bienestar-social.html">Bienestar Social</option>
         <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="seguridad-fisica.html">Seguridad Física</option>
         <option value="compensacion.html">Compensación</option>
         <option value="finanzas.html">Finanzas</option>
         <option value="repositorio.html">Repositorio</option>
@@ -87,15 +88,15 @@
                 <button class="active" onclick="toggleATSView('tabla', this)">Tabla</button>
                 <button onclick="toggleATSView('kanban', this)">Kanban</button>
               </div>
-              <button class="btn btn-captacion btn-sm" onclick="openModalATS()">+ Nuevo candidato</button>
+              <button class="btn btn-captacion btn-sm" onclick="openModalATS()">Nuevo candidato</button>
             </div>
             <div class="toolbar-content" data-toolbar="estructura" style="display:none;align-items:center;gap:16px;width:100%;">
                 <div style="display:flex;align-items:center;gap:8px;flex:1;">
                   <input type="text" class="form-input" id="estSearch" placeholder="Buscar en estructura..." oninput="filterEstructura()" style="max-width:320px;height:36px;">
                 </div>
               <div style="display:flex;align-items:center;gap:8px;">
-                <button class="btn btn-captacion btn-sm" onclick="openModalUnidad()">+ Nueva unidad</button>
-                <button class="btn btn-outline" onclick="openModalCargo()">+ Nuevo cargo</button>
+                <button class="btn btn-captacion btn-sm" onclick="openModalUnidad()">Nueva unidad</button>
+                <button class="btn btn-outline" onclick="openModalCargo()">Nuevo cargo</button>
               </div>
             </div>
             <div class="toolbar-content" data-toolbar="plantilla" style="display:none;align-items:center;gap:16px;width:100%;">
@@ -105,13 +106,13 @@
               </select>
               <span style="font-size:12px;color:var(--color-text-secondary);" id="plantCount">0 trabajadores</span>
               <div style="display:flex;align-items:center;gap:8px;margin-left:auto;">
-                <button class="btn btn-captacion btn-sm" onclick="location.href='trabajador-nuevo.html'">+ Nuevo trabajador</button>
+                <button class="btn btn-captacion btn-sm" onclick="location.href='trabajador-nuevo.html'">Nuevo trabajador</button>
                 <button class="btn btn-outline btn-sm" onclick="openModalImportar()">Importar plantilla</button>
               </div>
             </div>
             <div class="toolbar-content" data-toolbar="requisiciones" style="display:none;align-items:center;gap:16px;width:100%;">
               <input type="text" class="form-input" id="reqSearch" placeholder="Buscar en requisiciones..." oninput="filterRequisiciones()" style="flex:1;max-width:400px;height:36px;">
-              <button class="btn btn-captacion btn-sm" onclick="openModalSolicitud()">+ Nueva solicitud</button>
+              <button class="btn btn-captacion btn-sm" onclick="openModalSolicitud()">Nueva solicitud</button>
               <button class="btn btn-outline btn-sm" onclick="loadRequisiciones()">Actualizar</button>
             </div>
           </header>
@@ -222,9 +223,9 @@
 
           <div class="tool-section" id="tool-requisiciones">
             <div class="tool-section-header">
-              <div style="display:flex;gap:8px;align-items:center;">
-                <button class="btn btn-sm req-tab active" data-tab="vacantes" onclick="switchReqView('vacantes',this)" style="background:var(--module-captacion);color:#fff;border:0;border-radius:4px;padding:6px 16px;">Vacantes Pendientes</button>
-                <button class="btn btn-sm req-tab" data-tab="solicitudes" onclick="switchReqView('solicitudes',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Solicitudes</button>
+              <div class="mod-tabs">
+                <button class="mod-tab active" data-tab="vacantes" onclick="switchReqView('vacantes',this)">Vacantes Pendientes</button>
+                <button class="mod-tab" data-tab="solicitudes" onclick="switchReqView('solicitudes',this)">Solicitudes</button>
               </div>
               <span style="font-size:12px;color:var(--color-text-secondary);" id="reqCount">0 pendientes</span>
             </div>
@@ -260,9 +261,9 @@
 
           <div class="tool-section" id="tool-plantilla">
             <div class="tool-section-header">
-              <div style="display:flex;gap:8px;align-items:center;">
-                <button class="btn btn-sm plantilla-tab active" data-tab="activo" onclick="switchPlantillaView('activo',this)" style="background:var(--module-captacion);color:#fff;border:0;border-radius:4px;padding:6px 16px;">Personal Activo</button>
-                <button class="btn btn-sm plantilla-tab" data-tab="historico" onclick="switchPlantillaView('historico',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Histórico</button>
+              <div class="mod-tabs">
+                <button class="mod-tab active" data-tab="activo" onclick="switchPlantillaView('activo',this)">Personal Activo</button>
+                <button class="mod-tab" data-tab="historico" onclick="switchPlantillaView('historico',this)">Histórico</button>
               </div>
               <span style="font-size:12px;color:var(--color-text-secondary);" id="plantCount">0 trabajadores</span>
             </div>
@@ -316,7 +317,7 @@
     <div class="modal">
       <div class="modal-header">
         <h3>Nuevo proceso de reclutamiento</h3>
-        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <button class="modal-close" onclick="closeModal()"><i class="fi fi-sr-cross-small"></i></button>
       </div>
       <div class="modal-body">
         <form id="moduleForm">
@@ -363,7 +364,7 @@
     <div class="modal" style="max-width:400px;">
       <div class="modal-header">
         <h3>Cambiar estado</h3>
-        <button class="modal-close" onclick="closeEstadoPicker()">&times;</button>
+        <button class="modal-close" onclick="closeEstadoPicker()"><i class="fi fi-sr-cross-small"></i></button>
       </div>
       <div class="modal-body">
         <p style="margin-bottom:12px;font-size:14px;color:#666;">
@@ -378,7 +379,7 @@
     <div class="modal" style="max-width:400px;">
       <div class="modal-header">
         <h3>Descartar candidato</h3>
-        <button class="modal-close" onclick="closeDescarta()">&times;</button>
+        <button class="modal-close" onclick="closeDescarta()"><i class="fi fi-sr-cross-small"></i></button>
       </div>
       <div class="modal-body">
         <p style="margin-bottom:12px;font-size:14px;color:#666;">
@@ -400,7 +401,7 @@
     <div class="modal" style="max-width:600px;">
       <div class="modal-header">
         <h3>Ficha del candidato</h3>
-        <button class="modal-close" onclick="closeFichaTecnica()">&times;</button>
+        <button class="modal-close" onclick="closeFichaTecnica()"><i class="fi fi-sr-cross-small"></i></button>
       </div>
       <div class="modal-body" id="fichaBody"></div>
     </div>
@@ -410,7 +411,7 @@
     <div class="modal">
       <div class="modal-header">
         <h3>Nuevo candidato</h3>
-        <button class="modal-close" onclick="closeModalATS()">&times;</button>
+        <button class="modal-close" onclick="closeModalATS()"><i class="fi fi-sr-cross-small"></i></button>
       </div>
       <div class="modal-body">
         <form id="atsForm">
@@ -469,7 +470,7 @@
     <div class="modal" style="max-width:480px;">
       <div class="modal-header">
         <h3 id="modalUnidadTitle">Nueva unidad</h3>
-        <button class="modal-close" onclick="closeModalUnidad()">&times;</button>
+        <button class="modal-close" onclick="closeModalUnidad()"><i class="fi fi-sr-cross-small"></i></button>
       </div>
       <div class="modal-body">
         <form id="unidadForm">
@@ -504,7 +505,7 @@
     <div class="modal" style="max-width:700px;">
       <div class="modal-header">
         <h3 id="modalCargoTitle">Nuevo cargo</h3>
-        <button class="modal-close" onclick="closeModalCargo()">&times;</button>
+        <button class="modal-close" onclick="closeModalCargo()"><i class="fi fi-sr-cross-small"></i></button>
       </div>
       <div class="modal-body" style="max-height:calc(90vh - 140px);overflow-y:auto;">
         <form id="cargoForm">
@@ -624,7 +625,7 @@
     <div class="modal" style="max-width:520px;">
       <div class="modal-header">
         <h3>Ingreso de personal</h3>
-        <button class="modal-close" onclick="closeIngreso()">&times;</button>
+        <button class="modal-close" onclick="closeIngreso()"><i class="fi fi-sr-cross-small"></i></button>
       </div>
       <div class="modal-body">
         <form id="ingresoForm">
@@ -665,7 +666,7 @@
     <div class="modal" style="max-width:800px;">
       <div class="modal-header">
         <h3>Organigrama</h3>
-        <button class="modal-close" onclick="closeModalOrganigrama()">&times;</button>
+        <button class="modal-close" onclick="closeModalOrganigrama()"><i class="fi fi-sr-cross-small"></i></button>
       </div>
       <div class="modal-body" id="organigramaBody" style="max-height:60vh;overflow-y:auto;font-size:13px;"></div>
     </div>
@@ -675,7 +676,7 @@
     <div class="modal" style="max-width:520px;">
       <div class="modal-header">
         <h3 id="modalTrabTitle">Editar trabajador</h3>
-        <button class="modal-close" onclick="closeModalTrab()">&times;</button>
+        <button class="modal-close" onclick="closeModalTrab()"><i class="fi fi-sr-cross-small"></i></button>
       </div>
       <div class="modal-body">
         <form id="trabForm">
@@ -730,7 +731,7 @@
     <div class="modal" style="max-width:560px;">
       <div class="modal-header">
         <h3>Nueva solicitud de requisición</h3>
-        <button class="modal-close" onclick="closeModalSolicitud()">&times;</button>
+        <button class="modal-close" onclick="closeModalSolicitud()"><i class="fi fi-sr-cross-small"></i></button>
       </div>
       <div class="modal-body">
         <form id="solicitudForm">
@@ -779,7 +780,7 @@
     <div class="modal" style="max-width:480px;">
       <div class="modal-header">
         <h3>Justificar rechazo</h3>
-        <button class="modal-close" onclick="closeModalRechazo()">&times;</button>
+        <button class="modal-close" onclick="closeModalRechazo()"><i class="fi fi-sr-cross-small"></i></button>
       </div>
       <div class="modal-body">
         <p style="margin-bottom:12px;font-size:14px;color:#666;">
@@ -801,7 +802,7 @@
     <div class="modal" style="max-width:580px;">
       <div class="modal-header">
         <h3>Importar plantilla activa</h3>
-        <button class="modal-close" onclick="closeModalImportar()">&times;</button>
+        <button class="modal-close" onclick="closeModalImportar()"><i class="fi fi-sr-cross-small"></i></button>
       </div>
       <div class="modal-body">
         <div id="importSteps">
@@ -1887,11 +1888,7 @@
     function switchPlantillaView(tab, btn) {
       currentPlantillaView = tab;
       localStorage.setItem('fiat_captacion_plantilla_view', tab);
-      document.querySelectorAll('.plantilla-tab').forEach(function(b) {
-        b.style.background = b === btn ? 'var(--module-captacion)' : 'transparent';
-        b.style.color = b === btn ? '#fff' : 'var(--color-text)';
-        b.style.border = b === btn ? '0' : '1px solid var(--border-color)';
-      });
+      Array.prototype.forEach.call(btn.parentElement.querySelectorAll('.mod-tab'), function(b) { b.classList.toggle('active', b === btn); });
       document.getElementById('plantillaActivoView').style.display = tab === 'activo' ? '' : 'none';
       document.getElementById('plantillaHistoricoView').style.display = tab === 'historico' ? '' : 'none';
       filterPlantilla();
@@ -2344,11 +2341,7 @@
     function switchReqView(tab, btn) {
       currentReqView = tab;
       localStorage.setItem('fiat_captacion_req_view', tab);
-      document.querySelectorAll('.req-tab').forEach(function(b) {
-        b.style.background = b === btn ? 'var(--module-captacion)' : 'transparent';
-        b.style.color = b === btn ? '#fff' : 'var(--color-text)';
-        b.style.border = b === btn ? '0' : '1px solid var(--border-color)';
-      });
+      Array.prototype.forEach.call(btn.parentElement.querySelectorAll('.mod-tab'), function(b) { b.classList.toggle('active', b === btn); });
       document.getElementById('reqVacantesView').style.display = tab === 'vacantes' ? '' : 'none';
       document.getElementById('reqSolicitudesView').style.display = tab === 'solicitudes' ? '' : 'none';
       if (tab === 'solicitudes') loadSolicitudes();
@@ -2544,12 +2537,12 @@
       }
       v = localStorage.getItem('fiat_captacion_plantilla_view');
       if (v && v !== 'activo') {
-        var pb = document.querySelector('.plantilla-tab[data-tab="' + v + '"]');
+        var pb = document.querySelector('.mod-tab[data-tab="' + v + '"]');
         if (pb) switchPlantillaView(v, pb);
       }
       v = localStorage.getItem('fiat_captacion_req_view');
       if (v && v !== 'vacantes') {
-        var rb = document.querySelector('.req-tab[data-tab="' + v + '"]');
+        var rb = document.querySelector('.mod-tab[data-tab="' + v + '"]');
         if (rb) switchReqView(v, rb);
       }
     })();

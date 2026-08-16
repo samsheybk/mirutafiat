@@ -34,7 +34,7 @@ function uiDialogMarkup(type, message, buttons, renderHtml) {
       <div class="modal ui-dialog">
         <div class="modal-header">
           <h3>${conf.title}</h3>
-          <button class="modal-close" onclick="uiDialogDismiss(false)" title="Cerrar">&times;</button>
+          <button class="modal-close" onclick="uiDialogDismiss(false)" title="Cerrar"><i class="fi fi-sr-cross-small"></i></button>
         </div>
         <div class="modal-body">
           <div class="ui-dialog-content">

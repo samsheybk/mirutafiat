@@ -367,6 +367,7 @@
         <option value="capacitacion.html">Capacitación y Desarrollo</option>
         <option value="bienestar-social.html">Bienestar Social</option>
         <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="seguridad-fisica.html">Seguridad Física</option>
         <option value="compensacion.html">Compensación</option>
         <option value="finanzas.html">Finanzas</option>
         <option value="repositorio.html" selected>Repositorio</option>
@@ -423,11 +424,11 @@
                 <button class="repo-view-btn active" onclick="switchView('list', this)"><i class="fi fi-sr-list"></i> Lista</button>
                 <button class="repo-view-btn" onclick="switchView('tree', this)"><i class="fi fi-sr-folder"></i> Carpetas</button>
               </div>
-              <button class="btn btn-repositorio btn-sm" onclick="openUploadModal()">+ Subir documento</button>
+              <button class="btn btn-repositorio btn-sm" onclick="openUploadModal()">Subir documento</button>
             </div>
             <div class="toolbar-content" data-toolbar="categorias" style="display:none;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
               <span style="font-size:13px;color:var(--color-text-secondary);margin-bottom:8px;">Administra las categorías y subcategorías del repositorio.</span>
-              <button class="btn btn-repositorio btn-sm" style="margin-left:auto;" onclick="openCategoryModal()">+ Nueva categoría</button>
+              <button class="btn btn-repositorio btn-sm" style="margin-left:auto;" onclick="openCategoryModal()">Nueva categoría</button>
             </div>
           </header>
 
@@ -450,7 +451,7 @@
   <!-- Modal Subir Documento -->
   <div class="modal-overlay" id="modalUpload">
     <div class="modal" style="max-width:600px;">
-      <div class="modal-header"><h3 id="uploadModalTitle">Subir documento</h3><button class="modal-close" onclick="closeModal('modalUpload')">&times;</button></div>
+      <div class="modal-header"><h3 id="uploadModalTitle">Subir documento</h3><button class="modal-close" onclick="closeModal('modalUpload')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="uploadForm">
           <div class="form-group"><label>Título *</label><input type="text" class="form-input" id="docTitulo" required style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"></div>
@@ -504,7 +505,7 @@
   <!-- Modal Descargar Protegido -->
   <div class="modal-overlay" id="modalPassword">
     <div class="modal" style="max-width:400px;">
-      <div class="modal-header"><h3>Documento protegido</h3><button class="modal-close" onclick="closeModal('modalPassword')">&times;</button></div>
+      <div class="modal-header"><h3>Documento protegido</h3><button class="modal-close" onclick="closeModal('modalPassword')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <p style="margin-bottom:16px;" id="passwordModalMsg">Este documento está protegido con contraseña. Ingresa la contraseña para descargar.</p>
         <div class="form-group"><label>Contraseña</label>
@@ -524,7 +525,7 @@
   <!-- Modal Vista Previa -->
   <div class="modal-overlay" id="modalPreview">
     <div class="modal repo-preview-modal">
-      <div class="modal-header"><h3 id="previewTitle">Vista previa</h3><button class="modal-close" onclick="closeModal('modalPreview')">&times;</button></div>
+      <div class="modal-header"><h3 id="previewTitle">Vista previa</h3><button class="modal-close" onclick="closeModal('modalPreview')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body" id="previewBody"></div>
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeModal('modalPreview')">Cerrar</button>
@@ -536,7 +537,7 @@
   <!-- Modal Categoría -->
   <div class="modal-overlay" id="modalCategory">
     <div class="modal" style="max-width:500px;">
-      <div class="modal-header"><h3 id="categoryModalTitle">Nueva categoría</h3><button class="modal-close" onclick="closeModal('modalCategory')">&times;</button></div>
+      <div class="modal-header"><h3 id="categoryModalTitle">Nueva categoría</h3><button class="modal-close" onclick="closeModal('modalCategory')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="categoryForm">
           <div class="form-group"><label>Nombre *</label><input type="text" class="form-input" id="catNombre" required style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"></div>
@@ -557,7 +558,7 @@
   <!-- Modal Subcategoría -->
   <div class="modal-overlay" id="modalSubcategory">
     <div class="modal" style="max-width:500px;">
-      <div class="modal-header"><h3 id="subcategoryModalTitle">Nueva subcategoría</h3><button class="modal-close" onclick="closeModal('modalSubcategory')">&times;</button></div>
+      <div class="modal-header"><h3 id="subcategoryModalTitle">Nueva subcategoría</h3><button class="modal-close" onclick="closeModal('modalSubcategory')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="subcategoryForm">
           <div class="form-group"><label>Categoría *</label><select class="form-select" id="subcatCategoria" required></select></div>

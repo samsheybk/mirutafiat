@@ -98,6 +98,7 @@
         <option value="capacitacion.html">Capacitación y Desarrollo</option>
         <option value="bienestar-social.html" selected>Bienestar Social</option>
         <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="seguridad-fisica.html">Seguridad Física</option>
         <option value="compensacion.html">Compensación</option>
         <option value="finanzas.html">Finanzas</option>
         <option value="repositorio.html">Repositorio</option>
@@ -154,31 +155,30 @@
               <span id="plantillaCount" style="font-size:12px;color:var(--color-text-secondary);">0 trabajadores</span>
             </div>
             <div class="toolbar-content" data-toolbar="prestamos" style="display:none;align-items:center;gap:16px;width:100%;">
-              <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Préstamos</h2>
-              <button class="btn btn-bienestar btn-sm" onclick="openModalPrestamo()" style="margin-left:auto;">+ Nuevo préstamo</button>
+              <button class="btn btn-bienestar btn-sm" onclick="openModalPrestamo()" style="margin-left:auto;">Nuevo préstamo</button>
             </div>
             <div class="toolbar-content" data-toolbar="polizas" style="display:none;align-items:center;gap:16px;width:100%;">
-              <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Pólizas</h2>
               <input type="text" class="form-input" id="polBuscar" placeholder="Buscar por tipo, proveedor o cobertura..." oninput="renderPolizas()" style="flex:1;max-width:300px;height:34px;" title="Filtrar pólizas">
-              <button class="btn btn-bienestar btn-sm" onclick="openModalPoliza()" style="margin-left:auto;">+ Nuevo tipo de póliza</button>
+              <button class="btn btn-bienestar btn-sm" onclick="openModalPoliza()" style="margin-left:auto;">Nuevo tipo de póliza</button>
             </div>
             <div class="toolbar-content" data-toolbar="vehiculos" style="display:none;align-items:center;gap:10px;width:100%;flex-wrap:wrap;">
-              <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Venta de vehículos</h2>
               <input type="text" class="form-input" id="venBuscar" placeholder="Buscar por trabajador, vehículo o placa..." oninput="renderVentas()" style="flex:1;max-width:300px;height:34px;" title="Filtrar ventas">
-              <button class="btn btn-sm ven-tab" data-vtab="ventas" onclick="venSwitchView('ventas',this)" style="background:var(--module-bienestar);color:#fff;border:0;border-radius:4px;padding:6px 16px;">Ventas</button>
-              <button class="btn btn-sm ven-tab" data-vtab="cronograma" onclick="venSwitchView('cronograma',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Cronograma</button>
-              <button class="btn btn-bienestar btn-sm" onclick="openModalVenta()" style="margin-left:auto;">+ Nueva venta</button>
+              <div class="mod-tabs">
+                <button class="mod-tab" data-vtab="ventas" onclick="venSwitchView('ventas',this)">Ventas</button>
+                <button class="mod-tab" data-vtab="cronograma" onclick="venSwitchView('cronograma',this)">Cronograma</button>
+              </div>
+              <button class="btn btn-bienestar btn-sm" onclick="openModalVenta()" style="margin-left:auto;">Nueva venta</button>
             </div>
             <div class="toolbar-content" data-toolbar="uniformes" style="display:none;align-items:center;gap:10px;width:100%;flex-wrap:wrap;">
-              <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Inventario de uniformes</h2>
               <input type="text" class="form-input" id="uniBuscar" placeholder="Buscar..." oninput="uniBuscar()" style="flex:1;max-width:280px;height:34px;" title="Filtrar por prenda, talla o trabajador">
-              <button class="btn btn-sm uni-tab" data-utab="stock" onclick="uniSwitchView('stock',this)" style="background:var(--module-bienestar);color:#fff;border:0;border-radius:4px;padding:6px 16px;">Stock</button>
-              <button class="btn btn-sm uni-tab" data-utab="entregas" onclick="uniSwitchView('entregas',this)" style="background:transparent;color:var(--color-text);border:1px solid var(--border-color);border-radius:4px;padding:6px 16px;">Entregas</button>
-              <button class="btn btn-bienestar btn-sm" id="uniNuevoBtn" onclick="openModalUniformeStock()" style="margin-left:auto;">+ Nueva prenda</button>
+              <div class="mod-tabs">
+                <button class="mod-tab" data-utab="stock" onclick="uniSwitchView('stock',this)">Stock</button>
+                <button class="mod-tab" data-utab="entregas" onclick="uniSwitchView('entregas',this)">Entregas</button>
+              </div>
+              <button class="btn btn-bienestar btn-sm" id="uniNuevoBtn" onclick="openModalUniformeStock()" style="margin-left:auto;">Nueva prenda</button>
             </div>
             <div class="toolbar-content" data-toolbar="encuestas" style="display:none;align-items:center;gap:16px;width:100%;">
-              <h2 style="font-size:18px;font-weight:700;color:var(--module-bienestar);">Encuestas</h2>
-              <button class="btn btn-bienestar btn-sm" onclick="openModalEncuesta()" style="margin-left:auto;">+ Nueva encuesta</button>
+              <button class="btn btn-bienestar btn-sm" onclick="openModalEncuesta()" style="margin-left:auto;">Nueva encuesta</button>
             </div>
             <div class="toolbar-content" data-toolbar="calendario" style="display:none;align-items:center;gap:10px;width:100%;flex-wrap:wrap;">
               <span class="cal-filtro-label">Desde</span>
@@ -188,7 +188,7 @@
               <select class="form-input" id="calFiltroTipo" onchange="onCalFiltroTipoChange()" style="width:auto;" title="Filtrar por tipo de evento">
                 <option value="">Todos los tipos</option>
               </select>
-              <button class="btn btn-bienestar btn-sm" onclick="openModalCalendario(null, calFechaSel())" style="margin-left:auto;">+ Nuevo evento</button>
+              <button class="btn btn-bienestar btn-sm" onclick="openModalCalendario(null, calFechaSel())" style="margin-left:auto;">Nuevo evento</button>
             </div>
           </header>
 
@@ -334,7 +334,7 @@
 
   <div class="modal-overlay" id="modalPrestamo">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalPrestamoTitle">Nuevo préstamo</h3><button class="modal-close" onclick="bsHideModal('modalPrestamo')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalPrestamoTitle">Nuevo préstamo</h3><button class="modal-close" onclick="bsHideModal('modalPrestamo')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="formPrestamo">
           <div class="form-group"><label>Trabajador</label>
@@ -363,7 +363,7 @@
 
   <div class="modal-overlay" id="modalPoliza">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalPolizaTitle">Nuevo tipo de póliza</h3><button class="modal-close" onclick="bsHideModal('modalPoliza')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalPolizaTitle">Nuevo tipo de póliza</h3><button class="modal-close" onclick="bsHideModal('modalPoliza')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="formPoliza">
           <div class="form-row">
@@ -386,7 +386,7 @@
 
   <div class="modal-overlay" id="modalPolizaTrabajadores">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalPolizaTrabTitle">Trabajadores</h3><button class="modal-close" onclick="bsHideModal('modalPolizaTrabajadores')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalPolizaTrabTitle">Trabajadores</h3><button class="modal-close" onclick="bsHideModal('modalPolizaTrabajadores')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <input type="text" class="form-input" id="polTrabBuscar" placeholder="Buscar trabajador..." oninput="renderPolizaTrabajadores()" style="width:100%;margin-bottom:12px;">
         <div style="margin-bottom:10px;"><label class="checkbox-label"><input type="checkbox" id="polTrabMarcarTodos" onchange="marcarTodosPolizaTrabajadores(this.checked)"> Marcar todos</label></div>
@@ -401,7 +401,7 @@
 
   <div class="modal-overlay" id="modalVenta">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalVentaTitle">Nueva venta</h3><button class="modal-close" onclick="bsHideModal('modalVenta')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalVentaTitle">Nueva venta</h3><button class="modal-close" onclick="bsHideModal('modalVenta')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="formVenta">
           <div class="form-group"><label>Trabajador</label>
@@ -435,7 +435,7 @@
 
   <div class="modal-overlay" id="modalUniformeStock">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalUniformeStockTitle">Nueva prenda</h3><button class="modal-close" onclick="bsHideModal('modalUniformeStock')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalUniformeStockTitle">Nueva prenda</h3><button class="modal-close" onclick="bsHideModal('modalUniformeStock')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="formUniformeStock">
           <div class="form-row">
@@ -460,7 +460,7 @@
 
   <div class="modal-overlay" id="modalUniformeEntrega">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalUniformeEntregaTitle">Nueva entrega</h3><button class="modal-close" onclick="bsHideModal('modalUniformeEntrega')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalUniformeEntregaTitle">Nueva entrega</h3><button class="modal-close" onclick="bsHideModal('modalUniformeEntrega')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="formUniformeEntrega">
           <div class="form-group"><label>Trabajador</label>
@@ -475,7 +475,7 @@
           <div class="form-group">
             <label>Artículos (solo stock disponible)</label>
             <div id="ueItemsList"></div>
-            <button type="button" class="btn btn-bienestar btn-sm" onclick="ueAddItem()">+ Agregar artículo</button>
+            <button type="button" class="btn btn-bienestar btn-sm" onclick="ueAddItem()">Agregar artículo</button>
           </div>
           <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="ue_observaciones" rows="2"></textarea></div>
         </form>
@@ -489,7 +489,7 @@
 
   <div class="modal-overlay" id="modalEncuesta">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalEncuestaTitle">Nueva encuesta</h3><button class="modal-close" onclick="bsHideModal('modalEncuesta')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalEncuestaTitle">Nueva encuesta</h3><button class="modal-close" onclick="bsHideModal('modalEncuesta')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="formEncuesta">
           <div class="form-group"><label>Título</label><input type="text" class="form-input" id="enc_titulo" required></div>
@@ -509,7 +509,7 @@
           <div class="form-group">
             <label>Preguntas (selección simple)</label>
             <div id="encPreguntasList"><div class="enc-preguntas-hint">Agrega las preguntas de la encuesta. Cada pregunta tendrá opciones de selección simple.</div></div>
-            <button type="button" class="btn btn-bienestar btn-sm" onclick="bsAddPregunta()">+ Agregar pregunta</button>
+            <button type="button" class="btn btn-bienestar btn-sm" onclick="bsAddPregunta()">Agregar pregunta</button>
           </div>
         </form>
       </div>
@@ -522,7 +522,7 @@
 
   <div class="modal-overlay" id="modalCompartirEncuesta">
     <div class="modal">
-      <div class="modal-header"><h3 id="encShareTitulo">Compartir encuesta</h3><button class="modal-close" onclick="bsHideModal('modalCompartirEncuesta')">&times;</button></div>
+      <div class="modal-header"><h3 id="encShareTitulo">Compartir encuesta</h3><button class="modal-close" onclick="bsHideModal('modalCompartirEncuesta')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:14px;line-height:1.6;">Comparte este enlace con tus trabajadores para que puedan llenar la encuesta. Solo se puede llenar mientras la encuesta esté <b>Activa</b>.</p>
         <div style="display:flex;gap:8px;align-items:stretch;">
@@ -538,7 +538,7 @@
 
   <div class="modal-overlay" id="modalCalendario">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalCalendarioTitle">Nuevo evento</h3><button class="modal-close" onclick="bsHideModal('modalCalendario')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalCalendarioTitle">Nuevo evento</h3><button class="modal-close" onclick="bsHideModal('modalCalendario')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="formCalendario">
           <div class="form-group"><label>Título</label><input type="text" class="form-input" id="cal_titulo" required></div>
@@ -1182,12 +1182,7 @@
       document.getElementById('venVentasView').style.display = view === 'ventas' ? '' : 'none';
       document.getElementById('venCronogramaView').style.display = view === 'cronograma' ? '' : 'none';
       document.getElementById('venBuscar').style.display = view === 'ventas' ? '' : 'none';
-      document.querySelectorAll('.ven-tab').forEach(function(t) {
-        var on = t.getAttribute('data-vtab') === view;
-        t.style.background = on ? 'var(--module-bienestar)' : 'transparent';
-        t.style.color = on ? '#fff' : 'var(--color-text)';
-        t.style.border = on ? '0' : '1px solid var(--border-color)';
-      });
+      Array.prototype.forEach.call(btn.parentElement.querySelectorAll('.mod-tab'), function(t) { t.classList.toggle('active', t === btn); });
       if (view === 'cronograma') {
         llenarVenCronSelect(ventaCuotasActualId);
         renderVentaCuotas();
@@ -1208,7 +1203,7 @@
 
     function openVentaCuotas(id) {
       ventaCuotasActualId = id;
-      var btn = document.querySelector('.ven-tab[data-vtab="cronograma"]');
+      var btn = document.querySelector('.mod-tab[data-vtab="cronograma"]');
       venSwitchView('cronograma', btn);
     }
 
@@ -1293,18 +1288,13 @@
       localStorage.setItem('fiat_bienestar_uni_view', view);
       document.getElementById('uniStockView').style.display = view === 'stock' ? '' : 'none';
       document.getElementById('uniEntregasView').style.display = view === 'entregas' ? '' : 'none';
-      document.querySelectorAll('.uni-tab').forEach(function(t) {
-        var on = t.getAttribute('data-utab') === view;
-        t.style.background = on ? 'var(--module-bienestar)' : 'transparent';
-        t.style.color = on ? '#fff' : 'var(--color-text)';
-        t.style.border = on ? '0' : '1px solid var(--border-color)';
-      });
+      Array.prototype.forEach.call(btn.parentElement.querySelectorAll('.mod-tab'), function(t) { t.classList.toggle('active', t === btn); });
       var btnEl = document.getElementById('uniNuevoBtn');
       if (view === 'entregas') {
-        btnEl.textContent = '+ Nueva entrega';
+        btnEl.textContent = 'Nueva entrega';
         btnEl.setAttribute('onclick', 'openModalUniformeEntrega()');
       } else {
-        btnEl.textContent = '+ Nueva prenda';
+        btnEl.textContent = 'Nueva prenda';
         btnEl.setAttribute('onclick', 'openModalUniformeStock()');
       }
     }
@@ -1505,7 +1495,7 @@
       row.className = 'ue-item';
       row.innerHTML = '<select class="form-select ue-item-stock" style="flex:1;">' + ueStockOptions(prefill ? prefill.stock_id : null) + '</select>'
         + '<input type="number" class="form-input ue-item-cantidad" min="1" value="' + (prefill ? prefill.cantidad : 1) + '" style="width:84px;" oninput="ueValidateCantidad(this)">'
-        + '<button type="button" class="modal-close" title="Quitar artículo" onclick="ueRemoveItem(this)">&times;</button>';
+        + '<button type="button" class="modal-close" title="Quitar artículo" onclick="ueRemoveItem(this)"><i class="fi fi-sr-cross-small"></i></button>';
       list.appendChild(row);
     }
 
@@ -1669,17 +1659,17 @@
           return '<div class="enc-opcion">'
             + '<span class="enc-opcion-radio"></span>'
             + '<input type="text" class="form-input" value="' + escBienestar(op) + '" placeholder="Opción ' + (j + 1) + '..." oninput="encuestaPreguntas[' + i + '].opciones[' + j + ']=this.value">'
-            + '<button type="button" class="modal-close" title="Quitar opción" onclick="encuestaPreguntas[' + i + '].opciones.splice(' + j + ',1);renderEncuestaPreguntas()">&times;</button>'
+            + '<button type="button" class="modal-close" title="Quitar opción" onclick="encuestaPreguntas[' + i + '].opciones.splice(' + j + ',1);renderEncuestaPreguntas()"><i class="fi fi-sr-cross-small"></i></button>'
             + '</div>';
         }).join('');
         return '<div class="enc-pregunta">'
           + '<div class="enc-pregunta-head">'
           + '<span class="enc-pregunta-num">' + (i + 1) + '</span>'
           + '<input type="text" class="form-input" value="' + escBienestar(p.pregunta) + '" placeholder="Escribe la pregunta..." oninput="encuestaPreguntas[' + i + '].pregunta=this.value">'
-          + '<button type="button" class="modal-close" title="Eliminar pregunta" onclick="encuestaPreguntas.splice(' + i + ',1);renderEncuestaPreguntas()">&times;</button>'
+          + '<button type="button" class="modal-close" title="Eliminar pregunta" onclick="encuestaPreguntas.splice(' + i + ',1);renderEncuestaPreguntas()"><i class="fi fi-sr-cross-small"></i></button>'
           + '</div>'
           + '<div class="enc-opciones">' + opciones + '</div>'
-          + '<button type="button" class="btn btn-outline btn-sm" onclick="encuestaPreguntas[' + i + '].opciones.push(\'\');renderEncuestaPreguntas()">+ Agregar opción</button>'
+          + '<button type="button" class="btn btn-outline btn-sm" onclick="encuestaPreguntas[' + i + '].opciones.push(\'\');renderEncuestaPreguntas()">Agregar opción</button>'
           + '</div>';
       }).join('');
     }
@@ -2296,12 +2286,12 @@
       restoreTool();
       var uv = localStorage.getItem('fiat_bienestar_uni_view');
       if (uv && uv !== 'stock') {
-        var ubtn = document.querySelector('.uni-tab[data-utab="' + uv + '"]');
+        var ubtn = document.querySelector('.mod-tab[data-utab="' + uv + '"]');
         if (ubtn) uniSwitchView(uv, ubtn);
       }
       var vv = localStorage.getItem('fiat_bienestar_ven_view');
       if (vv && vv !== 'ventas') {
-        var vbtn = document.querySelector('.ven-tab[data-vtab="' + vv + '"]');
+        var vbtn = document.querySelector('.mod-tab[data-vtab="' + vv + '"]');
         if (vbtn) venSwitchView(vv, vbtn);
       }
       renderCalendario();

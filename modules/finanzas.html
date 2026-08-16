@@ -114,6 +114,7 @@
         <option value="capacitacion.html">Capacitación y Desarrollo</option>
         <option value="bienestar-social.html">Bienestar Social</option>
         <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="seguridad-fisica.html">Seguridad Física</option>
         <option value="compensacion.html">Compensación</option>
         <option value="finanzas.html" selected>Finanzas</option>
         <option value="repositorio.html">Repositorio</option>
@@ -165,7 +166,7 @@
               <div class="form-group" style="margin:0;flex:1;min-width:180px;"><label>Buscar</label>
                 <input type="text" class="form-input" id="fil_buscar" placeholder="Concepto, proveedor o responsable..." oninput="renderMovimientos()">
               </div>
-              <button class="btn btn-finanzas btn-sm" onclick="openModalMovimiento()">+ Registrar movimiento</button>
+              <button class="btn btn-finanzas btn-sm" onclick="openModalMovimiento()">Registrar movimiento</button>
             </div>
             <div class="toolbar-content" data-toolbar="reportes" style="display:none;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
               <div class="form-group" style="margin:0;"><label>Período</label>
@@ -242,7 +243,7 @@
 
   <div class="modal-overlay" id="modalMovimiento">
     <div class="modal">
-      <div class="modal-header"><h3 id="modalMovimientoTitle">Registrar movimiento</h3><button class="modal-close" onclick="finHideModal('modalMovimiento')">&times;</button></div>
+      <div class="modal-header"><h3 id="modalMovimientoTitle">Registrar movimiento</h3><button class="modal-close" onclick="finHideModal('modalMovimiento')"><i class="fi fi-sr-cross-small"></i></button></div>
       <div class="modal-body">
         <form id="formMovimiento">
           <div class="form-row">

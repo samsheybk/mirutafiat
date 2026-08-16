@@ -53,6 +53,10 @@
       { key: 'inv-equipos', name: 'Inventario de equipos' },
       { key: 'inv-insumos', name: 'Inventario de insumos' }
     ]},
+    { key: 'seguridad-fisica.html', name: 'Seguridad Física', tools: [
+      { key: 'accesos', name: 'Control de acceso' },
+      { key: 'novedades', name: 'Libro de novedades' }
+    ]},
     { key: 'compensacion.html', name: 'Compensación', tools: [
       { key: 'salarial', name: 'Estructura salarial por cargo' },
       { key: 'liquidaciones', name: 'Liquidaciones' },
@@ -257,6 +261,7 @@
       state.role = 'Administrador';
       applyNav();
       applyPanelTools();
+      window.dispatchEvent(new CustomEvent('fiatAccessReady'));
       return;
     }
     var session = await getSession().catch(function () { return null; });
@@ -273,6 +278,7 @@
     applyDashboard();
     guardCurrentPage();
     applyPanelTools();
+    window.dispatchEvent(new CustomEvent('fiatAccessReady'));
   }
 
   window.fiatAccess = {

@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seguridad Física - Intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
+  <style>
+    :root { --module-color: var(--module-seguridad-fisica); }
+    .sf-hint { font-size: 12px; color: var(--color-text-secondary); padding: 4px 0 14px; }
+    .sf-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--color-bg); border: 1px dashed var(--color-border); padding: 12px; margin: 4px 0 12px; }
+    .sf-info .form-group { margin: 0; }
+    .sf-info-wide { grid-column: 1 / -1; }
+    .toolbar-content .form-input, .toolbar-content .form-select { height: 36px; }
+    .tool-section.active { height: 100%; overflow-y: auto; padding-right: 4px; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <nav class="topnav" style="background:var(--module-seguridad-fisica);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><span class="topnav-logo"></span>Intranet</div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Home</option>
+        <option value="captacion.html">Captación y Selección</option>
+        <option value="relaciones-laborales.html">Relaciones Laborales</option>
+        <option value="capacitacion.html">Capacitación y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="seguridad-fisica.html" selected>Seguridad Física</option>
+        <option value="compensacion.html">Compensación</option>
+        <option value="finanzas.html">Finanzas</option>
+        <option value="repositorio.html">Repositorio</option>
+        <option value="chatfiat.html">Mensajería</option>
+        <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
+        <option value="gourmet.html">Gourmet</option>
+        <option value="ti.html">Sistemas TI</option>
+      </select>
+
+      <div class="topnav-spacer"></div>
+      <div class="nav-user">
+        <div class="nav-user-menu">
+          <button class="nav-user-menu-btn" id="userMenuBtn" type="button" aria-label="Opciones de usuario" title="Opciones de usuario">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="12" cy="19" r="1.9"></circle></svg>
+          </button>
+          <div class="nav-user-dropdown" id="userDropdown">
+            <div class="user-drop-header">
+              <div class="user-drop-name" id="userDropName">Usuario</div>
+              <div class="user-drop-email" id="userDropEmail"></div>
+              <div class="user-drop-meta" id="userDropMeta"></div>
+            </div>
+            <button type="button" class="user-drop-item" id="userDropHelp">Detalles del módulo</button>
+            <button type="button" class="user-drop-item user-drop-danger" id="userDropLogout">Cerrar sesión</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-panel">
+          <div class="panel-item active" data-tool="accesos" onclick="switchTool('accesos')" title="Control de acceso"><span class="panel-item-indicator bg-seguridad-fisica"></span><i class="fi fi-sr-arrow-right-to-bracket" style="font-size:24px;pointer-events:none;"></i>
+          </div>
+          <div class="panel-item" data-tool="novedades" onclick="switchTool('novedades')" title="Libro de novedades"><span class="panel-item-indicator bg-seguridad-fisica"></span><i class="fi fi-sr-clipboard-list-check" style="font-size:24px;pointer-events:none;"></i>
+          </div>
+        </div>
+
+        <div class="module-body">
+          <header class="topbar" style="gap:16px;">
+            <div class="toolbar-content" data-toolbar="accesos" style="display:flex;align-items:center;gap:10px;width:100%;flex-wrap:wrap;">
+              <div class="form-group" style="margin:0;flex:1;min-width:180px;">
+                <input type="text" class="form-input" id="accSearch" placeholder="Buscar por nombre, cédula, empresa o placa..." autocomplete="off" spellcheck="false" oninput="renderAccesos()">
+              </div>
+              <div class="form-group" style="margin:0;">
+                <select class="form-select" id="accFiltroDireccion" onchange="renderAccesos()">
+                  <option value="">Todas las direcciones</option>
+                  <option>Entrada</option>
+                  <option>Salida</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0;">
+                <select class="form-select" id="accFiltroTipo" onchange="renderAccesos()">
+                  <option value="">Todos los tipos</option>
+                  <option>Trabajador</option>
+                  <option>Visitante</option>
+                  <option>Proveedor</option>
+                  <option>Contratista</option>
+                  <option>Otro</option>
+                </select>
+              </div>
+              <button class="btn btn-seguridad-fisica btn-sm" onclick="openModalAcceso()" style="margin-left:auto;">Registrar acceso</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="novedades" style="display:none;align-items:center;gap:10px;width:100%;flex-wrap:wrap;">
+              <div class="form-group" style="margin:0;flex:1;min-width:180px;">
+                <input type="text" class="form-input" id="novSearch" placeholder="Buscar por título o descripción..." autocomplete="off" spellcheck="false" oninput="renderNovedades()">
+              </div>
+              <div class="form-group" style="margin:0;">
+                <select class="form-select" id="novFiltroTurno" onchange="renderNovedades()">
+                  <option value="">Todos los turnos</option>
+                  <option>Mañana</option>
+                  <option>Tarde</option>
+                  <option>Noche</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0;">
+                <select class="form-select" id="novFiltroEstado" onchange="renderNovedades()">
+                  <option value="">Todos los estados</option>
+                  <option>Abierta</option>
+                  <option>En seguimiento</option>
+                  <option>Cerrada</option>
+                </select>
+              </div>
+              <button class="btn btn-seguridad-fisica btn-sm" onclick="openModalNovedad()" style="margin-left:auto;">Nueva novedad</button>
+            </div>
+          </header>
+
+          <div class="module-content">
+            <!-- Control de acceso -->
+            <div class="tool-section active" id="tool-accesos">
+              <div class="sf-hint">Registro de entrada y salida de personas y vehículos en los puntos de control de las instalaciones. Incluye visitantes, proveedores y contratistas con su empresa, placa y motivo.</div>
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Fecha</th><th>Hora</th><th>Dirección</th><th>Persona</th><th>Cédula / RIF</th><th>Empresa</th><th>Vehículo</th><th>Punto de control</th><th>Motivo</th><th style="width:110px;">Acciones</th></tr></thead>
+                  <tbody id="accesosBody">
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Libro de novedades -->
+            <div class="tool-section" id="tool-novedades">
+              <div class="sf-hint">Bitácora de novedades del personal de seguridad: hechos relevantes ocurridos durante el turno, con categoría, ubicación, acciones tomadas y estado de seguimiento.</div>
+              <div class="tabla-scroll">
+                <table class="data-table">
+                  <thead><tr><th>Fecha</th><th>Hora</th><th>Turno</th><th>Categoría</th><th>Novedad</th><th>Ubicación</th><th>Acciones tomadas</th><th>Estado</th><th>Registrado por</th><th style="width:110px;">Acciones</th></tr></thead>
+                  <tbody id="novedadesBody">
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                    <tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Acceso -->
+  <div class="modal-overlay" id="modalAcceso">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalAccesoTitle">Registrar acceso</h3><button class="modal-close" onclick="sfHideModal('modalAcceso')"><i class="fi fi-sr-cross-small"></i></button></div>
+      <div class="modal-body">
+        <form id="formAcceso">
+          <div class="form-row">
+            <div class="form-group"><label>Dirección *</label>
+              <select class="form-select" id="acc_direccion"><option value="Entrada">Entrada</option><option value="Salida">Salida</option></select>
+            </div>
+            <div class="form-group"><label>Tipo *</label>
+              <select class="form-select" id="acc_tipo" onchange="sfTipoChange()"><option value="Trabajador">Trabajador</option><option value="Visitante">Visitante</option><option value="Proveedor">Proveedor</option><option value="Contratista">Contratista</option><option value="Otro">Otro</option></select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Nombre *</label><input type="text" class="form-input" id="acc_nombre" placeholder="Nombre y apellido" required></div>
+            <div class="form-group"><label>Cédula / RIF</label><input type="text" class="form-input" id="acc_cedula" placeholder="Ej: V-12.345.678"></div>
+          </div>
+          <div class="form-group" id="acc_empresa_group"><label>Empresa</label><input type="text" class="form-input" id="acc_empresa" placeholder="Empresa que representa"></div>
+          <div class="form-row">
+            <div class="form-group"><label>Vehículo</label>
+              <select class="form-select" id="acc_vehiculo_tipo"><option value="">Ninguno</option><option>Auto</option><option>Camioneta</option><option>Camión</option><option>Moto</option><option>Otro</option></select>
+            </div>
+            <div class="form-group"><label>Placa</label><input type="text" class="form-input" id="acc_placa" placeholder="Ej: AB123CD" style="text-transform:uppercase;"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Fecha *</label><input type="date" class="form-input" id="acc_fecha" required></div>
+            <div class="form-group"><label>Hora *</label><input type="time" class="form-input" id="acc_hora"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Punto de control *</label>
+              <select class="form-select" id="acc_punto_control"><option value="Portón principal">Portón principal</option><option value="Patio de vehículos">Patio de vehículos</option><option value="Almacén">Almacén</option><option value="Oficinas">Oficinas</option><option>Otro</option></select>
+            </div>
+            <div class="form-group"><label>Motivo</label><input type="text" class="form-input" id="acc_motivo" placeholder="Ej: Entrega de repuestos, visita a RRHH"></div>
+          </div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="acc_observaciones" rows="2"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="sfHideModal('modalAcceso')">Cancelar</button>
+        <button class="btn btn-seguridad-fisica" onclick="saveAcceso()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Novedad -->
+  <div class="modal-overlay" id="modalNovedad">
+    <div class="modal">
+      <div class="modal-header"><h3 id="modalNovedadTitle">Nueva novedad</h3><button class="modal-close" onclick="sfHideModal('modalNovedad')"><i class="fi fi-sr-cross-small"></i></button></div>
+      <div class="modal-body">
+        <form id="formNovedad">
+          <div class="form-row">
+            <div class="form-group"><label>Fecha *</label><input type="date" class="form-input" id="nov_fecha" required></div>
+            <div class="form-group"><label>Hora *</label><input type="time" class="form-input" id="nov_hora"></div>
+            <div class="form-group"><label>Turno *</label>
+              <select class="form-select" id="nov_turno"><option>Mañana</option><option>Tarde</option><option>Noche</option></select>
+            </div>
+          </div>
+          <div class="form-group"><label>Categoría *</label>
+            <select class="form-select" id="nov_categoria"><option>Control de acceso</option><option>Incidente</option><option>Daño a la propiedad</option><option>Emergencia</option><option>Visita institucional</option><option>Otro</option></select>
+          </div>
+          <div class="form-group"><label>Novedad *</label><input type="text" class="form-input" id="nov_titulo" placeholder="Título breve de la novedad" required></div>
+          <div class="form-group"><label>Descripción</label><textarea class="form-textarea" id="nov_descripcion" rows="3" placeholder="Detalle de lo ocurrido"></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Ubicación</label><input type="text" class="form-input" id="nov_ubicacion" placeholder="Ej: Portón principal, Patio de vehículos"></div>
+            <div class="form-group"><label>Estado</label>
+              <select class="form-select" id="nov_estado"><option value="Abierta">Abierta</option><option value="En seguimiento">En seguimiento</option><option value="Cerrada">Cerrada</option></select>
+            </div>
+          </div>
+          <div class="form-group"><label>Acciones tomadas</label><textarea class="form-textarea" id="nov_acciones" rows="2" placeholder="¿Qué se hizo al respecto?"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="sfHideModal('modalNovedad')">Cancelar</button>
+        <button class="btn btn-seguridad-fisica" onclick="saveNovedad()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Detalle de Novedad -->
+  <div class="modal-overlay" id="modalDetalleNovedad">
+    <div class="modal" style="max-width:640px;">
+      <div class="modal-header"><h3 id="detalleNovedadTitle">Detalle de la novedad</h3><button class="modal-close" onclick="sfHideModal('modalDetalleNovedad')"><i class="fi fi-sr-cross-small"></i></button></div>
+      <div class="modal-body">
+        <div class="sf-info" id="detalleNovedadInfo" style="display:none;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-seguridad-fisica" onclick="openModalNovedad(detalleNovedadId)">Editar</button>
+        <button class="btn btn-outline" style="color:#dc2626;border-color:#dc2626;" onclick="deleteNovedad(detalleNovedadId)">Eliminar</button>
+        <button class="btn btn-outline" onclick="sfHideModal('modalDetalleNovedad')">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/modules.js"></script>
+  <script>
+    function sfEscape(s) {
+      return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function sfShowModal(id) {
+      document.getElementById(id).classList.add('show');
+    }
+
+    function sfHideModal(id) {
+      document.getElementById(id).classList.remove('show');
+    }
+
+    document.addEventListener('click', function(e) {
+      if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('show');
+    });
+
+    function sfRegistradoPor() {
+      try {
+        if (window.fiatAccess && fiatAccess.state && fiatAccess.state.worker) {
+          var w = fiatAccess.state.worker;
+          var n = ((w.nombres || '') + ' ' + (w.apellidos || '')).trim();
+          if (n) return n;
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    function sfTipoChange() {
+      var tipo = document.getElementById('acc_tipo').value;
+      document.getElementById('acc_empresa_group').style.display = tipo === 'Trabajador' ? 'none' : 'block';
+    }
+
+    /* ===== CONTROL DE ACCESO ===== */
+    var sfAccesos = [];
+    var editingAccesoId = null;
+
+    function dirBadge(d) {
+      if (d === 'Entrada') return '<span class="badge badge-active">Entrada</span>';
+      if (d === 'Salida') return '<span class="badge badge-inactive">Salida</span>';
+      return sfEscape(d || '-');
+    }
+
+    async function loadAccesos() {
+      try {
+        var { data, error } = await supabaseClient.from('seguridad_fisica_accesos').select('*').order('fecha', { ascending: false }).order('hora', { ascending: false });
+        if (error) throw error;
+        sfAccesos = data || [];
+        renderAccesos();
+      } catch (err) {
+        document.getElementById('accesosBody').innerHTML =
+          '<tr><td colspan="10" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar el control de acceso: ' + sfEscape(err.message) + '</td></tr>';
+      }
+    }
+
+    function renderAccesos() {
+      var tbody = document.getElementById('accesosBody');
+      var q = (document.getElementById('accSearch').value || '').trim().toLowerCase();
+      var fDir = document.getElementById('accFiltroDireccion').value;
+      var fTipo = document.getElementById('accFiltroTipo').value;
+      var rows = sfAccesos.filter(function(a) {
+        if (fDir && a.direccion !== fDir) return false;
+        if (fTipo && a.tipo !== fTipo) return false;
+        if (q) {
+          var hay = [a.nombre, a.cedula, a.empresa, a.placa, a.motivo, a.punto_control].join(' ').toLowerCase();
+          if (hay.indexOf(q) === -1) return false;
+        }
+        return true;
+      });
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:#999;">No hay registros de acceso' + (q ? ' para "' + sfEscape(q) + '"' : '') + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = rows.map(function(a) {
+        var veh = [];
+        if (a.vehiculo_tipo) veh.push(a.vehiculo_tipo);
+        if (a.placa) veh.push(a.placa);
+        return '<tr>'
+          + '<td>' + (a.fecha || '-') + '</td>'
+          + '<td>' + (a.hora || '-') + '</td>'
+          + '<td>' + dirBadge(a.direccion) + '</td>'
+          + '<td><span style="font-weight:600;">' + sfEscape(a.nombre || '-') + '</span><div style="font-size:11px;color:var(--color-text-secondary);">' + sfEscape(a.tipo || '') + '</div></td>'
+          + '<td>' + sfEscape(a.cedula || '-') + '</td>'
+          + '<td>' + sfEscape(a.empresa || '-') + '</td>'
+          + '<td>' + (veh.length ? sfEscape(veh.join(' · ')) : '-') + '</td>'
+          + '<td>' + sfEscape(a.punto_control || '-') + '</td>'
+          + '<td>' + sfEscape(a.motivo || '-') + '</td>'
+          + '<td>'
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalAcceso(' + a.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteAcceso(' + a.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+      uiFadeIn(tbody);
+    }
+
+    function openModalAcceso(id) {
+      editingAccesoId = id || null;
+      document.getElementById('formAcceso').reset();
+      document.getElementById('modalAccesoTitle').textContent = id ? 'Editar acceso' : 'Registrar acceso';
+      document.getElementById('acc_fecha').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('acc_hora').value = new Date().toTimeString().slice(0, 5);
+      sfTipoChange();
+      if (id) {
+        var a = sfAccesos.find(function(x) { return x.id === id; });
+        if (a) {
+          document.getElementById('acc_direccion').value = a.direccion;
+          document.getElementById('acc_tipo').value = a.tipo || 'Trabajador';
+          sfTipoChange();
+          document.getElementById('acc_nombre').value = a.nombre || '';
+          document.getElementById('acc_cedula').value = a.cedula || '';
+          document.getElementById('acc_empresa').value = a.empresa || '';
+          document.getElementById('acc_vehiculo_tipo').value = a.vehiculo_tipo || '';
+          document.getElementById('acc_placa').value = a.placa || '';
+          document.getElementById('acc_fecha').value = a.fecha || '';
+          document.getElementById('acc_hora').value = a.hora || '';
+          document.getElementById('acc_punto_control').value = a.punto_control || 'Portón principal';
+          document.getElementById('acc_motivo').value = a.motivo || '';
+          document.getElementById('acc_observaciones').value = a.observaciones || '';
+        }
+      }
+      sfShowModal('modalAcceso');
+    }
+
+    async function saveAcceso() {
+      var nombre = document.getElementById('acc_nombre').value.trim();
+      var fecha = document.getElementById('acc_fecha').value;
+      var hora = document.getElementById('acc_hora').value;
+      if (!nombre) {
+        showAlert('El nombre es obligatorio', 'warning');
+        return;
+      }
+      if (!fecha) {
+        showAlert('La fecha es obligatoria', 'warning');
+        return;
+      }
+      var placa = (document.getElementById('acc_placa').value || '').trim().toUpperCase();
+      var vehiculoTipo = document.getElementById('acc_vehiculo_tipo').value;
+      var payload = {
+        direccion: document.getElementById('acc_direccion').value,
+        tipo: document.getElementById('acc_tipo').value,
+        nombre: nombre,
+        cedula: document.getElementById('acc_cedula').value.trim() || null,
+        empresa: document.getElementById('acc_empresa').value.trim() || null,
+        vehiculo_tipo: vehiculoTipo || null,
+        placa: placa || null,
+        fecha: fecha,
+        hora: hora || null,
+        punto_control: document.getElementById('acc_punto_control').value,
+        motivo: document.getElementById('acc_motivo').value.trim() || null,
+        observaciones: document.getElementById('acc_observaciones').value.trim() || null,
+        registrado_por: sfRegistradoPor()
+      };
+      try {
+        if (editingAccesoId) {
+          var { error } = await supabaseClient.from('seguridad_fisica_accesos').update(payload).eq('id', editingAccesoId);
+          if (error) throw error;
+        } else {
+          var { error } = await supabaseClient.from('seguridad_fisica_accesos').insert([payload]);
+          if (error) throw error;
+        }
+        sfHideModal('modalAcceso');
+        loadAccesos();
+        showAlert(editingAccesoId ? 'Acceso actualizado' : 'Acceso registrado', 'success');
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteAcceso(id) {
+      var ok = await showConfirm('¿Eliminar este registro de acceso?', 'Eliminar');
+      if (!ok) return;
+      try {
+        var { error } = await supabaseClient.from('seguridad_fisica_accesos').delete().eq('id', id);
+        if (error) throw error;
+        loadAccesos();
+        showAlert('Registro eliminado', 'success');
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== LIBRO DE NOVEDADES ===== */
+    var sfNovedades = [];
+    var editingNovedadId = null;
+    var detalleNovedadId = null;
+
+    async function loadNovedades() {
+      try {
+        var { data, error } = await supabaseClient.from('seguridad_fisica_novedades').select('*').order('fecha', { ascending: false }).order('hora', { ascending: false });
+        if (error) throw error;
+        sfNovedades = data || [];
+        renderNovedades();
+      } catch (err) {
+        document.getElementById('novedadesBody').innerHTML =
+          '<tr><td colspan="10" style="text-align:center;padding:40px;color:#dc2626;">Error al cargar el libro de novedades: ' + sfEscape(err.message) + '</td></tr>';
+      }
+    }
+
+    function renderNovedades() {
+      var tbody = document.getElementById('novedadesBody');
+      var q = (document.getElementById('novSearch').value || '').trim().toLowerCase();
+      var fTurno = document.getElementById('novFiltroTurno').value;
+      var fEstado = document.getElementById('novFiltroEstado').value;
+      var rows = sfNovedades.filter(function(n) {
+        if (fTurno && n.turno !== fTurno) return false;
+        if (fEstado && n.estado !== fEstado) return false;
+        if (q) {
+          var hay = [n.titulo, n.descripcion, n.ubicacion, n.categoria, n.acciones].join(' ').toLowerCase();
+          if (hay.indexOf(q) === -1) return false;
+        }
+        return true;
+      });
+      if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:#999;">No hay novedades registradas' + (q ? ' para "' + sfEscape(q) + '"' : '') + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = rows.map(function(n) {
+        return '<tr>'
+          + '<td>' + (n.fecha || '-') + '</td>'
+          + '<td>' + (n.hora || '-') + '</td>'
+          + '<td><span class="badge badge-pending">' + sfEscape(n.turno || '-') + '</span></td>'
+          + '<td>' + sfEscape(n.categoria || '-') + '</td>'
+          + '<td><a href="javascript:void(0)" onclick="openDetalleNovedad(' + n.id + ')" style="font-weight:600;color:var(--module-seguridad-fisica);text-decoration:none;cursor:pointer;">' + sfEscape(n.titulo || '-') + '</a></td>'
+          + '<td>' + sfEscape(n.ubicacion || '-') + '</td>'
+          + '<td>' + sfEscape(n.acciones || '-') + '</td>'
+          + '<td><span class="badge ' + getBadgeClass(n.estado) + '">' + sfEscape(n.estado) + '</span></td>'
+          + '<td>' + sfEscape(n.registrado_por || '-') + '</td>'
+          + '<td>'
+          + '<button class="btn btn-sm btn-outline" title="Editar" onclick="openModalNovedad(' + n.id + ')"><i class="fi fi-sr-pencil" style="font-size:15px;line-height:1;pointer-events:none;"></i></button> '
+          + '<button class="btn btn-sm btn-outline" title="Eliminar" onclick="deleteNovedad(' + n.id + ')"><i class="fi fi-sr-trash" style="font-size:15px;line-height:1;pointer-events:none;color:#dc2626;"></i></button>'
+          + '</td>'
+          + '</tr>';
+      }).join('');
+      uiFadeIn(tbody);
+    }
+
+    function openDetalleNovedad(id) {
+      var n = sfNovedades.find(function(x) { return x.id === id; });
+      if (!n) return;
+      detalleNovedadId = id;
+      document.getElementById('detalleNovedadTitle').textContent = n.titulo || 'Detalle de la novedad';
+      document.getElementById('detalleNovedadInfo').style.display = 'grid';
+      document.getElementById('detalleNovedadInfo').innerHTML =
+        '<div class="form-group"><label>Fecha</label><div>' + (n.fecha || '-') + (n.hora ? ' · ' + n.hora : '') + '</div></div>'
+        + '<div class="form-group"><label>Turno</label><div>' + sfEscape(n.turno || '-') + '</div></div>'
+        + '<div class="form-group"><label>Categoría</label><div>' + sfEscape(n.categoria || '-') + '</div></div>'
+        + '<div class="form-group"><label>Estado</label><div><span class="badge ' + getBadgeClass(n.estado) + '">' + sfEscape(n.estado) + '</span></div></div>'
+        + '<div class="form-group"><label>Ubicación</label><div>' + sfEscape(n.ubicacion || '-') + '</div></div>'
+        + '<div class="form-group"><label>Registrado por</label><div>' + sfEscape(n.registrado_por || '-') + '</div></div>'
+        + '<div class="form-group sf-info-wide"><label>Descripción</label><div style="white-space:pre-wrap;">' + sfEscape(n.descripcion || '-') + '</div></div>'
+        + '<div class="form-group sf-info-wide"><label>Acciones tomadas</label><div style="white-space:pre-wrap;">' + sfEscape(n.acciones || '-') + '</div></div>';
+      sfShowModal('modalDetalleNovedad');
+    }
+
+    function openModalNovedad(id) {
+      editingNovedadId = id || null;
+      document.getElementById('formNovedad').reset();
+      document.getElementById('modalNovedadTitle').textContent = id ? 'Editar novedad' : 'Nueva novedad';
+      document.getElementById('nov_fecha').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('nov_hora').value = new Date().toTimeString().slice(0, 5);
+      if (id) {
+        var n = sfNovedades.find(function(x) { return x.id === id; });
+        if (n) {
+          document.getElementById('nov_fecha').value = n.fecha || '';
+          document.getElementById('nov_hora').value = n.hora || '';
+          document.getElementById('nov_turno').value = n.turno || 'Mañana';
+          document.getElementById('nov_categoria').value = n.categoria || 'Control de acceso';
+          document.getElementById('nov_titulo').value = n.titulo || '';
+          document.getElementById('nov_descripcion').value = n.descripcion || '';
+          document.getElementById('nov_ubicacion').value = n.ubicacion || '';
+          document.getElementById('nov_estado').value = n.estado || 'Abierta';
+          document.getElementById('nov_acciones').value = n.acciones || '';
+        }
+      }
+      sfShowModal('modalNovedad');
+    }
+
+    async function saveNovedad() {
+      var titulo = document.getElementById('nov_titulo').value.trim();
+      var fecha = document.getElementById('nov_fecha').value;
+      if (!titulo) {
+        showAlert('El título de la novedad es obligatorio', 'warning');
+        return;
+      }
+      if (!fecha) {
+        showAlert('La fecha es obligatoria', 'warning');
+        return;
+      }
+      var payload = {
+        fecha: fecha,
+        hora: document.getElementById('nov_hora').value || null,
+        turno: document.getElementById('nov_turno').value,
+        categoria: document.getElementById('nov_categoria').value,
+        titulo: titulo,
+        descripcion: document.getElementById('nov_descripcion').value.trim() || null,
+        ubicacion: document.getElementById('nov_ubicacion').value.trim() || null,
+        estado: document.getElementById('nov_estado').value,
+        acciones: document.getElementById('nov_acciones').value.trim() || null,
+        registrado_por: sfRegistradoPor()
+      };
+      try {
+        if (editingNovedadId) {
+          var { error } = await supabaseClient.from('seguridad_fisica_novedades').update(payload).eq('id', editingNovedadId);
+          if (error) throw error;
+        } else {
+          var { error } = await supabaseClient.from('seguridad_fisica_novedades').insert([payload]);
+          if (error) throw error;
+        }
+        sfHideModal('modalNovedad');
+        sfHideModal('modalDetalleNovedad');
+        loadNovedades();
+        showAlert(editingNovedadId ? 'Novedad actualizada' : 'Novedad registrada', 'success');
+      } catch (err) {
+        showAlert('Error al guardar: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteNovedad(id) {
+      var ok = await showConfirm('¿Eliminar esta novedad?', 'Eliminar');
+      if (!ok) return;
+      try {
+        var { error } = await supabaseClient.from('seguridad_fisica_novedades').delete().eq('id', id);
+        if (error) throw error;
+        sfHideModal('modalDetalleNovedad');
+        loadNovedades();
+        showAlert('Novedad eliminada', 'success');
+      } catch (err) {
+        showAlert('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    /* ===== INICIALIZACIÓN ===== */
+    document.addEventListener('DOMContentLoaded', function() {
+      restoreTool();
+      loadAccesos();
+      loadNovedades();
+    });
+  </script>
+
+  <script src="../js/module-help.js"></script>
+  <script src="../js/access.js"></script>
+</body>
+</html>

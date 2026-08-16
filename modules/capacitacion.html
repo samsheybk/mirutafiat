@@ -37,6 +37,7 @@
         <option value="capacitacion.html" selected>Capacitación y Desarrollo</option>
         <option value="bienestar-social.html">Bienestar Social</option>
         <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="seguridad-fisica.html">Seguridad Física</option>
         <option value="compensacion.html">Compensación</option>
         <option value="finanzas.html">Finanzas</option>
         <option value="repositorio.html">Repositorio</option>
@@ -96,22 +97,18 @@
                 <button type="button" class="active" id="vistaTablaBtn" onclick="setVistaCursos('tabla')">Tabla</button>
                 <button type="button" id="vistaGridBtn" onclick="setVistaCursos('grid')">Cuadrícula</button>
               </div>
-              <button class="btn btn-capacitacion btn-sm" onclick="location.href='curso.html'" style="margin-left:auto;">+ Nuevo curso</button>
+              <button class="btn btn-capacitacion btn-sm" onclick="location.href='curso.html'" style="margin-left:auto;">Nuevo curso</button>
             </div>
             <div class="toolbar-content" data-toolbar="talleres" style="display:none;align-items:center;gap:16px;width:100%;">
-              <h2 style="font-size:18px;font-weight:700;color:var(--module-capacitacion);">Talleres</h2>
-              <button class="btn btn-capacitacion btn-sm" style="margin-left:auto;">+ Nuevo taller</button>
+              <button class="btn btn-capacitacion btn-sm" style="margin-left:auto;">Nuevo taller</button>
             </div>
             <div class="toolbar-content" data-toolbar="evaluaciones" style="display:none;align-items:center;gap:16px;width:100%;">
-              <h2 style="font-size:18px;font-weight:700;color:var(--module-capacitacion);">Evaluaciones</h2>
-              <button class="btn btn-capacitacion btn-sm" style="margin-left:auto;">+ Nueva evaluación</button>
+              <button class="btn btn-capacitacion btn-sm" style="margin-left:auto;">Nueva evaluación</button>
             </div>
             <div class="toolbar-content" data-toolbar="planes" style="display:none;align-items:center;gap:16px;width:100%;">
-              <h2 style="font-size:18px;font-weight:700;color:var(--module-capacitacion);">Planes de formación</h2>
-              <button class="btn btn-capacitacion btn-sm" style="margin-left:auto;">+ Nuevo plan</button>
+              <button class="btn btn-capacitacion btn-sm" style="margin-left:auto;">Nuevo plan</button>
             </div>
             <div class="toolbar-content" data-toolbar="cargos" style="display:none;align-items:center;gap:16px;width:100%;">
-              <h2 style="font-size:18px;font-weight:700;color:var(--module-capacitacion);">Cargos</h2>
               <input type="text" id="buscarCargo" class="form-input" placeholder="Buscar cargo..." style="width:240px;height:36px;margin-left:16px;" oninput="filtrarCargos()">
             </div>
           </header>

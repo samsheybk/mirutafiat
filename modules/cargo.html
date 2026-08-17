@@ -236,7 +236,7 @@
         var cargo = rc.data;
 
         var [ru, rj] = await Promise.all([
-          supabaseClient.from('est_unidades').select('id,titulo').eq('id', cargo.unidad_id).single(),
+          supabaseClient.from('est_unidades').select('id,nombre').eq('id', cargo.unidad_id).single(),
           cargo.jefe_inmediato_id
             ? supabaseClient.from('est_cargos').select('id,titulo').eq('id', cargo.jefe_inmediato_id).single()
             : Promise.resolve({ data: null })
@@ -244,7 +244,7 @@
 
         document.getElementById('cargoTitulo').textContent = cargo.titulo;
         document.getElementById('cargoInfo').innerHTML =
-          '<div class="form-group"><label>Unidad</label><div style="font-weight:600;">' + escHtml(ru.data ? ru.data.titulo : '—') + '</div></div>' +
+          '<div class="form-group"><label>Unidad</label><div style="font-weight:600;">' + escHtml(ru.data ? ru.data.nombre : '—') + '</div></div>' +
           '<div class="form-group"><label>Jefe inmediato</label><div style="font-weight:600;">' + escHtml(rj.data ? rj.data.titulo : '—') + '</div></div>' +
           '<div class="form-group"><label>Vacantes</label><div style="font-weight:600;">' + (cargo.vacantes || 0) + '</div></div>';
 

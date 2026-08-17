@@ -360,13 +360,13 @@
         if (rc.error) throw rc.error;
 
         var [ru, rj, rcomp, rcur] = await Promise.all([
-          supabaseClient.from('est_unidades').select('id,titulo').order('titulo'),
+          supabaseClient.from('est_unidades').select('id,nombre').order('nombre'),
           supabaseClient.from('est_cargos').select('id,titulo').order('titulo'),
           supabaseClient.from('car_competencias').select('cargo_id,tipo'),
           supabaseClient.from('car_cursos_obligatorios').select('cargo_id')
         ]);
         var unidades = {};
-        (ru.data || []).forEach(function(u) { unidades[u.id] = u.titulo; });
+        (ru.data || []).forEach(function(u) { unidades[u.id] = u.nombre; });
         var jefes = {};
         (rj.data || []).forEach(function(j) { jefes[j.id] = j.titulo; });
 

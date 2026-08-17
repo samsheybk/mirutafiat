@@ -488,6 +488,7 @@ a {
   position: relative;
 }
 
+.nav-user-text { display: none; }
 .nav-user-menu-btn {
   width: 44px;
   height: 44px;
@@ -2707,17 +2708,19 @@ a {
   .nav-user {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     order: 3;
   }
+  .nav-user-dots { display: none; }
+  .nav-user-text { display: inline; font-size: 13px; font-weight: 600; }
+  .nav-user-menu-btn { width: auto; gap: 4px; }
   .topnav-spacer {
     display: none;
   }
   .nav-splash-btn {
-    display: none !important;
+    display: none;
   }
   .topnav.open .nav-splash-btn {
-    display: flex !important;
     order: 3;
     margin-left: 0;
   }

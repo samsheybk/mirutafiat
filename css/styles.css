@@ -443,7 +443,7 @@ a {
   padding: 10px 10px 6px;
   font-size: 10.5px;
   font-weight: 800;
-  color: #64748b !important;
+  color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   border-top: 1px solid #f1f5f9;
@@ -460,7 +460,7 @@ a {
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: #1e293b !important;
+  color: #1e293b;
   font-size: 13px;
   font-weight: 500;
   text-align: left;
@@ -469,7 +469,7 @@ a {
 }
 .nav-drop-item:hover { background: #f1f5f9; color: #0f172a; }
 .nav-drop-item i { font-size: 16px; flex: none; }
-.nav-drop-item span { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #1e293b !important; }
+.nav-drop-item span { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #1e293b; }
 .nav-drop-item.current { background: #f1f5f9; color: #0f172a; font-weight: 600; }
 .nav-drop-check { color: #34d399; font-size: 13px !important; }
 
@@ -3233,13 +3233,5 @@ a {
   }
 }
 
-/* ===== Botones: ícono separado del texto ===== */
-.module-content button:has(i.fi):not(.filter-toggle-btn):not(.topnav-toggle):not(.nav-drop-item):not(.nav-drop-btn),
-.module-body button:has(i.fi):not(.filter-toggle-btn):not(.topnav-toggle):not(.nav-drop-item):not(.nav-drop-btn),
-a:has(i.fi) {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
+
 

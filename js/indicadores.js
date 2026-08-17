@@ -700,7 +700,8 @@
   panelItem.title = 'Indicadores de gestión';
   panelItem.innerHTML =
     '<span class="panel-item-indicator ' + cfg.bg + '"></span>' +
-    '<i class="fi fi-sr-dashboard" style="font-size:24px;pointer-events:none;"></i>';
+    '<i class="fi fi-sr-dashboard" style="font-size:24px;pointer-events:none;"></i>' +
+    '<span class="panel-item-label">Indicadores</span>';
   panelEl.appendChild(panelItem);
 
   // 2) Encabezado en la barra de herramientas (si existe)

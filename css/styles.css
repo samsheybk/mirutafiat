@@ -846,6 +846,21 @@ a {
 .panel-item-label {
   display: none;
 }
+@media (max-width: 640px) {
+  .panel-item-label {
+    display: block;
+    font-size: 9px;
+    font-weight: 600;
+    line-height: 1.1;
+    text-align: center;
+    color: inherit;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 56px;
+    margin-top: -1px;
+  }
+}
 
 /* Botón "más herramientas" (solo móvil cuando hay >4) */
 .panel-more-btn {

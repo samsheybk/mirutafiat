@@ -364,6 +364,8 @@ a {
   flex: 1;
 }
 
+.nav-home-icon { display: none; }
+
 .nav-select {
   height: 36px;
   padding: 0 32px 0 12px;
@@ -2671,6 +2673,13 @@ a {
   }
   .topnav-brand span {
     display: none;
+  }
+  .nav-home-icon {
+    display: inline-block;
+    font-size: 18px;
+    color: #fff;
+    margin-right: 6px;
+    vertical-align: middle;
   }
   .topnav-logo {
     width: 72px;

@@ -2669,7 +2669,6 @@ a {
   }
   .topnav-brand {
     font-size: 14px;
-    margin-right: auto;
   }
   .topnav-brand span {
     display: none;
@@ -2685,11 +2684,6 @@ a {
     width: 72px;
     height: 28px;
     margin-right: 6px;
-  }
-  .topnav-toggle {
-    display: flex;
-    flex-shrink: 0;
-    order: 3;
   }
   .nav-select {
     order: 2;
@@ -2711,7 +2705,10 @@ a {
   .nav-drop-btn { width: 100%; min-width: 0; }
   .nav-drop-panel { left: 0; right: 0; min-width: 0; }
   .nav-user {
-    display: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    order: 3;
   }
   .topnav-spacer {
     display: none;
@@ -2732,14 +2729,6 @@ a {
   }
   .topnav-brand {
     order: 1;
-    margin-right: auto;
-  }
-  .topnav-toggle {
-    order: 3;
-    margin-left: 0;
-  }
-  .topnav.open .nav-user {
-    display: none;
   }
   .topnav.open .nav-select {
     order: 2;
@@ -2749,9 +2738,6 @@ a {
     order: 2;
     display: block;
     flex-basis: 100%;
-  }
-  .topnav.open .nav-user {
-    display: none;
   }
   .topnav.open .topnav-spacer {
     display: none;

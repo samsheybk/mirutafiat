@@ -3234,7 +3234,7 @@ a {
 }
 
 /* ===== Botones: ícono separado del texto ===== */
-button:has(i.fi):not(.filter-toggle-btn):not(.topnav-toggle),
+button:has(i.fi):not(.filter-toggle-btn):not(.topnav-toggle):not(.nav-drop-item):not(.nav-drop-btn),
 a:has(i.fi) {
   display: inline-flex;
   align-items: center;

@@ -113,23 +113,20 @@
     'captacion.html': {
       bg: 'bg-captacion',
       subtitle: 'Indicadores del proceso de reclutamiento, selección e incorporación de personal.',
-      cards: [
-        { title: 'Candidatos (ATS)', icon: 'fi-sr-users', table: 'ats_candidatos', count: true, hint: 'Postulantes en el proceso' },
-        { title: 'En entrevista', icon: 'fi-sr-clock', table: 'ats_candidatos', count: true, filter: { estado_kanban: 'Entrevista' }, hint: 'Etapa de entrevista' },
-        { title: 'Elegibles', icon: 'fi-sr-badge-check', table: 'ats_candidatos', count: true, filter: { estado_kanban: 'Elegible' }, hint: 'Listos para contratar' },
-        { title: 'Requisiciones', icon: 'fi-sr-file-chart-line', table: 'requisiciones_solicitudes', count: true, hint: 'Solicitudes de personal' },
-        { title: 'Requisiciones pendientes', icon: 'fi-sr-clock', table: 'requisiciones_solicitudes', count: true, filter: { estado: 'Pendiente' }, hint: 'En espera de aprobación' },
-        { title: 'Trabajadores activos', icon: 'fi-sr-briefcase', table: 'plantilla_trabajadores', count: true, filter: { estado: 'Activo' }, hint: 'Plantilla activa' },
-        { title: 'Unidades', icon: 'fi-sr-diagram-project', table: 'est_unidades', count: true, hint: 'Estructura organizacional' },
-        { title: 'Cargos', icon: 'fi-sr-briefcase', table: 'est_cargos', count: true, hint: 'Puestos definidos' },
-        { title: 'Cobertura de la plantilla', icon: 'fi-sr-chart-pie', calc: 'cobertura_plantilla', format: 'percent', hint: 'Activos vs plazas configuradas' }
-      ],
+      cards: [],
       sections: [
         {
           title: 'Tiempo promedio de abandono por cargo',
           icon: 'fi-sr-time-past',
           desc: 'Días promedio que permanecen los trabajadores en la empresa antes de egresar, por cargo. Ordenados del más corto al más largo para anticipar futuras búsquedas de candidatos.',
           calc: 'abandono_por_cargo'
+        },
+        {
+          title: 'Headcount por unidad',
+          icon: 'fi-sr-chart-pie',
+          chart: 'donut',
+          calc: 'bienestar_headcount',
+          desc: 'Distribución de la plantilla activa por unidad organizacional.'
         }
       ]
     },
@@ -165,17 +162,36 @@
     'bienestar-social.html': {
       bg: 'bg-bienestar',
       subtitle: 'Indicadores de los programas, beneficios y actividades para los trabajadores.',
-      cards: [
-        { title: 'Trabajadores activos', icon: 'fi-sr-users', table: 'plantilla_trabajadores', count: true, filter: { estado: 'Activo' }, hint: 'Beneficiarios potenciales' },
-        { title: 'Préstamos', icon: 'fi-sr-hand-holding-usd', table: 'bienestar_prestamos', count: true, hint: 'Solicitudes registradas' },
-        { title: 'Préstamos activos', icon: 'fi-sr-hand-holding-usd', table: 'bienestar_prestamos', count: true, filter: { estado: 'Activo' }, hint: 'En proceso de pago' },
-        { title: 'Tipos de póliza', icon: 'fi-sr-shield', table: 'bienestar_poliza_tipos', count: true, hint: 'Catálogo de seguros' },
-        { title: 'Pólizas asignadas', icon: 'fi-sr-shield', table: 'bienestar_poliza_trabajadores', count: true, filter: { estado: 'Activa' }, hint: 'Trabajadores asegurados' },
-        { title: 'Ventas de vehículos', icon: 'fi-sr-car', table: 'bienestar_vehiculos_ventas', count: true, hint: 'Contratos a cuotas' },
-        { title: 'Cuotas pendientes', icon: 'fi-sr-clock', table: 'bienestar_vehiculos_pagos', count: true, filter: { estado: 'Pendiente' }, hint: 'Pagos por cobrar' },
-        { title: 'Prendas en stock', icon: 'fi-sr-vest', table: 'bienestar_uniforme_stock', count: true, filter: { cantidad: 'gt:0' }, hint: 'Uniformes disponibles' },
-        { title: 'Encuestas', icon: 'fi-sr-square-poll-horizontal', table: 'bienestar_encuestas', count: true, hint: 'Encuestas creadas' },
-        { title: 'Eventos', icon: 'fi-sr-calendar', table: 'bienestar_calendario', count: true, hint: 'Actividades del calendario' }
+      cards: [],
+      sections: [
+        {
+          title: 'Distribución por género',
+          icon: 'fi-sr-venus-mars',
+          chart: 'donut',
+          calc: 'bienestar_sexo',
+          desc: 'Total de hombres y mujeres en la plantilla activa.'
+        },
+        {
+          title: 'Distribución por edades',
+          icon: 'fi-sr-cake-birthday',
+          chart: 'donut',
+          calc: 'bienestar_edades',
+          desc: 'Distribución etaria de la plantilla activa.'
+        },
+        {
+          title: 'Padres y madres',
+          icon: 'fi-sr-people',
+          chart: 'donut',
+          calc: 'bienestar_padres_madres',
+          desc: 'Trabajadores con carga familiar registrada como padre o madre.'
+        },
+        {
+          title: 'Headcount por unidad',
+          icon: 'fi-sr-chart-pie',
+          chart: 'donut',
+          calc: 'bienestar_headcount',
+          desc: 'Distribución de la plantilla activa por unidad organizacional.'
+        }
       ]
     },
     'seguridad-salud.html': {
@@ -265,7 +281,7 @@
 
   var indPalette = ['#7c3aed', '#2563eb', '#16a34a', '#d97706', '#dc2626', '#0891b2', '#db2777', '#4f46e5', '#65a30d', '#9333ea'];
 
-  function indDonutHtml(labels, values, colors, usd, totalUsd) {
+  function indDonutHtml(labels, values, colors, usd, totalUsd, centerText, centerSub) {
     var total = (values || []).reduce(function (s, v) { return s + (+v || 0); }, 0);
     if (!total) return '<div class="ind-empty">Sin estructuras salariales registradas</div>';
     var R = 60, W = 22, cx = 90, cy = 90;
@@ -286,12 +302,14 @@
     if (usd && totalUsd != null) {
       legend += '<div class="ind-legend-total"><span>Total</span><span>' + indFormat(totalUsd, 'usd') + ' / mes</span></div>';
     }
+    var cText = centerText != null ? centerText : total;
+    var cSub = centerSub != null ? centerSub : 'estructuras';
     return '<div class="ind-donut">' +
-      '<svg viewBox="0 0 180 180" width="180" height="180">' +
+      '<svg viewBox="0 0 180 180" width="150" height="150">' +
       '<circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" fill="none" stroke="var(--color-border)" stroke-width="' + W + '"></circle>' +
       segs +
-      '<text x="' + cx + '" y="' + cy + '" text-anchor="middle" dominant-baseline="central" style="font-size:22px;font-weight:700;fill:var(--color-text);">' + total + '</text>' +
-      '<text x="' + cx + '" y="' + (cy + 22) + '" text-anchor="middle" style="font-size:10px;fill:var(--color-text-secondary);">estructuras</text>' +
+      '<text x="' + cx + '" y="' + cy + '" text-anchor="middle" dominant-baseline="central" style="font-size:22px;font-weight:700;fill:var(--color-text);">' + cText + '</text>' +
+      '<text x="' + cx + '" y="' + (cy + 22) + '" text-anchor="middle" style="font-size:10px;fill:var(--color-text-secondary);">' + indEscape(cSub) + '</text>' +
       '</svg>' +
       '<div class="ind-legend">' + legend + '</div>' +
       '</div>';
@@ -388,6 +406,21 @@
   }
 
   var CALCULATORS = {
+    _mockMode: false,
+    _mockData: {
+      bienestar_sexo: function () {
+        return { labels: ['Masculino', 'Femenino'], values: [42, 28], colors: ['#2563eb', '#e11d48'], centerText: 70, centerSub: 'trabajadores' };
+      },
+      bienestar_edades: function () {
+        return { labels: ['18-25', '26-35', '36-45', '46-55', '56+'], values: [8, 22, 20, 14, 6], colors: ['#16a34a', '#2563eb', '#d97706', '#dc2626', '#7c3aed'], centerText: 34, centerSub: 'edad promedio' };
+      },
+      bienestar_padres_madres: function () {
+        return { labels: ['Padres', 'Madres'], values: [18, 15], colors: ['#0891b2', '#db2777'], centerText: 33, centerSub: 'familiares' };
+      },
+      bienestar_headcount: function () {
+        return { labels: ['Recursos Humanos', 'Soporte', 'Producción', 'Administración', 'Ventas'], values: [18, 14, 16, 12, 10], colors: ['#2563eb', '#0891b2', '#16a34a', '#d97706', '#dc2626'], centerText: 70, centerSub: 'trabajadores' };
+      }
+    },
     estructuras_suma: async function () {
       var eRes = await supabaseClient.from('comp_estructura_salarial').select('estado, parte_bs, parte_usd, tasa_bcv, sueldo_base_bs, sueldo_base_usd, complemento_usd');
       if (eRes.error) throw eRes.error;
@@ -564,6 +597,94 @@
           ] };
         })
       };
+    },
+    bienestar_sexo: async function () {
+      var res = await supabaseClient.from('plantilla_trabajadores').select('sexo', { count: 'exact', head: false }).eq('estado', 'Activo');
+      if (res.error) throw res.error;
+      var m = 0, f = 0;
+      (res.data || []).forEach(function (t) {
+        if (t.sexo === 'Masculino') m++;
+        else if (t.sexo === 'Femenino') f++;
+      });
+      var total = m + f;
+      return {
+        labels: ['Masculino', 'Femenino'],
+        values: [m, f],
+        colors: ['#2563eb', '#e11d48'],
+        centerText: total,
+        centerSub: 'trabajadores'
+      };
+    },
+    bienestar_edades: async function () {
+      var res = await supabaseClient.from('plantilla_trabajadores').select('fecha_nacimiento').eq('estado', 'Activo');
+      if (res.error) throw res.error;
+      var ranges = { '18-25': 0, '26-35': 0, '36-45': 0, '46-55': 0, '56+': 0 };
+      var sumAge = 0, countAge = 0;
+      var now = Date.now();
+      (res.data || []).forEach(function (t) {
+        if (!t.fecha_nacimiento) return;
+        var bd = new Date(t.fecha_nacimiento);
+        if (isNaN(bd.getTime())) return;
+        var age = Math.floor((now - bd.getTime()) / (365.25 * 86400000));
+        if (age < 18) return;
+        sumAge += age;
+        countAge++;
+        if (age <= 25) ranges['18-25']++;
+        else if (age <= 35) ranges['26-35']++;
+        else if (age <= 45) ranges['36-45']++;
+        else if (age <= 55) ranges['46-55']++;
+        else ranges['56+']++;
+      });
+      var avg = countAge ? Math.round(sumAge / countAge) : '—';
+      return {
+        labels: Object.keys(ranges),
+        values: Object.values(ranges),
+        colors: ['#16a34a', '#2563eb', '#d97706', '#dc2626', '#7c3aed'],
+        centerText: avg,
+        centerSub: 'edad promedio'
+      };
+    },
+    bienestar_padres_madres: async function () {
+      var res = await supabaseClient.from('trabajador_carga_familiar').select('parentesco');
+      if (res.error) throw res.error;
+      var padres = 0, madres = 0;
+      (res.data || []).forEach(function (c) {
+        if (c.parentesco === 'Padre') padres++;
+        else if (c.parentesco === 'Madre') madres++;
+      });
+      var total = padres + madres;
+      return {
+        labels: ['Padres', 'Madres'],
+        values: [padres, madres],
+        colors: ['#0891b2', '#db2777'],
+        centerText: total,
+        centerSub: 'familiares'
+      };
+    },
+    bienestar_headcount: async function () {
+      var tRes = await supabaseClient.from('plantilla_trabajadores').select('unidad_id').eq('estado', 'Activo');
+      if (tRes.error) throw tRes.error;
+      var uRes = await supabaseClient.from('est_unidades').select('id, nombre');
+      if (uRes.error) throw uRes.error;
+      var nombres = {};
+      (uRes.data || []).forEach(function (u) { nombres[u.id] = u.nombre; });
+      var porUnidad = {};
+      (tRes.data || []).forEach(function (t) {
+        var key = t.unidad_id || 'Sin unidad';
+        porUnidad[key] = (porUnidad[key] || 0) + 1;
+      });
+      var items = Object.keys(porUnidad).map(function (k) {
+        return { nombre: nombres[k] || 'Sin unidad', n: porUnidad[k] };
+      }).sort(function (a, b) { return b.n - a.n; });
+      var total = items.reduce(function (s, it) { return s + it.n; }, 0);
+      var palette = ['#2563eb', '#7c3aed', '#0891b2', '#16a34a', '#d97706', '#dc2626', '#db2777', '#4f46e5', '#65a30d', '#ea580c'];
+      return {
+        labels: items.map(function (it) { return it.nombre; }),
+        values: items.map(function (it) { return it.n; }),
+        colors: items.map(function (_, i) { return palette[i % palette.length]; }),
+        centerText: total,
+        centerSub: 'trabajadores'
+      };
     }
   };
 
@@ -590,11 +711,13 @@
     tb.setAttribute('data-toolbar', 'indicadores');
     tb.style.cssText = 'display:none;align-items:center;gap:10px;width:100%;flex-wrap:wrap;';
     tb.innerHTML =
-      '<h2 style="font-size:18px;font-weight:700;color:var(--module-color);white-space:nowrap;">Indicadores de gestión</h2>' +
-      '<span style="font-size:13px;color:var(--color-text-secondary);white-space:nowrap;">Análisis:</span>' +
       '<input type="date" class="form-input" id="indDesde" value="' + indRango.desde + '" style="height:36px;max-width:160px;" onchange="indAplicarRango()" title="Inicio del rango de análisis">' +
-      '<span style="color:var(--color-text-secondary);">→</span>' +
-      '<input type="date" class="form-input" id="indHasta" value="' + indRango.hasta + '" style="height:36px;max-width:160px;" onchange="indAplicarRango()" title="Fin del rango de análisis">';
+      '<input type="date" class="form-input" id="indHasta" value="' + indRango.hasta + '" style="height:36px;max-width:160px;" onchange="indAplicarRango()" title="Fin del rango de análisis">' +
+      '<label class="ind-mock-toggle" title="Simular datos de ejemplo para previsualizar los gráficos">' +
+        '<input type="checkbox" id="indMockToggle" onchange="indToggleMock(this.checked)">' +
+        '<span class="ind-mock-slider"></span>' +
+        '<span class="ind-mock-text">Simular</span>' +
+      '</label>';
     topbarEl.appendChild(tb);
   }
 
@@ -717,11 +840,17 @@
       if (emptyEl) emptyEl.innerHTML = '<div class="ind-empty">No disponible</div>';
       return;
     }
-    fn().then(function (res) {
+    var promise;
+    if (CALCULATORS._mockMode && CALCULATORS._mockData[sec.calc]) {
+      promise = Promise.resolve(CALCULATORS._mockData[sec.calc]());
+    } else {
+      promise = fn();
+    }
+    promise.then(function (res) {
       if (sec.chart === 'donut') {
         var chartEl = document.getElementById('indChart-' + i);
         if (chartEl) {
-          chartEl.innerHTML = (res && res.labels) ? indDonutHtml(res.labels, res.values, res.colors, res.usd, res.totalUsd) : '<div class="ind-empty">Sin datos</div>';
+          chartEl.innerHTML = (res && res.labels) ? indDonutHtml(res.labels, res.values, res.colors, res.usd, res.totalUsd, res.centerText, res.centerSub) : '<div class="ind-empty">Sin datos</div>';
         }
         return;
       }
@@ -752,6 +881,11 @@
     (cfg.sections || []).forEach(loadSection);
   }
 
+  function indToggleMock(checked) {
+    CALCULATORS._mockMode = !!checked;
+    loadIndicadores();
+  }
+
   // 5) Recargar al activar la herramienta
   var hooked = false;
   function hookSwitchTool() {
@@ -768,5 +902,11 @@
   loadIndicadores();
   hookSwitchTool();
   window.indAplicarRango = indAplicarRango;
+  window.indToggleMock = indToggleMock;
   document.addEventListener('DOMContentLoaded', hookSwitchTool);
+
+  var saved = localStorage.getItem('fiat_tool_' + location.pathname);
+  if (saved === 'indicadores' && document.getElementById('tool-indicadores')) {
+    switchTool('indicadores');
+  }
 })();

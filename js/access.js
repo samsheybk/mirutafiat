@@ -16,29 +16,38 @@
 
   var SUPERADMIN_EMAILS = ['developer@prueba.dev'];
 
+  /* ===== Unidades (agrupan los módulos) ===== */
+  var UNIDADES = [
+    { key: 'rrhh', name: 'Recursos Humanos', accent: '#2563eb' },
+    { key: 'soporte', name: 'Soporte', accent: '#0e7490' },
+    { key: 'admin-finanzas', name: 'Administración y Finanzas', accent: '#b45309' },
+    { key: 'comunicaciones', name: 'Comunicaciones', accent: '#4f46e5' }
+  ];
+  window.FIAT_UNIDADES = UNIDADES;
+
   window.FIAT_MODULES = [
-    { key: 'captacion.html', name: 'Captación y Selección', tools: [
+    { key: 'captacion.html', name: 'Captación y Selección', unidad: 'rrhh', tools: [
       { key: 'ats', name: 'ATS' },
       { key: 'estructura', name: 'Estructura organizacional' },
       { key: 'psicologia', name: 'Psicología' },
       { key: 'requisiciones', name: 'Requisiciones de personal' },
       { key: 'plantilla', name: 'Plantilla activa' }
     ]},
-    { key: 'relaciones-laborales.html', name: 'Relaciones Laborales', tools: [
+    { key: 'relaciones-laborales.html', name: 'Relaciones Laborales', unidad: 'rrhh', tools: [
       { key: 'registros', name: 'Registros laborales' },
       { key: 'conceptos', name: 'Conceptos' },
       { key: 'equipos', name: 'Asignación de equipos' },
       { key: 'plantilla', name: 'Plantilla activa' },
       { key: 'actas', name: 'Actas y reuniones' }
     ]},
-    { key: 'capacitacion.html', name: 'Capacitación y Desarrollo', tools: [
+    { key: 'capacitacion.html', name: 'Capacitación y Desarrollo', unidad: 'rrhh', tools: [
       { key: 'cursos', name: 'Cursos' },
       { key: 'talleres', name: 'Talleres' },
       { key: 'evaluaciones', name: 'Evaluaciones' },
       { key: 'planes', name: 'Planes de formación' },
       { key: 'cargos', name: 'Cargos' }
     ]},
-    { key: 'bienestar-social.html', name: 'Bienestar Social', tools: [
+    { key: 'bienestar-social.html', name: 'Bienestar Social', unidad: 'rrhh', tools: [
       { key: 'plantilla', name: 'Plantilla de trabajadores' },
       { key: 'prestamos', name: 'Préstamos' },
       { key: 'polizas', name: 'Pólizas' },
@@ -46,58 +55,58 @@
       { key: 'encuestas', name: 'Encuestas' },
       { key: 'calendario', name: 'Calendario' }
     ]},
-    { key: 'seguridad-salud.html', name: 'Seguridad y Salud Laboral', tools: [
+    { key: 'seguridad-salud.html', name: 'Seguridad y Salud Laboral', unidad: 'rrhh', tools: [
       { key: 'incidentes', name: 'Incidentes' },
       { key: 'inspecciones', name: 'Inspecciones' },
       { key: 'servicio-medico', name: 'Servicio Médico' },
       { key: 'inv-equipos', name: 'Inventario de equipos' },
       { key: 'inv-insumos', name: 'Inventario de insumos' }
     ]},
-    { key: 'seguridad-fisica.html', name: 'Seguridad Física', tools: [
+    { key: 'seguridad-fisica.html', name: 'Seguridad Física', unidad: 'soporte', tools: [
       { key: 'accesos', name: 'Control de acceso' },
       { key: 'novedades', name: 'Libro de novedades' }
     ]},
-    { key: 'compensacion.html', name: 'Compensación', tools: [
+    { key: 'compensacion.html', name: 'Compensación', unidad: 'rrhh', tools: [
       { key: 'salarial', name: 'Estructura salarial por cargo' },
       { key: 'liquidaciones', name: 'Liquidaciones' },
       { key: 'reportes', name: 'Reportes' },
       { key: 'biometria', name: 'Biometría' }
     ]},
-    { key: 'finanzas.html', name: 'Finanzas', tools: [
+    { key: 'finanzas.html', name: 'Finanzas', unidad: 'admin-finanzas', tools: [
       { key: 'movimientos', name: 'Registro de movimientos' },
       { key: 'reportes', name: 'Reportes financieros' }
     ]},
-    { key: 'repositorio.html', name: 'Repositorio', tools: [
+    { key: 'repositorio.html', name: 'Repositorio', unidad: 'soporte', tools: [
       { key: 'documentos', name: 'Documentos' },
       { key: 'categorias', name: 'Categorías' }
     ]},
-    { key: 'chatfiat.html', name: 'Mensajería', tools: [
+    { key: 'chatfiat.html', name: 'Mensajería', unidad: 'comunicaciones', tools: [
       { key: 'inicio', name: 'Inicio' },
       { key: 'mensajes', name: 'Mensajes' }
     ]},
-    { key: 'desarrollo-organizacional.html', name: 'Desarrollo organizacional', tools: [
+    { key: 'desarrollo-organizacional.html', name: 'Desarrollo organizacional', unidad: 'rrhh', tools: [
       { key: 'analisis-kpi', name: 'Análisis de KPI por unidades' },
       { key: 'rendimiento-kpi', name: 'Rendimiento según KPI' },
       { key: 'okr', name: 'OKR' },
       { key: 'estadisticas', name: 'Estadísticas de salud' }
     ]},
-    { key: 'oportunidades.html', name: 'Oportunidades de acción', tools: [
+    { key: 'oportunidades.html', name: 'Oportunidades de acción', unidad: 'rrhh', tools: [
       { key: 'vision', name: 'Visión general' },
       { key: 'oportunidades', name: 'Oportunidades de crecimiento' },
       { key: 'roadmap', name: 'Hoja de ruta' },
       { key: 'costos', name: 'Propuesta de costos' }
     ]},
-    { key: 'gestion-usuarios.html', name: 'Gestión de usuarios', tools: [
+    { key: 'gestion-usuarios.html', name: 'Gestión de usuarios', unidad: 'soporte', tools: [
       { key: 'usuarios', name: 'Usuarios y accesos' },
       { key: 'accesos', name: 'Permisos por módulo' }
     ]},
-    { key: 'gourmet.html', name: 'Gourmet', tools: [
+    { key: 'gourmet.html', name: 'Gourmet', unidad: 'soporte', tools: [
       { key: 'equipos', name: 'Inventario de equipos y utensilios' },
       { key: 'insumos', name: 'Inventario de insumos' },
       { key: 'recetario', name: 'Recetario' },
       { key: 'catalogo', name: 'Menú del día' }
     ]},
-    { key: 'ti.html', name: 'Sistemas TI', tools: [
+    { key: 'ti.html', name: 'Sistemas TI', unidad: 'soporte', tools: [
       { key: 'inventario', name: 'Inventario TI' },
       { key: 'helpdesk', name: 'Helpdesk' },
       { key: 'proyectos', name: 'Gestión de proyectos TI' }
@@ -200,6 +209,23 @@
     }
   }
 
+  var MODULE_ICONS = {
+    'captacion.html': ['fi-sr-users', '#2563eb'],
+    'relaciones-laborales.html': ['fi-sr-briefcase', '#059669'],
+    'capacitacion.html': ['fi-sr-graduation-cap', '#ea580c'],
+    'bienestar-social.html': ['fi-sr-heart', '#db2777'],
+    'seguridad-salud.html': ['fi-sr-shield', '#dc2626'],
+    'seguridad-fisica.html': ['fi-sr-lock', '#334155'],
+    'compensacion.html': ['fi-sr-coins', '#7c3aed'],
+    'finanzas.html': ['fi-sr-chart-line', '#b45309'],
+    'repositorio.html': ['fi-sr-folder', '#06b6d4'],
+    'chatfiat.html': ['fi-sr-envelope', '#4f46e5'],
+    'desarrollo-organizacional.html': ['fi-sr-chart-line-up', '#d97706'],
+    'gestion-usuarios.html': ['fi-sr-user-gear', '#0ea5e9'],
+    'gourmet.html': ['fi-sr-utensils', '#a16207'],
+    'ti.html': ['fi-sr-laptop', '#0e7490']
+  };
+
   function applyNav() {
     var sel = document.getElementById('navSelect');
     if (!sel) return;
@@ -207,16 +233,104 @@
     var home = inModules() ? '../dashboard.html' : 'dashboard.html';
     var prefix = inModules() ? '' : 'modules/';
     var opts = '<option value="' + home + '"' + (cur === 'dashboard.html' ? ' selected' : '') + '>Home</option>';
-    (window.FIAT_MODULES || []).forEach(function (m) {
-      if (m.key === 'oportunidades.html') return;
-      if (m.key === 'gestion-usuarios.html') return;
-      if (!canViewModule(m.key)) return;
-      opts += '<option value="' + prefix + m.key + '"' + (cur === m.key ? ' selected' : '') + '>' + m.name + '</option>';
+    var visible = (window.FIAT_MODULES || []).filter(function (m) {
+      if (m.key === 'oportunidades.html') return false;
+      if (m.key === 'gestion-usuarios.html') return false;
+      return canViewModule(m.key);
     });
     if (state.manage) {
-      opts += '<option value="' + prefix + 'gestion-usuarios.html"' + (cur === 'gestion-usuarios.html' ? ' selected' : '') + '>Gestión de usuarios</option>';
+      visible.push({ key: 'gestion-usuarios.html', name: 'Gestión de usuarios', unidad: 'soporte' });
     }
+    (window.FIAT_UNIDADES || []).forEach(function (u) {
+      var mods = visible.filter(function (m) { return m.unidad === u.key; });
+      if (!mods.length) return;
+      opts += '<optgroup label="' + u.name + '">';
+      mods.forEach(function (m) {
+        opts += '<option value="' + prefix + m.key + '"' + (cur === m.key ? ' selected' : '') + '>' + m.name + '</option>';
+      });
+      opts += '</optgroup>';
+    });
     sel.innerHTML = opts;
+    buildNavDropdown(sel, cur, home, prefix);
+  }
+
+  function buildNavDropdown(sel, cur, home, prefix) {
+    var existing = document.querySelector('.nav-dropdown');
+    if (existing) existing.remove();
+    var wrap = document.createElement('div');
+    wrap.className = 'nav-dropdown';
+    var groupsHtml = '';
+    (window.FIAT_UNIDADES || []).forEach(function (u) {
+      var mods = (window.FIAT_MODULES || []).filter(function (m) {
+        return m.unidad === u.key && (m.key === 'gestion-usuarios.html' ? state.manage : canViewModule(m.key));
+      });
+      if (!mods.length) return;
+      var items = '';
+      mods.forEach(function (m) {
+        var ic = MODULE_ICONS[m.key] || ['fi-sr-dashboard', '#0d9488'];
+        var isCur = cur === m.key;
+        items += '<button type="button" class="nav-drop-item' + (isCur ? ' current' : '') +
+          '" data-url="' + prefix + m.key + '">' +
+          '<i class="fi ' + ic[0] + '" style="color:' + ic[1] + ';"></i><span>' + m.name + '</span>' +
+          (isCur ? '<i class="fi fi-sr-check nav-drop-check"></i>' : '') +
+          '</button>';
+      });
+      groupsHtml += '<div class="nav-drop-group">' + u.name + '</div>' + items;
+    });
+    var curOpt = sel.options[sel.selectedIndex];
+    var curLabel = curOpt ? curOpt.textContent : 'Home';
+    var homeIc = MODULE_ICONS['dashboard.html'] || ['fi-sr-home', '#0d9488'];
+    wrap.innerHTML =
+      '<button type="button" class="nav-drop-btn" aria-haspopup="listbox" aria-expanded="false">' +
+        '<span class="nav-drop-label">' + curLabel + '</span>' +
+        '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+      '</button>' +
+      '<div class="nav-drop-panel" role="listbox">' +
+        '<button type="button" class="nav-drop-item' + (cur === 'dashboard.html' ? ' current' : '') + '" data-url="' + home + '">' +
+          '<i class="fi fi-sr-home" style="color:#0d9488;"></i><span>Home</span>' +
+          (cur === 'dashboard.html' ? '<i class="fi fi-sr-check nav-drop-check"></i>' : '') +
+        '</button>' +
+        groupsHtml +
+      '</div>';
+    sel.parentNode.insertBefore(wrap, sel);
+    sel.style.display = 'none';
+    setTimeout(function () { navDropdownSync(sel); }, 0);
+    var btn = wrap.querySelector('.nav-drop-btn');
+    var panel = wrap.querySelector('.nav-drop-panel');
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      navDropdownSync(sel);
+      var open = wrap.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    panel.addEventListener('click', function (e) {
+      var item = e.target.closest('.nav-drop-item');
+      if (!item) return;
+      var url = item.getAttribute('data-url');
+      if (typeof window.navigateModule === 'function') window.navigateModule(url);
+      else location.href = url;
+      wrap.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    });
+    document.addEventListener('click', function (e) {
+      if (!wrap.contains(e.target)) {
+        wrap.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        wrap.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  function navDropdownSync(sel) {
+    var label = document.querySelector('.nav-drop-label');
+    if (!label || !sel) return;
+    var opt = sel.options[sel.selectedIndex];
+    label.textContent = opt ? opt.textContent : 'Home';
   }
 
   function applyDashboard() {

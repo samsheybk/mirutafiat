@@ -99,6 +99,7 @@
                 <button class="btn btn-outline" onclick="openModalCargo()">Nuevo cargo</button>
               </div>
             </div>
+            <div class="toolbar-content" data-toolbar="psicologia" style="display:none;align-items:center;gap:16px;width:100%;"></div>
             <div class="toolbar-content" data-toolbar="plantilla" style="display:none;align-items:center;gap:16px;width:100%;">
               <input type="text" class="form-input" id="plantSearch" placeholder="Buscar trabajador..." oninput="filterPlantilla()" style="max-width:280px;height:36px;">
               <select class="form-select" id="filtroUnidad" onchange="filterPlantilla()" style="max-width:200px;height:36px;">
@@ -839,7 +840,7 @@
   <script>
     (function() {
       var saved = localStorage.getItem('fiat_tool_' + location.pathname);
-      if (saved && saved !== 'ats') switchTool(saved);
+      if (saved && saved !== 'ats' && document.getElementById('tool-' + saved)) switchTool(saved);
     })();
 
     let atsView = 'tabla';

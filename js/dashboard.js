@@ -25,14 +25,14 @@
     'bienestar-social.html': { icon: 'fi-sr-hand-holding-usd', accent: '#db2777' },
     'seguridad-salud.html': { icon: 'fi-sr-shield', accent: '#dc2626' },
     'seguridad-fisica.html': { icon: 'fi-sr-shield-check', accent: '#334155' },
-    'compensacion.html': { icon: 'fi-sr-money-check', accent: '#7c3aed' },
+    'compensacion.html': { icon: 'fi-sr-coins', accent: '#7c3aed' },
     'finanzas.html': { icon: 'fi-sr-receipt', accent: '#b45309' },
     'repositorio.html': { icon: 'fi-sr-folder', accent: '#06b6d4' },
     'chatfiat.html': { icon: 'fi-sr-envelope', accent: '#4f46e5' },
     'desarrollo-organizacional.html': { icon: 'fi-sr-chart-line-up', accent: '#d97706' },
     'gestion-usuarios.html': { icon: 'fi-sr-users-gear', accent: '#0ea5e9' },
     'gourmet.html': { icon: 'fi-sr-restaurant', accent: '#a16207' },
-    'ti.html': { icon: 'fi-sr-computer', accent: '#0e7490' }
+    'ti.html': { icon: 'fi-sr-laptop', accent: '#0e7490' }
   };
 
   var idx = 0;
@@ -114,20 +114,34 @@
     var countEl = document.getElementById('homeModulesCount');
     if (!grid) return;
     var mods = (window.FIAT_MODULES || []).filter(function (m) { return moduleVisible(m.key); });
+    if (window.fiatAccess && window.fiatAccess.state && window.fiatAccess.state.manage) {
+      mods = mods.concat([{ key: 'gestion-usuarios.html', name: 'Gestión de usuarios', unidad: 'admin-finanzas' }]);
+    }
     grid.innerHTML = '';
-    mods.forEach(function (m) {
-      var meta = MODULES_META[m.key] || { icon: 'fi-sr-dashboard', accent: '#0d9488' };
-      var card = document.createElement('button');
-      card.type = 'button';
-      card.className = 'home-module-card';
-      card.title = m.name;
-      card.setAttribute('aria-label', 'Detalle del módulo ' + m.name);
-      card.style.setProperty('--m-accent', meta.accent);
-      card.addEventListener('click', function () {
-        if (typeof openHelp === 'function') openHelp(m.key);
+    (window.FIAT_UNIDADES || []).forEach(function (u) {
+      var unitMods = mods.filter(function (m) { return m.unidad === u.key; });
+      if (!unitMods.length) return;
+      var section = document.createElement('div');
+      section.className = 'home-unit';
+      section.innerHTML = '<div class="home-unit-head"><span>' + u.name + '</span></div>';
+      var unitGrid = document.createElement('div');
+      unitGrid.className = 'module-grid home-modules-unit';
+      unitMods.forEach(function (m) {
+        var meta = MODULES_META[m.key] || { icon: 'fi-sr-dashboard', accent: '#0d9488' };
+        var card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'home-module-card';
+        card.title = m.name;
+        card.setAttribute('aria-label', 'Detalle del módulo ' + m.name);
+        card.style.setProperty('--m-accent', meta.accent);
+        card.addEventListener('click', function () {
+          if (typeof openHelp === 'function') openHelp(m.key);
+        });
+        card.innerHTML = '<i class="fi ' + meta.icon + '" style="color:' + meta.accent + ';"></i>';
+        unitGrid.appendChild(card);
       });
-      card.innerHTML = '<i class="fi ' + meta.icon + '" style="color:' + meta.accent + ';"></i>';
-      grid.appendChild(card);
+      section.appendChild(unitGrid);
+      grid.appendChild(section);
     });
     if (countEl) countEl.textContent = mods.length ? (mods.length + (mods.length === 1 ? ' módulo' : ' módulos') + ' disponibles') : 'Sin módulos asignados';
   }

@@ -416,7 +416,7 @@ a {
   background: #f8fafc;
 }
 .nav-drop-btn svg { flex: none; transition: transform 0.15s; color: var(--color-nav); }
-.nav-drop-icon { font-size: 16px; flex: none; }
+.nav-drop-icon { font-size: 16px; flex: none; display: inline-block; }
 .nav-dropdown.open .nav-drop-btn svg { transform: rotate(180deg); }
 .nav-drop-label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .nav-drop-panel {
@@ -2788,12 +2788,13 @@ a {
     right: 0;
     z-index: 80;
     width: 100%;
-    height: 62px;
+    height: auto;
+    min-height: 62px;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 6px 12px;
+    gap: 6px;
+    padding: 6px 8px;
     border-right: none;
     border-bottom: none;
     border-top: 1px solid var(--color-border);
@@ -2803,16 +2804,22 @@ a {
   }
   .panel-item {
     flex-shrink: 0;
-    width: 52px;
-    height: 46px;
+    width: auto;
+    min-width: 52px;
+    height: auto;
+    padding: 4px 6px 2px;
+    flex-direction: column;
+    gap: 2px;
   }
   .module-panel.panel-more .panel-item.panel-more-hidden {
     display: none;
   }
   .module-panel.panel-more .panel-more-btn {
     display: flex;
-    width: 52px;
-    height: 46px;
+    width: auto;
+    min-width: 52px;
+    height: auto;
+    padding: 4px 6px 2px;
   }
   .module-body {
     padding-bottom: 62px;

@@ -443,7 +443,7 @@ a {
   padding: 10px 10px 6px;
   font-size: 10.5px;
   font-weight: 800;
-  color: #94a3b8;
+  color: #64748b !important;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   border-top: 1px solid #f1f5f9;
@@ -460,7 +460,7 @@ a {
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: #334155;
+  color: #1e293b !important;
   font-size: 13px;
   font-weight: 500;
   text-align: left;
@@ -469,7 +469,7 @@ a {
 }
 .nav-drop-item:hover { background: #f1f5f9; color: #0f172a; }
 .nav-drop-item i { font-size: 16px; flex: none; }
-.nav-drop-item span { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-drop-item span { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #1e293b !important; }
 .nav-drop-item.current { background: #f1f5f9; color: #0f172a; font-weight: 600; }
 .nav-drop-check { color: #34d399; font-size: 13px !important; }
 

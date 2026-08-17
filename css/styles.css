@@ -2735,26 +2735,23 @@ a {
     margin-left: 0;
   }
   .topnav.open .nav-user {
-    order: 3;
+    display: none;
   }
   .topnav.open .nav-select {
-    order: 4;
+    order: 3;
     display: block;
     flex-basis: 100%;
   }
   .topnav.open .nav-dropdown {
-    order: 4;
+    order: 3;
     display: block;
     flex-basis: 100%;
   }
   .topnav.open .nav-user {
-    display: flex;
-    margin-left: 0;
-    gap: 8px;
-    align-items: center;
+    display: none;
   }
   .topnav.open .topnav-spacer {
-    display: block;
+    display: none;
   }
   .splash-show-arrow.left {
     left: 6px;

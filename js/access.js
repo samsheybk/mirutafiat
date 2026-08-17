@@ -270,12 +270,12 @@
         var ic = MODULE_ICONS[m.key] || ['fi-sr-dashboard', '#0d9488'];
         var isCur = cur === m.key;
         items += '<button type="button" class="nav-drop-item' + (isCur ? ' current' : '') +
-          '" data-url="' + prefix + m.key + '">' +
-          '<i class="fi ' + ic[0] + '" style="color:' + ic[1] + ';"></i><span>' + m.name + '</span>' +
+          '" data-url="' + prefix + m.key + '" style="display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:none;border-radius:8px;background:transparent;color:#1e293b;font-size:13px;font-weight:500;text-align:left;cursor:pointer;">' +
+          '<i class="fi ' + ic[0] + '" style="color:' + ic[1] + ';font-size:16px;flex:none;"></i><span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#1e293b;font-size:13px;">' + m.name + '</span>' +
           (isCur ? '<i class="fi fi-sr-check nav-drop-check"></i>' : '') +
           '</button>';
       });
-      groupsHtml += '<div class="nav-drop-group">' + u.name + '</div>' + items;
+      groupsHtml += '<div class="nav-drop-group" style="color:#64748b;">' + u.name + '</div>' + items;
     });
     var curOpt = sel.options[sel.selectedIndex];
     var curLabel = curOpt ? curOpt.textContent : 'Home';
@@ -283,14 +283,14 @@
     var curPage = cur || 'dashboard.html';
     var curIc = MODULE_ICONS[curPage] || homeIc;
     wrap.innerHTML =
-      '<button type="button" class="nav-drop-btn" aria-haspopup="listbox" aria-expanded="false">' +
-        '<i class="fi ' + curIc[0] + ' nav-drop-icon" style="color:' + curIc[1] + ';"></i>' +
-        '<span class="nav-drop-label">' + curLabel + '</span>' +
+      '<button type="button" class="nav-drop-btn" aria-haspopup="listbox" aria-expanded="false" style="display:flex;align-items:center;justify-content:space-between;gap:10px;height:36px;min-width:220px;padding:0 12px;border:1px solid rgba(255,255,255,0.25);border-radius:var(--radius-md);background:#fff;color:#0f172a;font-size:13px;font-weight:600;cursor:pointer;">' +
+        '<i class="fi ' + curIc[0] + ' nav-drop-icon" style="color:' + curIc[1] + ';font-size:16px;flex:none;"></i>' +
+        '<span class="nav-drop-label" style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#0f172a;">' + curLabel + '</span>' +
         '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
       '</button>' +
-      '<div class="nav-drop-panel" role="listbox">' +
-        '<button type="button" class="nav-drop-item' + (cur === 'dashboard.html' ? ' current' : '') + '" data-url="' + home + '">' +
-          '<i class="fi fi-sr-home" style="color:#0d9488;"></i><span>Home</span>' +
+      '<div class="nav-drop-panel" role="listbox" style="background:#fff;color:#1e293b;">' +
+        '<button type="button" class="nav-drop-item' + (cur === 'dashboard.html' ? ' current' : '') + '" data-url="' + home + '" style="display:flex;align-items:center;gap:10px;width:100%;padding:9px 10px;border:none;border-radius:8px;background:transparent;color:#1e293b;font-size:13px;font-weight:500;text-align:left;cursor:pointer;">' +
+          '<i class="fi fi-sr-home" style="color:#0d9488;font-size:16px;flex:none;"></i><span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#1e293b;font-size:13px;">Home</span>' +
           (cur === 'dashboard.html' ? '<i class="fi fi-sr-check nav-drop-check"></i>' : '') +
         '</button>' +
         groupsHtml +

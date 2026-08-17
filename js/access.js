@@ -280,8 +280,11 @@
     var curOpt = sel.options[sel.selectedIndex];
     var curLabel = curOpt ? curOpt.textContent : 'Home';
     var homeIc = MODULE_ICONS['dashboard.html'] || ['fi-sr-home', '#0d9488'];
+    var curPage = cur || 'dashboard.html';
+    var curIc = MODULE_ICONS[curPage] || homeIc;
     wrap.innerHTML =
       '<button type="button" class="nav-drop-btn" aria-haspopup="listbox" aria-expanded="false">' +
+        '<i class="fi ' + curIc[0] + ' nav-drop-icon" style="color:' + curIc[1] + ';"></i>' +
         '<span class="nav-drop-label">' + curLabel + '</span>' +
         '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
       '</button>' +
@@ -328,9 +331,17 @@
 
   function navDropdownSync(sel) {
     var label = document.querySelector('.nav-drop-label');
+    var icon = document.querySelector('.nav-drop-icon');
     if (!label || !sel) return;
     var opt = sel.options[sel.selectedIndex];
     label.textContent = opt ? opt.textContent : 'Home';
+    if (icon && opt) {
+      var val = opt.value || '';
+      var base = val.split('/').pop() || 'dashboard.html';
+      var ic = MODULE_ICONS[base] || MODULE_ICONS['dashboard.html'] || ['fi-sr-home', '#0d9488'];
+      icon.className = 'fi ' + ic[0] + ' nav-drop-icon';
+      icon.style.color = ic[1];
+    }
   }
 
   function applyDashboard() {

@@ -3234,21 +3234,12 @@ a {
 }
 
 /* ===== Botones: ícono separado del texto ===== */
-button:has(i.fi):not(.filter-toggle-btn):not(.topnav-toggle):not(.nav-drop-item):not(.nav-drop-btn),
+.module-content button:has(i.fi):not(.filter-toggle-btn):not(.topnav-toggle):not(.nav-drop-item):not(.nav-drop-btn),
+.module-body button:has(i.fi):not(.filter-toggle-btn):not(.topnav-toggle):not(.nav-drop-item):not(.nav-drop-btn),
 a:has(i.fi) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-}
-
-.nav-drop-item,
-.nav-drop-item[style],
-.nav-drop-btn,
-button.nav-drop-item {
-  display: flex !important;
-  width: 100% !important;
-  text-align: left !important;
-  justify-content: flex-start !important;
 }
 

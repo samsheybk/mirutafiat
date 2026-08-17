@@ -241,14 +241,8 @@
     if (state.manage) {
       visible.push({ key: 'gestion-usuarios.html', name: 'Gestión de usuarios', unidad: 'soporte' });
     }
-    (window.FIAT_UNIDADES || []).forEach(function (u) {
-      var mods = visible.filter(function (m) { return m.unidad === u.key; });
-      if (!mods.length) return;
-      opts += '<optgroup label="' + u.name + '">';
-      mods.forEach(function (m) {
-        opts += '<option value="' + prefix + m.key + '"' + (cur === m.key ? ' selected' : '') + '>' + m.name + '</option>';
-      });
-      opts += '</optgroup>';
+    visible.forEach(function (m) {
+      opts += '<option value="' + prefix + m.key + '"' + (cur === m.key ? ' selected' : '') + '>' + m.name + '</option>';
     });
     sel.innerHTML = opts;
   }

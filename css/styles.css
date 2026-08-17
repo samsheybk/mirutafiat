@@ -3242,3 +3242,13 @@ a:has(i.fi) {
   gap: 6px;
 }
 
+.nav-drop-item,
+.nav-drop-item[style],
+.nav-drop-btn,
+button.nav-drop-item {
+  display: flex !important;
+  width: 100% !important;
+  text-align: left !important;
+  justify-content: flex-start !important;
+}
+

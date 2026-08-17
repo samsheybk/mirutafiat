@@ -418,7 +418,7 @@ a {
 .nav-drop-btn svg { flex: none; transition: transform 0.15s; color: var(--color-nav); }
 .nav-drop-icon { font-size: 16px; flex: none; }
 .nav-dropdown.open .nav-drop-btn svg { transform: rotate(180deg); }
-.nav-drop-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nav-drop-label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .nav-drop-panel {
   display: none;
   position: absolute;

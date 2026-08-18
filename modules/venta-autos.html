@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Venta de Autos - Intranet</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/styles.css">
+  <link rel="stylesheet" href="../css/uicons-solid-rounded.css">
+  <style>
+    :root { --module-color: var(--module-venta-autos); }
+    .va-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin-bottom:14px; }
+    .va-card { background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-md); padding:10px 14px; display:flex; align-items:center; gap:12px; }
+    .va-card i { font-size:22px; color:var(--module-venta-autos); flex-shrink:0; }
+    .va-card-body { min-width:0; }
+    .va-card span { display:block; font-size:11px; color:var(--color-text-secondary); font-weight:600; text-transform:uppercase; letter-spacing:0.3px; }
+    .va-card strong { display:block; font-size:20px; margin-top:2px; }
+    .va-card .v-alert { color:#dc2626; }
+    .va-card .v-warn { color:#D97706; }
+    .va-card .v-ok { color:#059669; }
+    .badge { border-radius:999px; font-size:11px; font-weight:600; padding:3px 10px; }
+    .badge-success { background:#dcfce7; color:#166534; }
+    .badge-warning { background:#fef3c7; color:#92400e; }
+    .badge-danger { background:#fee2e2; color:#991b1b; }
+    .badge-info { background:#e0f2fe; color:#075985; }
+    .badge-secondary { background:#f1f5f9; color:#475569; }
+    .modal-overlay .modal { border-radius:20px; border:1px solid var(--color-border); box-shadow:var(--shadow-lg); }
+    .modal-overlay .modal-header { background:linear-gradient(135deg,#0369a1,#0c4a6e); color:#fff; border-radius:19px 19px 0 0; }
+    .modal-overlay .modal-header h3 { color:#fff; }
+    .modal-overlay .modal-close { color:#fff; }
+    .modal-overlay .modal-close:hover { opacity:0.85; }
+    .modal-overlay .form-input, .modal-overlay .form-select, .modal-overlay .form-textarea { border-radius:10px; border:1px solid var(--color-border); background:var(--color-surface); font-size:13px; }
+    .modal-overlay .form-input:focus, .modal-overlay .form-select:focus, .modal-overlay .form-textarea:focus { outline:none; border-color:#0369a1; box-shadow:0 0 0 3px rgba(3,105,161,0.12); }
+    .toolbar-content { align-items:center; }
+    .toolbar-content .form-input, .toolbar-content .form-select, .toolbar-content .btn-sm { height:40px; box-sizing:border-box; }
+    .empty-hint { padding:18px; text-align:center; color:var(--color-text-secondary); font-size:13px; background:var(--color-surface); border:1px dashed var(--color-border); border-radius:var(--radius-sm); }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <nav class="topnav" style="background:var(--module-venta-autos);">
+      <div class="topnav-brand" onclick="location.href='../dashboard.html'"><i class="fi fi-sr-home nav-home-icon"></i><span class="topnav-logo"></span><span class="nav-home-text">Intranet</span></div>
+      <select class="nav-select" id="navSelect" onchange="navigateModule(this.value)">
+        <option value="../dashboard.html">Home</option>
+        <option value="captacion.html">Captacion y Seleccion</option>
+        <option value="relaciones-laborales.html">Relaciones Laborales</option>
+        <option value="capacitacion.html">Capacitacion y Desarrollo</option>
+        <option value="bienestar-social.html">Bienestar Social</option>
+        <option value="seguridad-salud.html">Seguridad y Salud Laboral</option>
+        <option value="seguridad-fisica.html">Seguridad Fisica</option>
+        <option value="compensacion.html">Compensacion</option>
+        <option value="finanzas.html">Finanzas</option>
+        <option value="repositorio.html">Repositorio</option>
+        <option value="chatfiat.html">Mensajeria</option>
+        <option value="desarrollo-organizacional.html">Desarrollo organizacional</option>
+        <option value="gourmet.html">Gourmet</option>
+        <option value="ti.html">Sistemas TI</option>
+        <option value="venta-autos.html" selected>Venta de Autos</option>
+      </select>
+      <div class="topnav-spacer"></div>
+      <div class="nav-user">
+        <div class="nav-user-menu">
+          <button class="nav-user-menu-btn" id="userMenuBtn" type="button" aria-label="Opciones de usuario" title="Opciones de usuario">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.9"></circle><circle cx="12" cy="12" r="1.9"></circle><circle cx="12" cy="19" r="1.9"></circle></svg>
+          </button>
+          <div class="nav-user-dropdown" id="userDropdown">
+            <div class="user-drop-header">
+              <div class="user-drop-name" id="userDropName">Usuario</div>
+              <div class="user-drop-email" id="userDropEmail"></div>
+              <div class="user-drop-meta" id="userDropMeta"></div>
+            </div>
+            <button type="button" class="user-drop-item" id="userDropHelp">Detalles del modulo</button>
+            <button type="button" class="user-drop-item user-drop-danger" id="userDropLogout">Cerrar sesion</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <div class="main-content">
+      <div class="module-layout">
+        <div class="module-panel">
+          <div class="panel-item active" data-tool="inventario" onclick="switchTool('inventario')" title="Inventario de vehiculos"><span class="panel-item-indicator bg-venta-autos"></span><i class="fi fi-sr-car" style="font-size:24px;pointer-events:none;"></i><span class="panel-item-label">Inventario</span></div>
+          <div class="panel-item" data-tool="concesionarios" onclick="switchTool('concesionarios')" title="Concesionarios"><span class="panel-item-indicator bg-venta-autos"></span><i class="fi fi-sr-store-alt" style="font-size:24px;pointer-events:none;"></i><span class="panel-item-label">Concesionarios</span></div>
+          <div class="panel-item" data-tool="envios" onclick="switchTool('envios')" title="Envios y logistica"><span class="panel-item-indicator bg-venta-autos"></span><i class="fi fi-sr-truck-loading" style="font-size:24px;pointer-events:none;"></i><span class="panel-item-label">Envios</span></div>
+          <div class="panel-item" data-tool="ventas" onclick="switchTool('ventas')" title="Ventas"><span class="panel-item-indicator bg-venta-autos"></span><i class="fi fi-sr-file-invoice-dollar" style="font-size:24px;pointer-events:none;"></i><span class="panel-item-label">Ventas</span></div>
+          <div class="panel-item" data-tool="repuestos" onclick="switchTool('repuestos')" title="Control de repuestos"><span class="panel-item-indicator bg-venta-autos"></span><i class="fi fi-sr-gears" style="font-size:24px;pointer-events:none;"></i><span class="panel-item-label">Repuestos</span></div>
+          <div class="panel-item" data-tool="dashboard-resumen" onclick="switchTool('dashboard-resumen')" title="Resumen general"><span class="panel-item-indicator bg-venta-autos"></span><i class="fi fi-sr-chart-pie" style="font-size:24px;pointer-events:none;"></i><span class="panel-item-label">Resumen</span></div>
+        </div>
+
+        <div class="module-body">
+          <header class="topbar" style="gap:16px;">
+            <div class="toolbar-content" data-toolbar="inventario" style="display:flex;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
+              <div class="form-group" style="margin:0;"><label>Modelo</label><select class="form-select" id="inv_modelo_filter" onchange="renderInventario()"><option value="">Todos</option></select></div>
+              <div class="form-group" style="margin:0;"><label>Estado</label><select class="form-select" id="inv_estado" onchange="renderInventario()"><option value="">Todos</option><option value="Disponible">Disponible</option><option value="Vendido">Vendido</option><option value="En transito">En transito</option><option value="Entregado">Entregado</option></select></div>
+              <div class="form-group" style="margin:0;flex:1;min-width:180px;"><label>Buscar</label><input type="text" class="form-input" id="inv_buscar" placeholder="VIN, nombre, color..." oninput="renderInventario()"></div>
+              <button class="btn btn-venta-autos btn-sm" onclick="openModalInventario()"><i class="fi fi-sr-plus" style="pointer-events:none;margin-right:4px;"></i>Agregar vehiculo</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="concesionarios" style="display:none;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
+              <div class="form-group" style="margin:0;flex:1;min-width:180px;"><label>Buscar</label><input type="text" class="form-input" id="con_buscar" placeholder="Nombre, ubicacion..." oninput="renderConcesionarios()"></div>
+              <button class="btn btn-venta-autos btn-sm" onclick="openModalConcesionario()"><i class="fi fi-sr-plus" style="pointer-events:none;margin-right:4px;"></i>Agregar concesionario</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="envios" style="display:none;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
+              <div class="form-group" style="margin:0;"><label>Estado</label><select class="form-select" id="env_estado_filter" onchange="renderEnvios()"><option value="">Todos</option><option value="Pendiente">Pendiente</option><option value="En transito">En transito</option><option value="Entregado">Entregado</option><option value="Cancelado">Cancelado</option></select></div>
+              <div class="form-group" style="margin:0;flex:1;min-width:180px;"><label>Buscar</label><input type="text" class="form-input" id="env_buscar" placeholder="Concesionario, vehiculo..." oninput="renderEnvios()"></div>
+              <button class="btn btn-venta-autos btn-sm" onclick="openModalEnvio()"><i class="fi fi-sr-plus" style="pointer-events:none;margin-right:4px;"></i>Registrar envio</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="ventas" style="display:none;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
+              <div class="form-group" style="margin:0;"><label>Estado</label><select class="form-select" id="ven_estado_filter" onchange="renderVentas()"><option value="">Todos</option><option value="Completada">Completada</option><option value="Pendiente">Pendiente</option><option value="Cancelada">Cancelada</option></select></div>
+              <div class="form-group" style="margin:0;flex:1;min-width:180px;"><label>Buscar</label><input type="text" class="form-input" id="ven_buscar" placeholder="Cliente, vehiculo..." oninput="renderVentas()"></div>
+              <button class="btn btn-venta-autos btn-sm" onclick="openModalVenta()"><i class="fi fi-sr-plus" style="pointer-events:none;margin-right:4px;"></i>Registrar venta</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="repuestos" style="display:none;align-items:flex-end;gap:10px;width:100%;flex-wrap:wrap;">
+              <div class="form-group" style="margin:0;"><label>Categoria</label><select class="form-select" id="rep_cat_filter" onchange="renderRepuestos()"><option value="">Todas</option></select></div>
+              <div class="form-group" style="margin:0;"><label>Estado</label><select class="form-select" id="rep_estado_filter" onchange="renderRepuestos()"><option value="">Todos</option><option value="Disponible">Disponible</option><option value="Bajo stock">Bajo stock</option><option value="Agotado">Agotado</option></select></div>
+              <div class="form-group" style="margin:0;flex:1;min-width:180px;"><label>Buscar</label><input type="text" class="form-input" id="rep_buscar" placeholder="Codigo, descripcion..." oninput="renderRepuestos()"></div>
+              <button class="btn btn-venta-autos btn-sm" onclick="openModalRepuesto()"><i class="fi fi-sr-plus" style="pointer-events:none;margin-right:4px;"></i>Agregar repuesto</button>
+              <button class="btn btn-outline btn-sm" onclick="openModalRepMovimiento()" style="margin-left:4px;"><i class="fi fi-sr-exchange" style="pointer-events:none;margin-right:4px;"></i>Movimiento</button>
+            </div>
+            <div class="toolbar-content" data-toolbar="dashboard-resumen" style="display:none;align-items:center;gap:10px;width:100%;">
+              <span style="font-size:13px;color:var(--color-text-secondary);">Resumen general del modulo Venta de Autos</span>
+            </div>
+          </header>
+
+          <div class="module-content">
+            <div class="tool-section active" id="tool-inventario">
+              <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Nombre</th><th>Modelo</th><th>Ano</th><th>Color</th><th>VIN</th><th>Concesionario</th><th style="text-align:right;">Precio</th><th>Estado</th><th style="width:100px;">Acciones</th></tr></thead><tbody id="inventarioBody"><tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr><tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr></tbody></table></div>
+            </div>
+
+            <div class="tool-section" id="tool-concesionarios">
+              <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Nombre</th><th>Ubicacion</th><th>Telefono</th><th>Contacto</th><th>Nivel</th><th>Email</th><th style="width:100px;">Acciones</th></tr></thead><tbody id="concesionariosBody"><tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr></tbody></table></div>
+            </div>
+
+            <div class="tool-section" id="tool-envios">
+              <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Fecha envio</th><th>Vehiculo</th><th>Concesionario</th><th>Origen</th><th>Destino</th><th>Estimada</th><th>Estado</th><th style="width:100px;">Acciones</th></tr></thead><tbody id="enviosBody"><tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr></tbody></table></div>
+            </div>
+
+            <div class="tool-section" id="tool-ventas">
+              <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Fecha</th><th>Cliente</th><th>Vehiculo</th><th>Concesionario</th><th style="text-align:right;">Precio USD</th><th>Moneda</th><th>Pago</th><th>Estado</th><th style="width:100px;">Acciones</th></tr></thead><tbody id="ventasBody"><tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr></tbody></table></div>
+            </div>
+
+            <div class="tool-section" id="tool-repuestos">
+              <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Codigo</th><th>Descripcion</th><th>Categoria</th><th style="text-align:right;">Stock</th><th style="text-align:right;">Minimo</th><th style="text-align:right;">Precio USD</th><th>Estado</th><th style="width:100px;">Acciones</th></tr></thead><tbody id="repuestosBody"><tr class="skeleton-table"><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td><td><div class="skeleton"></div></td></tr></tbody></table></div>
+              <div style="margin-top:18px;"><h4 style="font-size:14px;margin-bottom:8px;"><i class="fi fi-sr-exchange" style="color:var(--module-venta-autos);margin-right:6px;"></i>Movimientos de repuestos</h4>
+                <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Fecha</th><th>Repuesto</th><th>Tipo</th><th style="text-align:right;">Cantidad</th><th>Motivo</th><th>Responsable</th></tr></thead><tbody id="repMovimientosBody"></tbody></table></div>
+              </div>
+            </div>
+
+            <div class="tool-section" id="tool-dashboard-resumen">
+              <div class="va-cards" id="dashCards"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+                <div><h4 style="font-size:14px;margin-bottom:8px;"><i class="fi fi-sr-chart-pie" style="color:var(--module-venta-autos);margin-right:6px;"></i>Vehiculos por estado</h4><div id="dashVehiculosEstado"></div></div>
+                <div><h4 style="font-size:14px;margin-bottom:8px;"><i class="fi fi-sr-store-alt" style="color:var(--module-venta-autos);margin-right:6px;"></i>Ventas por concesionario</h4><div id="dashVentasConcesionario"></div></div>
+              </div>
+              <div style="margin-top:18px;"><h4 style="font-size:14px;margin-bottom:8px;"><i class="fi fi-sr-chart-histogram" style="color:var(--module-venta-autos);margin-right:6px;"></i>Ultimas ventas</h4>
+                <div style="overflow-x:auto;"><table class="data-table"><thead><tr><th>Fecha</th><th>Cliente</th><th>Vehiculo</th><th>Concesionario</th><th style="text-align:right;">Precio</th><th>Estado</th></tr></thead><tbody id="dashUltimasVentas"></tbody></table></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Inventario -->
+  <div class="modal-overlay" id="modalInventario">
+    <div class="modal" style="max-width:540px;">
+      <div class="modal-header"><h3 id="invModalTitle">Agregar vehiculo</h3><button class="modal-close" onclick="closeModal('modalInventario')"><i class="fi fi-sr-cross-small"></i></button></div>
+      <div class="modal-body">
+        <form id="invForm">
+          <div class="form-row">
+            <div class="form-group"><label>Nombre</label><input type="text" class="form-input" id="inv_nombre" placeholder="Ej: Fiat 500 Sport" required></div>
+            <div class="form-group"><label>Modelo</label><input type="text" class="form-input" id="inv_modelo" placeholder="Ej: 500, Pulse, Cronos" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Ano</label><input type="number" class="form-input" id="inv_anio" min="2000" max="2030" placeholder="2026" required></div>
+            <div class="form-group"><label>Color</label><input type="text" class="form-input" id="inv_color" placeholder="Ej: Blanco, Negro" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>VIN</label><input type="text" class="form-input" id="inv_vin" placeholder="Numero de serie" required></div>
+            <div class="form-group"><label>Precio (USD)</label><input type="number" step="0.01" min="0" class="form-input" id="inv_precio" placeholder="0.00" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Concesionario</label><select class="form-select" id="inv_concesionario_id" required></select></div>
+            <div class="form-group"><label>Estado</label><select class="form-select" id="inv_estado_select" required><option value="Disponible">Disponible</option><option value="Vendido">Vendido</option><option value="En transito">En transito</option><option value="Entregado">Entregado</option></select></div>
+          </div>
+          <div class="form-group"><label>Descripcion</label><textarea class="form-textarea" id="inv_descripcion" rows="2"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalInventario')">Cancelar</button>
+        <button class="btn btn-venta-autos" onclick="saveInventario()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Concesionario -->
+  <div class="modal-overlay" id="modalConcesionario">
+    <div class="modal" style="max-width:500px;">
+      <div class="modal-header"><h3 id="conModalTitle">Agregar concesionario</h3><button class="modal-close" onclick="closeModal('modalConcesionario')"><i class="fi fi-sr-cross-small"></i></button></div>
+      <div class="modal-body">
+        <form id="conForm">
+          <div class="form-group"><label>Nombre</label><input type="text" class="form-input" id="con_nombre" placeholder="Ej: Concesionaria Caracas" required></div>
+          <div class="form-row">
+            <div class="form-group"><label>Ubicacion</label><input type="text" class="form-input" id="con_ubicacion" placeholder="Ej: Caracas, Venezuela" required></div>
+            <div class="form-group"><label>Telefono</label><input type="text" class="form-input" id="con_telefono" placeholder="+58 212-000-0000"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Contacto</label><input type="text" class="form-input" id="con_contacto" placeholder="Nombre del responsable"></div>
+            <div class="form-group"><label>Nivel</label><select class="form-select" id="con_nivel"><option value="Standard">Standard</option><option value="Premium">Premium</option><option value="Gold">Gold</option><option value="Platinum">Platinum</option></select></div>
+          </div>
+          <div class="form-group"><label>Email</label><input type="email" class="form-input" id="con_email" placeholder="correo@concesionario.com"></div>
+          <div class="form-group"><label>Direccion</label><textarea class="form-textarea" id="con_direccion" rows="2"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalConcesionario')">Cancelar</button>
+        <button class="btn btn-venta-autos" onclick="saveConcesionario()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Envio -->
+  <div class="modal-overlay" id="modalEnvio">
+    <div class="modal" style="max-width:540px;">
+      <div class="modal-header"><h3 id="envModalTitle">Registrar envio</h3><button class="modal-close" onclick="closeModal('modalEnvio')"><i class="fi fi-sr-cross-small"></i></button></div>
+      <div class="modal-body">
+        <form id="envForm">
+          <div class="form-row">
+            <div class="form-group"><label>Vehiculo</label><select class="form-select" id="env_vehiculo_id" required></select></div>
+            <div class="form-group"><label>Concesionario destino</label><select class="form-select" id="env_concesionario_id" required></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Origen</label><input type="text" class="form-input" id="env_origen" placeholder="Ej: Planta Maracaibo" required></div>
+            <div class="form-group"><label>Destino</label><input type="text" class="form-input" id="env_destino" placeholder="Ej: Concesionaria Caracas" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Fecha envio</label><input type="date" class="form-input" id="env_fecha" required></div>
+            <div class="form-group"><label>Fecha estimada</label><input type="date" class="form-input" id="env_fecha_estimada"></div>
+          </div>
+          <div class="form-group"><label>Estado</label><select class="form-select" id="env_estado_select" required><option value="Pendiente">Pendiente</option><option value="En transito">En transito</option><option value="Entregado">Entregado</option><option value="Cancelado">Cancelado</option></select></div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="env_observaciones" rows="2"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalEnvio')">Cancelar</button>
+        <button class="btn btn-venta-autos" onclick="saveEnvio()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Venta -->
+  <div class="modal-overlay" id="modalVenta">
+    <div class="modal" style="max-width:540px;">
+      <div class="modal-header"><h3 id="venModalTitle">Registrar venta</h3><button class="modal-close" onclick="closeModal('modalVenta')"><i class="fi fi-sr-cross-small"></i></button></div>
+      <div class="modal-body">
+        <form id="venForm">
+          <div class="form-group"><label>Cliente</label><input type="text" class="form-input" id="ven_cliente" placeholder="Nombre completo" required></div>
+          <div class="form-row">
+            <div class="form-group"><label>Vehiculo</label><select class="form-select" id="ven_vehiculo_id" required></select></div>
+            <div class="form-group"><label>Concesionario</label><select class="form-select" id="ven_concesionario_id" required></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Precio (USD)</label><input type="number" step="0.01" min="0" class="form-input" id="ven_precio" required></div>
+            <div class="form-group"><label>Moneda</label><select class="form-select" id="ven_moneda"><option value="USD">Dolares (USD)</option><option value="Bs">Bolivares (Bs.)</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Tasa cambio (Bs./USD)</label><input type="number" step="0.0001" min="0" class="form-input" id="ven_tasa" placeholder="36.50"></div>
+            <div class="form-group"><label>Metodo de pago</label><select class="form-select" id="ven_metodo_pago"><option value="">---</option><option value="Efectivo">Efectivo</option><option value="Transferencia">Transferencia</option><option value="Tarjeta">Tarjeta</option><option value="Financiamiento">Financiamiento</option><option value="Otro">Otro</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Fecha venta</label><input type="date" class="form-input" id="ven_fecha" required></div>
+            <div class="form-group"><label>Estado</label><select class="form-select" id="ven_estado_select" required><option value="Completada">Completada</option><option value="Pendiente">Pendiente</option><option value="Cancelada">Cancelada</option></select></div>
+          </div>
+          <div class="form-group"><label>Observaciones</label><textarea class="form-textarea" id="ven_observaciones" rows="2"></textarea></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalVenta')">Cancelar</button>
+        <button class="btn btn-venta-autos" onclick="saveVenta()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Repuesto -->
+  <div class="modal-overlay" id="modalRepuesto">
+    <div class="modal" style="max-width:500px;">
+      <div class="modal-header"><h3 id="repModalTitle">Agregar repuesto</h3><button class="modal-close" onclick="closeModal('modalRepuesto')"><i class="fi fi-sr-cross-small"></i></button></div>
+      <div class="modal-body">
+        <form id="repForm">
+          <div class="form-row">
+            <div class="form-group"><label>Codigo</label><input type="text" class="form-input" id="rep_codigo" placeholder="Ej: REP-001" required></div>
+            <div class="form-group"><label>Descripcion</label><input type="text" class="form-input" id="rep_descripcion" placeholder="Ej: Filtro de aceite" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Categoria</label><select class="form-select" id="rep_categoria_select" required><option value="Motor">Motor</option><option value="Frenos">Frenos</option><option value="Suspension">Suspension</option><option value="Electrico">Electrico</option><option value="Carroceria">Carroceria</option><option value="Interior">Interior</option><option value="Filtros">Filtros</option><option value="Lubricantes">Lubricantes</option><option value="Otro">Otro</option></select></div>
+            <div class="form-group"><label>Estado</label><select class="form-select" id="rep_estado_select"><option value="Disponible">Disponible</option><option value="Bajo stock">Bajo stock</option><option value="Agotado">Agotado</option></select></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Stock</label><input type="number" min="0" class="form-input" id="rep_stock" required></div>
+            <div class="form-group"><label>Stock minimo</label><input type="number" min="0" class="form-input" id="rep_stock_min" required></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Precio (USD)</label><input type="number" step="0.01" min="0" class="form-input" id="rep_precio_usd" required></div>
+            <div class="form-group"><label>Precio (Bs.)</label><input type="number" step="0.01" min="0" class="form-input" id="rep_precio_bs"></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalRepuesto')">Cancelar</button>
+        <button class="btn btn-venta-autos" onclick="saveRepuesto()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Movimiento repuesto -->
+  <div class="modal-overlay" id="modalRepMovimiento">
+    <div class="modal" style="max-width:460px;">
+      <div class="modal-header"><h3>Registrar movimiento</h3><button class="modal-close" onclick="closeModal('modalRepMovimiento')"><i class="fi fi-sr-cross-small"></i></button></div>
+      <div class="modal-body">
+        <form id="repMovForm">
+          <div class="form-group"><label>Repuesto</label><select class="form-select" id="mov_repuesto_id" required></select></div>
+          <div class="form-row">
+            <div class="form-group"><label>Tipo</label><select class="form-select" id="mov_tipo" required><option value="Entrada">Entrada</option><option value="Salida">Salida</option></select></div>
+            <div class="form-group"><label>Cantidad</label><input type="number" min="1" class="form-input" id="mov_cantidad" required></div>
+          </div>
+          <div class="form-group"><label>Motivo</label><input type="text" class="form-input" id="mov_motivo" placeholder="Ej: Compra, Venta, Devolucion" required></div>
+          <div class="form-group"><label>Responsable</label><input type="text" class="form-input" id="mov_responsable" placeholder="Nombre de quien gestiona"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modalRepMovimiento')">Cancelar</button>
+        <button class="btn btn-venta-autos" onclick="saveRepMovimiento()">Registrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase-config.js"></script>
+  <script src="../js/ui.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/modules.js"></script>
+  <script>
+    /* ===== STATE ===== */
+    var vaInventario = [], vaConcesionarios = [], vaEnvios = [], vaVentas = [], vaRepuestos = [], vaRepMovimientos = [];
+    var editingId = null;
+
+    function vaEscape(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function openModal(id) { var el = document.getElementById(id); if (el) el.classList.add('show'); }
+    function closeModal(id) { var el = document.getElementById(id); if (el) el.classList.remove('show'); }
+    document.addEventListener('click', function(e) { if (e.target.classList && e.target.classList.contains('modal-overlay')) e.target.classList.remove('show'); });
+
+    function fmtUsd(n) { return '$ ' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+    function fmtBs(n) { return 'Bs. ' + Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+    function todayISO() { var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+    function usuarioActual() { try { if (window.fiatAccess&&fiatAccess.state&&fiatAccess.state.worker) { var w=fiatAccess.state.worker; var n=((w.nombres||'')+' '+(w.apellidos||'')).trim(); if(n)return n; } } catch(e){} return null; }
+    function isConcesionarioUser() { try { if (window.fiatAccess&&fiatAccess.state&&fiatAccess.state.worker) return fiatAccess.state.worker.unidad==='Concesionarios'; } catch(e){} return false; }
+    function getConcesionarioId() { try { if (window.fiatAccess&&fiatAccess.state&&fiatAccess.state.worker) return fiatAccess.state.worker.concesionario_id||null; } catch(e){} return null; }
+
+    function estadoBadge(estado) {
+      var map={'Disponible':'badge-success','Completada':'badge-success','Entregado':'badge-success','Vendido':'badge-info','Pendiente':'badge-warning','En transito':'badge-warning','Cancelada':'badge-danger','Cancelado':'badge-danger','Bajo stock':'badge-warning','Agotado':'badge-danger'};
+      return '<span class="badge '+(map[estado]||'badge-secondary')+'">'+vaEscape(estado)+'</span>';
+    }
+
+    /* ===== CONCESIONARIOS ===== */
+    async function loadConcesionarios() {
+      try {
+        var {data,error} = await supabaseClient.from('autos_concesionarios').select('*').order('nombre');
+        if(error) throw error;
+        vaConcesionarios = data||[]; renderConcesionarios(); fillConcesionarioSelects();
+      } catch(err) { document.getElementById('concesionariosBody').innerHTML='<tr><td colspan="7" style="text-align:center;padding:40px;color:#dc2626;">Error: '+vaEscape(err.message)+'</td></tr>'; }
+    }
+
+    function renderConcesionarios() {
+      var buscar=((document.getElementById('con_buscar')||{}).value||'').trim().toLowerCase();
+      var lista=vaConcesionarios.filter(function(c){ if(buscar){ var h=[c.nombre,c.ubicacion,c.contacto].join(' ').toLowerCase(); if(h.indexOf(buscar)===-1) return false; } return true; });
+      if(!lista.length){ document.getElementById('concesionariosBody').innerHTML='<tr><td colspan="7" class="empty-hint">No hay concesionarios registrados</td></tr>'; return; }
+      document.getElementById('concesionariosBody').innerHTML=lista.map(function(c){
+        return '<tr><td>'+vaEscape(c.nombre)+'</td><td>'+vaEscape(c.ubicacion)+'</td><td>'+vaEscape(c.telefono)+'</td><td>'+vaEscape(c.contacto)+'</td><td>'+vaEscape(c.nivel||'Standard')+'</td><td>'+vaEscape(c.email||'')+'</td><td><button class="btn btn-outline btn-sm" onclick="editConcesionario(&apos;'+c.id+'&apos;)" title="Editar"><i class="fi fi-sr-pencil" style="pointer-events:none;"></i></button> <button class="btn btn-outline btn-sm" onclick="deleteConcesionario(&apos;'+c.id+'&apos;)" title="Eliminar" style="color:#dc2626;border-color:#fecaca;"><i class="fi fi-sr-trash" style="pointer-events:none;"></i></button></td></tr>';
+      }).join('');
+    }
+
+    function fillConcesionarioSelects() {
+      var opts='<option value="">---</option>'+vaConcesionarios.map(function(c){ return '<option value="'+c.id+'">'+vaEscape(c.nombre)+'</option>'; }).join('');
+      ['inv_concesionario_id','env_concesionario_id','ven_concesionario_id'].forEach(function(id){ var el=document.getElementById(id); if(el) el.innerHTML=opts; });
+    }
+
+    function fillVehiculoSelects() {
+      var disponibles=vaInventario.filter(function(v){ return v.estado==='Disponible'; });
+      var opts='<option value="">---</option>'+disponibles.map(function(v){ return '<option value="'+v.id+'">'+vaEscape(v.nombre)+' ('+vaEscape(v.vin||'')+')</option>'; }).join('');
+      ['env_vehiculo_id','ven_vehiculo_id'].forEach(function(id){ var el=document.getElementById(id); if(el) el.innerHTML=opts; });
+    }
+
+    function openModalConcesionario(id) {
+      editingId=id||null;
+      document.getElementById('conModalTitle').textContent=id?'Editar concesionario':'Agregar concesionario';
+      if(id){ var c=vaConcesionarios.find(function(x){return x.id===id;}); if(c){ document.getElementById('con_nombre').value=c.nombre||''; document.getElementById('con_ubicacion').value=c.ubicacion||''; document.getElementById('con_telefono').value=c.telefono||''; document.getElementById('con_contacto').value=c.contacto||''; document.getElementById('con_nivel').value=c.nivel||'Standard'; document.getElementById('con_email').value=c.email||''; document.getElementById('con_direccion').value=c.direccion||''; } }
+      else { document.getElementById('conForm').reset(); }
+      openModal('modalConcesionario');
+    }
+
+    function editConcesionario(id) { openModalConcesionario(id); }
+
+    async function saveConcesionario() {
+      var nombre=document.getElementById('con_nombre').value.trim();
+      if(!nombre){ showAlert('El nombre es obligatorio','error'); return; }
+      var payload={nombre:nombre,ubicacion:document.getElementById('con_ubicacion').value.trim(),telefono:document.getElementById('con_telefono').value.trim(),contacto:document.getElementById('con_contacto').value.trim(),nivel:document.getElementById('con_nivel').value,email:document.getElementById('con_email').value.trim(),direccion:document.getElementById('con_direccion').value.trim()};
+      try { var r; if(editingId){ r=await supabaseClient.from('autos_concesionarios').update(payload).eq('id',editingId); } else { r=await supabaseClient.from('autos_concesionarios').insert([payload]); } if(r.error) throw r.error; closeModal('modalConcesionario'); showAlert(editingId?'Concesionario actualizado':'Concesionario registrado','success'); await loadConcesionarios(); } catch(err){ showAlert('Error al guardar: '+err.message,'error'); }
+    }
+
+    async function deleteConcesionario(id) {
+      if(!(await showConfirm('Eliminar este concesionario?'))) return;
+      try { var r=await supabaseClient.from('autos_concesionarios').delete().eq('id',id); if(r.error) throw r.error; showAlert('Concesionario eliminado','success'); await loadConcesionarios(); } catch(err){ showAlert('Error: '+err.message,'error'); }
+    }
+
+    /* ===== INVENTARIO ===== */
+    async function loadInventario() {
+      try {
+        var q=supabaseClient.from('autos_inventario').select('*').order('nombre');
+        if(isConcesionarioUser()){ var cid=getConcesionarioId(); if(cid) q=q.eq('concesionario_id',cid); }
+        var {data,error}=await q; if(error) throw error;
+        vaInventario=data||[]; renderInventario(); fillVehiculoSelects(); fillModeloFilter();
+      } catch(err){ document.getElementById('inventarioBody').innerHTML='<tr><td colspan="9" style="text-align:center;padding:40px;color:#dc2626;">Error: '+vaEscape(err.message)+'</td></tr>'; }
+    }
+
+    function fillModeloFilter() {
+      var modelos={}; vaInventario.forEach(function(v){ if(v.modelo) modelos[v.modelo]=true; });
+      var sel=document.getElementById('inv_modelo_filter'); if(!sel) return;
+      var actual=sel.value; sel.innerHTML='<option value="">Todos</option>'+Object.keys(modelos).sort().map(function(m){ return '<option value="'+vaEscape(m)+'">'+vaEscape(m)+'</option>'; }).join('');
+      if(actual) sel.value=actual;
+    }
+
+    function renderInventario() {
+      var modelo=((document.getElementById('inv_modelo_filter')||{}).value||'').trim();
+      var estado=((document.getElementById('inv_estado')||{}).value||'').trim();
+      var buscar=((document.getElementById('inv_buscar')||{}).value||'').trim().toLowerCase();
+      var conMap={}; vaConcesionarios.forEach(function(c){ conMap[c.id]=c.nombre; });
+      var lista=vaInventario.filter(function(v){
+        if(modelo && v.modelo!==modelo) return false;
+        if(estado && v.estado!==estado) return false;
+        if(buscar){ var h=[v.nombre,v.modelo,v.vin,v.color,v.descripcion].join(' ').toLowerCase(); if(h.indexOf(buscar)===-1) return false; }
+        return true;
+      });
+      var total=vaInventario.length, disp=vaInventario.filter(function(v){return v.estado==='Disponible';}).length, vend=vaInventario.filter(function(v){return v.estado==='Vendido';}).length;
+      if(!lista.length){ document.getElementById('inventarioBody').innerHTML='<tr><td colspan="9" class="empty-hint">No hay vehiculos registrados</td></tr>'; return; }
+      document.getElementById('inventarioBody').innerHTML=lista.map(function(v){
+        return '<tr><td>'+vaEscape(v.nombre)+'</td><td>'+vaEscape(v.modelo)+'</td><td>'+vaEscape(v.anio||'')+'</td><td>'+vaEscape(v.color)+'</td><td style="font-family:monospace;font-size:12px;">'+vaEscape(v.vin)+'</td><td>'+vaEscape(conMap[v.concesionario_id]||'-')+'</td><td style="text-align:right;font-weight:600;">'+fmtUsd(v.precio)+'</td><td>'+estadoBadge(v.estado)+'</td><td><button class="btn btn-outline btn-sm" onclick="editInventario(&apos;'+v.id+'&apos;)" title="Editar"><i class="fi fi-sr-pencil" style="pointer-events:none;"></i></button> <button class="btn btn-outline btn-sm" onclick="deleteInventario(&apos;'+v.id+'&apos;)" title="Eliminar" style="color:#dc2626;border-color:#fecaca;"><i class="fi fi-sr-trash" style="pointer-events:none;"></i></button></td></tr>';
+      }).join('');
+    }
+
+    function openModalInventario(id) {
+      editingId=id||null;
+      document.getElementById('invModalTitle').textContent=id?'Editar vehiculo':'Agregar vehiculo';
+      if(id){ var v=vaInventario.find(function(x){return x.id===id;}); if(v){ document.getElementById('inv_nombre').value=v.nombre||''; document.getElementById('inv_modelo').value=v.modelo||''; document.getElementById('inv_anio').value=v.anio||''; document.getElementById('inv_color').value=v.color||''; document.getElementById('inv_vin').value=v.vin||''; document.getElementById('inv_precio').value=v.precio||''; document.getElementById('inv_concesionario_id').value=v.concesionario_id||''; document.getElementById('inv_estado_select').value=v.estado||'Disponible'; document.getElementById('inv_descripcion').value=v.descripcion||''; } }
+      else { document.getElementById('invForm').reset(); }
+      openModal('modalInventario');
+    }
+
+    function editInventario(id) { openModalInventario(id); }
+
+    async function saveInventario() {
+      var nombre=document.getElementById('inv_nombre').value.trim();
+      if(!nombre){ showAlert('El nombre es obligatorio','error'); return; }
+      var payload={nombre:nombre,modelo:document.getElementById('inv_modelo').value.trim(),anio:document.getElementById('inv_anio').value,color:document.getElementById('inv_color').value.trim(),vin:document.getElementById('inv_vin').value.trim(),precio:Number(document.getElementById('inv_precio').value)||0,concesionario_id:document.getElementById('inv_concesionario_id').value||null,estado:document.getElementById('inv_estado_select').value,descripcion:document.getElementById('inv_descripcion').value.trim()};
+      try { var r; if(editingId){ r=await supabaseClient.from('autos_inventario').update(payload).eq('id',editingId); } else { r=await supabaseClient.from('autos_inventario').insert([payload]); } if(r.error) throw r.error; closeModal('modalInventario'); showAlert(editingId?'Vehiculo actualizado':'Vehiculo registrado','success'); await loadInventario(); } catch(err){ showAlert('Error al guardar: '+err.message,'error'); }
+    }
+
+    async function deleteInventario(id) {
+      if(!(await showConfirm('Eliminar este vehiculo?'))) return;
+      try { var r=await supabaseClient.from('autos_inventario').delete().eq('id',id); if(r.error) throw r.error; showAlert('Vehiculo eliminado','success'); await loadInventario(); } catch(err){ showAlert('Error: '+err.message,'error'); }
+    }
+
+    /* ===== ENVIOS ===== */
+    async function loadEnvios() {
+      try {
+        var {data,error}=await supabaseClient.from('autos_envios').select('*').order('created_at',{ascending:false});
+        if(error) throw error;
+        vaEnvios=data||[]; renderEnvios();
+      } catch(err){ document.getElementById('enviosBody').innerHTML='<tr><td colspan="8" style="text-align:center;padding:40px;color:#dc2626;">Error: '+vaEscape(err.message)+'</td></tr>'; }
+    }
+
+    function renderEnvios() {
+      var estadoF=((document.getElementById('env_estado_filter')||{}).value||'').trim();
+      var buscar=((document.getElementById('env_buscar')||{}).value||'').trim().toLowerCase();
+      var vehMap={}, conMap={}; vaInventario.forEach(function(v){ vehMap[v.id]=v.nombre; }); vaConcesionarios.forEach(function(c){ conMap[c.id]=c.nombre; });
+      var lista=vaEnvios.filter(function(e){
+        if(estadoF && e.estado!==estadoF) return false;
+        if(buscar){ var h=[vehMap[e.vehiculo_id],conMap[e.concesionario_id],e.origen,e.destino].join(' ').toLowerCase(); if(h.indexOf(buscar)===-1) return false; }
+        return true;
+      });
+      var pend=vaEnvios.filter(function(e){return e.estado==='Pendiente';}).length, transit=vaEnvios.filter(function(e){return e.estado==='En transito';}).length;
+      if(!lista.length){ document.getElementById('enviosBody').innerHTML='<tr><td colspan="8" class="empty-hint">No hay envios registrados</td></tr>'; return; }
+      document.getElementById('enviosBody').innerHTML=lista.map(function(e){
+        return '<tr><td>'+vaEscape(e.fecha||'')+'</td><td>'+vaEscape(vehMap[e.vehiculo_id]||'-')+'</td><td>'+vaEscape(conMap[e.concesionario_id]||'-')+'</td><td>'+vaEscape(e.origen)+'</td><td>'+vaEscape(e.destino)+'</td><td>'+vaEscape(e.fecha_estimada||'-')+'</td><td>'+estadoBadge(e.estado)+'</td><td><button class="btn btn-outline btn-sm" onclick="editEnvio(&apos;'+e.id+'&apos;)" title="Editar"><i class="fi fi-sr-pencil" style="pointer-events:none;"></i></button> <button class="btn btn-outline btn-sm" onclick="deleteEnvio(&apos;'+e.id+'&apos;)" title="Eliminar" style="color:#dc2626;border-color:#fecaca;"><i class="fi fi-sr-trash" style="pointer-events:none;"></i></button></td></tr>';
+      }).join('');
+    }
+
+    function openModalEnvio(id) {
+      editingId=id||null;
+      document.getElementById('envModalTitle').textContent=id?'Editar envio':'Registrar envio';
+      if(id){ var e=vaEnvios.find(function(x){return x.id===id;}); if(e){ document.getElementById('env_vehiculo_id').value=e.vehiculo_id||''; document.getElementById('env_concesionario_id').value=e.concesionario_id||''; document.getElementById('env_origen').value=e.origen||''; document.getElementById('env_destino').value=e.destino||''; document.getElementById('env_fecha').value=e.fecha||''; document.getElementById('env_fecha_estimada').value=e.fecha_estimada||''; document.getElementById('env_estado_select').value=e.estado||'Pendiente'; document.getElementById('env_observaciones').value=e.observaciones||''; } }
+      else { document.getElementById('envForm').reset(); document.getElementById('env_fecha').value=todayISO(); }
+      openModal('modalEnvio');
+    }
+
+    function editEnvio(id) { openModalEnvio(id); }
+
+    async function saveEnvio() {
+      var vehiculo_id=document.getElementById('env_vehiculo_id').value;
+      if(!vehiculo_id){ showAlert('Seleccione un vehiculo','error'); return; }
+      var payload={vehiculo_id:vehiculo_id||null,concesionario_id:document.getElementById('env_concesionario_id').value||null,origen:document.getElementById('env_origen').value.trim(),destino:document.getElementById('env_destino').value.trim(),fecha:document.getElementById('env_fecha').value,fecha_estimada:document.getElementById('env_fecha_estimada').value||null,estado:document.getElementById('env_estado_select').value,observaciones:document.getElementById('env_observaciones').value.trim()};
+      try { var r; if(editingId){ r=await supabaseClient.from('autos_envios').update(payload).eq('id',editingId); } else { r=await supabaseClient.from('autos_envios').insert([payload]); } if(r.error) throw r.error; closeModal('modalEnvio'); showAlert(editingId?'Envio actualizado':'Envio registrado','success'); await loadEnvios(); } catch(err){ showAlert('Error al guardar: '+err.message,'error'); }
+    }
+
+    async function deleteEnvio(id) {
+      if(!(await showConfirm('Eliminar este envio?'))) return;
+      try { var r=await supabaseClient.from('autos_envios').delete().eq('id',id); if(r.error) throw r.error; showAlert('Envio eliminado','success'); await loadEnvios(); } catch(err){ showAlert('Error: '+err.message,'error'); }
+    }
+
+    /* ===== VENTAS ===== */
+    async function loadVentas() {
+      try {
+        var q=supabaseClient.from('autos_ventas').select('*').order('created_at',{ascending:false});
+        if(isConcesionarioUser()){ var cid=getConcesionarioId(); if(cid) q=q.eq('concesionario_id',cid); }
+        var {data,error}=await q; if(error) throw error;
+        vaVentas=data||[]; renderVentas();
+      } catch(err){ document.getElementById('ventasBody').innerHTML='<tr><td colspan="9" style="text-align:center;padding:40px;color:#dc2626;">Error: '+vaEscape(err.message)+'</td></tr>'; }
+    }
+
+    function renderVentas() {
+      var estadoF=((document.getElementById('ven_estado_filter')||{}).value||'').trim();
+      var buscar=((document.getElementById('ven_buscar')||{}).value||'').trim().toLowerCase();
+      var vehMap={}, conMap={}; vaInventario.forEach(function(v){ vehMap[v.id]=v.nombre; }); vaConcesionarios.forEach(function(c){ conMap[c.id]=c.nombre; });
+      var lista=vaVentas.filter(function(v){
+        if(estadoF && v.estado!==estadoF) return false;
+        if(buscar){ var h=[v.cliente,vehMap[v.vehiculo_id],conMap[v.concesionario_id]].join(' ').toLowerCase(); if(h.indexOf(buscar)===-1) return false; }
+        return true;
+      });
+      var comp=vaVentas.filter(function(v){return v.estado==='Completada';}).length, totalUsd=vaVentas.filter(function(v){return v.estado==='Completada';}).reduce(function(s,v){return s+(Number(v.precio_venta)||0);},0);
+      if(!lista.length){ document.getElementById('ventasBody').innerHTML='<tr><td colspan="9" class="empty-hint">No hay ventas registradas</td></tr>'; return; }
+      document.getElementById('ventasBody').innerHTML=lista.map(function(v){
+        return '<tr><td>'+vaEscape(v.fecha||'')+'</td><td>'+vaEscape(v.cliente)+'</td><td>'+vaEscape(vehMap[v.vehiculo_id]||'-')+'</td><td>'+vaEscape(conMap[v.concesionario_id]||'-')+'</td><td style="text-align:right;font-weight:600;">'+fmtUsd(v.precio_venta)+'</td><td>'+vaEscape(v.moneda||'USD')+'</td><td>'+vaEscape(v.metodo_pago||'-')+'</td><td>'+estadoBadge(v.estado)+'</td><td><button class="btn btn-outline btn-sm" onclick="editVenta(&apos;'+v.id+'&apos;)" title="Editar"><i class="fi fi-sr-pencil" style="pointer-events:none;"></i></button> <button class="btn btn-outline btn-sm" onclick="deleteVenta(&apos;'+v.id+'&apos;)" title="Eliminar" style="color:#dc2626;border-color:#fecaca;"><i class="fi fi-sr-trash" style="pointer-events:none;"></i></button></td></tr>';
+      }).join('');
+    }
+
+    function openModalVenta(id) {
+      editingId=id||null;
+      document.getElementById('venModalTitle').textContent=id?'Editar venta':'Registrar venta';
+      if(id){ var v=vaVentas.find(function(x){return x.id===id;}); if(v){ document.getElementById('ven_cliente').value=v.cliente||''; document.getElementById('ven_vehiculo_id').value=v.vehiculo_id||''; document.getElementById('ven_concesionario_id').value=v.concesionario_id||''; document.getElementById('ven_precio').value=v.precio_venta||''; document.getElementById('ven_moneda').value=v.moneda||'USD'; document.getElementById('ven_tasa').value=v.tasa_cambio||''; document.getElementById('ven_metodo_pago').value=v.metodo_pago||''; document.getElementById('ven_fecha').value=v.fecha||''; document.getElementById('ven_estado_select').value=v.estado||'Completada'; document.getElementById('ven_observaciones').value=v.observaciones||''; } }
+      else { document.getElementById('venForm').reset(); document.getElementById('ven_fecha').value=todayISO(); }
+      openModal('modalVenta');
+    }
+
+    function editVenta(id) { openModalVenta(id); }
+
+    async function saveVenta() {
+      var cliente=document.getElementById('ven_cliente').value.trim();
+      if(!cliente){ showAlert('El cliente es obligatorio','error'); return; }
+      var vehiculo_id=document.getElementById('ven_vehiculo_id').value;
+      var payload={cliente:cliente,vehiculo_id:vehiculo_id||null,concesionario_id:document.getElementById('ven_concesionario_id').value||null,precio_venta:Number(document.getElementById('ven_precio').value)||0,moneda:document.getElementById('ven_moneda').value,tasa_cambio:Number(document.getElementById('ven_tasa').value)||0,metodo_pago:document.getElementById('ven_metodo_pago').value,fecha:document.getElementById('ven_fecha').value,estado:document.getElementById('ven_estado_select').value,observaciones:document.getElementById('ven_observaciones').value.trim()};
+      try { var r; if(editingId){ r=await supabaseClient.from('autos_ventas').update(payload).eq('id',editingId); } else { r=await supabaseClient.from('autos_ventas').insert([payload]); } if(r.error) throw r.error; closeModal('modalVenta'); showAlert(editingId?'Venta actualizada':'Venta registrada','success'); await loadVentas(); await loadInventario(); } catch(err){ showAlert('Error al guardar: '+err.message,'error'); }
+    }
+
+    async function deleteVenta(id) {
+      if(!(await showConfirm('Eliminar esta venta?'))) return;
+      try { var r=await supabaseClient.from('autos_ventas').delete().eq('id',id); if(r.error) throw r.error; showAlert('Venta eliminada','success'); await loadVentas(); } catch(err){ showAlert('Error: '+err.message,'error'); }
+    }
+
+    /* ===== REPUESTOS ===== */
+    async function loadRepuestos() {
+      try {
+        var {data,error}=await supabaseClient.from('repuestos_inventario').select('*').order('codigo');
+        if(error) throw error;
+        vaRepuestos=data||[]; renderRepuestos(); fillRepSelects();
+      } catch(err){ document.getElementById('repuestosBody').innerHTML='<tr><td colspan="8" style="text-align:center;padding:40px;color:#dc2626;">Error: '+vaEscape(err.message)+'</td></tr>'; }
+    }
+
+    function fillRepSelects() {
+      var opts='<option value="">---</option>'+vaRepuestos.map(function(r){ return '<option value="'+r.id+'">'+vaEscape(r.codigo)+' - '+vaEscape(r.descripcion)+'</option>'; }).join('');
+      var el=document.getElementById('mov_repuesto_id'); if(el) el.innerHTML=opts;
+      var cats={}; vaRepuestos.forEach(function(r){ if(r.categoria) cats[r.categoria]=true; });
+      var sel=document.getElementById('rep_cat_filter'); if(sel){ var actual=sel.value; sel.innerHTML='<option value="">Todas</option>'+Object.keys(cats).sort().map(function(c){ return '<option value="'+vaEscape(c)+'">'+vaEscape(c)+'</option>'; }).join(''); if(actual) sel.value=actual; }
+    }
+
+    function renderRepuestos() {
+      var catF=((document.getElementById('rep_cat_filter')||{}).value||'').trim();
+      var estadoF=((document.getElementById('rep_estado_filter')||{}).value||'').trim();
+      var buscar=((document.getElementById('rep_buscar')||{}).value||'').trim().toLowerCase();
+      var lista=vaRepuestos.filter(function(r){
+        if(catF && r.categoria!==catF) return false;
+        if(estadoF && r.estado!==estadoF) return false;
+        if(buscar){ var h=[r.codigo,r.descripcion,r.categoria].join(' ').toLowerCase(); if(h.indexOf(buscar)===-1) return false; }
+        return true;
+      });
+      var stock=vaRepuestos.reduce(function(s,r){return s+(Number(r.stock)||0);},0), bajo=vaRepuestos.filter(function(r){return r.estado==='Bajo stock';}).length, agot=vaRepuestos.filter(function(r){return r.estado==='Agotado';}).length;
+      if(!lista.length){ document.getElementById('repuestosBody').innerHTML='<tr><td colspan="8" class="empty-hint">No hay repuestos registrados</td></tr>'; return; }
+      document.getElementById('repuestosBody').innerHTML=lista.map(function(r){
+        return '<tr><td style="font-family:monospace;font-size:12px;">'+vaEscape(r.codigo)+'</td><td>'+vaEscape(r.descripcion)+'</td><td>'+vaEscape(r.categoria)+'</td><td style="text-align:right;font-weight:600;">'+(Number(r.stock)||0)+'</td><td style="text-align:right;">'+(Number(r.stock_minimo)||0)+'</td><td style="text-align:right;font-weight:600;">'+fmtUsd(r.precio_usd)+'</td><td>'+estadoBadge(r.estado)+'</td><td><button class="btn btn-outline btn-sm" onclick="editRepuesto(&apos;'+r.id+'&apos;)" title="Editar"><i class="fi fi-sr-pencil" style="pointer-events:none;"></i></button> <button class="btn btn-outline btn-sm" onclick="deleteRepuesto(&apos;'+r.id+'&apos;)" title="Eliminar" style="color:#dc2626;border-color:#fecaca;"><i class="fi fi-sr-trash" style="pointer-events:none;"></i></button></td></tr>';
+      }).join('');
+    }
+
+    function openModalRepuesto(id) {
+      editingId=id||null;
+      document.getElementById('repModalTitle').textContent=id?'Editar repuesto':'Agregar repuesto';
+      if(id){ var r=vaRepuestos.find(function(x){return x.id===id;}); if(r){ document.getElementById('rep_codigo').value=r.codigo||''; document.getElementById('rep_descripcion').value=r.descripcion||''; document.getElementById('rep_categoria_select').value=r.categoria||'Motor'; document.getElementById('rep_estado_select').value=r.estado||'Disponible'; document.getElementById('rep_stock').value=r.stock||0; document.getElementById('rep_stock_min').value=r.stock_minimo||0; document.getElementById('rep_precio_usd').value=r.precio_usd||0; document.getElementById('rep_precio_bs').value=r.precio_bs||0; } }
+      else { document.getElementById('repForm').reset(); }
+      openModal('modalRepuesto');
+    }
+
+    function editRepuesto(id) { openModalRepuesto(id); }
+
+    async function saveRepuesto() {
+      var codigo=document.getElementById('rep_codigo').value.trim();
+      if(!codigo){ showAlert('El codigo es obligatorio','error'); return; }
+      var payload={codigo:codigo,descripcion:document.getElementById('rep_descripcion').value.trim(),categoria:document.getElementById('rep_categoria_select').value,estado:document.getElementById('rep_estado_select').value,stock:Number(document.getElementById('rep_stock').value)||0,stock_minimo:Number(document.getElementById('rep_stock_min').value)||0,precio_usd:Number(document.getElementById('rep_precio_usd').value)||0,precio_bs:Number(document.getElementById('rep_precio_bs').value)||0};
+      try { var r; if(editingId){ r=await supabaseClient.from('repuestos_inventario').update(payload).eq('id',editingId); } else { r=await supabaseClient.from('repuestos_inventario').insert([payload]); } if(r.error) throw r.error; closeModal('modalRepuesto'); showAlert(editingId?'Repuesto actualizado':'Repuesto registrado','success'); await loadRepuestos(); } catch(err){ showAlert('Error al guardar: '+err.message,'error'); }
+    }
+
+    async function deleteRepuesto(id) {
+      if(!(await showConfirm('Eliminar este repuesto?'))) return;
+      try { var r=await supabaseClient.from('repuestos_inventario').delete().eq('id',id); if(r.error) throw r.error; showAlert('Repuesto eliminado','success'); await loadRepuestos(); } catch(err){ showAlert('Error: '+err.message,'error'); }
+    }
+
+    /* ===== MOVIMIENTOS REPUESTOS ===== */
+    async function loadRepMovimientos() {
+      try {
+        var {data,error}=await supabaseClient.from('repuestos_movimientos').select('*').order('created_at',{ascending:false}).limit(50);
+        if(error) throw error;
+        vaRepMovimientos=data||[]; renderRepMovimientos();
+      } catch(err){}
+    }
+
+    function renderRepMovimientos() {
+      var repMap={}; vaRepuestos.forEach(function(r){ repMap[r.id]=r.codigo+' - '+r.descripcion; });
+      if(!vaRepMovimientos.length){ document.getElementById('repMovimientosBody').innerHTML='<tr><td colspan="6" class="empty-hint">Sin movimientos recientes</td></tr>'; return; }
+      document.getElementById('repMovimientosBody').innerHTML=vaRepMovimientos.map(function(m){
+        return '<tr><td>'+vaEscape(m.fecha||m.created_at||'')+'</td><td>'+vaEscape(repMap[m.repuesto_id]||'-')+'</td><td><span class="badge '+(m.tipo==='Entrada'?'badge-success':'badge-danger')+'">'+vaEscape(m.tipo)+'</span></td><td style="text-align:right;font-weight:600;">'+(Number(m.cantidad)||0)+'</td><td>'+vaEscape(m.motivo||'')+'</td><td>'+vaEscape(m.responsable||'')+'</td></tr>';
+      }).join('');
+    }
+
+    function openModalRepMovimiento() {
+      document.getElementById('repMovForm').reset();
+      openModal('modalRepMovimiento');
+    }
+
+    async function saveRepMovimiento() {
+      var repuesto_id=document.getElementById('mov_repuesto_id').value;
+      if(!repuesto_id){ showAlert('Seleccione un repuesto','error'); return; }
+      var cantidad=Number(document.getElementById('mov_cantidad').value)||0;
+      var payload={repuesto_id:repuesto_id,tipo:document.getElementById('mov_tipo').value,cantidad:cantidad,motivo:document.getElementById('mov_motivo').value.trim(),responsable:document.getElementById('mov_responsable').value.trim(),fecha:todayISO()};
+      try {
+        var r=await supabaseClient.from('repuestos_movimientos').insert([payload]); if(r.error) throw r.error;
+        var rep=vaRepuestos.find(function(x){return x.id===repuesto_id;});
+        if(rep){
+          var nuevoStock=rep.stock||0;
+          if(payload.tipo==='Entrada') nuevoStock+=cantidad; else nuevoStock=Math.max(0,nuevoStock-cantidad);
+          var estadoRep='Disponible';
+          if(nuevoStock<=0) estadoRep='Agotado'; else if(nuevoStock<=(rep.stock_minimo||0)) estadoRep='Bajo stock';
+          await supabaseClient.from('repuestos_inventario').update({stock:nuevoStock,estado:estadoRep}).eq('id',rep.id);
+        }
+        closeModal('modalRepMovimiento'); showAlert('Movimiento registrado','success'); await loadRepuestos(); await loadRepMovimientos();
+      } catch(err){ showAlert('Error al guardar: '+err.message,'error'); }
+    }
+
+    /* ===== DASHBOARD RESUMEN ===== */
+    function renderDashboard() {
+      var totalVeh=vaInventario.length, totalVen=vaVentas.length, totalRep=vaRepuestos.length, totalEnv=vaEnvios.length;
+      var ingresos=vaVentas.filter(function(v){return v.estado==='Completada';}).reduce(function(s,v){return s+(Number(v.precio_venta)||0);},0);
+      document.getElementById('dashCards').innerHTML='<div class="va-card"><i class="fi fi-sr-car"></i><div class="va-card-body"><span>Vehiculos</span><strong>'+totalVeh+'</strong></div></div><div class="va-card"><i class="fi fi-sr-file-invoice-dollar"></i><div class="va-card-body"><span>Ventas</span><strong>'+totalVen+'</strong></div></div><div class="va-card"><i class="fi fi-sr-dollar"></i><div class="va-card-body"><span>Ingresos USD</span><strong class="v-ok">'+fmtUsd(ingresos)+'</strong></div></div><div class="va-card"><i class="fi fi-sr-store-alt"></i><div class="va-card-body"><span>Concesionarios</span><strong>'+vaConcesionarios.length+'</strong></div></div><div class="va-card"><i class="fi fi-sr-truck-loading"></i><div class="va-card-body"><span>Envios</span><strong>'+totalEnv+'</strong></div></div><div class="va-card"><i class="fi fi-sr-gears"></i><div class="va-card-body"><span>Repuestos</span><strong>'+totalRep+'</strong></div></div>';
+      var estMap={}; vaInventario.forEach(function(v){ estMap[v.estado]=(estMap[v.estado]||0)+1; });
+      var colors={'Disponible':'#16a34a','Vendido':'#2563eb','En transito':'#d97706','Entregado':'#7c3aed'};
+      var html='<div style="display:flex;flex-direction:column;gap:6px;">';
+      Object.keys(estMap).forEach(function(k){ var pct=totalVeh?Math.round(estMap[k]/totalVeh*100):0; html+='<div style="display:flex;align-items:center;gap:8px;font-size:13px;"><span style="width:8px;height:8px;border-radius:50%;background:'+(colors[k]||'#94a3b8')+';flex-shrink:0;"></span><span style="flex:1;">'+vaEscape(k)+'</span><span style="font-weight:600;">'+estMap[k]+'</span><span style="color:var(--color-text-secondary);width:36px;text-align:right;">'+pct+'%</span></div>'; });
+      document.getElementById('dashVehiculosEstado').innerHTML=html+'</div>'||'<div class="empty-hint">Sin datos</div>';
+      var venMap={}; vaVentas.forEach(function(v){ var k=v.concesionario_id||'Sin asignar'; venMap[k]=(venMap[k]||0)+1; });
+      var conMap2={}; vaConcesionarios.forEach(function(c){ conMap2[c.id]=c.nombre; });
+      var html2='<div style="display:flex;flex-direction:column;gap:6px;">';
+      Object.keys(venMap).forEach(function(k){ html2+='<div style="display:flex;align-items:center;gap:8px;font-size:13px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--module-venta-autos);flex-shrink:0;"></span><span style="flex:1;">'+vaEscape(conMap2[k]||k)+'</span><span style="font-weight:600;">'+venMap[k]+'</span></div>'; });
+      document.getElementById('dashVentasConcesionario').innerHTML=html2+'</div>'||'<div class="empty-hint">Sin datos</div>';
+      var ultimas=vaVentas.slice().sort(function(a,b){return (b.fecha||b.created_at||'').localeCompare(a.fecha||a.created_at||'');}).slice(0,5);
+      var vehMap={}; vaInventario.forEach(function(v){ vehMap[v.id]=v.nombre; });
+      if(!ultimas.length){ document.getElementById('dashUltimasVentas').innerHTML='<tr><td colspan="6" class="empty-hint">Sin ventas</td></tr>'; return; }
+      document.getElementById('dashUltimasVentas').innerHTML=ultimas.map(function(v){
+        return '<tr><td>'+vaEscape(v.fecha||'')+'</td><td>'+vaEscape(v.cliente)+'</td><td>'+vaEscape(vehMap[v.vehiculo_id]||'-')+'</td><td>'+vaEscape(conMap2[v.concesionario_id]||'-')+'</td><td style="text-align:right;font-weight:600;">'+fmtUsd(v.precio_venta)+'</td><td>'+estadoBadge(v.estado)+'</td></tr>';
+      }).join('');
+    }
+
+    /* ===== INIT ===== */
+    document.addEventListener('DOMContentLoaded', function() {
+      (async function() {
+        await Promise.all([loadConcesionarios(),loadInventario()]);
+        await Promise.all([loadEnvios(),loadVentas(),loadRepuestos(),loadRepMovimientos()]);
+        renderDashboard();
+        var savedTool=localStorage.getItem('fiat_tool_'+location.pathname);
+        if(savedTool && document.getElementById('tool-'+savedTool)) switchTool(savedTool);
+      })();
+    });
+  </script>
+
+  <script src="../js/module-help.js"></script>
+  <script src="../js/access.js"></script>
+  <script src="../js/indicadores.js"></script>
+</body>
+</html>

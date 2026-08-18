@@ -12,6 +12,7 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "docx": "^9.7.1",
     "http-server": "^14.1.1",
     "sharp": "^0.35.3"
   },

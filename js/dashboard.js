@@ -32,7 +32,8 @@
     'desarrollo-organizacional.html': { icon: 'fi-sr-chart-line-up', accent: '#d97706' },
     'gestion-usuarios.html': { icon: 'fi-sr-users-gear', accent: '#0ea5e9' },
     'gourmet.html': { icon: 'fi-sr-restaurant', accent: '#a16207' },
-    'ti.html': { icon: 'fi-sr-laptop', accent: '#0e7490' }
+    'ti.html': { icon: 'fi-sr-laptop', accent: '#0e7490' },
+    'venta-autos.html': { icon: 'fi-sr-car', accent: '#0369a1' }
   };
 
   var idx = 0;

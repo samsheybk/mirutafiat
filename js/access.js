@@ -110,6 +110,14 @@
       { key: 'inventario', name: 'Inventario TI' },
       { key: 'helpdesk', name: 'Helpdesk' },
       { key: 'proyectos', name: 'Gestión de proyectos TI' }
+    ]},
+    { key: 'venta-autos.html', name: 'Venta de Autos', unidad: 'soporte', tools: [
+      { key: 'inventario', name: 'Inventario de vehículos' },
+      { key: 'concesionarios', name: 'Concesionarios' },
+      { key: 'envios', name: 'Envíos y logística' },
+      { key: 'ventas', name: 'Ventas' },
+      { key: 'repuestos', name: 'Control de repuestos' },
+      { key: 'dashboard-resumen', name: 'Resumen general' }
     ]}
   ];
 
@@ -223,7 +231,8 @@
     'desarrollo-organizacional.html': ['fi-sr-chart-line-up', '#d97706'],
     'gestion-usuarios.html': ['fi-sr-user-gear', '#0ea5e9'],
     'gourmet.html': ['fi-sr-utensils', '#a16207'],
-    'ti.html': ['fi-sr-laptop', '#0e7490']
+    'ti.html': ['fi-sr-laptop', '#0e7490'],
+    'venta-autos.html': ['fi-sr-car', '#0369a1']
   };
 
   function applyNav() {

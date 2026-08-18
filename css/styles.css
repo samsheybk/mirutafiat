@@ -37,6 +37,7 @@
   --module-usuarios: #0ea5e9;
   --module-gourmet: #a16207;
   --module-ti: #0e7490;
+  --module-venta-autos: #0369a1;
 }
 
 html, body {
@@ -1507,6 +1508,7 @@ a {
 .btn-usuarios { background: var(--module-usuarios); }
 .btn-gourmet { background: var(--module-gourmet); }
 .btn-ti { background: var(--module-ti); }
+.btn-venta-autos { background: var(--module-venta-autos); }
 
 .border-captacion { border-color: var(--module-captacion); }
 .border-relaciones { border-color: var(--module-relaciones); }
@@ -1521,6 +1523,7 @@ a {
 .border-finanzas { border-color: var(--module-finanzas); }
 .border-oportunidades { border-color: var(--module-oportunidades); }
 .border-usuarios { border-color: var(--module-usuarios); }
+.border-venta-autos { border-color: var(--module-venta-autos); }
 
 .text-captacion { color: var(--module-captacion); }
 .text-relaciones { color: var(--module-relaciones); }
@@ -1535,6 +1538,7 @@ a {
 .text-finanzas { color: var(--module-finanzas); }
 .text-oportunidades { color: var(--module-oportunidades); }
 .text-usuarios { color: var(--module-usuarios); }
+.text-venta-autos { color: var(--module-venta-autos); }
 
 .bg-captacion { background: var(--module-captacion); }
 .bg-relaciones { background: var(--module-relaciones); }
@@ -1552,6 +1556,7 @@ a {
 .bg-usuarios { background: var(--module-usuarios); }
 .bg-gourmet { background: var(--module-gourmet); }
 .bg-ti { background: var(--module-ti); }
+.bg-venta-autos { background: var(--module-venta-autos); }
 
 /* ===== EMPTY STATE ===== */
 .empty-state {

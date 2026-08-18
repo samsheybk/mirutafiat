@@ -110,26 +110,7 @@
   }
 
   var CONFIG = {
-    'captacion.html': {
-      bg: 'bg-captacion',
-      subtitle: 'Indicadores del proceso de reclutamiento, selección e incorporación de personal.',
-      cards: [],
-      sections: [
-        {
-          title: 'Tiempo promedio de abandono por cargo',
-          icon: 'fi-sr-time-past',
-          desc: 'Días promedio que permanecen los trabajadores en la empresa antes de egresar, por cargo. Ordenados del más corto al más largo para anticipar futuras búsquedas de candidatos.',
-          calc: 'abandono_por_cargo'
-        },
-        {
-          title: 'Headcount por unidad',
-          icon: 'fi-sr-chart-pie',
-          chart: 'donut',
-          calc: 'bienestar_headcount',
-          desc: 'Distribución de la plantilla activa por unidad organizacional.'
-        }
-      ]
-    },
+    'captacion.html': null,
     'relaciones-laborales.html': {
       bg: 'bg-relaciones',
       subtitle: 'Indicadores de la vida laboral de los trabajadores y las relaciones con la empresa.',
@@ -273,6 +254,11 @@
         { title: 'Accesos configurados', icon: 'fi-sr-users-gear', table: 'usuario_accesos', count: true, hint: 'Permisos registrados' },
         { title: 'Accesos activos', icon: 'fi-sr-shield-check', table: 'usuario_accesos', count: true, filter: { activo: true }, hint: 'Usuarios habilitados' }
       ]
+    },
+    'venta-autos.html': {
+      bg: 'bg-venta-autos',
+      subtitle: 'Indicadores de ventas de vehículos, concesionarios, envíos y repuestos.',
+      cards: []
     }
   };
 

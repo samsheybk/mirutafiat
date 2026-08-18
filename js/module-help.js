@@ -190,6 +190,19 @@
         { icon: 'fi-sr-headset', name: 'Helpdesk', desc: 'Mesa de ayuda con tickets por categoría y prioridad, estado (abierto, en proceso, resuelto, cerrado), solicitante y técnico asignado.' },
         { icon: 'fi-sr-chart-gantt', name: 'Gestión de proyectos TI', desc: 'Proyectos con fase, avance, responsable y fechas, con tareas por proyecto y control de su estado.' }
       ]
+    },
+    'venta-autos.html': {
+      title: 'Venta de Autos',
+      subtitle: 'Gestión integral de vehículos, concesionarios, envíos, ventas y control de repuestos para la red de distribución FIAT.',
+      accent: '#0369a1',
+      tools: [
+        { icon: 'fi-sr-car', name: 'Inventario de vehículos', desc: 'Registro de unidades FIAT por modelo, año, color, VIN, precio y estado (disponible, vendido, en tránsito, entregado). Búsqueda y filtros por concesionario.' },
+        { icon: 'fi-sr-store-alt', name: 'Concesionarios', desc: 'Directorio de concesionarios con datos de contacto, ubicación, nivel de representación y unidades asignadas. Registro de usuarios concesionario con acceso al sistema.' },
+        { icon: 'fi-sr-truck-loading', name: 'Envíos y logística', desc: 'Control de envíos de vehículos desde planta/concesionario destino, con seguimiento de estado, fechas estimadas y confirmación de recepción.' },
+        { icon: 'fi-sr-file-invoice-dollar', name: 'Ventas', desc: 'Registro de ventas con datos del cliente, vehículos vendido, precio de venta en USD, método de pago,跟踪 del estado de la transacción y generación de factura.' },
+        { icon: 'fi-sr-gears', name: 'Control de repuestos', desc: 'Inventario de repuestos por código, descripción, categoría y stock, con registro de entradas, salidas y movimientos, alertas de bajo stock y cotización de precios en USD/BS.' },
+        { icon: 'fi-sr-chart-pie', name: 'Resumen general', desc: 'Dashboard con indicadores clave: unidades vendidas, ingresos, stock de vehículos y repuestos, envíos pendientes y rendimiento por concesionario.' }
+      ]
     }
   };
 
